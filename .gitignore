@@ -1,2 +1,4 @@
 /.idea/
 /django_server/db.sqlite3
+/city_logistics_ui/static/build/
+/city_logistics_ui/node_modules/

@@ -1,0 +1,16 @@
+{
+  "name": "city_logistics_ui",
+  "version": "1.0.0",
+  "description": "UI for the FVH City Logistics POC application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"TBD\"",
+    "watch": "./node_modules/.bin/sass styles/index.scss static/build/styles/index.css --watch",
+    "build": "./node_modules/.bin/sass styles/index.scss static/build/styles/index.css"
+  },
+  "author": "Johan Lindqvist / Forum Virium Helsinki",
+  "dependencies": {
+    "bootstrap": "^4.4.1",
+    "sass": "^1.23.7"
+  }
+}
