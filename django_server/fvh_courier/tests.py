@@ -287,6 +287,14 @@ class RestAPITests(APITestCase):
         package.refresh_from_db()
         self.assertLessEqual(now, package.delivered_time)
 
+    def test_view_openapi_schema(self):
+        # When requesting to view the API schema
+        url = reverse('openapi-schema')
+        response = self.client.get(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     def create_and_login_courier(self):
         user = User.objects.create(username='courier')
         user.groups.add(Group.objects.get(name=rest.COURIER_GROUP))

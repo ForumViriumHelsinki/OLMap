@@ -8,6 +8,9 @@ verify_ssl = true
 [packages]
 django = ">=3.0"
 djangorestframework = ">=3.10"
+pyaml = ">=19.4"
+uritemplate = ">=3.0"
+coreapi=">=2.3"
 
 [requires]
 python_version = "3.7"
