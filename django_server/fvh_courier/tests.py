@@ -29,8 +29,8 @@ class RestAPITests(APITestCase):
         url = reverse('outgoing_package-list')
         response = self.client.get(url)
 
-        # Then an Forbidden response is received:
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # Then an Unauthorized response is received:
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_empty_list_of_outgoing_packages(self):
         # Given that there are no packages registered for delivery
@@ -110,8 +110,8 @@ class RestAPITests(APITestCase):
         url = reverse('available_package-list')
         response = self.client.get(url)
 
-        # Then an Forbidden response is received:
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # Then an Unauthorized response is received:
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_list_available_packages_not_courier(self):
         # Given that a non-courier user is signed in
@@ -295,8 +295,29 @@ class RestAPITests(APITestCase):
         # Then an OK response is received:
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_get_current_user_when_not_signed_in(self):
+        # Given that no user is signed in
+        # When requesting the current user over ReST
+        url = reverse('current_user')
+        response = self.client.get(url)
+
+        # Then a 404 response is received:
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_current_user_when_signed_in(self):
+        # Given that a courier user is signed in
+        courier = self.create_and_login_courier()
+
+        # When requesting the current user over ReST
+        url = reverse('current_user')
+        response = self.client.get(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert_dict_contains(response.data, {'first_name': 'Coranne', 'last_name': 'Courier', 'is_courier': True})
+
     def create_and_login_courier(self):
-        user = User.objects.create(username='courier')
+        user = User.objects.create(username='courier', first_name='Coranne', last_name='Courier')
         user.groups.add(Group.objects.get(name=rest.COURIER_GROUP))
         self.client.force_login(user)
         return user

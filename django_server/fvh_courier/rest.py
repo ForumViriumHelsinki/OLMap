@@ -1,6 +1,8 @@
+from django.conf.urls import url
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.utils import timezone
-from rest_framework import serializers, viewsets, permissions, routers, mixins
+from rest_framework import serializers, viewsets, permissions, routers, mixins, views, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -17,10 +19,14 @@ class AddressSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     phone_numbers = serializers.SlugRelatedField(many=True, read_only=True, slug_field='number')
+    is_courier = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'phone_numbers']
+        fields = ['first_name', 'last_name', 'phone_numbers', 'is_courier']
+
+    def get_is_courier(self, user):
+        return user.groups.filter(name=COURIER_GROUP).exists()
 
 
 class PackageSerializer(serializers.ModelSerializer):
@@ -116,7 +122,43 @@ class OutgoingPackagesViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelVie
         serializer.save(sender=self.request.user)
 
 
+class CurrentUserView(views.APIView):
+    """
+    Serialize & return the logged in user.
+    """
+    def get(self, request, format=None):
+        if request.user.is_anonymous:
+            response = Response("No user.", status=status.HTTP_404_NOT_FOUND)
+        else:
+            response = Response(UserSerializer(request.user).data)
+        response['Access-Control-Allow-Origin'] = '*'
+        return response
+
+
+class LoginView(views.APIView):
+    def post(self, request, format=None):
+        data = request.data
+
+        username = data.get('username', None)
+        password = data.get('password', None)
+
+        user = authenticate(username=username, password=password)
+
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return Response(UserSerializer(request.user).data)
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
 router = routers.DefaultRouter()
 router.register('available_packages', AvailablePackagesViewSet, 'available_package')
 router.register('my_packages', MyPackagesViewSet, 'my_package')
 router.register('outgoing_packages', OutgoingPackagesViewSet, 'outgoing_package')
+
+urlpatterns = [
+    url('^user/$', CurrentUserView.as_view(), name='current_user'),
+    url('^login/$', LoginView.as_view(), name='login_user')
+] + router.urls
