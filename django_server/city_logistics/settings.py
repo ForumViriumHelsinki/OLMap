@@ -120,7 +120,8 @@ USE_L10N = True
 
 USE_TZ = True
 
-CORS_ORIGIN_WHITELIST = ['http://10.255.255.175:3000', 'http://localhost:3000']
+# CORS_ORIGIN_WHITELIST = ['http://10.255.255.175:3000', 'http://localhost:3000']
+CORS_ORIGIN_ALLOW_ALL = True
 
 STATIC_URL = '/static/'
 
