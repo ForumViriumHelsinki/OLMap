@@ -3,7 +3,7 @@ Proof of concept app for last mile city logistics
 
 ## Installation
 
-*Prerequisites*: Python 3.7, Node.js 13.3
+**Prerequisites**: Python 3.7, Node.js 13.3
 
 In project root:
 
