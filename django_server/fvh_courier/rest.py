@@ -1,11 +1,12 @@
-from django.conf.urls import url
-from django.contrib.auth import authenticate, login
+from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.utils import timezone
 from rest_framework import serializers, viewsets, permissions, routers, mixins, views, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from drf_jsonschema import to_jsonschema
 from . import models
 
 COURIER_GROUP = 'Courier'
@@ -23,18 +24,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'phone_numbers', 'is_courier']
+        fields = ['first_name', 'last_name', 'username', 'phone_numbers', 'is_courier']
 
     def get_is_courier(self, user):
         return user.groups.filter(name=COURIER_GROUP).exists()
 
 
 class PackageSerializer(serializers.ModelSerializer):
-    pickup_at = AddressSerializer()
-    deliver_to = AddressSerializer()
-
-    sender = UserSerializer(required=False)
-    courier = UserSerializer(required=False)
+    pickup_at = AddressSerializer(read_only=False)
+    deliver_to = AddressSerializer(read_only=False)
 
     def create(self, validated_data):
         """
@@ -48,6 +46,7 @@ class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Package
         fields = '__all__'
+        read_only_fields = ['picked_up_time', 'delivered_time', 'sender', 'courier']
 
 
 class UserBelongsToGroup(permissions.IsAuthenticated):
@@ -121,44 +120,14 @@ class OutgoingPackagesViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelVie
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
 
+    @action(detail=False, methods=['get'])
+    def jsonschema(self, request, pk=None):
+        return Response(to_jsonschema(self.get_serializer()))
 
-class CurrentUserView(views.APIView):
-    """
-    Serialize & return the logged in user.
-    """
-    def get(self, request, format=None):
-        if request.user.is_anonymous:
-            response = Response("No user.", status=status.HTTP_404_NOT_FOUND)
-        else:
-            response = Response(UserSerializer(request.user).data)
-        response['Access-Control-Allow-Origin'] = '*'
-        return response
-
-
-class LoginView(views.APIView):
-    def post(self, request, format=None):
-        data = request.data
-
-        username = data.get('username', None)
-        password = data.get('password', None)
-
-        user = authenticate(username=username, password=password)
-
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                return Response(UserSerializer(request.user).data)
-            else:
-                return Response(status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
 router = routers.DefaultRouter()
 router.register('available_packages', AvailablePackagesViewSet, 'available_package')
 router.register('my_packages', MyPackagesViewSet, 'my_package')
 router.register('outgoing_packages', OutgoingPackagesViewSet, 'outgoing_package')
 
-urlpatterns = [
-    url('^user/$', CurrentUserView.as_view(), name='current_user'),
-    url('^login/$', LoginView.as_view(), name='login_user')
-] + router.urls
+urlpatterns = router.urls

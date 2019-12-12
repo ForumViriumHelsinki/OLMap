@@ -120,7 +120,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-CORS_ORIGIN_WHITELIST = ['http://10.255.255.175:3000']
+CORS_ORIGIN_WHITELIST = ['http://10.255.255.175:3000', 'http://localhost:3000']
 
 STATIC_URL = '/static/'
 
@@ -129,4 +129,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ]
+}
+
+REST_AUTH_SERIALIZERS = {
+    'USER_DETAILS_SERIALIZER': 'fvh_courier.rest.UserSerializer'
 }
