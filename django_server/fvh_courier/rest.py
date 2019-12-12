@@ -34,6 +34,9 @@ class PackageSerializer(serializers.ModelSerializer):
     pickup_at = AddressSerializer(read_only=False)
     deliver_to = AddressSerializer(read_only=False)
 
+    sender = UserSerializer(required=False, read_only=True)
+    courier = UserSerializer(required=False, read_only=True)
+
     def create(self, validated_data):
         """
         Overridden create method to allow creating / referring to addresses; vanilla DRF create does not
@@ -46,7 +49,7 @@ class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Package
         fields = '__all__'
-        read_only_fields = ['picked_up_time', 'delivered_time', 'sender', 'courier']
+        read_only_fields = ['picked_up_time', 'delivered_time']
 
 
 class UserBelongsToGroup(permissions.IsAuthenticated):
