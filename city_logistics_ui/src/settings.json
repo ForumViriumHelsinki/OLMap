@@ -1,0 +1,14 @@
+{
+  "serverRoot": "http://localhost:8000",
+  "algoliaPlaces": {
+    "auth": {
+      "appId": "pl484T49YN6O",
+      "apiKey": "12340f42cc0ed0b641ddaa450e8a1246"
+    },
+    "configuration": {
+      "language": "fi",
+      "countries": ["fi"],
+      "type": "address"
+    }
+  }
+}

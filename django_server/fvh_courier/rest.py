@@ -1,9 +1,12 @@
+from datetime import timedelta
+
 from django.contrib.auth.models import User
 from django.utils import timezone
-from rest_framework import serializers, viewsets, permissions, routers, mixins
+from rest_framework import serializers, viewsets, permissions, routers, mixins, views, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from drf_jsonschema import to_jsonschema
 from . import models
 
 COURIER_GROUP = 'Courier'
@@ -17,18 +20,22 @@ class AddressSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     phone_numbers = serializers.SlugRelatedField(many=True, read_only=True, slug_field='number')
+    is_courier = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'phone_numbers']
+        fields = ['first_name', 'last_name', 'username', 'phone_numbers', 'is_courier']
+
+    def get_is_courier(self, user):
+        return user.groups.filter(name=COURIER_GROUP).exists()
 
 
 class PackageSerializer(serializers.ModelSerializer):
-    pickup_at = AddressSerializer()
-    deliver_to = AddressSerializer()
+    pickup_at = AddressSerializer(read_only=False)
+    deliver_to = AddressSerializer(read_only=False)
 
-    sender = UserSerializer(required=False)
-    courier = UserSerializer(required=False)
+    sender = UserSerializer(required=False, read_only=True)
+    courier = UserSerializer(required=False, read_only=True)
 
     def create(self, validated_data):
         """
@@ -42,6 +49,7 @@ class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Package
         fields = '__all__'
+        read_only_fields = ['picked_up_time', 'delivered_time']
 
 
 class UserBelongsToGroup(permissions.IsAuthenticated):
@@ -115,8 +123,14 @@ class OutgoingPackagesViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelVie
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
 
+    @action(detail=False, methods=['get'])
+    def jsonschema(self, request, pk=None):
+        return Response(to_jsonschema(self.get_serializer()))
+
 
 router = routers.DefaultRouter()
 router.register('available_packages', AvailablePackagesViewSet, 'available_package')
 router.register('my_packages', MyPackagesViewSet, 'my_package')
 router.register('outgoing_packages', OutgoingPackagesViewSet, 'outgoing_package')
+
+urlpatterns = router.urls

@@ -27,6 +27,9 @@ class Address(TimestampedModel):
         verbose_name = _('address')
         verbose_name_plural = _('addresses')
 
+    def __str__(self):
+        return self.street_address
+
 
 class Package(TimestampedModel):
     pickup_at = models.ForeignKey(Address, verbose_name=_('pickup location'), related_name='outbound_packages',

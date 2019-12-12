@@ -1,2 +1,8 @@
 /.idea/
 /django_server/db.sqlite3
+/city_logistics_ui/static/build/
+/city_logistics_ui/public/build/
+/city_logistics_ui/node_modules/
+.DS_Store
+__pycache__
+/city_logistics_ui/yarn-error.log

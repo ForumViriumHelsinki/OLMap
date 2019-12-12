@@ -29,8 +29,8 @@ class RestAPITests(APITestCase):
         url = reverse('outgoing_package-list')
         response = self.client.get(url)
 
-        # Then an Forbidden response is received:
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # Then an Unauthorized response is received:
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_empty_list_of_outgoing_packages(self):
         # Given that there are no packages registered for delivery
@@ -110,8 +110,8 @@ class RestAPITests(APITestCase):
         url = reverse('available_package-list')
         response = self.client.get(url)
 
-        # Then an Forbidden response is received:
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        # Then an Unauthorized response is received:
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_list_available_packages_not_courier(self):
         # Given that a non-courier user is signed in
@@ -295,8 +295,110 @@ class RestAPITests(APITestCase):
         # Then an OK response is received:
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_get_current_user_when_not_signed_in(self):
+        # Given that no user is signed in
+        # When requesting the current user over ReST
+        url = reverse('rest_user_details')
+        response = self.client.get(url)
+
+        # Then a 401 response is received:
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_current_user_when_signed_in(self):
+        # Given that a courier user is signed in
+        courier = self.create_and_login_courier()
+
+        # When requesting the current user over ReST
+        url = reverse('rest_user_details')
+        response = self.client.get(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        assert_dict_contains(response.data, {'first_name': 'Coranne', 'last_name': 'Courier', 'is_courier': True})
+
+    def test_get_new_package_schema(self):
+        # Given that a user is signed in
+        courier = self.create_and_login_courier()
+
+        # When requesting the schema for a new package over ReST
+        url = reverse('outgoing_package-jsonschema')
+        response = self.client.get(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        assert_dict_contains(response.data, {
+            'type': 'object',
+            'properties': {
+                'pickup_at': {
+                    'type': 'object',
+                    'required': ['street_address', 'postal_code', 'city', 'country', 'lat', 'lon'],
+                    'title': 'Pickup at'
+                },
+                'deliver_to': {
+                    'type': 'object',
+                    'required': ['street_address', 'postal_code', 'city', 'country', 'lat', 'lon'],
+                    'title': 'Deliver to'
+                },
+                'height': {
+                    'type': 'integer', 'title': 'Height', 'description': 'in cm'},
+                'width': {
+                    'type': 'integer', 'title': 'Width', 'description': 'in cm'},
+                'depth': {
+                    'type': 'integer', 'title': 'Depth', 'description': 'in cm'},
+                'weight': {
+                    'type': 'string',
+                    'pattern': '^\\-?[0-9]*(\\.[0-9]{1,2})?$',
+                    'title': 'Weight',
+                    'description': 'in kg'},
+                'recipient': {
+                    'type': 'string', 'maxLength': 128, 'minLength': 1, 'title': 'Recipient'},
+                'recipient_phone': {
+                    'type': 'string', 'maxLength': 32, 'minLength': 1, 'title': 'Recipient phone number'},
+                'earliest_pickup_time': {
+                    'type': 'string', 'format': 'date-time', 'title': 'Earliest pickup time'},
+                'latest_pickup_time': {
+                    'type': 'string', 'format': 'date-time', 'title': 'Latest pickup time'},
+                'earliest_delivery_time': {
+                    'type': 'string', 'format': 'date-time', 'title': 'Earliest delivery time'},
+                'latest_delivery_time': {
+                    'type': 'string', 'format': 'date-time', 'title': 'Latest delivery time'}
+            },
+            'required': [
+                'pickup_at', 'deliver_to', 'height', 'width', 'depth', 'weight', 'recipient', 'recipient_phone',
+                'earliest_pickup_time', 'latest_pickup_time', 'earliest_delivery_time', 'latest_delivery_time'
+            ]
+        })
+
+        assert_dict_contains(response.data['properties']['pickup_at'], {
+            'properties': {
+                'street_address': {
+                    'type': 'string',
+                    'maxLength': 128,
+                    'minLength': 1,
+                    'title': 'Street address'},
+                'postal_code': {
+                    'type': 'string',
+                    'maxLength': 16,
+                    'minLength': 1,
+                    'title': 'Postal code'},
+                'city': {
+                    'type': 'string',
+                    'maxLength': 64,
+                    'minLength': 1,
+                    'title': 'City'},
+                'country': {
+                    'type': 'string',
+                    'maxLength': 64,
+                    'minLength': 1,
+                    'title': 'Country'},
+                'lat': {'type': 'string', 'pattern': '^\\-?[0-9]*(\\.[0-9]{1,6})?$', 'title': 'Lat'},
+                'lon': {'type': 'string', 'pattern': '^\\-?[0-9]*(\\.[0-9]{1,6})?$', 'title': 'Lon'}
+            }
+        })
+
     def create_and_login_courier(self):
-        user = User.objects.create(username='courier')
+        user = User.objects.create(username='courier', first_name='Coranne', last_name='Courier')
         user.groups.add(Group.objects.get(name=rest.COURIER_GROUP))
         self.client.force_login(user)
         return user

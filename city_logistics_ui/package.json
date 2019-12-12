@@ -1,0 +1,41 @@
+{
+  "name": "city_logistics_ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "UI for the FVH City Logistics POC application",
+  "scripts": {
+    "start": "react-scripts start --no-cache",
+    "build": "react-scripts build",
+    "test": "react-scripts test --no-cache",
+    "eject": "react-scripts eject"
+  },
+  "author": "Johan Lindqvist / Forum Virium Helsinki",
+  "dependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.3.2",
+    "@testing-library/user-event": "^7.1.2",
+    "bootstrap": "^4.4.1",
+    "moment": "^2.24.0",
+    "places.js": "^1.17.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-jsonschema-form": "^2.0.0-alpha.1",
+    "react-scripts": "3.3.0",
+    "sass": "^1.23.7"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

@@ -11,6 +11,9 @@ djangorestframework = ">=3.10"
 pyaml = ">=19.4"
 uritemplate = ">=3.0"
 coreapi=">=2.3"
+django-cors-headers=">=3.2"
+django-rest-auth=">=0.9"
+jsonschema=">=3.2"
 
 [requires]
 python_version = "3.7"
