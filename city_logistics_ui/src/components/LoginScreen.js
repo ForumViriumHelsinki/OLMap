@@ -1,8 +1,11 @@
 import React from 'react';
 import loadData, {login} from "../loadData";
+import Error from "./Error";
 
 
 export default class LoginScreen extends React.Component {
+  url = '/rest-auth/login/';
+
   constructor(props) {
     super(props);
     this.submit = this.submit.bind(this);
@@ -18,11 +21,7 @@ export default class LoginScreen extends React.Component {
           <p className="lead text-primary">Sign in</p>
         </div>
         <form onSubmit={this.submit}>
-          {this.state.error && (
-            <div className="alert alert-danger" role="alert">
-              Login failed. Please try again.
-            </div>
-          )}
+          <Error status={this.state.error} message="Login failed. Please try again."/>
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <input type="test" className="form-control" name="username"
@@ -46,7 +45,7 @@ export default class LoginScreen extends React.Component {
     var data = {};
     formData.forEach((value, key) => data[key] = value);
     this.setState({error: false, ...data});
-    loadData('/rest-auth/login/', {method: 'POST', data: data }).then((response) => {
+    loadData(this.url, {method: 'POST', data: data }).then((response) => {
       if (response.status == 200) response.json().then((data) => {
         login(data.key);
         this.props.onLogin();

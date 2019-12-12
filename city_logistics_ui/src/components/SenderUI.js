@@ -9,6 +9,7 @@ export default class SenderUI extends FVHTabsUI {
     newPackage: {
       header: 'New package',
       ChildComponent: NewPackage,
+      childProps: {onCreated: () => this.setState({activeTab: 'myPackages'})},
       icon: 'add_box',
       menuText: 'New'
     },

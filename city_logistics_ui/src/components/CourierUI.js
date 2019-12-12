@@ -15,6 +15,7 @@ export default class CourierUI extends FVHTabsUI {
     availablePackage: {
       header: 'Available',
       ChildComponent: AvailablePackages,
+      childProps: {onPackageReserved: () => this.setState({activeTab: 'myPackages'})},
       icon: 'dynamic_feed',
       menuText: 'Available'
     },

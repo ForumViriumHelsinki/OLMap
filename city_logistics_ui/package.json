@@ -11,14 +11,17 @@
   },
   "author": "Johan Lindqvist / Forum Virium Helsinki",
   "dependencies": {
-    "bootstrap": "^4.4.1",
-    "sass": "^1.23.7",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "bootstrap": "^4.4.1",
+    "moment": "^2.24.0",
+    "places.js": "^1.17.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-scripts": "3.3.0"
+    "react-jsonschema-form": "^2.0.0-alpha.1",
+    "react-scripts": "3.3.0",
+    "sass": "^1.23.7"
   },
   "eslintConfig": {
     "extends": "react-app"

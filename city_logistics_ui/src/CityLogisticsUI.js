@@ -21,15 +21,17 @@ class CityLogisticsUI extends React.Component {
   }
 
   refreshUser() {
-    loadData('/rest/user/').then(response => {
-      if (response.status == 404) this.setState({user: null, dataFetched: true});
+    loadData('/rest-auth/user/').then(response => {
+      if (response.status == 401) this.setState({user: null, dataFetched: true});
       else response.json().then(user => this.setState({user, dataFetched: true}));
     })
   }
 
   logout() {
-    logout();
-    this.setState({user: null});
+    loadData('/rest-auth/logout/', {method: 'POST'}).then(response => {
+      logout();
+      this.setState({user: null});
+    });
   }
 
   render() {
