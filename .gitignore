@@ -6,3 +6,4 @@
 .DS_Store
 __pycache__
 /city_logistics_ui/yarn-error.log
+/city_logistics_ui/build/

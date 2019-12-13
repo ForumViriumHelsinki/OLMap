@@ -1,5 +1,5 @@
 {
-  "serverRoot": "http://localhost:8000",
+  "serverRoot": "http://10.255.255.175:8000",
   "algoliaPlaces": {
     "auth": {
       "appId": "pl484T49YN6O",
@@ -10,5 +10,9 @@
       "countries": ["fi"],
       "type": "address"
     }
-  }
+  },
+  "MapBox": {
+    "accessToken": "pk.eyJ1Ijoiam9oYW4tZnZoIiwiYSI6ImNrNDJtOGh5cDAxczIzb3FpdHg1Z3c5MGwifQ.bp9ubCm67HLIorEUb21K3A"
+  },
+  "useMockGeolocation": [60.1616867, 24.944368]
 }
