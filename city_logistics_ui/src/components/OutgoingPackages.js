@@ -2,6 +2,7 @@ import React from 'react';
 import {CardP} from "./Card";
 import PackageList from "./PackageList";
 import {formatTimestamp} from "../utils";
+import Contacts from "./Contacts";
 
 
 export default class OutgoingPackages extends React.Component {
@@ -14,14 +15,19 @@ export default class OutgoingPackages extends React.Component {
   }
 
   packageContent(item) {
-    return item.courier
+    const {courier, picked_up_time, delivered_time} = item;
+
+    return courier
       ? <>
-          <CardP>Courier: {item.courier.first_name} {item.courier.last_name}</CardP>
-          {item.picked_up_time
+          <Contacts
+            title="Courier"
+            name={`${courier.first_name} ${courier.last_name}`}
+            phone={delivered_time ? [] : courier.phone_numbers} />
+          {picked_up_time
             ? <>
-              <CardP>Picked up at {formatTimestamp(item.picked_up_time)}</CardP>
-              {item.delivered_time
-                ? <CardP>Delivered at {formatTimestamp(item.delivered_time)}</CardP>
+              <CardP>Picked up at {formatTimestamp(picked_up_time)}</CardP>
+              {delivered_time
+                ? <CardP>Delivered at {formatTimestamp(delivered_time)}</CardP>
                 : <CardP>Delivery in progress</CardP>
               }
             </>

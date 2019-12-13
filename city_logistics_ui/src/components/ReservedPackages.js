@@ -5,6 +5,7 @@ import {loadData} from "../loadData";
 import Button from "./Button";
 import {formatTimestamp} from "../utils";
 import MapWidget from "./MapWidget";
+import Contacts from "./Contacts";
 
 
 export default class ReservedPackages extends React.Component {
@@ -28,14 +29,22 @@ export default class ReservedPackages extends React.Component {
   }
 
   packageContent(item) {
+    const {weight, width, height, depth, picked_up_time, delivered_time, recipient, recipient_phone, sender} = item;
+
     return <>
-      <CardP>{item.weight} kg, {item.width}*{item.height}*{item.depth}cm</CardP>
-      {item.picked_up_time
+      <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>
+      {picked_up_time
         ?
-          item.delivered_time
-            ? <CardP>Delivered {formatTimestamp(item.delivered_time)}</CardP>
-            : <Button onClick={() => this.packageAction(item.id, 'delivery')}>Register delivery</Button>
-        : <Button onClick={() => this.packageAction(item.id, 'pickup')}>Register pickup</Button>
+          delivered_time
+            ? <CardP>Delivered {formatTimestamp(delivered_time)}</CardP>
+            : <>
+                <Contacts phone={recipient_phone} title="Recipient" name={recipient}/>
+                <Button onClick={() => this.packageAction(item.id, 'delivery')}>Register delivery</Button>
+              </>
+        : <>
+            <Contacts phone={sender.phone_numbers} title="Sender" name={`${sender.first_name} ${sender.last_name}`}/>
+            <Button onClick={() => this.packageAction(item.id, 'pickup')}>Register pickup</Button>
+          </>
       }
     </>;
   }
