@@ -4634,6 +4634,11 @@ gauge@~2.7.3:
     strip-ansi "^3.0.1"
     wide-align "^1.1.0"
 
+geolib@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/geolib/-/geolib-3.2.0.tgz#1758d81b2989680172b8d30d79bb1d810fdf251f"
+  integrity sha512-GEsrhSlqrQG9a3nras/hDOnrKOzi4ngUOjpjKycXZWTaOrGHsz0vQQuKNwHSEA+X8Q57POnEn5iQ/GTz55r5Ag==
+
 get-caller-file@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/get-caller-file/-/get-caller-file-1.0.3.tgz#f978fa4c90d1dfe7ff2d6beda2a515e713bdcf4a"

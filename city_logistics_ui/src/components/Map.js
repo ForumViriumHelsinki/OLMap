@@ -13,12 +13,6 @@ export default class Map extends React.Component {
     currentPosition: null,
   };
 
-  markerIcons = {
-    origin: {glyph: 'work', glyphSize: 20},
-    destination: {glyph: 'check', glyphSize: 20},
-    currentPosition: {glyph: 'directions_bike', glyphSize: 20}
-  }
-
   constructor(props) {
     super(props);
     this.initMapState()
@@ -87,7 +81,7 @@ export default class Map extends React.Component {
       else
         this.markers[name] = L.marker(
           [coord.lat, coord.lon],
-          {icon: new GlyphIcon(this.markerIcons[name])}
+          {icon: new GlyphIcon({glyph: settings.markerIcons[name], glyphSize: 20})}
         ).addTo(this.leafletMap);
     });
   }
