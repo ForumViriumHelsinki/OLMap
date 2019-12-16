@@ -12,16 +12,25 @@ class TimestampedModel(models.Model):
         abstract = True
 
 
-class Address(TimestampedModel):
-    street_address = models.CharField(verbose_name=_('street address'), max_length=128)
-    postal_code = models.CharField(verbose_name=_('postal code'), max_length=16)
-    city = models.CharField(verbose_name=_('city'), max_length=64)
-    country = models.CharField(verbose_name=_('country'), max_length=64)
-
+class BaseLocation(TimestampedModel):
     lat = models.DecimalField(max_digits=9, decimal_places=6)
     lon = models.DecimalField(max_digits=9, decimal_places=6)
 
     # coordinate = PointField()
+
+    class Meta:
+        abstract = True
+
+
+class UserLocation(BaseLocation):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='location')
+
+
+class Address(BaseLocation):
+    street_address = models.CharField(verbose_name=_('street address'), max_length=128)
+    postal_code = models.CharField(verbose_name=_('postal code'), max_length=16)
+    city = models.CharField(verbose_name=_('city'), max_length=64)
+    country = models.CharField(verbose_name=_('country'), max_length=64)
 
     class Meta:
         verbose_name = _('address')

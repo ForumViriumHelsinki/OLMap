@@ -1,13 +1,15 @@
 from datetime import timedelta
 
 from django.contrib.auth.models import User
+from django.urls import path
 from django.utils import timezone
 from rest_framework import serializers, viewsets, permissions, routers, mixins, views, status
 from rest_framework.decorators import action
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 
 from drf_jsonschema import to_jsonschema
-from . import models
+from fvh_courier import models
 
 COURIER_GROUP = 'Courier'
 
@@ -72,7 +74,7 @@ class PackagesViewSetMixin:
 
     def get_queryset(self):
         return self.get_base_queryset()\
-            .select_related('pickup_at', 'deliver_to', 'courier', 'sender')\
+            .select_related('pickup_at', 'deliver_to', 'courier__location', 'sender')\
             .prefetch_related('courier__phone_numbers', 'courier__groups', 'sender__phone_numbers', 'sender__groups')
 
 
@@ -123,8 +125,35 @@ class MyPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UserLocation
+        exclude = ['user']
+
+
+class OutgoingPackageSerializer(PackageSerializer):
+    courier_location = serializers.SerializerMethodField()
+
+    def get_courier_location(self, package):
+        # If the location is not relevant to this package, return None:
+        if package.delivered_time or not package.courier_id:
+            return None
+
+        try:
+            location = package.courier.location
+        except models.UserLocation.DoesNotExist:
+            return None
+
+        # Do not return some old location for the courier that may not be related to this package:
+        if location.modified_at < package.modified_at:
+            return None
+
+        return LocationSerializer(location).data
+
+
 class OutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OutgoingPackageSerializer
 
     def get_base_queryset(self):
         return self.request.user.sent_packages.all()
@@ -137,9 +166,22 @@ class OutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMixin, vie
         return Response(to_jsonschema(self.get_serializer()))
 
 
+class MyLocationView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsCourier]
+    serializer_class = LocationSerializer
+
+    def get_object(self):
+        try:
+            return self.request.user.location
+        except models.UserLocation.DoesNotExist:
+            return models.UserLocation(user=self.request.user)
+
+
 router = routers.DefaultRouter()
 router.register('available_packages', AvailablePackagesViewSet, 'available_package')
 router.register('my_packages', MyPackagesViewSet, 'my_package')
 router.register('outgoing_packages', OutgoingPackagesViewSet, 'outgoing_package')
 
-urlpatterns = router.urls
+urlpatterns = router.urls + [
+    path('my_location/', MyLocationView.as_view(), name='user_location')
+]
