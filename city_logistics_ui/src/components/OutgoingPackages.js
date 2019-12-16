@@ -44,7 +44,7 @@ export default class OutgoingPackages extends React.Component {
 
   packageTitle(item) {
     const {pickup_at, deliver_to, picked_up_time, delivered_time, courier_location, recipient} = item;
-    const currentPositionIndex = courier_location && (delivered_time ? -1 : picked_up_time ? 1 : 0);
+    const currentPositionIndex =  (delivered_time || !courier_location) ? -1 : picked_up_time ? 1 : 0;
     return <>
       <MapWidget origin={pickup_at} destination={deliver_to}
                  currentPositionIndex={currentPositionIndex}
