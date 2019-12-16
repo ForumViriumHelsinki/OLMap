@@ -27,7 +27,10 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['first_name', 'last_name', 'username', 'phone_numbers', 'is_courier']
 
     def get_is_courier(self, user):
-        return user.groups.filter(name=COURIER_GROUP).exists()
+        for group in user.groups.all():
+            if group.name == COURIER_GROUP:
+                return True
+        return False
 
 
 class PackageSerializer(serializers.ModelSerializer):
@@ -64,11 +67,19 @@ class IsCourier(UserBelongsToGroup):
     group_name = COURIER_GROUP
 
 
-class AvailablePackagesViewSet(viewsets.ReadOnlyModelViewSet):
+class PackagesViewSetMixin:
     serializer_class = PackageSerializer
-    permission_classes = [IsCourier]
 
     def get_queryset(self):
+        return self.get_base_queryset()\
+            .select_related('pickup_at', 'deliver_to', 'courier', 'sender')\
+            .prefetch_related('courier__phone_numbers', 'courier__groups', 'sender__phone_numbers', 'sender__groups')
+
+
+class AvailablePackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsCourier]
+
+    def get_base_queryset(self):
         return models.Package.available_packages()
 
     @action(detail=True, methods=['put'])
@@ -83,11 +94,10 @@ class AvailablePackagesViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class MyPackagesViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = PackageSerializer
+class MyPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsCourier]
 
-    def get_queryset(self):
+    def get_base_queryset(self):
         return self.request.user.delivered_packages.all()
 
     @action(detail=True, methods=['put'])
@@ -113,11 +123,10 @@ class MyPackagesViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class OutgoingPackagesViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
-    serializer_class = PackageSerializer
+class OutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
+    def get_base_queryset(self):
         return self.request.user.sent_packages.all()
 
     def perform_create(self, serializer):

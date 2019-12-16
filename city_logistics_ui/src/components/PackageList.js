@@ -5,13 +5,22 @@ import Card from "./Card";
 
 
 export default class PackageList extends React.Component {
+  refreshInterval = 10000;
+
   state = {
     packages: null,
     error: false
   };
 
   componentDidMount() {
+    this.refreshPackages = this.refreshPackages.bind(this);
     this.refreshPackages();
+    this.fetchInterval = setInterval(this.refreshPackages, this.refreshInterval);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.fetchInterval);
+    this.fetchInterval = null;
   }
 
   refreshPackages() {

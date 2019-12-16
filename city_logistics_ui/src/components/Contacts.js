@@ -3,7 +3,7 @@ import React from 'react';
 export default class Contacts extends React.Component {
   render() {
     const {title, name, phone} = this.props;
-    return <p>
+    return <div className="mt-1">
       <strong>{title}</strong><br/>
       {name}<br/>
       {(Array.isArray(phone) ? phone: [phone]).map((phoneNr) =>
@@ -17,6 +17,6 @@ export default class Contacts extends React.Component {
           </a>
         </div>
       )}
-    </p>;
+    </div>;
   }
 }
