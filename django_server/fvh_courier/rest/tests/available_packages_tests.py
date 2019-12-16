@@ -65,16 +65,16 @@ class AvailablePackagesTests(FVHAPITestCase):
                 "postal_code": "00123",
                 "city": "Ankeborg",
                 "country": "Ankerige",
-                "lat": "64.040000",
-                "lon": "80.650000"
+                "lat": "64.04000000",
+                "lon": "80.65000000"
             },
             "deliver_to": {
                 "street_address": "Helvetesapelsinvägen 666",
                 "postal_code": "00321",
                 "city": "Ankeborg",
                 "country": "Ankerige",
-                "lat": "64.540000",
-                "lon": "80.050000"
+                "lat": "64.54000000",
+                "lon": "80.05000000"
             },
             "sender": {
                 "first_name": "Cedrik",

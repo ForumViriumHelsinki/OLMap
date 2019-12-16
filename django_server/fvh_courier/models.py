@@ -13,8 +13,8 @@ class TimestampedModel(models.Model):
 
 
 class BaseLocation(TimestampedModel):
-    lat = models.DecimalField(max_digits=9, decimal_places=6)
-    lon = models.DecimalField(max_digits=9, decimal_places=6)
+    lat = models.DecimalField(max_digits=11, decimal_places=8)
+    lon = models.DecimalField(max_digits=11, decimal_places=8)
 
     # coordinate = PointField()
 

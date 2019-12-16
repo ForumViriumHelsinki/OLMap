@@ -108,8 +108,8 @@ class OutgoingPackagesTests(FVHAPITestCase):
                     'maxLength': 64,
                     'minLength': 1,
                     'title': 'Country'},
-                'lat': {'type': 'string', 'pattern': '^\\-?[0-9]*(\\.[0-9]{1,6})?$', 'title': 'Lat'},
-                'lon': {'type': 'string', 'pattern': '^\\-?[0-9]*(\\.[0-9]{1,6})?$', 'title': 'Lon'}
+                'lat': {'type': 'string', 'pattern': '^\\-?[0-9]*(\\.[0-9]{1,8})?$', 'title': 'Lat'},
+                'lon': {'type': 'string', 'pattern': '^\\-?[0-9]*(\\.[0-9]{1,8})?$', 'title': 'Lon'}
             }
         })
 
@@ -128,16 +128,16 @@ class OutgoingPackagesTests(FVHAPITestCase):
                 "postal_code": "00123",
                 "city": "Ankeborg",
                 "country": "Ankerige",
-                "lat": "64.040000",
-                "lon": "80.650000"
+                "lat": "64.04000000",
+                "lon": "80.65000000"
             },
             "deliver_to": {
                 "street_address": "Helvetesapelsinvägen 666",
                 "postal_code": "00321",
                 "city": "Ankeborg",
                 "country": "Ankerige",
-                "lat": "64.540000",
-                "lon": "80.050000"
+                "lat": "64.54000000",
+                "lon": "80.05000000"
             },
             "height": 20,
             "width": 30,
