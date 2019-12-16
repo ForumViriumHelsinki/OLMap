@@ -26,7 +26,10 @@ export default class PackageList extends React.Component {
   refreshPackages() {
     loadData(this.props.url)
     .then((response) => {
-      if (response.status == 200) response.json().then((packages) => this.setState({packages}));
+      if (response.status == 200) response.json().then((packages) => {
+        this.setState({packages});
+        if (this.props.onPackagesLoaded) this.props.onPackagesLoaded(packages);
+      });
       else this.setState({error: true});
     })
   }

@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal, {ModalBody} from "./Modal";
+import Modal from "./Modal";
 import * as L from 'leaflet';
 import settings from '../settings';
 
@@ -27,11 +27,11 @@ export default class Map extends React.Component {
   }
 
   render() {
-    const {origin, destination, onClose, currentPositionIndex} = this.props;
+    const {origin, destination, onClose, currentPositionIndex, currentPosition} = this.props;
 
     return <Modal title={`${origin.street_address} to ${destination.street_address}`} onClose={onClose}>
       <div id="leafletMap" style={{height: '70vh'}}> </div>
-      {(currentPositionIndex > -1) &&
+      {(currentPositionIndex > -1) && !currentPosition &&
         <Geolocator onLocation={([lat, lon]) => this.setState({currentPosition: {lat, lon}})}/>
       }
     </Modal>;
@@ -52,7 +52,7 @@ export default class Map extends React.Component {
 
   refreshMap() {
     const {origin, destination} = this.props;
-    const {currentPosition} = this.state;
+    const currentPosition = this.getCurrentPosition();
 
     if (!this.leafletMap) {
       this.leafletMap = L.map('leafletMap');
@@ -86,10 +86,14 @@ export default class Map extends React.Component {
     });
   }
 
+  getCurrentPosition() {
+    return this.props.currentPosition || this.state.currentPosition;
+  }
+
   coords() {
     const {origin, destination} = this.props;
     const currentPositionIndex = this.props.currentPositionIndex || 0;
-    const {currentPosition} = this.state;
+    const currentPosition = this.getCurrentPosition();
     const coords = [origin, destination];
 
     if (currentPosition && (currentPositionIndex >= 0)) {

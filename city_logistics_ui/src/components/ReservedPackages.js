@@ -6,23 +6,32 @@ import Button from "./Button";
 import {formatTimestamp} from "../utils";
 import MapWidget from "./MapWidget";
 import Contacts from "./Contacts";
-import settings from '../settings';
-import Distances from "./Distances";
 import Geolocator from "./Geolocator";
+import PackageDistances from "./PackageDistances";
 
 
 export default class ReservedPackages extends React.Component {
   url = "/rest/my_packages/";
+  locationUrl = "/rest/my_location/";
+
   packageList = React.createRef();
   state = {
     currentLocation: null
   };
+  locationSaveNeeded = false;
+
+  constructor() {
+    super(...arguments);
+    this.updateLocationSaveNeeded = this.updateLocationSaveNeeded.bind(this);
+    this.locationUpdated = this.locationUpdated.bind(this);
+  }
 
   render() {
     return <>
       <PackageList
         url={this.url}
         ref={this.packageList}
+        onPackagesLoaded={this.updateLocationSaveNeeded}
         packageTitle={(item) =>
           <>
             <MapWidget
@@ -33,7 +42,7 @@ export default class ReservedPackages extends React.Component {
           </>}
         packageSubtitles={(item) => [formatTimestamp(item.earliest_pickup_time)]}
         packageContent={(item) => this.packageContent(item)} />
-      <Geolocator onLocation={(currentLocation) => this.setState({currentLocation})}/>
+      <Geolocator onLocation={this.locationUpdated}/>
     </>;
   }
 
@@ -41,31 +50,13 @@ export default class ReservedPackages extends React.Component {
     const {
       weight, width, height, depth,
       picked_up_time, delivered_time,
-      pickup_at, deliver_to,
       recipient, recipient_phone, sender} = item;
-
-    const [lat, lon] = this.state.currentLocation || [];
-
-    const currentLocation = this.state.currentLocation && {
-      name: 'current location', location: {lat, lon}, icon: settings.markerIcons.currentPosition
-    };
-
-    const points=[
-      {name: 'pickup at', location: pickup_at, icon: settings.markerIcons.origin},
-      {name: 'deliver to', location: deliver_to, icon: settings.markerIcons.destination}
-    ];
-
-    if (currentLocation) {
-      if (picked_up_time) {
-        if (!delivered_time) {
-          points.splice(1, 0, currentLocation);
-        }
-      } else points.splice(0, 0, currentLocation);
-    }
+    const {currentLocation} = this.state;
+    const [lat, lon] = currentLocation || [];
 
     return <>
       <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>
-      <Distances {...{points}} />
+      <PackageDistances package={item} courierLocation={currentLocation && {lat, lon}}/>
       {picked_up_time
         ?
           delivered_time
@@ -88,5 +79,18 @@ export default class ReservedPackages extends React.Component {
       if (response.status == 200) this.packageList.current.refreshPackages();
       else this.setState({error: true});
     })
+  }
+
+  // If there are undelivered but reserved packages, courier location should be saved to db:
+  updateLocationSaveNeeded(packages) {
+    this.locationSaveNeeded = packages.filter((p) => !p.delivered_time).length > 0;
+  }
+
+  locationUpdated(currentLocation) {
+    this.setState({currentLocation});
+    if (this.locationSaveNeeded) {
+      const [lat, lon] = currentLocation;
+      loadData(this.locationUrl, {method: 'PUT', data: {lat, lon}});
+    }
   }
 }
