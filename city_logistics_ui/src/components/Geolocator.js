@@ -23,9 +23,10 @@ export default class Geolocator extends React.Component {
 
   componentDidMount() {
     if (settings.useMockGeolocation) {
+      setTimeout(() => this.props.onLocation(settings.useMockGeolocation), 500);
       this.mockInterval = setInterval(
         () => this.props.onLocation(settings.useMockGeolocation),
-        1000)
+        10000)
     } else this.geolocationWatcher = navigator.geolocation.watchPosition(
       (position) => {
         this.props.onLocation([position.coords.latitude, position.coords.longitude])

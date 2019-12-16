@@ -13,13 +13,13 @@ export default class Button extends React.Component {
     const {showConfirmation} = this.state;
 
     return <>
-        <a href="#" className="btn btn-secondary"
+        <button className="btn btn-secondary"
                 onClick={(e) => {
                   e.preventDefault();
                   this.setState({showConfirmation: true})
                 }}>
         {children}
-      </a>
+      </button>
       {showConfirmation &&
         <Confirm title={confirm || (children + '?')}
                  onClose={() => this.setState({showConfirmation: false})}

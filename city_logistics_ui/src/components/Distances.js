@@ -9,17 +9,19 @@ class Icon extends React.Component {
 }
 
 Icon.propTypes = {icon: PropTypes.any};
+
+
 export default class Distances extends React.Component {
   render() {
     const {points} = this.props;
     return <p className="text-black-50 small">{
       points.map(({name, icon, location}, i) =>
-        <>
+        <React.Fragment key={name}>
           {(i > 0) &&
           <><Icon icon="remove"/>{this.getDistance(location, points[i - 1].location)}<Icon icon="arrow_forward"/></>
           }
           <span className="text-dark"><Icon icon={icon}/></span>
-        </>
+        </React.Fragment>
       )
     }</p>;
   }

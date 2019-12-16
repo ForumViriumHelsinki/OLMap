@@ -16,7 +16,7 @@ export default class LoginScreen extends React.Component {
     return (
       <div className="container">
         <div className="text-center">
-          <img className="w-50" src="images/FORUM_VIRIUM_logo_orange.png"/>
+          <img className="w-50" src="images/FORUM_VIRIUM_logo_orange.png" alt="logo"/>
           <h3>FVH City Logistics</h3>
           <p className="lead text-primary">Sign in</p>
         </div>

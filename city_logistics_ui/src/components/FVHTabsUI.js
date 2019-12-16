@@ -15,12 +15,12 @@ class NavItem extends React.Component {
     const {icon, text, onClick, active} = this.props;
 
     return <li className={`nav-item${active ? ' active' : ''}`}>
-      <a className="nav-link p-2" href="#" onClick={(e) => {
+      <button className="nav-link p-2" href="#" onClick={(e) => {
         e.preventDefault();
         onClick();
       }}>
         <Icon icon={icon} text={text}/>
-      </a>
+      </button>
     </li>;
   }
 }
