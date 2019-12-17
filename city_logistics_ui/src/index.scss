@@ -62,3 +62,10 @@ $theme-colors: (
 );
 
 @import "../node_modules/bootstrap/scss/bootstrap";
+
+
+// Misc style corrections for our use cases:
+
+button.nav-link {
+  display: inline-block;
+}
