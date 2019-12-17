@@ -1,6 +1,6 @@
 import React from "react";
 import * as PropTypes from "prop-types";
-import Confirm from "./Confirm";
+import Confirm from "util_components/Confirm";
 
 
 export default class Button extends React.Component {

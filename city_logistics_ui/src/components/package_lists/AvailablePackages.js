@@ -2,10 +2,10 @@ import React from 'react';
 
 import {loadData} from "loadData";
 
-import Geolocator from "./Geolocator";
-import LiveDataLoader from "components/LiveDataLoader";
-import AvailablePackage from "components/AvailablePackage";
-import Component from "components/Component";
+import Geolocator from "util_components/Geolocator";
+import LiveDataLoader from "util_components/LiveDataLoader";
+import AvailablePackage from "components/package_cards/AvailablePackage";
+import Component from "util_components/Component";
 
 
 export default class AvailablePackages extends Component {

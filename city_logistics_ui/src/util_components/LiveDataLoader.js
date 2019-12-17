@@ -1,6 +1,6 @@
 import React from 'react';
-import loadData from "../loadData";
-import Error from "./Error";
+import loadData from "loadData";
+import Error from "util_components/Error";
 
 
 export default class LiveDataLoader extends React.Component {

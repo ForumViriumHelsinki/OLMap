@@ -1,5 +1,5 @@
 import React from "react";
-import Map from "./Map";
+import Map from "util_components/Map";
 
 export default class MapWidget extends React.Component {
   state = {

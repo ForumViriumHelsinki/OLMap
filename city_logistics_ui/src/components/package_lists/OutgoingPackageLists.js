@@ -1,9 +1,9 @@
 import React from 'react';
-import LiveDataLoader from "./LiveDataLoader";
-import Spinner from "./Spinner";
-import TabbedCardList from "./TabbedCardList";
-import PendingOutgoingPackage from "./PendingOutgoingPackage";
-import DeliveredOutgoingPackage from "./DeliveredOutgoingPackage";
+import LiveDataLoader from "util_components/LiveDataLoader";
+import Spinner from "util_components/Spinner";
+import TabbedCardList from "util_components/TabbedCardList";
+import PendingOutgoingPackage from "components/package_cards/PendingOutgoingPackage";
+import DeliveredOutgoingPackage from "components/package_cards/DeliveredOutgoingPackage";
 
 export default class OutgoingPackageLists extends React.Component {
   url="/rest/outgoing_packages/";

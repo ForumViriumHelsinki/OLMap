@@ -1,7 +1,7 @@
 import React from 'react';
-import Card, {CardP} from "components/Card";
-import MapWidget from "components/MapWidget";
-import Contacts from "components/Contacts";
+import Card, {CardP} from "util_components/Card";
+import MapWidget from "util_components/MapWidget";
+import Contacts from "util_components/Contacts";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
 

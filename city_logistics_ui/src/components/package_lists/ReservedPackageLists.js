@@ -1,12 +1,12 @@
 import React from 'react';
-import LiveDataLoader from "./LiveDataLoader";
-import Spinner from "./Spinner";
-import TabbedCardList from "./TabbedCardList";
+import LiveDataLoader from "util_components/LiveDataLoader";
+import Spinner from "util_components/Spinner";
+import TabbedCardList from "util_components/TabbedCardList";
 import {loadData} from "loadData";
-import Geolocator from "components/Geolocator";
-import DeliveredByMePackage from "components/DeliveredByMePackage";
-import InTransitPackage from "components/InTransitPackage";
-import Component from "components/Component";
+import Geolocator from "util_components/Geolocator";
+import DeliveredByMePackage from "components/package_cards/DeliveredByMePackage";
+import InTransitPackage from "components/package_cards/InTransitPackage";
+import Component from "util_components/Component";
 
 export default class ReservedPackageLists extends Component {
   url = "/rest/my_packages/";

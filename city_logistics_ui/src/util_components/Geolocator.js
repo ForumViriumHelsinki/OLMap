@@ -1,6 +1,6 @@
 import React from 'react';
-import Modal, {ModalBody} from "./Modal";
-import settings from "../settings";
+import Modal, {ModalBody} from "util_components/Modal";
+import settings from "settings";
 
 export default class Geolocator extends React.Component {
   state = {

@@ -1,7 +1,7 @@
 import React from 'react';
 import NewPackage from "./NewPackage";
 import FVHTabsUI from "./FVHTabsUI";
-import OutgoingPackageLists from "components/OutgoingPackageLists";
+import OutgoingPackageLists from "components/package_lists/OutgoingPackageLists";
 
 
 export default class SenderUI extends FVHTabsUI {

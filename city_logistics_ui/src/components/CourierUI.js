@@ -1,7 +1,7 @@
 import React from 'react';
 import FVHTabsUI from "./FVHTabsUI";
-import AvailablePackages from "./AvailablePackages";
-import ReservedPackageLists from "components/ReservedPackageLists";
+import AvailablePackages from "components/package_lists/AvailablePackages";
+import ReservedPackageLists from "components/package_lists/ReservedPackageLists";
 
 
 export default class CourierUI extends FVHTabsUI {

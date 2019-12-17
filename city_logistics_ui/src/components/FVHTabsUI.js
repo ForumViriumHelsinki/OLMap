@@ -1,5 +1,5 @@
 import React from 'react';
-import Confirm from "./Confirm";
+import Confirm from "util_components/Confirm";
 
 class Icon extends React.Component {
   render() {

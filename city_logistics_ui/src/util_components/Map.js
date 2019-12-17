@@ -1,12 +1,12 @@
 import React from 'react';
-import Modal from "./Modal";
+import Modal from "util_components/Modal";
 import * as L from 'leaflet';
-import settings from '../settings';
+import settings from 'settings';
 
 import styles from 'leaflet/dist/leaflet.css';
 
-import GlyphIcon from "./GlyphIcon";
-import Geolocator from "./Geolocator";
+import GlyphIcon from "util_components/GlyphIcon";
+import Geolocator from "util_components/Geolocator";
 
 export default class Map extends React.Component {
   state = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import NavPills from "components/NavPills";
+import NavPills from "util_components/NavPills";
 
 export default class TabbedCardList extends React.Component {
   state = {activeTab: 0};

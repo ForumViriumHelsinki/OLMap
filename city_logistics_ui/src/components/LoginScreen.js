@@ -1,6 +1,6 @@
 import React from 'react';
 import loadData, {login} from "../loadData";
-import Error from "./Error";
+import Error from "util_components/Error";
 
 
 export default class LoginScreen extends React.Component {

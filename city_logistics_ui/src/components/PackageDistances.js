@@ -1,6 +1,6 @@
 import React from 'react';
 import settings from "../settings";
-import Distances from "./Distances";
+import Distances from "util_components/Distances";
 
 export default class PackageDistances extends React.Component {
   render() {
