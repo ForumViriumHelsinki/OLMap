@@ -6,7 +6,7 @@ import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
 import Button from "util_components/Button";
 
-export default class InTransitPackage extends React.Component {
+export default class AvailablePackage extends React.Component {
   render() {
     const {
       earliest_pickup_time, pickup_at, deliver_to,

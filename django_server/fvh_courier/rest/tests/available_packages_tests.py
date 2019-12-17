@@ -79,7 +79,7 @@ class AvailablePackagesTests(FVHAPITestCase):
             "sender": {
                 "first_name": "Cedrik",
                 "last_name": "Sender",
-                "phone_numbers": ["+3587654321"]
+                "phone_numbers": ["+358505436657"]
             },
             "courier": None,
             "height": 20,
@@ -87,7 +87,7 @@ class AvailablePackagesTests(FVHAPITestCase):
             "depth": 20,
             "weight": "2.00",
             "recipient": "Reginald Receiver",
-            "recipient_phone": "+358401234567",
+            "recipient_phone": "+358505436657",
             "picked_up_time": None,
             "delivered_time": None
         })

@@ -92,6 +92,7 @@ class AvailablePackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewS
         package = self.get_object()
         package.courier = self.request.user
         package.save()
+        models.PackageSMS.notify_sender_of_reservation(package, referer=request.headers.get('referer', None))
         serializer = self.get_serializer(package)
         return Response(serializer.data)
 
@@ -110,6 +111,7 @@ class MyPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
         package = self.get_object()
         package.picked_up_time = package.picked_up_time or timezone.now()
         package.save()
+        models.PackageSMS.notify_recipient_of_pickup(package, referer=request.headers.get('referer', None))
         serializer = self.get_serializer(package)
         return Response(serializer.data)
 
@@ -121,6 +123,7 @@ class MyPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
         package = self.get_object()
         package.delivered_time = package.delivered_time or timezone.now()
         package.save()
+        models.PackageSMS.notify_sender_of_delivery(package, referer=request.headers.get('referer', None))
         serializer = self.get_serializer(package)
         return Response(serializer.data)
 
@@ -166,6 +169,15 @@ class OutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMixin, vie
         return Response(to_jsonschema(self.get_serializer()))
 
 
+class PackagesByUUIDReadOnlyViewSet(PackagesViewSetMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = OutgoingPackageSerializer
+    lookup_field = 'uuid'
+
+    def get_base_queryset(self):
+        return models.Package.objects.all()
+
+
 class MyLocationView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsCourier]
     serializer_class = LocationSerializer
@@ -181,6 +193,7 @@ router = routers.DefaultRouter()
 router.register('available_packages', AvailablePackagesViewSet, 'available_package')
 router.register('my_packages', MyPackagesViewSet, 'my_package')
 router.register('outgoing_packages', OutgoingPackagesViewSet, 'outgoing_package')
+router.register('packages', PackagesByUUIDReadOnlyViewSet, 'uuid_package')
 
 urlpatterns = router.urls + [
     path('my_location/', MyLocationView.as_view(), name='user_location')

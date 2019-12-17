@@ -48,7 +48,7 @@ class FVHAPITestCase(APITestCase):
 
             sender=sender,
             recipient='Reginald Receiver',
-            recipient_phone='+358401234567',
+            recipient_phone='+358505436657',
 
             earliest_pickup_time=now,
             latest_pickup_time=now + datetime.timedelta(hours=1),
@@ -60,5 +60,5 @@ class FVHAPITestCase(APITestCase):
 
     def create_sender(self):
         sender = User.objects.create(username='sender', first_name='Cedrik', last_name='Sender')
-        sender.phone_numbers.create(number='+3587654321')
+        sender.phone_numbers.create(number='+358505436657')
         return sender

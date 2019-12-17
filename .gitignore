@@ -7,3 +7,4 @@
 __pycache__
 /city_logistics_ui/yarn-error.log
 /city_logistics_ui/build/
+/django_server/city_logistics/local_settings.py

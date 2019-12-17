@@ -161,3 +161,15 @@ if LOG_DB_QUERIES:
             }
         }
     }
+
+TWILIO = {
+    'ACCOUNT_SID': 'configure in local settings',
+    'AUTH_TOKEN': 'configure in local settings',
+    'SENDER_NR': 'configure in local settings'
+}
+FRONTEND_ROOT = "https://app.citylogistiikka.fi/"
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass

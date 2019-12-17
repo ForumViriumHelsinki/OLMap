@@ -144,7 +144,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
             "depth": 20,
             "weight": "2.00",
             "recipient": "Reginald Receiver",
-            "recipient_phone": "+358401234567",
+            "recipient_phone": "+358505436657",
         }
 
         timestamps = {
