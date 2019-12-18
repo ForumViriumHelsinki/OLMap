@@ -1,14 +1,14 @@
 import React from 'react';
 import FVHTabsUI from "./FVHTabsUI";
-import ReservedPackages from "./ReservedPackages";
-import AvailablePackages from "./AvailablePackages";
+import AvailablePackages from "components/package_lists/AvailablePackages";
+import ReservedPackageLists from "components/package_lists/ReservedPackageLists";
 
 
 export default class CourierUI extends FVHTabsUI {
   tabs = {
     myPackages: {
       header: 'My packages',
-      ChildComponent: ReservedPackages,
+      ChildComponent: ReservedPackageLists,
       icon: 'directions_bike',
       menuText: 'Packages'
     },

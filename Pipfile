@@ -14,6 +14,8 @@ coreapi=">=2.3"
 django-cors-headers=">=3.2"
 django-rest-auth=">=0.9"
 jsonschema=">=3.2"
+twilio=">=6.35"
+uuid = "*"
 psycopg2-binary = ">2.8"
 
 [requires]

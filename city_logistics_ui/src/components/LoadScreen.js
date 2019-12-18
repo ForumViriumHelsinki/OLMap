@@ -1,5 +1,5 @@
 import React from "react";
-import Spinner from "./Spinner";
+import Spinner from "util_components/Spinner";
 
 export default class LoadScreen extends React.Component {
   render() {

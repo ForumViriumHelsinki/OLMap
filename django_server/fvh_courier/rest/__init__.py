@@ -1,13 +1,15 @@
 from datetime import timedelta
 
 from django.contrib.auth.models import User
+from django.urls import path
 from django.utils import timezone
 from rest_framework import serializers, viewsets, permissions, routers, mixins, views, status
 from rest_framework.decorators import action
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 
 from drf_jsonschema import to_jsonschema
-from . import models
+from fvh_courier import models
 
 COURIER_GROUP = 'Courier'
 
@@ -27,7 +29,10 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['first_name', 'last_name', 'username', 'phone_numbers', 'is_courier']
 
     def get_is_courier(self, user):
-        return user.groups.filter(name=COURIER_GROUP).exists()
+        for group in user.groups.all():
+            if group.name == COURIER_GROUP:
+                return True
+        return False
 
 
 class PackageSerializer(serializers.ModelSerializer):
@@ -64,11 +69,19 @@ class IsCourier(UserBelongsToGroup):
     group_name = COURIER_GROUP
 
 
-class AvailablePackagesViewSet(viewsets.ReadOnlyModelViewSet):
+class PackagesViewSetMixin:
     serializer_class = PackageSerializer
-    permission_classes = [IsCourier]
 
     def get_queryset(self):
+        return self.get_base_queryset()\
+            .select_related('pickup_at', 'deliver_to', 'courier__location', 'sender')\
+            .prefetch_related('courier__phone_numbers', 'courier__groups', 'sender__phone_numbers', 'sender__groups')
+
+
+class AvailablePackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsCourier]
+
+    def get_base_queryset(self):
         return models.Package.available_packages()
 
     @action(detail=True, methods=['put'])
@@ -79,15 +92,15 @@ class AvailablePackagesViewSet(viewsets.ReadOnlyModelViewSet):
         package = self.get_object()
         package.courier = self.request.user
         package.save()
+        models.PackageSMS.notify_sender_of_reservation(package, referer=request.headers.get('referer', None))
         serializer = self.get_serializer(package)
         return Response(serializer.data)
 
 
-class MyPackagesViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = PackageSerializer
+class MyPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsCourier]
 
-    def get_queryset(self):
+    def get_base_queryset(self):
         return self.request.user.delivered_packages.all()
 
     @action(detail=True, methods=['put'])
@@ -98,6 +111,7 @@ class MyPackagesViewSet(viewsets.ReadOnlyModelViewSet):
         package = self.get_object()
         package.picked_up_time = package.picked_up_time or timezone.now()
         package.save()
+        models.PackageSMS.notify_recipient_of_pickup(package, referer=request.headers.get('referer', None))
         serializer = self.get_serializer(package)
         return Response(serializer.data)
 
@@ -109,15 +123,42 @@ class MyPackagesViewSet(viewsets.ReadOnlyModelViewSet):
         package = self.get_object()
         package.delivered_time = package.delivered_time or timezone.now()
         package.save()
+        models.PackageSMS.notify_sender_of_delivery(package, referer=request.headers.get('referer', None))
         serializer = self.get_serializer(package)
         return Response(serializer.data)
 
 
-class OutgoingPackagesViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
-    serializer_class = PackageSerializer
-    permission_classes = [permissions.IsAuthenticated]
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UserLocation
+        exclude = ['user']
 
-    def get_queryset(self):
+
+class OutgoingPackageSerializer(PackageSerializer):
+    courier_location = serializers.SerializerMethodField()
+
+    def get_courier_location(self, package):
+        # If the location is not relevant to this package, return None:
+        if package.delivered_time or not package.courier_id:
+            return None
+
+        try:
+            location = package.courier.location
+        except models.UserLocation.DoesNotExist:
+            return None
+
+        # Do not return some old location for the courier that may not be related to this package:
+        if location.modified_at < package.modified_at:
+            return None
+
+        return LocationSerializer(location).data
+
+
+class OutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OutgoingPackageSerializer
+
+    def get_base_queryset(self):
         return self.request.user.sent_packages.all()
 
     def perform_create(self, serializer):
@@ -128,9 +169,32 @@ class OutgoingPackagesViewSet(mixins.CreateModelMixin, viewsets.ReadOnlyModelVie
         return Response(to_jsonschema(self.get_serializer()))
 
 
+class PackagesByUUIDReadOnlyViewSet(PackagesViewSetMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = OutgoingPackageSerializer
+    lookup_field = 'uuid'
+
+    def get_base_queryset(self):
+        return models.Package.objects.all()
+
+
+class MyLocationView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsCourier]
+    serializer_class = LocationSerializer
+
+    def get_object(self):
+        try:
+            return self.request.user.location
+        except models.UserLocation.DoesNotExist:
+            return models.UserLocation(user=self.request.user)
+
+
 router = routers.DefaultRouter()
 router.register('available_packages', AvailablePackagesViewSet, 'available_package')
 router.register('my_packages', MyPackagesViewSet, 'my_package')
 router.register('outgoing_packages', OutgoingPackagesViewSet, 'outgoing_package')
+router.register('packages', PackagesByUUIDReadOnlyViewSet, 'uuid_package')
 
-urlpatterns = router.urls
+urlpatterns = router.urls + [
+    path('my_location/', MyLocationView.as_view(), name='user_location')
+]

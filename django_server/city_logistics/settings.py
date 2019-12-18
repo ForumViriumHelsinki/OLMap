@@ -135,3 +135,41 @@ REST_FRAMEWORK = {
 REST_AUTH_SERIALIZERS = {
     'USER_DETAILS_SERIALIZER': 'fvh_courier.rest.UserSerializer'
 }
+
+LOG_DB_QUERIES = False
+
+if LOG_DB_QUERIES:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'filters': {
+            'require_debug_true': {
+                '()': 'django.utils.log.RequireDebugTrue',
+            }
+        },
+        'handlers': {
+            'console': {
+                'level': 'DEBUG',
+                'filters': ['require_debug_true'],
+                'class': 'logging.StreamHandler',
+            }
+        },
+        'loggers': {
+            'django.db.backends': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+            }
+        }
+    }
+
+TWILIO = {
+    'ACCOUNT_SID': 'configure in local settings',
+    'AUTH_TOKEN': 'configure in local settings',
+    'SENDER_NR': 'configure in local settings'
+}
+FRONTEND_ROOT = "https://app.citylogistiikka.fi/"
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass

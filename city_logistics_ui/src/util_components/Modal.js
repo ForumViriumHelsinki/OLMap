@@ -21,17 +21,21 @@ export default class Modal extends React.Component {
     const {title, onClose, children} = this.props;
     return (<>
       <div className="modal-backdrop show"> </div>
-      <div className="modal show" tabIndex="-1" role="dialog" style={{display: 'block'}}>
-        <div className="modal-dialog modal-dialog-centered" role="document">
+      <div className="modal show" tabIndex="-1" role="dialog" style={{display: 'block'}} onClick={onClose}>
+        <div className="modal-dialog modal-dialog-centered"
+             role="document"
+             onClick={(e) => e.stopPropagation()}>
           <div className="modal-content">
-            <div className="modal-header">
-              <h6 className="modal-title">{title}</h6>
-              {onClose &&
-              <button type="button" className="close" aria-label="Close" onClick={onClose}>
-                <span aria-hidden="true">&times;</span>
-              </button>
-              }
-            </div>
+            {title &&
+              <div className="modal-header">
+                <h6 className="modal-title">{title}</h6>
+                {onClose &&
+                <button type="button" className="close" aria-label="Close" onClick={onClose}>
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                }
+              </div>
+            }
             {children}
           </div>
         </div>

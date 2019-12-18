@@ -1,7 +1,7 @@
 import React from 'react';
 import NewPackage from "./NewPackage";
-import OutgoingPackages from "./OutgoingPackages";
 import FVHTabsUI from "./FVHTabsUI";
+import OutgoingPackageLists from "components/package_lists/OutgoingPackageLists";
 
 
 export default class SenderUI extends FVHTabsUI {
@@ -15,7 +15,7 @@ export default class SenderUI extends FVHTabsUI {
     },
     myPackages: {
       header: 'My packages',
-      ChildComponent: OutgoingPackages,
+      ChildComponent: OutgoingPackageLists,
       icon: 'dynamic_feed',
       menuText: 'Packages'
     }

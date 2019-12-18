@@ -3,10 +3,10 @@ import React from 'react';
 import Form from "react-jsonschema-form";
 import places from "places.js";
 import loadData from "../loadData";
-import Spinner from "./Spinner";
+import Spinner from "util_components/Spinner";
 
 import settings from "../settings";
-import Error from "./Error";
+import Error from "util_components/Error";
 import moment from "moment";
 
 export default class NewPackage extends React.Component {
