@@ -2,7 +2,12 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from fvh_courier.models import Package, Address, PhoneNumber
+from fvh_courier.models import Package, Address, PhoneNumber, PackageSMS
+
+
+class PackageSMSInline(admin.TabularInline):
+    model = PackageSMS
+    extra = 0
 
 
 @admin.register(Package)
@@ -15,12 +20,31 @@ class PackageAdmin(admin.ModelAdmin):
         'courier__username', 'courier__first_name', 'courier__last_name',
     ]
     date_hierarchy = 'created_at'
+    inlines = [PackageSMSInline]
 
 
 @admin.register(Address)
 class AddressAdmin(admin.ModelAdmin):
     list_display = ['street_address', 'lat', 'lon']
     search_fields = ['street_address']
+
+
+@admin.register(PackageSMS)
+class PackageSMSAdmin(admin.ModelAdmin):
+    list_display = [
+        'created_at', 'package_id', 'message_type', 'recipient_number',
+        'package_sender', 'package_recipient', 'courier']
+    list_select_related = ['package__sender', 'package__courier']
+    date_hierarchy = 'created_at'
+
+    def package_sender(self, msg):
+        return msg.package.sender.get_full_name()
+
+    def courier(self, msg):
+        return msg.package.courier.get_full_name()
+
+    def package_recipient(self, msg):
+        return msg.package.recipient
 
 
 admin.site.unregister(User)
