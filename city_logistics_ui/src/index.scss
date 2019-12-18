@@ -65,7 +65,16 @@ $theme-colors: (
 
 
 // Misc style corrections for our use cases:
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
 
 button.nav-link {
   display: inline-block;
+}
+
+.container {
+  max-width: 800px;
 }

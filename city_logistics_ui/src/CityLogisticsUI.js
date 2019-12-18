@@ -1,9 +1,19 @@
 import React from 'react';
-import loadData, {logout} from "./loadData";
-import LoginScreen from './components/LoginScreen';
-import LoadScreen from "./components/LoadScreen";
-import CourierUI from "./components/CourierUI";
-import SenderUI from "./components/SenderUI";
+import {
+  HashRouter as Router,
+  Switch,
+  Route,
+  useParams
+} from "react-router-dom"
+
+import loadData, {logout} from "loadData";
+
+import LoginScreen from 'components/LoginScreen';
+import LoadScreen from "components/LoadScreen";
+import CourierUI from "components/CourierUI";
+import SenderUI from "components/SenderUI";
+import PendingOutgoingPackage from "components/package_cards/PendingOutgoingPackage";
+import LivePackage from "components/LivePackage";
 
 class CityLogisticsUI extends React.Component {
   state = {
@@ -36,12 +46,23 @@ class CityLogisticsUI extends React.Component {
 
   render() {
     const {user, dataFetched} = this.state;
-    if (dataFetched) {
-      if (user) {
-        if (user.is_courier) return <CourierUI user={user} onLogout={this.logout} />;
-        else return <SenderUI user={user} onLogout={this.logout}/>;
-      } else return <LoginScreen onLogin={() => this.refreshUser()}/>
-    } else return <LoadScreen/>;
+    const Package = () => <LivePackage uuid={useParams().packageUUID}/>;
+
+    return <Router>
+      <Switch>
+        <Route path='/package/:packageUUID'>
+          <Package/>
+        </Route>
+        <Route exact path=''>
+          {dataFetched ?
+            user ?
+              user.is_courier ? <CourierUI user={user} onLogout={this.logout} />
+              : <SenderUI user={user} onLogout={this.logout}/>
+            : <LoginScreen onLogin={() => this.refreshUser()}/>
+          : <LoadScreen/>}
+        </Route>
+      </Switch>
+    </Router>
   }
 }
 

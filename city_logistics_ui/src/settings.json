@@ -1,5 +1,5 @@
 {
-  "serverRoot": "http://10.255.255.175:8000",
+  "serverRoot": "http://localhost:8000",
   "algoliaPlaces": {
     "auth": {
       "appId": "pl484T49YN6O",

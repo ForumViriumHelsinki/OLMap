@@ -1,14 +1,7 @@
 import React from 'react';
 import Confirm from "util_components/Confirm";
-
-class Icon extends React.Component {
-  render() {
-    return <>
-      <i className="material-icons">{this.props.icon}</i><br/>
-      <small>{this.props.text}</small>
-    </>;
-  }
-}
+import Icon from "util_components/Icon";
+import NavBar from "util_components/NavBar";
 
 class NavItem extends React.Component {
   render() {
@@ -24,6 +17,7 @@ class NavItem extends React.Component {
     </li>;
   }
 }
+
 
 export default class FVHTabsUI extends React.Component {
   // Override in subclasses:
@@ -43,39 +37,31 @@ export default class FVHTabsUI extends React.Component {
   };
 
   render() {
-    const {user} = this.props;
+    const {user, onLogout} = this.props;
     const {activeTab, showLogout} = this.state;
     const {ChildComponent, header, childProps} = this.tabs[activeTab];
 
     return (
       <>
-        <nav className="navbar navbar-dark bg-primary mb-2">
-          <div className="w-25">
-            <div className="text-center text-light d-inline-block">
-              <Icon icon={user.is_courier ? "directions_bike" : "account_circle"} text={user.username}/>
-            </div>
-          </div>
-          <h5 className="mt-1 text-light">{header}</h5>
-          <div className="w-25 d-flex justify-content-end">
-            <img style={{maxHeight: 48, marginRight: -16}} src="images/FORUM_VIRIUM_logo_white.png"/>
-          </div>
-        </nav>
+        <NavBar header={header}
+                icon={user.is_courier ? "directions_bike" : "account_circle"}
+                iconText={user.username}/>
         <div className="container" style={{marginBottom: 96}}>
           <ChildComponent {...childProps}/>
         </div>
         <nav className="navbar fixed-bottom navbar-dark bg-primary">
           <ul className="navbar-nav flex-row nav-fill flex-fill">
             {Object.entries(this.tabs).map(([tabName, {icon, menuText}]) => (
-              <NavItem key={tabName} icon={icon} text={menuText} active={activeTab==tabName}
+              <NavItem key={tabName} icon={icon} text={menuText} active={activeTab == tabName}
                        onClick={() => this.setState({activeTab: tabName})}/>
             ))}
             <NavItem icon="logout" text="Logout" onClick={() => this.setState({showLogout: true})}/>
           </ul>
         </nav>
         {showLogout &&
-          <Confirm title="Log out?"
-                   onClose={() => this.setState({showLogout: false})}
-                   onConfirm={this.props.onLogout}/>
+        <Confirm title="Log out?"
+                 onClose={() => this.setState({showLogout: false})}
+                 onConfirm={onLogout}/>
         }
       </>
     );
