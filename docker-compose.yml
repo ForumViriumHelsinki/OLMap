@@ -12,6 +12,7 @@ services:
       - ./.env.dev
     depends_on:
       - db
+
   db:
     image: postgres:12.1
     volumes:
@@ -21,14 +22,14 @@ services:
       - POSTGRES_PASSWORD=hello_django
       - POSTGRES_DB=hello_django_dev
 
-#  frontend:
-#      build: ./city_logistics_ui
-##      command: ["npm", "start"]
-#      ports:
-#        - "3000:3000"
-#      volumes:
-#        - ./city_logistics_ui:/app/frontend
-#        - node-modules:/app/city_logistics_ui/node_modules
+  frontend:
+      build: ./city_logistics_ui
+      command: yarn start
+      ports:
+        - "3000:3000"
+      volumes:
+        - ./city_logistics_ui:/app/frontend
+        - node-modules:/app/city_logistics_ui/node_modules
 
 volumes:
   postgres_data:
