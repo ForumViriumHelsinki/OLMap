@@ -17,10 +17,8 @@ services:
     image: postgres:12.1
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=hello_django
-      - POSTGRES_PASSWORD=hello_django
-      - POSTGRES_DB=hello_django_dev
+    env_file:
+      - ./.env.dev
 
   frontend:
       build: ./city_logistics_ui
