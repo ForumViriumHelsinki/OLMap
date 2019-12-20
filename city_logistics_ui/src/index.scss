@@ -75,6 +75,10 @@ button.nav-link {
   display: inline-block;
 }
 
+button.nav-link:focus {
+  outline: none;
+}
+
 .container {
   max-width: 800px;
 }

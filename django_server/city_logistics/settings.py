@@ -126,7 +126,8 @@ USE_TZ = True
 # CORS_ORIGIN_WHITELIST = ['http://10.255.255.175:3000', 'http://localhost:3000']
 CORS_ORIGIN_ALLOW_ALL = True
 
-STATIC_URL = '/static/'
+STATIC_URL = '/staticfiles/'
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
