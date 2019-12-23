@@ -2,8 +2,12 @@ import React from 'react';
 import loadData from "loadData";
 import Error from "util_components/Error";
 
+type LiveDataLoaderProps = {
+  url: string,
+  onLoad: (data: any) => any
+}
 
-export default class LiveDataLoader extends React.Component {
+export default class LiveDataLoader extends React.Component<LiveDataLoaderProps> {
   refreshInterval = 10000;
   _isMounted = false;
 
@@ -11,6 +15,7 @@ export default class LiveDataLoader extends React.Component {
     items: null,
     error: false
   };
+  fetchInterval: NodeJS.Timeout | null = null;
 
   componentDidMount() {
     this.refreshItems = this.refreshItems.bind(this);
@@ -20,7 +25,7 @@ export default class LiveDataLoader extends React.Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.fetchInterval);
+    if (this.fetchInterval) clearInterval(this.fetchInterval);
     this.fetchInterval = null;
     this._isMounted = false;
   }

@@ -1,6 +1,12 @@
 import React from 'react';
 
-export default class Contacts extends React.Component {
+type ContactProps = {
+  title: string,
+  name: string,
+  phone: string | string[]
+}
+
+export default class Contacts extends React.Component<ContactProps> {
   render() {
     const {title, name, phone} = this.props;
     return <div className="mt-1">

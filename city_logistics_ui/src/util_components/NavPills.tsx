@@ -1,6 +1,13 @@
 import React from 'react';
 
-export default class NavPills extends React.Component {
+type NavPillProps = {
+  onSelect: (nav: string, i: number) => any,
+  navs: string[],
+  active: string,
+  disabled: string[]
+}
+
+export default class NavPills extends React.Component<NavPillProps> {
   render() {
     const {navs, onSelect} = this.props;
     return <ul className="nav nav-pills nav-justified">
@@ -12,7 +19,7 @@ export default class NavPills extends React.Component {
     </ul>;
   }
 
-  getClassName(nav) {
+  getClassName(nav: string) {
     const {active, disabled} = this.props;
     return `nav-link${(nav == active) ? ' active' : ''}${disabled.includes(nav) ? ' disabled' : ''}`;
   }

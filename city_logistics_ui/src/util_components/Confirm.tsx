@@ -1,7 +1,13 @@
 import React from "react";
 import Modal, {ModalActions} from "util_components/Modal";
 
-export default class Confirm extends React.Component {
+type ConfirmProps = {
+  title: string,
+  onConfirm: () => any,
+  onClose: () => any
+}
+
+export default class Confirm extends React.Component<ConfirmProps> {
   render() {
     const {title, onConfirm, onClose} = this.props;
 

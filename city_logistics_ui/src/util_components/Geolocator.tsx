@@ -1,13 +1,15 @@
 import React from 'react';
 import Modal, {ModalBody} from "util_components/Modal";
-import settings from "settings";
+import settings from "settings.json";
+import {LocationTuple} from './types';
 
-export default class Geolocator extends React.Component {
+export default class Geolocator extends React.Component<{onLocation: (location: LocationTuple) => any}> {
   state = {
     geolocationError: null
   };
 
-  geolocationWatcher = null;
+  geolocationWatcher: number | null = null;
+  mockInterval: NodeJS.Timeout | null = null;
 
   render() {
     const {geolocationError} = this.state;

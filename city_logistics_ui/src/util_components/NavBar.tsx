@@ -1,7 +1,7 @@
 import React from "react";
 import Icon from "util_components/Icon";
 
-export default class NavBar extends React.Component {
+export default class NavBar extends React.Component<{icon: string, iconText: string, header: string}> {
   render() {
     const {icon, iconText, header} = this.props;
 

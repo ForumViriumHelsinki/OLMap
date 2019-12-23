@@ -2,8 +2,13 @@ import React from "react";
 import * as PropTypes from "prop-types";
 import Confirm from "util_components/Confirm";
 
+type ButtonProps = {
+  onClick: () => any,
+  children: any,
+  confirm?: string
+};
 
-export default class Button extends React.Component {
+export default class Button extends React.Component<ButtonProps> {
   state = {
     showConfirmation: false
   };
@@ -28,5 +33,3 @@ export default class Button extends React.Component {
     </>;
   }
 }
-
-Button.propTypes = {onClick: PropTypes.func};

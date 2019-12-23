@@ -1,10 +1,16 @@
 import React from "react";
 
-export function CardP({children}) {
+export function CardP({children}: {children: any}) {
   return <p className="card-text">{children}</p>;
 }
 
-export default class Card extends React.Component {
+type CardProps = {
+  title: string,
+  subtitles: string[],
+  children: any
+}
+
+export default class Card extends React.Component<CardProps> {
   render() {
     const {title, subtitles, children} = this.props;
     return <div className="card mb-2">

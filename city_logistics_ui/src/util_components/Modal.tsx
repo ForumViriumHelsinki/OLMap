@@ -6,7 +6,13 @@ export class ModalBody extends React.Component {
   }
 }
 
-export class ModalActions extends React.Component {
+type Action = {
+  label: string,
+  action: () => any,
+  color: 'primary' | 'secondary' | 'light' | 'outline-primary' | 'outline-secondary'
+}
+
+export class ModalActions extends React.Component<{actions: Action[]}> {
   render() {
     return <div className="modal-footer">
       {this.props.actions.map(({label, action, color}) =>
@@ -16,12 +22,14 @@ export class ModalActions extends React.Component {
   }
 }
 
-export default class Modal extends React.Component {
+type ModalProps = {title: string, onClose: () => any, children: any}
+
+export default class Modal extends React.Component<ModalProps> {
   render() {
     const {title, onClose, children} = this.props;
     return (<>
       <div className="modal-backdrop show"> </div>
-      <div className="modal show" tabIndex="-1" role="dialog" style={{display: 'block'}} onClick={onClose}>
+      <div className="modal show" tabIndex={-1} role="dialog" style={{display: 'block'}} onClick={onClose}>
         <div className="modal-dialog modal-dialog-centered"
              role="document"
              onClick={(e) => e.stopPropagation()}>

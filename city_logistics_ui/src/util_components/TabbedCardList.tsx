@@ -1,7 +1,16 @@
 import React from 'react';
-import NavPills from "util_components/NavPills";
+import NavPills from "./NavPills";
 
-export default class TabbedCardList extends React.Component {
+type TabbedCardListProps = {
+  items: any[],
+  tabs: {
+    name: string,
+    filter: (item: any) => any
+    renderItem: (item: any) => any
+  }[]
+}
+
+export default class TabbedCardList extends React.Component<TabbedCardListProps> {
   state = {activeTab: 0};
 
   render() {

@@ -1,25 +1,37 @@
 import React from 'react';
 import Modal from "util_components/Modal";
+// @ts-ignore
 import * as L from 'leaflet';
-import settings from 'settings';
+import settings from 'settings.json';
 
-import styles from 'leaflet/dist/leaflet.css';
+// @ts-ignore
+import styles from 'leaflet/dist/leaflet.css'; // eslint-disable-line
 
 import GlyphIcon from "util_components/GlyphIcon";
 import Geolocator from "util_components/Geolocator";
+import {Location, Address} from './types';
 
-export default class Map extends React.Component {
+export type MapProps = {
+  origin: Address,
+  destination: Address,
+  currentPosition?: Location,
+  currentPositionIndex?: number,
+  onClose: () => any
+}
+
+export default class Map extends React.Component<MapProps, {currentPosition: null | Location}> {
   state = {
-    currentPosition: null,
+    currentPosition: null
   };
 
-  constructor(props) {
-    super(props);
-    this.initMapState()
-  }
+  private leafletMap: any = null;
+  private markers: {
+    origin?: any, destination?: any, currentPosition?: any
+  } = {};
+  private path: any = null;
+  private userMovedMap: boolean = false;
 
   initMapState() {
-    this.initialZoom = 13;
     this.leafletMap = null;
     this.markers = {};
     this.path = null;
@@ -27,7 +39,7 @@ export default class Map extends React.Component {
   }
 
   render() {
-    const {origin, destination, onClose, currentPositionIndex, currentPosition} = this.props;
+    const {origin, destination, onClose, currentPositionIndex=0, currentPosition} = this.props;
 
     return <Modal title={`${origin.street_address} to ${destination.street_address}`} onClose={onClose}>
       <div id="leafletMap" style={{height: '70vh'}}> </div>
@@ -46,7 +58,7 @@ export default class Map extends React.Component {
     this.initMapState()
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate() {
     this.refreshMap();
   }
 
@@ -77,11 +89,13 @@ export default class Map extends React.Component {
 
     Object.entries({origin, destination, currentPosition}).forEach(([name, coord]) => {
       if (!coord) return;
-      if (this.markers[name]) this.markers[name].setLatLng([coord.lat, coord.lon]);
-      else
-        this.markers[name] = L.marker(
+      // @ts-ignore
+      const marker = this.markers[name], glyph = settings.markerIcons[name];
+      if (marker) marker.setLatLng([coord.lat, coord.lon]);
+      // @ts-ignore
+      else this.markers[name] = L.marker(
           [coord.lat, coord.lon],
-          {icon: new GlyphIcon({glyph: settings.markerIcons[name], glyphSize: 20})}
+          {icon: new GlyphIcon({glyph, glyphSize: 20})}
         ).addTo(this.leafletMap);
     });
   }
@@ -94,7 +108,7 @@ export default class Map extends React.Component {
     const {origin, destination} = this.props;
     const currentPositionIndex = this.props.currentPositionIndex || 0;
     const currentPosition = this.getCurrentPosition();
-    const coords = [origin, destination];
+    const coords: Location[] = [origin, destination];
 
     if (currentPosition && (currentPositionIndex >= 0)) {
       coords.splice(currentPositionIndex, 0, currentPosition);
