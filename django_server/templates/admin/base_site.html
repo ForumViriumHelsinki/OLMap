@@ -1,0 +1,143 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrastyle %}
+<style type="text/css">
+a:link, a:visited {
+    color: #FF5000;
+}
+
+a:focus, a:hover {
+    color: #FF5000;
+}
+
+code strong {
+    color: #FF5000;
+}
+
+table thead th.sorted .sortoptions a.sortremove:focus:after,
+table thead th.sorted .sortoptions a.sortremove:hover:after {
+    color: #FF5000;
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background: #FF5000;
+}
+
+.button:active, input[type=submit]:active, input[type=button]:active,
+.button:focus, input[type=submit]:focus, input[type=button]:focus,
+.button:hover, input[type=submit]:hover, input[type=button]:hover {
+    background: #FF5000;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default {
+    background: #FF5000;
+}
+
+.button.default:active, input[type=submit].default:active,
+.button.default:focus, input[type=submit].default:focus,
+.button.default:hover, input[type=submit].default:hover {
+    background: #FF5000;
+}
+
+.button[disabled].default,
+input[type=submit][disabled].default,
+input[type=button][disabled].default {
+    opacity: 0.4;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background: #FF5000;
+    color: #fff;
+}
+
+div.breadcrumbs {
+    background: #fff;
+    color: #FF5000;
+    box-shadow: 0 2px 4px rgba(255, 80, 0, 0.3);
+}
+
+div.breadcrumbs a {
+    color: #FF5000;
+}
+
+div.breadcrumbs a:focus, div.breadcrumbs a:hover {
+    color: #FF5000;
+}
+
+/* ACTION ICONS */
+
+.viewlink, .inlineviewlink {
+    padding-left: 16px;
+    background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
+}
+
+.addlink {
+    padding-left: 16px;
+    background: url(../img/icon-addlink.svg) 0 1px no-repeat;
+}
+
+.changelink, .inlinechangelink {
+    padding-left: 16px;
+    background: url(../img/icon-changelink.svg) 0 1px no-repeat;
+}
+
+.deletelink {
+    padding-left: 16px;
+    background: url(../img/icon-deletelink.svg) 0 1px no-repeat;
+}
+
+a.deletelink:link, a.deletelink:visited {
+    color: #CC3434;
+}
+
+a.deletelink:focus, a.deletelink:hover {
+    color: #993333;
+    text-decoration: none;
+}
+
+.object-tools a:focus, .object-tools a:hover {
+    background-color: #FF5000;
+}
+
+#header {
+    background: #FF5000;
+    color: #fff;
+}
+
+#header a:link, #header a:visited {
+    color: #fff;
+}
+
+#branding h1 {
+    color: #fff;
+}
+
+#branding h1, #branding h1 a:link, #branding h1 a:visited {
+    color: #fff;
+}
+
+#branding h2 {
+    color: #fff;
+}
+
+
+#user-tools a:focus, #user-tools a:hover {
+    border-bottom-color: #fff;
+    color: #fff;
+}
+
+input:focus {
+  outline-color: rgba(255, 80, 0, 0.247);
+}
+
+</style>
+{% endblock %}

@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
-    'django.contrib.admin',
+    'city_logistics.apps.AdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
