@@ -5,7 +5,7 @@ export function CardP({children}: {children: any}) {
 }
 
 type CardProps = {
-  title: string,
+  title: string | React.ReactNode,
   subtitles: string[],
   children: any
 }

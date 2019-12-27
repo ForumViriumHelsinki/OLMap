@@ -1,11 +1,11 @@
 import React from 'react';
 import Card, {CardP} from "util_components/Card";
 import MapWidget from "util_components/MapWidget";
-import Contacts from "util_components/Contacts";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
+import {Package} from "components/types";
 
-export default class DeliveredByMePackage extends React.Component {
+export default class DeliveredByMePackage extends React.Component<{package: Package}> {
   render() {
     const {pickup_at, deliver_to, weight, width, height, depth, picked_up_time, delivered_time} = this.props.package;
 

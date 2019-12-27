@@ -1,4 +1,4 @@
-import {Address} from "util_components/types";
+import {Address, Location} from "util_components/types";
 
 export type User = {
     is_courier: boolean,
@@ -9,8 +9,20 @@ export type User = {
 };
 
 export type Package = {
-    picked_up_time: string,
-    delivered_time: string,
+    created_at: string,
+    recipient: string,
+    recipient_phone: string,
+    sender?: User,
+    courier?: User,
+    courier_location?: Location,
+    picked_up_time?: string,
+    delivered_time?: string,
+    earliest_pickup_time: string,
     pickup_at: Address,
-    deliver_to: Address
+    deliver_to: Address,
+    weight: number,
+    width: number,
+    height: number,
+    depth: number,
+    id: number
 }

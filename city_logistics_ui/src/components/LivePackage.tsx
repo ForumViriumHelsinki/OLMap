@@ -3,14 +3,15 @@ import LiveDataLoader from "util_components/LiveDataLoader";
 import PendingOutgoingPackage from "components/package_cards/PendingOutgoingPackage";
 import Spinner from "util_components/Spinner";
 import NavBar from "util_components/NavBar";
+import {Package} from "components/types";
 
 export default class LivePackage extends React.Component<{uuid: string}> {
   url(uuid: string) {
     return `/rest/packages/${uuid}/`
   }
 
-  state = {
-    pkg: null
+  state: {pkg?: Package} = {
+    pkg: undefined
   };
 
   render() {

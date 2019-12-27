@@ -5,8 +5,16 @@ import Contacts from "util_components/Contacts";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
 import Button from "util_components/Button";
+import {Package, User} from "components/types";
+import {LocationTuple} from "util_components/types";
 
-export default class InTransitPackage extends React.Component {
+type InTransitPackageProps = {
+    package: Package & {sender: User},
+    currentLocation: LocationTuple,
+    onPackageAction: (id: number, action: string) => any
+}
+
+export default class InTransitPackage extends React.Component<InTransitPackageProps> {
   render() {
     const {
       earliest_pickup_time, pickup_at, deliver_to, weight, width, height, depth,

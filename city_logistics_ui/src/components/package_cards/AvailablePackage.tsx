@@ -1,12 +1,19 @@
 import React from 'react';
 import Card, {CardP} from "util_components/Card";
 import MapWidget from "util_components/MapWidget";
-import Contacts from "util_components/Contacts";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
 import Button from "util_components/Button";
+import {Package} from "components/types";
+import {LocationTuple} from "util_components/types";
 
-export default class AvailablePackage extends React.Component {
+type AvailablePackageProps = {
+    package: Package,
+    currentLocation: LocationTuple,
+    onPackageReserve: (id: number) => any
+}
+
+export default class AvailablePackage extends React.Component<AvailablePackageProps> {
   render() {
     const {
       earliest_pickup_time, pickup_at, deliver_to,

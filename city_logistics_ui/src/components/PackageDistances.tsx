@@ -4,7 +4,7 @@ import Distances from "util_components/Distances";
 import {Package} from "components/types";
 import {Location} from "util_components/types";
 
-export default class PackageDistances extends React.Component<{courierLocation: Location, package: Package}> {
+export default class PackageDistances extends React.Component<{courierLocation?: Location, package: Package}> {
   render() {
     const {courierLocation} = this.props;
     const {picked_up_time, delivered_time, pickup_at, deliver_to} = this.props.package;

@@ -4,8 +4,9 @@ import MapWidget from "util_components/MapWidget";
 import Contacts from "util_components/Contacts";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
+import {Package} from "components/types";
 
-export default class PendingOutgoingPackage extends React.Component {
+export default class PendingOutgoingPackage extends React.Component<{package: Package}> {
   render() {
     const {
       created_at, pickup_at, deliver_to, recipient, courier,

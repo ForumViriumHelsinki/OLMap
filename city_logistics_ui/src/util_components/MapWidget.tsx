@@ -1,7 +1,7 @@
 import React from "react";
-import Map, {MapProps} from "./Map";
+import Map, {BaseMapProps} from "./Map";
 
-export default class MapWidget extends React.Component<MapProps> {
+export default class MapWidget extends React.Component<BaseMapProps> {
   state = {
     mapOpen: null
   };

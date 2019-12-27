@@ -10,11 +10,14 @@ import GlyphIcon from "util_components/GlyphIcon";
 import Geolocator from "util_components/Geolocator";
 import {Location, Address} from './types';
 
-export type MapProps = {
+export type BaseMapProps = {
   origin: Address,
   destination: Address,
   currentPosition?: Location,
   currentPositionIndex?: number,
+}
+
+export type MapProps = BaseMapProps & {
   onClose: () => any
 }
 
