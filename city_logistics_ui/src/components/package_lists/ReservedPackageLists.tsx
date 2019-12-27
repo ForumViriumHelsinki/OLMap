@@ -7,16 +7,18 @@ import Geolocator from "util_components/Geolocator";
 import DeliveredByMePackage from "components/package_cards/DeliveredByMePackage";
 import InTransitPackage from "components/package_cards/InTransitPackage";
 import Component from "util_components/Component";
+import {LocationTuple} from "util_components/types";
+import {Package} from "components/types";
 
-export default class ReservedPackageLists extends Component {
+export default class ReservedPackageLists extends Component<{}> {
   url = "/rest/my_packages/";
   locationUrl = "/rest/my_location/";
   static bindMethods = ['locationUpdated', 'packageAction', 'packagesLoaded'];
-  dataLoader = React.createRef();
+  dataLoader = React.createRef<LiveDataLoader>();
 
-  state = {
-    currentLocation: null,
-    items: null
+  state: {currentLocation?: LocationTuple, items?: Package[]} = {
+    currentLocation: undefined,
+    items: undefined
   };
   locationSaveNeeded = false;
 
@@ -24,15 +26,15 @@ export default class ReservedPackageLists extends Component {
     return [
       {
         name: 'Pending',
-        filter: (item) => !item.delivered_time,
-        renderItem: (item) =>
+        filter: (item: Package) => !item.delivered_time,
+        renderItem: (item: Package) =>
           <InTransitPackage package={item}
                             currentLocation={this.state.currentLocation}
                             onPackageAction={this.packageAction}/>
       }, {
         name: 'Delivered',
-        filter: (item) => item.delivered_time,
-        renderItem: (item) => <DeliveredByMePackage package={item}/>
+        filter: (item: Package) => item.delivered_time,
+        renderItem: (item: Package) => <DeliveredByMePackage package={item}/>
       }
     ];
   }
@@ -46,21 +48,21 @@ export default class ReservedPackageLists extends Component {
     </>;
   }
 
-  packageAction(id, action) {
+  packageAction(id: number, action: string) {
     loadData(this.url + id + `/register_${action}/`, {method: 'PUT'})
     .then((response) => {
-      if (response.status == 200) this.dataLoader.current.refreshItems();
+      if ((response.status == 200) && this.dataLoader.current) this.dataLoader.current.refreshItems();
       else this.setState({error: true});
     })
   }
 
   // If there are undelivered but reserved packages, courier location should be saved to db:
-  packagesLoaded(items) {
+  packagesLoaded(items: Package[]) {
     this.setState({items});
     this.locationSaveNeeded = items.filter((p) => !p.delivered_time).length > 0;
   }
 
-  locationUpdated(currentLocation) {
+  locationUpdated(currentLocation: LocationTuple) {
     this.setState({currentLocation});
     if (this.locationSaveNeeded) {
       const [lat, lon] = currentLocation;

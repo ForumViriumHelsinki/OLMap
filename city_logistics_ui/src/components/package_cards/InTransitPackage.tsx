@@ -9,8 +9,8 @@ import {Package, User} from "components/types";
 import {LocationTuple} from "util_components/types";
 
 type InTransitPackageProps = {
-    package: Package & {sender: User},
-    currentLocation: LocationTuple,
+    package: Package,
+    currentLocation?: LocationTuple,
     onPackageAction: (id: number, action: string) => any
 }
 

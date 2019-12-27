@@ -6,14 +6,17 @@ import Geolocator from "util_components/Geolocator";
 import LiveDataLoader from "util_components/LiveDataLoader";
 import AvailablePackage from "components/package_cards/AvailablePackage";
 import Component from "util_components/Component";
+import {LocationTuple} from "util_components/types";
+import {Package} from "components/types";
 
+type func = () => any;
 
-export default class AvailablePackages extends Component {
+export default class AvailablePackages extends Component<{onPackageReserved: func}> {
   url = "/rest/available_packages/";
   static bindMethods = ['reservePackage'];
 
-  state = {
-    currentLocation: null,
+  state: {currentLocation?: LocationTuple, packages: Package[]} = {
+    currentLocation: undefined,
     packages: []
   };
 
@@ -32,7 +35,7 @@ export default class AvailablePackages extends Component {
     </>;
   }
 
-  reservePackage(id) {
+  reservePackage(id: number) {
     loadData(this.url + id + '/reserve/', {method: 'PUT'})
     .then((response) => {
       if (response.status == 200) this.props.onPackageReserved();

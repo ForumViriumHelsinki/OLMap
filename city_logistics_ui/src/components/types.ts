@@ -12,7 +12,7 @@ export type Package = {
     created_at: string,
     recipient: string,
     recipient_phone: string,
-    sender?: User,
+    sender: User,
     courier?: User,
     courier_location?: Location,
     picked_up_time?: string,

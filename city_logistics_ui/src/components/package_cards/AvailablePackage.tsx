@@ -9,7 +9,7 @@ import {LocationTuple} from "util_components/types";
 
 type AvailablePackageProps = {
     package: Package,
-    currentLocation: LocationTuple,
+    currentLocation?: LocationTuple,
     onPackageReserve: (id: number) => any
 }
 

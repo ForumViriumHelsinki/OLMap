@@ -4,21 +4,22 @@ import Spinner from "util_components/Spinner";
 import TabbedCardList from "util_components/TabbedCardList";
 import PendingOutgoingPackage from "components/package_cards/PendingOutgoingPackage";
 import DeliveredOutgoingPackage from "components/package_cards/DeliveredOutgoingPackage";
+import {Package} from "components/types";
 
 export default class OutgoingPackageLists extends React.Component {
   url="/rest/outgoing_packages/";
 
-  state = {items: null};
+  state: {items?: Package[]} = {items: undefined};
 
   tabs = [
     {
       name: 'Pending',
-      filter: (item) => !item.delivered_time,
-      renderItem: (item) => <PendingOutgoingPackage package={item}/>
+      filter: (item: Package) => !item.delivered_time,
+      renderItem: (item: Package) => <PendingOutgoingPackage package={item}/>
     }, {
       name: 'Delivered',
-      filter: (item) => item.delivered_time,
-      renderItem: (item) => <DeliveredOutgoingPackage package={item}/>
+      filter: (item: Package) => item.delivered_time,
+      renderItem: (item: Package) => <DeliveredOutgoingPackage package={item}/>
     }
   ]
 
