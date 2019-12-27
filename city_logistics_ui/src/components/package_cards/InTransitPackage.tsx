@@ -5,13 +5,13 @@ import Contacts from "util_components/Contacts";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
 import Button from "util_components/Button";
-import {Package, User} from "components/types";
+import {Package, packageAction, User} from "components/types";
 import {LocationTuple} from "util_components/types";
 
 type InTransitPackageProps = {
     package: Package,
     currentLocation?: LocationTuple,
-    onPackageAction: (id: number, action: string) => any
+    onPackageAction: (id: number, action: packageAction) => any
 }
 
 export default class InTransitPackage extends React.Component<InTransitPackageProps> {

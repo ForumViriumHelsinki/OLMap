@@ -4,12 +4,9 @@ import PendingOutgoingPackage from "components/package_cards/PendingOutgoingPack
 import Spinner from "util_components/Spinner";
 import NavBar from "util_components/NavBar";
 import {Package} from "components/types";
+import {uuidPackageUrl} from "urls";
 
 export default class LivePackage extends React.Component<{uuid: string}> {
-  url(uuid: string) {
-    return `/rest/packages/${uuid}/`
-  }
-
   state: {pkg?: Package} = {
     pkg: undefined
   };
@@ -21,7 +18,7 @@ export default class LivePackage extends React.Component<{uuid: string}> {
     return <>
       <NavBar icon="work" iconText="" header="Package"/>
       <div className="container">
-        <LiveDataLoader url={this.url(uuid)} onLoad={(pkg) => this.setState({pkg})}/>
+        <LiveDataLoader url={uuidPackageUrl(uuid)} onLoad={(pkg) => this.setState({pkg})}/>
         {pkg ? <PendingOutgoingPackage package={pkg}/> : <Spinner/>}
       </div>
     </>;

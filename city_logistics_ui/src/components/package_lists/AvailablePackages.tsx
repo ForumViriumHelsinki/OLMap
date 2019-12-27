@@ -8,11 +8,11 @@ import AvailablePackage from "components/package_cards/AvailablePackage";
 import Component from "util_components/Component";
 import {LocationTuple} from "util_components/types";
 import {Package} from "components/types";
+import {availablePackagesUrl, reservePackageUrl} from "urls";
 
 type func = () => any;
 
 export default class AvailablePackages extends Component<{onPackageReserved: func}> {
-  url = "/rest/available_packages/";
   static bindMethods = ['reservePackage'];
 
   state: {currentLocation?: LocationTuple, packages: Package[]} = {
@@ -25,7 +25,7 @@ export default class AvailablePackages extends Component<{onPackageReserved: fun
 
     return <>
       <Geolocator onLocation={(currentLocation) => this.setState({currentLocation})}/>
-      <LiveDataLoader url={this.url} onLoad={(packages) => this.setState({packages})}/>
+      <LiveDataLoader url={availablePackagesUrl} onLoad={(packages) => this.setState({packages})}/>
       {packages.length ?
           packages.map((item) =>
             <AvailablePackage key={item.id} package={item} currentLocation={currentLocation}
@@ -36,7 +36,7 @@ export default class AvailablePackages extends Component<{onPackageReserved: fun
   }
 
   reservePackage(id: number) {
-    loadData(this.url + id + '/reserve/', {method: 'PUT'})
+    loadData(reservePackageUrl(id), {method: 'PUT'})
     .then((response) => {
       if (response.status == 200) this.props.onPackageReserved();
       else this.setState({error: true});

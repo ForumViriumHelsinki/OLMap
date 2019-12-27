@@ -26,3 +26,5 @@ export type Package = {
     depth: number,
     id: number
 }
+
+export type packageAction = 'pickup' | 'delivery';

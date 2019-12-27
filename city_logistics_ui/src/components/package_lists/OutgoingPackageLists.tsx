@@ -5,10 +5,9 @@ import TabbedCardList from "util_components/TabbedCardList";
 import PendingOutgoingPackage from "components/package_cards/PendingOutgoingPackage";
 import DeliveredOutgoingPackage from "components/package_cards/DeliveredOutgoingPackage";
 import {Package} from "components/types";
+import {outgoingPackagesUrl} from "urls";
 
 export default class OutgoingPackageLists extends React.Component {
-  url="/rest/outgoing_packages/";
-
   state: {items?: Package[]} = {items: undefined};
 
   tabs = [
@@ -26,7 +25,7 @@ export default class OutgoingPackageLists extends React.Component {
   render() {
     const {items} = this.state;
     return <>
-      <LiveDataLoader url={this.url} onLoad={(items) => this.setState({items})}/>
+      <LiveDataLoader url={outgoingPackagesUrl} onLoad={(items) => this.setState({items})}/>
       {items ? <TabbedCardList items={items} tabs={this.tabs}/> : <Spinner/>}
     </>;
   }

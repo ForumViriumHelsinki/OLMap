@@ -2,11 +2,11 @@ import React, {FormEvent} from 'react';
 import loadData, {login} from "../loadData";
 import Error from "util_components/Error";
 import Component from "util_components/Component";
+import {loginUrl} from "urls";
 
 type func = () => any;
 
 export default class LoginScreen extends Component<{onLogin: func}> {
-  url = '/rest-auth/login/';
   static bindMethods = ['submit'];
 
   state = {username: '', password: '', error: false};
@@ -50,7 +50,7 @@ export default class LoginScreen extends Component<{onLogin: func}> {
     // @ts-ignore
     formData.forEach((value: any, key: string) => data[key] = value);
     this.setState({error: false, ...data});
-    loadData(this.url, {method: 'POST', data: data }).then((response) => {
+    loadData(loginUrl, {method: 'POST', data: data }).then((response) => {
       if (response.status == 200) response.json().then((data) => {
         login(data.key);
         this.props.onLogin();

@@ -8,11 +8,10 @@ import DeliveredByMePackage from "components/package_cards/DeliveredByMePackage"
 import InTransitPackage from "components/package_cards/InTransitPackage";
 import Component from "util_components/Component";
 import {LocationTuple} from "util_components/types";
-import {Package} from "components/types";
+import {Package, packageAction} from "components/types";
+import {myLocationUrl, myPackageActionUrl, myPackagesUrl} from "urls";
 
 export default class ReservedPackageLists extends Component<{}> {
-  url = "/rest/my_packages/";
-  locationUrl = "/rest/my_location/";
   static bindMethods = ['locationUpdated', 'packageAction', 'packagesLoaded'];
   dataLoader = React.createRef<LiveDataLoader>();
 
@@ -42,14 +41,14 @@ export default class ReservedPackageLists extends Component<{}> {
   render() {
     const {items} = this.state;
     return <>
-      <LiveDataLoader url={this.url} onLoad={this.packagesLoaded} ref={this.dataLoader}/>
+      <LiveDataLoader url={myPackagesUrl} onLoad={this.packagesLoaded} ref={this.dataLoader}/>
       {items ? <TabbedCardList items={items} tabs={this.tabs()}/> : <Spinner/>}
       <Geolocator onLocation={this.locationUpdated}/>
     </>;
   }
 
-  packageAction(id: number, action: string) {
-    loadData(this.url + id + `/register_${action}/`, {method: 'PUT'})
+  packageAction(id: number, action: packageAction) {
+    loadData(myPackageActionUrl(id, action), {method: 'PUT'})
     .then((response) => {
       if ((response.status == 200) && this.dataLoader.current) this.dataLoader.current.refreshItems();
       else this.setState({error: true});
@@ -66,7 +65,7 @@ export default class ReservedPackageLists extends Component<{}> {
     this.setState({currentLocation});
     if (this.locationSaveNeeded) {
       const [lat, lon] = currentLocation;
-      loadData(this.locationUrl, {method: 'PUT', data: {lat, lon}});
+      loadData(myLocationUrl, {method: 'PUT', data: {lat, lon}});
     }
   }
 }
