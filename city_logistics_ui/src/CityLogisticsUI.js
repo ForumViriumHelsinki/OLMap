@@ -1,3 +1,5 @@
+import styles from 'leaflet/dist/leaflet.css';
+
 import React from 'react';
 import {
   HashRouter as Router,
@@ -12,7 +14,6 @@ import LoginScreen from 'components/LoginScreen';
 import LoadScreen from "components/LoadScreen";
 import CourierUI from "components/CourierUI";
 import SenderUI from "components/SenderUI";
-import PendingOutgoingPackage from "components/package_cards/PendingOutgoingPackage";
 import LivePackage from "components/LivePackage";
 
 class CityLogisticsUI extends React.Component {

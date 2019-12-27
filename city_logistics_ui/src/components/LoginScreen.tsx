@@ -1,16 +1,15 @@
-import React from 'react';
+import React, {FormEvent} from 'react';
 import loadData, {login} from "../loadData";
 import Error from "util_components/Error";
+import Component from "util_components/Component";
 
+type func = () => any;
 
-export default class LoginScreen extends React.Component {
+export default class LoginScreen extends Component<{onLogin: func}> {
   url = '/rest-auth/login/';
+  static bindMethods = ['submit'];
 
-  constructor(props) {
-    super(props);
-    this.submit = this.submit.bind(this);
-    this.state = {username: '', password: ''};
-  }
+  state = {username: '', password: '', error: false};
 
   render() {
     return (
@@ -26,7 +25,7 @@ export default class LoginScreen extends React.Component {
             <label htmlFor="username">Username</label>
             <input type="test" className="form-control" name="username"
                    defaultValue={this.state.username}
-                   onBlur={() => document.getElementById('password').focus()}
+                   onBlur={this.focusPassword}
                    autoFocus={true}/>
           </div>
           <div className="form-group">
@@ -39,11 +38,17 @@ export default class LoginScreen extends React.Component {
     );
   }
 
-  submit(e) {
+  focusPassword() {
+    const input = document.getElementById('password');
+    if (input) input.focus();
+  }
+
+  submit(e: any) {
     e.preventDefault();
     const formData = new FormData(e.target);
-    var data = {};
-    formData.forEach((value, key) => data[key] = value);
+    let data = {};
+    // @ts-ignore
+    formData.forEach((value: any, key: string) => data[key] = value);
     this.setState({error: false, ...data});
     loadData(this.url, {method: 'POST', data: data }).then((response) => {
       if (response.status == 200) response.json().then((data) => {

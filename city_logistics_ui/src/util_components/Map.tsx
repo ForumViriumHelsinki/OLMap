@@ -4,8 +4,7 @@ import Modal from "util_components/Modal";
 import * as L from 'leaflet';
 import settings from 'settings.json';
 
-// @ts-ignore
-import styles from 'leaflet/dist/leaflet.css'; // eslint-disable-line
+import styles from 'leaflet/dist/leaflet.css';
 
 import GlyphIcon from "util_components/GlyphIcon";
 import Geolocator from "util_components/Geolocator";

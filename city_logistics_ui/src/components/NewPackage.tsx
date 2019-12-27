@@ -1,19 +1,23 @@
 import React from 'react';
 
+// @ts-ignore
 import Form from "react-jsonschema-form";
-import places from "places.js";
+import places, { ReconfigurableOptions, Suggestion } from "places.js";
 import loadData from "../loadData";
 import Spinner from "util_components/Spinner";
 
-import settings from "../settings";
+import settings from "settings.json";
 import Error from "util_components/Error";
 import moment from "moment";
+import Component from "util_components/Component";
 
-export default class NewPackage extends React.Component {
+type func = () => any;
+
+export default class NewPackage extends Component<{onCreated: func}> {
   addressFields = ['pickup_at', 'deliver_to'];
   stringField = {type: "string", maxLength: 128, minLength: 1};
-  autocompleteFields = {};
-  selectedAddresses = {};
+  autocompleteFields: {[index: string]: any} = {};
+  selectedAddresses: {[index: string]: any} = {};
 
   timeFieldDefaults = {
     earliest_pickup_time: 0,
@@ -27,10 +31,7 @@ export default class NewPackage extends React.Component {
     error: false
   };
 
-  constructor(props) {
-    super(props);
-    this.onSubmit = this.onSubmit.bind(this);
-  }
+  static bindMethods = ['onSubmit'];
 
   componentDidMount() {
     loadData('/rest/outgoing_packages/jsonschema/')
@@ -38,16 +39,18 @@ export default class NewPackage extends React.Component {
     .then((schema) => this.setSchema(schema))
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate() {
     const {auth, configuration} = settings.algoliaPlaces;
     this.addressFields.forEach((field) => {
+      const inputEl = document.getElementById(`root_${field}`);
+      if (inputEl) {
         this.autocompleteFields[field] = places({
           ...auth,
-          container: document.getElementById(`root_${field}`)
-        }).configure(configuration);
-        this.autocompleteFields[field].on('change', (e) => this.onAddressChange(field, e.suggestion));
+          container: inputEl as HTMLInputElement
+        }).configure(configuration as ReconfigurableOptions);
+        this.autocompleteFields[field].on('change', (e: any) => this.onAddressChange(field, e.suggestion));
       }
-    )
+    });
   }
 
   render() {
@@ -60,7 +63,7 @@ export default class NewPackage extends React.Component {
     } else return <Spinner/>
   }
 
-  setSchema(schema) {
+  setSchema(schema: any) {
     this.addressFields.forEach((field) =>
       schema.properties[field] = {...this.stringField, title: schema.properties[field].title});
     Object.entries(this.timeFieldDefaults).forEach(([field, hours]) =>
@@ -69,7 +72,7 @@ export default class NewPackage extends React.Component {
     this.setState({schema});
   }
 
-  onAddressChange(fieldName, address) {
+  onAddressChange(fieldName: string, address: Suggestion) {
     this.selectedAddresses[fieldName] = {
       street_address: address.name,
       postal_code: address.postcode,
@@ -80,6 +83,7 @@ export default class NewPackage extends React.Component {
     };
   }
 
+  // @ts-ignore
   onSubmit({formData}) {
     loadData('/rest/outgoing_packages/', {method: 'POST', data: {...formData, ...this.selectedAddresses}})
     .then((response) => {

@@ -4,8 +4,8 @@ import PendingOutgoingPackage from "components/package_cards/PendingOutgoingPack
 import Spinner from "util_components/Spinner";
 import NavBar from "util_components/NavBar";
 
-export default class LivePackage extends React.Component {
-  url(uuid) {
+export default class LivePackage extends React.Component<{uuid: string}> {
+  url(uuid: string) {
     return `/rest/packages/${uuid}/`
   }
 

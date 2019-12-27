@@ -11,6 +11,7 @@ export default class MapWidget extends React.Component<MapProps> {
 
     return <>
       <i className="material-icons float-right text-primary"
+         style={{cursor: 'pointer'}}
          onClick={() => this.setState({mapOpen: true})}>map</i>
 
       {mapOpen && <Map {...this.props} onClose={() => this.setState({mapOpen: false})}/>}
