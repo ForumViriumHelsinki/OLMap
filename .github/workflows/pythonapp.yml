@@ -10,11 +10,11 @@ jobs:
     services:
       image: postgres
       env:
-      - POSTGRES_DB: citylogistiikka_dev
-      - POSTGRES_USER: citylogistiikka
-      - POSTGRES_PASSWORD: citylogistiikka
+        POSTGRES_DB: citylogistiikka_dev
+        POSTGRES_USER: citylogistiikka
+        POSTGRES_PASSWORD: citylogistiikka
       ports:
-      - 5432/tcp
+        - 5432/tcp
       options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
