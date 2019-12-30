@@ -1,0 +1,11 @@
+[run]
+omit =
+    city_logistics/asgi.py
+    city_logistics/wsgi.py
+    city_logistics/settings.py
+    # 3rd party library added to repo for convenience:
+    drf_jsonschema/*
+    */migrations/*
+    # Measure coverage of application code, not the tests themselves:
+    */*_tests.py
+    manage.py
