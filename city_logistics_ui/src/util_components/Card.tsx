@@ -11,6 +11,10 @@ type CardProps = {
 }
 
 export default class Card extends React.Component<CardProps> {
+  static defaultProps = {
+    subtitles: []
+  }
+
   render() {
     const {title, subtitles, children} = this.props;
     return <div className="card mb-2">

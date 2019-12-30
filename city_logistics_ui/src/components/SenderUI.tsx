@@ -11,7 +11,7 @@ export default class SenderUI extends React.Component<{ user: User, onLogout: fu
     {
       header: 'New package',
       ChildComponent: NewPackage,
-      childProps: {onCreated: () => this.setState({activeTab: 'myPackages'})},
+      childProps: {onCreated: () => this.setState({activeTab: 'My packages'})},
       icon: 'add_box',
       menuText: 'New'
     },

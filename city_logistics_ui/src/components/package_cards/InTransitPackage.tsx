@@ -7,6 +7,7 @@ import PackageDistances from "components/PackageDistances";
 import Button from "util_components/Button";
 import {Package, packageAction, User} from "components/types";
 import {LocationTuple} from "util_components/types";
+import TimeInterval from "util_components/TimeInterval";
 
 type InTransitPackageProps = {
     package: Package,
@@ -17,7 +18,9 @@ type InTransitPackageProps = {
 export default class InTransitPackage extends React.Component<InTransitPackageProps> {
   render() {
     const {
-      earliest_pickup_time, pickup_at, deliver_to, weight, width, height, depth,
+      earliest_pickup_time, latest_pickup_time,
+      earliest_delivery_time, latest_delivery_time,
+      pickup_at, deliver_to, weight, width, height, depth,
       picked_up_time, recipient, recipient_phone, sender, id} = this.props.package;
 
     const {currentLocation, onPackageAction} = this.props;
@@ -37,10 +40,17 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
       {picked_up_time
         ?
           <>
+            <CardP>
+              <TimeInterval label="Delivery" from={earliest_delivery_time} to={latest_delivery_time}/>
+            </CardP>
             <Contacts phone={recipient_phone} title="Recipient" name={recipient}/>
             <Button onClick={() => onPackageAction(id, 'delivery')}>Register delivery</Button>
           </>
         : <>
+            <CardP>
+              <TimeInterval label="Pickup" from={earliest_pickup_time} to={latest_pickup_time}/><br />
+              <TimeInterval label="Delivery" from={earliest_delivery_time} to={latest_delivery_time}/>
+            </CardP>
             <Contacts phone={sender.phone_numbers} title="Sender" name={`${sender.first_name} ${sender.last_name}`}/>
             <Button onClick={() => onPackageAction(id, 'pickup')}>Register pickup</Button>
           </>

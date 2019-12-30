@@ -4,6 +4,8 @@ import MapWidget from "util_components/MapWidget";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
 import {Package} from "components/types";
+import {markerIcons as icons} from "settings.json"
+import Icon from "util_components/Icon";
 
 export default class DeliveredByMePackage extends React.Component<{package: Package}> {
   render() {
@@ -15,11 +17,13 @@ export default class DeliveredByMePackage extends React.Component<{package: Pack
     </>;
 
     return (
-      <Card title={title} subtitles={[formatTimestamp(delivered_time)]}>
+      <Card title={title}>
         <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>
         <PackageDistances package={this.props.package}/>
-        <CardP>Picked up at {formatTimestamp(picked_up_time)}</CardP>
-        <CardP>Delivered at {formatTimestamp(delivered_time)}</CardP>
+        <CardP>
+          <Icon icon={icons.origin}/> Picked up at {formatTimestamp(picked_up_time)}<br/>
+          <Icon icon={icons.destination}/> Delivered at {formatTimestamp(delivered_time)}
+        </CardP>
       </Card>
     );
   }

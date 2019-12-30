@@ -17,7 +17,13 @@ export type Package = {
     courier_location?: Location,
     picked_up_time?: string,
     delivered_time?: string,
+
     earliest_pickup_time: string,
+    latest_pickup_time: string,
+
+    earliest_delivery_time: string,
+    latest_delivery_time: string,
+
     pickup_at: Address,
     deliver_to: Address,
     weight: number,
