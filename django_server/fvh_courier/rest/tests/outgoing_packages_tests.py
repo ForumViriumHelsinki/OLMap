@@ -34,7 +34,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
 
     def test_get_new_package_schema(self):
         # Given that a user is signed in
-        courier = self.create_and_login_courier()
+        self.create_and_login_courier()
 
         # When requesting the schema for a new package over ReST
         url = reverse('outgoing_package-jsonschema')

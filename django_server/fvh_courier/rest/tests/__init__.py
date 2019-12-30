@@ -1,4 +1,4 @@
-from .available_packages_tests import *
-from .outgoing_packages_tests import *
-from .reserved_packages_tests import *
-from .rest_tests import *
+from .available_packages_tests import *  # noqa
+from .outgoing_packages_tests import *  # noqa
+from .reserved_packages_tests import *  # noqa
+from .rest_tests import *  # noqa

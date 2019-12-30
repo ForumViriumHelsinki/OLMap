@@ -1,9 +1,7 @@
-from datetime import timedelta
-
 from django.contrib.auth.models import User
 from django.urls import path
 from django.utils import timezone
-from rest_framework import serializers, viewsets, permissions, routers, mixins, views, status
+from rest_framework import serializers, viewsets, permissions, routers, mixins
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response

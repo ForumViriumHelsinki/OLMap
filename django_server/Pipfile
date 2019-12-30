@@ -17,6 +17,7 @@ jsonschema=">=3.2"
 twilio=">=6.35"
 uuid = "*"
 psycopg2-binary = ">2.8"
+flake8 = ">=3.7"
 
 [requires]
 python_version = "3.7"

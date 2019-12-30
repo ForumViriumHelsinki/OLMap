@@ -61,8 +61,8 @@ class Package(TimestampedModel):
     recipient = models.CharField(max_length=128, verbose_name=_('recipient'))
     recipient_phone = models.CharField(max_length=32, verbose_name=_('recipient phone number'))
 
-    courier = models.ForeignKey(User, verbose_name=_('courier'), null=True, blank=True, related_name='delivered_packages',
-                                on_delete=models.PROTECT)
+    courier = models.ForeignKey(User, verbose_name=_('courier'), null=True, blank=True,
+                                related_name='delivered_packages', on_delete=models.PROTECT)
 
     earliest_pickup_time = models.DateTimeField(verbose_name=_('earliest pickup time'))
     latest_pickup_time = models.DateTimeField(verbose_name=_('latest pickup time'))

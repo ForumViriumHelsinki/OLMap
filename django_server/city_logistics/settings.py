@@ -60,8 +60,7 @@ ROOT_URLCONF = 'city_logistics.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -82,10 +81,10 @@ WSGI_APPLICATION = 'city_logistics.wsgi.application'
 
 DATABASES = {
     "default": {
-        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("POSTGRES_DB", os.path.join(BASE_DIR, "db.sqlite3")),
-        "USER": os.environ.get("POSTGRES_USER", "user"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
+        "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.postgresql"),
+        "NAME": os.environ.get("POSTGRES_DB", "citylogistiikka_dev"),
+        "USER": os.environ.get("POSTGRES_USER", "citylogistiikka"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "citylogistiikka"),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
     }
@@ -123,7 +122,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-# CORS_ORIGIN_WHITELIST = ['http://10.255.255.175:3000', 'http://localhost:3000']
 CORS_ORIGIN_ALLOW_ALL = True
 
 STATIC_URL = '/staticfiles/'
@@ -174,6 +172,6 @@ TWILIO = {
 FRONTEND_ROOT = "https://app.citylogistiikka.fi/"
 
 try:
-    from .local_settings import *
+    from .local_settings import *  # noqa
 except ImportError:
     pass

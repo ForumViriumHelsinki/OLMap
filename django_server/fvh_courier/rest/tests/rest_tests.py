@@ -26,7 +26,7 @@ class RestAPITests(FVHAPITestCase):
 
     def test_get_current_user_when_signed_in(self):
         # Given that a courier user is signed in
-        courier = self.create_and_login_courier()
+        self.create_and_login_courier()
 
         # When requesting the current user over ReST
         url = reverse('rest_user_details')

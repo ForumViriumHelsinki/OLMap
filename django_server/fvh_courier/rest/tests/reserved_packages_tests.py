@@ -12,7 +12,7 @@ class ReservedPackagesTests(FVHAPITestCase):
 
         # And that there are packages that have been reserved by a courier for delivery
         sender = self.create_sender()
-        package = self.create_package(sender, courier=courier)
+        self.create_package(sender, courier=courier)
 
         # When requesting the list of available packages
         url = reverse('available_package-list')
