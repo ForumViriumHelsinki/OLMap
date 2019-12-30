@@ -40,7 +40,7 @@ class AvailablePackagesTests(FVHAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # And it contains an empty list:
-        self.assertEqual(response.data, [])
+        self.assertEqual(response.data, [1])
 
     def test_list_of_available_packages(self):
         # Given that there are packages available for delivery
