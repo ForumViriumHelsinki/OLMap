@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {loadData} from "loadData";
+import {sessionRequest} from "sessionRequest";
 
 import Geolocator from "util_components/Geolocator";
 import LiveDataLoader from "util_components/LiveDataLoader";
@@ -36,7 +36,7 @@ export default class AvailablePackages extends Component<{onPackageReserved: fun
   }
 
   reservePackage(id: number) {
-    loadData(reservePackageUrl(id), {method: 'PUT'})
+    sessionRequest(reservePackageUrl(id), {method: 'PUT'})
     .then((response) => {
       if (response.status == 200) this.props.onPackageReserved();
       else this.setState({error: true});

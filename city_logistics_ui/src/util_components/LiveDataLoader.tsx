@@ -1,5 +1,5 @@
 import React from 'react';
-import loadData from "loadData";
+import sessionRequest from "sessionRequest";
 import Error from "util_components/Error";
 
 type LiveDataLoaderProps = {
@@ -33,7 +33,7 @@ export default class LiveDataLoader extends React.Component<LiveDataLoaderProps>
   refreshItems() {
     const {url, onLoad} = this.props;
 
-    loadData(url).then((response) => {
+    sessionRequest(url).then((response) => {
       if (response.status == 200) response.json().then(this._isMounted ? onLoad : () => null);
       else this.setState({error: true});
     })

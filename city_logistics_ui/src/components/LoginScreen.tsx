@@ -1,5 +1,5 @@
 import React, {FormEvent} from 'react';
-import loadData, {login} from "../loadData";
+import sessionRequest, {login} from "sessionRequest";
 import Error from "util_components/Error";
 import Component from "util_components/Component";
 import {loginUrl} from "urls";
@@ -50,7 +50,7 @@ export default class LoginScreen extends Component<{onLogin: func}> {
     // @ts-ignore
     formData.forEach((value: any, key: string) => data[key] = value);
     this.setState({error: false, ...data});
-    loadData(loginUrl, {method: 'POST', data: data }).then((response) => {
+    sessionRequest(loginUrl, {method: 'POST', data: data }).then((response) => {
       if (response.status == 200) response.json().then((data) => {
         login(data.key);
         this.props.onLogin();

@@ -3,7 +3,7 @@ import React from 'react';
 // @ts-ignore
 import Form from "react-jsonschema-form";
 import places, { ReconfigurableOptions, Suggestion } from "places.js";
-import loadData from "../loadData";
+import sessionRequest from "sessionRequest";
 import Spinner from "util_components/Spinner";
 
 import settings from "settings.json";
@@ -34,7 +34,7 @@ export default class NewPackage extends Component<{onCreated: func}> {
   static bindMethods = ['onSubmit'];
 
   componentDidMount() {
-    loadData('/rest/outgoing_packages/jsonschema/')
+    sessionRequest('/rest/outgoing_packages/jsonschema/')
     .then((response) => response.json())
     .then((schema) => this.setSchema(schema))
   }
@@ -85,7 +85,7 @@ export default class NewPackage extends Component<{onCreated: func}> {
 
   // @ts-ignore
   onSubmit({formData}) {
-    loadData('/rest/outgoing_packages/', {method: 'POST', data: {...formData, ...this.selectedAddresses}})
+    sessionRequest('/rest/outgoing_packages/', {method: 'POST', data: {...formData, ...this.selectedAddresses}})
     .then((response) => {
       if (response.status == 201) this.props.onCreated();
       else this.setState({error: true});

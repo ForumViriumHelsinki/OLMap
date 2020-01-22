@@ -8,7 +8,7 @@ export function logout() {
   sessionStorage.clear();
 }
 
-export function loadData(url, options={}) {
+export function sessionRequest(url, options={}) {
   options.headers = options.headers || {};
   if (options && options.data && typeof options.data == 'object') {
     options.headers['Content-Type'] = 'application/json';
@@ -21,4 +21,4 @@ export function loadData(url, options={}) {
   return fetch(settings.serverRoot + url, options);
 }
 
-export default loadData;
+export default sessionRequest;

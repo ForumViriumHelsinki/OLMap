@@ -2,7 +2,7 @@ import React from 'react';
 import LiveDataLoader from "util_components/LiveDataLoader";
 import Spinner from "util_components/Spinner";
 import TabbedCardList from "util_components/TabbedCardList";
-import {loadData} from "loadData";
+import {sessionRequest} from "sessionRequest";
 import Geolocator from "util_components/Geolocator";
 import DeliveredByMePackage from "components/package_cards/DeliveredByMePackage";
 import InTransitPackage from "components/package_cards/InTransitPackage";
@@ -48,7 +48,7 @@ export default class ReservedPackageLists extends Component<{}> {
   }
 
   packageAction(id: number, action: packageAction) {
-    loadData(myPackageActionUrl(id, action), {method: 'PUT'})
+    sessionRequest(myPackageActionUrl(id, action), {method: 'PUT'})
     .then((response) => {
       if ((response.status == 200) && this.dataLoader.current) this.dataLoader.current.refreshItems();
       else this.setState({error: true});
@@ -65,7 +65,7 @@ export default class ReservedPackageLists extends Component<{}> {
     this.setState({currentLocation});
     if (this.locationSaveNeeded) {
       const [lat, lon] = currentLocation;
-      loadData(myLocationUrl, {method: 'PUT', data: {lat, lon}});
+      sessionRequest(myLocationUrl, {method: 'PUT', data: {lat, lon}});
     }
   }
 }

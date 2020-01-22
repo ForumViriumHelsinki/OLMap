@@ -8,7 +8,7 @@ import {
   useParams
 } from "react-router-dom"
 
-import loadData, {logout} from "loadData";
+import sessionRequest, {logout} from "sessionRequest";
 
 import LoginScreen from 'components/LoginScreen';
 import LoadScreen from "components/LoadScreen";
@@ -32,14 +32,14 @@ class CityLogisticsUI extends React.Component {
   }
 
   refreshUser() {
-    loadData('/rest-auth/user/').then(response => {
+    sessionRequest('/rest-auth/user/').then(response => {
       if (response.status == 401) this.setState({user: null, dataFetched: true});
       else response.json().then(user => this.setState({user, dataFetched: true}));
     })
   }
 
   logout() {
-    loadData('/rest-auth/logout/', {method: 'POST'}).then(response => {
+    sessionRequest('/rest-auth/logout/', {method: 'POST'}).then(response => {
       logout();
       this.setState({user: null});
     });
