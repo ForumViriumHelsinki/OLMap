@@ -7,7 +7,6 @@
     "start": "react-scripts start --no-cache",
     "build": "react-scripts build",
     "test": "react-scripts test --no-cache",
-    "config_prod": "node -e \"require('fs').writeFileSync('./src/settings.json', JSON.stringify({...require('./src/settings'), ...require('./src/prod_settings')}, null, 1))\"",
     "eject": "react-scripts eject"
   },
   "author": "Johan Lindqvist / Forum Virium Helsinki",
