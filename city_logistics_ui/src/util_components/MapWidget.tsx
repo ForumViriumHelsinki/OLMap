@@ -1,5 +1,5 @@
 import React from "react";
-import Map, {BaseMapProps} from "./Map";
+import RouteMapModal, {BaseMapProps} from "util_components/RouteMapModal";
 
 export default class MapWidget extends React.Component<BaseMapProps> {
   state = {
@@ -14,7 +14,7 @@ export default class MapWidget extends React.Component<BaseMapProps> {
          style={{cursor: 'pointer'}}
          onClick={() => this.setState({mapOpen: true})}>map</i>
 
-      {mapOpen && <Map {...this.props} onClose={() => this.setState({mapOpen: false})}/>}
+      {mapOpen && <RouteMapModal {...this.props} onClose={() => this.setState({mapOpen: false})}/>}
     </>;
   }
 }

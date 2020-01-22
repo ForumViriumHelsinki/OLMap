@@ -3,6 +3,7 @@ import FVHTabsUI from "util_components/FVHTabsUI";
 import AvailablePackages from "components/package_lists/AvailablePackages";
 import ReservedPackageLists from "components/package_lists/ReservedPackageLists";
 import {User} from "components/types";
+import OSMPhotoNotes from "components/OSMPhotoNotes";
 
 type func = () => any;
 
@@ -21,6 +22,13 @@ export default class CourierUI extends React.Component<{user: User, onLogout: fu
       icon: 'dynamic_feed',
       menuText: 'Available'
     },
+    {
+      header: 'Notes',
+      ChildComponent: OSMPhotoNotes,
+      icon: 'my_location',
+      menuText: 'Notes',
+      fullWidth: true
+    }
   ];
 
   render() {

@@ -29,7 +29,8 @@ type FVHTabsUIProps = {
     header: string,
     childProps?: any,
     icon: string,
-    menuText: string
+    menuText: string,
+    fullWidth?: boolean
   }[],
   onLogout: () => any
 }
@@ -46,14 +47,14 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, {activeTa
   render() {
     const {user, onLogout, tabs} = this.props;
     const {activeTab, showLogout} = this.state;
-    const {ChildComponent, header, childProps} = tabs.find(t => t.header == activeTab) || tabs[0];
+    const {ChildComponent, header, childProps, fullWidth} = tabs.find(t => t.header == activeTab) || tabs[0];
 
     return (
       <>
         <NavBar header={header}
                 icon={user.is_courier ? "directions_bike" : "account_circle"}
                 iconText={user.username}/>
-        <div className="container" style={{marginBottom: 96}}>
+        <div className={fullWidth ? '' : "container"} style={{marginBottom: 96}}>
           <ChildComponent {...childProps}/>
         </div>
         <nav className="navbar fixed-bottom navbar-dark bg-primary">
