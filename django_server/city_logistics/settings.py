@@ -135,7 +135,7 @@ REST_FRAMEWORK = {
 }
 
 REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'fvh_courier.rest.UserSerializer'
+    'USER_DETAILS_SERIALIZER': 'fvh_courier.rest.serializers.UserSerializer'
 }
 
 LOG_DB_QUERIES = False

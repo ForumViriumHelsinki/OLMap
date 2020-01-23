@@ -3,7 +3,9 @@ import datetime
 from django.contrib.auth.models import User, Group
 from django.utils import timezone
 from rest_framework.test import APITestCase
-from fvh_courier import rest, models
+
+from fvh_courier.rest.permissions import COURIER_GROUP
+from fvh_courier import models
 
 
 class FVHAPITestCase(APITestCase):
@@ -20,7 +22,7 @@ class FVHAPITestCase(APITestCase):
 
     def create_and_login_courier(self):
         user = User.objects.create(username='courier', first_name='Coranne', last_name='Courier')
-        user.groups.add(Group.objects.get(name=rest.COURIER_GROUP))
+        user.groups.add(Group.objects.get(name=COURIER_GROUP))
         self.client.force_login(user)
         return user
 

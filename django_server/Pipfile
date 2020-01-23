@@ -19,6 +19,7 @@ uuid = "*"
 psycopg2-binary = ">2.8"
 flake8 = ">=3.7"
 coverage=">=5.0"
+Pillow="*"
 
 [requires]
 python_version = "3.7"
