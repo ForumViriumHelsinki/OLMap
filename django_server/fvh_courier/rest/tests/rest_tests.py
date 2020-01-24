@@ -75,6 +75,10 @@ class RestAPITests(FVHAPITestCase):
         # And a note is created in db:
         note = models.OSMImageNote.objects.get()
 
+        # And it registers the user as the creator of the note:
+        self.assertEqual(note.created_by_id, courier.id)
+        self.assertEqual(note.modified_by_id, courier.id)
+
         # And when subsequently requesting to attach an image to the note
         with open(os.path.join(os.path.dirname(__file__), 'test_image.png'), 'rb') as file:
             file_content = file.read()

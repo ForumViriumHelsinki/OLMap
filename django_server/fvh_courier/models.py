@@ -29,6 +29,9 @@ class BaseLocation(TimestampedModel):
 class OSMFeature(models.Model):
     id = models.BigIntegerField(primary_key=True)
 
+    def __str__(self):
+        return f'OSMFeature({self.id})'
+
 
 def upload_osm_images_to(instance, filename):
     return f'osm_image_notes/{instance.id}/{filename}'
@@ -38,6 +41,20 @@ class OSMImageNote(BaseLocation):
     image = models.ImageField(null=True, blank=True, upload_to=upload_osm_images_to)
     comment = models.TextField(blank=True)
     osm_features = models.ManyToManyField(OSMFeature)
+
+    created_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='created_notes')
+    modified_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='modified_notes')
+    reviewed_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='reviewed_notes')
+
+    visible = models.BooleanField(default=True)
+    hidden_reason = models.TextField(
+        blank=True, help_text="If reviewer decides to hide the note, document reason here.")
+
+    def __str__(self):
+        return self.comment or f'OSMImageNote({self.id})'
 
 
 class UserLocation(BaseLocation):

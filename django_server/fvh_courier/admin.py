@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
-
+from django.conf import settings
 from fvh_courier.models import Package, Address, PhoneNumber, PackageSMS, OSMImageNote
 
 
@@ -63,10 +63,20 @@ class TeleconnectedUserAdmin(UserAdmin):
 
 @admin.register(OSMImageNote)
 class OSMImageNoteAdmin(admin.ModelAdmin):
-    list_display = ['comment', 'image', 'lat', 'lon', 'osm']
+    list_display = ['__str__', 'image', 'lat', 'lon', 'created_at', 'created_by', 'modified_at', 'modified_by', 'osm']
     search_fields = ['comment']
+    readonly_fields = ['image_', 'osm', 'osm_edit']
+
+    def osm_url(self, location):
+        return (f'https://www.openstreetmap.org/note/new?' +
+                f'lat={location.lat}&lon={location.lon}#map=19/{location.lat}/{location.lon}')
 
     def osm(self, location):
-        return mark_safe(
-            f'<a href="https://www.openstreetmap.org/note/new?' +
-            f'lat={location.lat}&lon={location.lon}#map=19/{location.lat}/{location.lon}">osm</a>')
+        return mark_safe(f'<a target="_osm" href="{self.osm_url(location)}">osm</a>')
+
+    def image_(self, image_note):
+        return mark_safe(f'<img src="{settings.MEDIA_URL}{image_note.image}" style="max-width: calc(100vw-260px); max-height: 60vh"/>')
+
+    def osm_edit(self, location):
+        url = f'https://www.openstreetmap.org/edit#map=23/{location.lat}/{location.lon}'
+        return mark_safe(f'<a target="_osm_edit" href="{url}">edit</a>')

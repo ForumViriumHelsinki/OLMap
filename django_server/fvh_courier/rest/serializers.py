@@ -88,4 +88,4 @@ class OutgoingPackageSerializer(PackageSerializer):
 class OSMImageNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OSMImageNote
-        fields = '__all__'
+        fields = ['id', 'comment', 'image', 'lat', 'lon']

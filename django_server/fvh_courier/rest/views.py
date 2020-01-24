@@ -113,3 +113,14 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         for id in request.data['osm_features']:
             models.OSMFeature.objects.get_or_create(id=id)
         return super().create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        osm_image_note = serializer.save()
+        osm_image_note.created_by = self.request.user
+        osm_image_note.modified_by = self.request.user
+        osm_image_note.save()
+
+    def perform_update(self, serializer):
+        osm_image_note = serializer.save()
+        osm_image_note.modified_by = self.request.user
+        osm_image_note.save()
