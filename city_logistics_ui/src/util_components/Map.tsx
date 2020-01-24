@@ -44,7 +44,7 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
         }
       </div>
       <div id="leafletMap" style={{height: '70vh'}}> </div>
-      <Geolocator onLocation={([lat, lon]) => this.setState({currentPosition: {lat, lon}})}/>
+      <Geolocator onLocation={([lon, lat]) => this.setState({currentPosition: {lat, lon}})}/>
     </div>;
   }
 

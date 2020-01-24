@@ -19,5 +19,5 @@
     "destination": "check",
     "currentPosition": "directions_bike"
   },
-  "useMockGeolocation": [60.161687, 24.944368]
+  "useMockGeolocation": [24.944368, 60.161687]
 }
