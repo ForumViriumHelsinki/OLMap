@@ -31,7 +31,7 @@ export default class Geolocator extends React.Component<{onLocation: (location: 
         10000)
     } else this.geolocationWatcher = navigator.geolocation.watchPosition(
       (position) => {
-        this.props.onLocation([position.coords.latitude, position.coords.longitude])
+        this.props.onLocation([position.coords.longitude, position.coords.latitude])
       },
       (error) => this.setState({geolocationError: error.message})
     );

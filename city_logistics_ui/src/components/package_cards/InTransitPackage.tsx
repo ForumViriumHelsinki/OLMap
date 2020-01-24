@@ -24,7 +24,7 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
       picked_up_time, recipient, recipient_phone, sender, id} = this.props.package;
 
     const {currentLocation, onPackageAction} = this.props;
-    const [lat, lon] = currentLocation || [];
+    const [lon, lat] = currentLocation || [];
 
     const currentPositionIndex = picked_up_time ? 1 : 0;
 

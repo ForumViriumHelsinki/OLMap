@@ -64,7 +64,7 @@ export default class ReservedPackageLists extends Component<{}> {
   locationUpdated(currentLocation: LocationTuple) {
     this.setState({currentLocation});
     if (this.locationSaveNeeded) {
-      const [lat, lon] = currentLocation;
+      const [lon, lat] = currentLocation;
       sessionRequest(myLocationUrl, {method: 'PUT', data: {lat, lon}});
     }
   }

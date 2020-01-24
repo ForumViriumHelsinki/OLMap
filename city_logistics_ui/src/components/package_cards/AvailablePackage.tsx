@@ -22,7 +22,7 @@ export default class AvailablePackage extends React.Component<AvailablePackagePr
       weight, width, height, depth, id} = this.props.package;
 
     const {currentLocation, onPackageReserve} = this.props;
-    const [lat, lon] = currentLocation || [];
+    const [lon, lat] = currentLocation || [];
 
     const title = <>
         <MapWidget origin={pickup_at} destination={deliver_to} currentPositionIndex={0}/>
