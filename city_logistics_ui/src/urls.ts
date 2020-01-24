@@ -14,4 +14,4 @@ export const myPackageActionUrl = (id: number, action: packageAction) => `/rest/
 export const uuidPackageUrl = (uuid: string) => `/rest/packages/${uuid}/`;
 
 export const osmImageNotesUrl = "/rest/osm_image_notes/";
-export const osmImageNoteAttachUrl = (id: number) => `/rest/osm_image_notes/${id}/image/`;
+export const osmImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/`;

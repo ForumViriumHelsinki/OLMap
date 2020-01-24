@@ -38,8 +38,7 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
     return <div className="position-relative">
       <div className="position-absolute p-2 text-center w-100" style={{zIndex: 500}}>
         {requestLocation &&
-          <Button color="primary" size="sm"
-                  onClick={() => onLocationSelected && onLocationSelected(this.leafletMap.getCenter())}>
+          <Button color="primary" size="sm" onClick={() => this.onLocationSelected()}>
             Select here
           </Button>
         }
@@ -47,6 +46,12 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
       <div id="leafletMap" style={{height: '70vh'}}> </div>
       <Geolocator onLocation={([lat, lon]) => this.setState({currentPosition: {lat, lon}})}/>
     </div>;
+  }
+
+  private onLocationSelected() {
+    const {onLocationSelected} = this.props;
+    const {lat, lng} = this.leafletMap.getCenter();
+    return onLocationSelected && onLocationSelected([lng, lat]);
   }
 
   componentDidMount() {

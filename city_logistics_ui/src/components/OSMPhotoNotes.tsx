@@ -15,7 +15,7 @@ import {getBoundsOfDistance, getDistance, getDistanceFromLine} from 'geolib';
 import OverpassFrontend from 'overpass-frontend';
 import {GeolibInputCoordinates} from "geolib/es/types";
 import sessionRequest, {login} from "sessionRequest";
-import {osmImageNoteAttachUrl, osmImageNotesUrl} from "urls";
+import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
 const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
 
 type OSMFeature = {
@@ -221,14 +221,16 @@ export default class OSMPhotoNotes extends Component<{}> {
 
   private onSubmit() {
     const {comment, location, relatedFeatures, image} = this.state;
+    const [lon, lat] = location as LocationTuple;
+    const fields = {comment, lat, lon, osm_features: relatedFeatures};
 
-    sessionRequest(osmImageNotesUrl, {method: 'POST', data: {comment, location, relatedFeatures}})
+    sessionRequest(osmImageNotesUrl, {method: 'POST', data: fields})
     .then((response: any) => {
       if ((response.status >= 300) || !image) return response;
       return response.json().then((data: any) => {
         let formData = new FormData();
         formData.append('image', image);
-        return sessionRequest(osmImageNoteAttachUrl(data.id), {method: 'POST', body: formData})
+        return sessionRequest(osmImageNoteUrl(data.id), {method: 'PATCH', body: formData})
       });
     }).then((response: any) => {
       if ((response.status >= 300)) this.setState({error: true, submitting: false});
