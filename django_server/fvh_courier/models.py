@@ -26,6 +26,20 @@ class BaseLocation(TimestampedModel):
         abstract = True
 
 
+class OSMFeature(models.Model):
+    id = models.BigIntegerField(primary_key=True)
+
+
+def upload_osm_images_to(instance, filename):
+    return f'osm_image_notes/{instance.id}/{filename}'
+
+
+class OSMImageNote(BaseLocation):
+    image = models.ImageField(null=True, blank=True, upload_to=upload_osm_images_to)
+    comment = models.TextField(blank=True)
+    osm_features = models.ManyToManyField(OSMFeature)
+
+
 class UserLocation(BaseLocation):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='location')
 

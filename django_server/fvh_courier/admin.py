@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.utils.safestring import mark_safe
 
-from fvh_courier.models import Package, Address, PhoneNumber, PackageSMS
+from fvh_courier.models import Package, Address, PhoneNumber, PackageSMS, OSMImageNote
 
 
 class PackageSMSInline(admin.TabularInline):
@@ -58,3 +59,14 @@ class PhoneNumberInline(admin.TabularInline):
 @admin.register(User)
 class TeleconnectedUserAdmin(UserAdmin):
     inlines = UserAdmin.inlines + [PhoneNumberInline]
+
+
+@admin.register(OSMImageNote)
+class OSMImageNoteAdmin(admin.ModelAdmin):
+    list_display = ['comment', 'image', 'lat', 'lon', 'osm']
+    search_fields = ['comment']
+
+    def osm(self, location):
+        return mark_safe(
+            f'<a href="https://www.openstreetmap.org/note/new?' +
+            f'lat={location.lat}&lon={location.lon}#map=19/{location.lat}/{location.lon}">osm</a>')

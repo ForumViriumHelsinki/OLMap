@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4be0c2e8e70d5dc6fb774adbd3110a968cc097305acc7e595fb4d662b379b6ac"
+            "sha256": "378da49ff998afea151942f303e4c6bf6c57fbc0871feae5c9795d4592bf2d85"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -95,6 +95,14 @@
             ],
             "index": "pypi",
             "version": "==5.0.3"
+        },
+        "dj-inmemorystorage": {
+            "hashes": [
+                "sha256:57a3d343a3f01ea10f2e4fd0583caa08716af9b4c939413cd495a519d98c8264",
+                "sha256:72d3a3f25bbf097fb3766e2da87e2bcdaf1c1e1c45edefe74f8153db92948532"
+            ],
+            "index": "pypi",
+            "version": "==2.0.0"
         },
         "django": {
             "hashes": [

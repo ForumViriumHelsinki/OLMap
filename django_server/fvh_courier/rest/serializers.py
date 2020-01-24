@@ -1,8 +1,19 @@
+import decimal
+
 from django.contrib.auth.models import User
+from django.db.models import DecimalField
 from rest_framework import serializers
 
 from fvh_courier import models
 from .permissions import COURIER_GROUP
+
+
+class RoundingDecimalField(serializers.DecimalField):
+    def validate_precision(self, value):
+        return value
+
+
+serializers.ModelSerializer.serializer_field_mapping[DecimalField] = RoundingDecimalField
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -72,3 +83,9 @@ class OutgoingPackageSerializer(PackageSerializer):
             return None
 
         return LocationSerializer(location).data
+
+
+class OSMImageNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.OSMImageNote
+        fields = '__all__'

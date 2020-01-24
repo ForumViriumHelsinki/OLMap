@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from drf_jsonschema import to_jsonschema
 from fvh_courier import models
-from .serializers import PackageSerializer, OutgoingPackageSerializer, LocationSerializer
+from .serializers import PackageSerializer, OutgoingPackageSerializer, LocationSerializer, OSMImageNoteSerializer
 from .permissions import IsCourier
 
 
@@ -102,3 +102,14 @@ class MyLocationView(RetrieveUpdateDestroyAPIView):
             return self.request.user.location
         except models.UserLocation.DoesNotExist:
             return models.UserLocation(user=self.request.user)
+
+
+class OSMImageNotesViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OSMImageNoteSerializer
+    queryset = models.OSMImageNote.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        for id in request.data['osm_features']:
+            models.OSMFeature.objects.get_or_create(id=id)
+        return super().create(request, *args, **kwargs)
