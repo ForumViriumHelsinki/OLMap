@@ -1,4 +1,4 @@
-import {Address, Location} from "util_components/types";
+import {Address, Location, LocationTuple} from "util_components/types";
 
 export type User = {
     is_courier: boolean,
@@ -34,3 +34,20 @@ export type Package = {
 }
 
 export type packageAction = 'pickup' | 'delivery';
+
+export type OSMImageNote = {
+    id?: number,
+    image?: any,
+    lat?: number,
+    lon?: number,
+    comment?: string,
+    osm_features: number[],
+};
+
+export type OSMFeature = {
+    type: "node" | "way" | "relation",
+    id: number,
+    lat: number,
+    lon: number,
+    tags: { [tag: string]: string }
+}

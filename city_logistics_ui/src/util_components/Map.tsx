@@ -3,7 +3,7 @@ import React from 'react';
 import * as L from 'leaflet';
 import settings from 'settings.json';
 
-import styles from 'leaflet/dist/leaflet.css';
+import 'leaflet/dist/leaflet.css';
 
 import GlyphIcon from "util_components/GlyphIcon";
 import Geolocator from "util_components/Geolocator";
@@ -12,9 +12,16 @@ import Icon from "util_components/Icon";
 // @ts-ignore
 import {Button} from "reactstrap";
 
+import './Map.css';
+
+const dotIcon = L.divIcon({className: "dotIcon", iconSize: [8, 8]});
+
+export type MapMarker = Location & { onClick: () => any };
+
 type MapProps = {
   requestLocation?: boolean,
   onLocationSelected?: (location: any) => any
+  dotMarkers?: MapMarker[]
 }
 
 export default class Map extends React.Component<MapProps, {currentPosition: null | Location}> {
@@ -25,10 +32,12 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
   private leafletMap: any = null;
   private markers: {currentPosition?: any, selectedPosition?: any} = {};
   private userMovedMap: boolean = false;
+  private dotMarkers?: object[] = undefined;
 
   initMapState() {
     this.leafletMap = null;
     this.markers = {};
+    this.dotMarkers = undefined;
     this.userMovedMap = false;
   }
 
@@ -69,7 +78,7 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
 
   refreshMap() {
     const {currentPosition} = this.state;
-    const {requestLocation} = this.props;
+    const {requestLocation, dotMarkers} = this.props;
 
     if (!this.leafletMap) {
       this.leafletMap = L.map('leafletMap');
@@ -108,6 +117,13 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
         this.markers.currentPosition = L.marker(latlng, {icon}).addTo(this.leafletMap);
       }
     }
+    if (dotMarkers && !(this.dotMarkers && this.dotMarkers.length))
+      this.dotMarkers = dotMarkers.map((dotMarker) => {
+        const marker = L.marker({lon: dotMarker.lon, lat: dotMarker.lat}, {icon: dotIcon})
+        marker.on('click', dotMarker.onClick)
+        marker.addTo(this.leafletMap);
+        return marker;
+      })
   }
 
   private mapMoved() {
