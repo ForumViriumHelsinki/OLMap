@@ -66,6 +66,7 @@ class OSMImageNoteAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'image', 'lat', 'lon', 'created_at', 'created_by', 'modified_at', 'modified_by', 'osm']
     search_fields = ['comment']
     readonly_fields = ['image_', 'osm', 'osm_edit']
+    filter_horizontal = ['osm_features']
 
     def osm_url(self, location):
         return (f'https://www.openstreetmap.org/note/new?' +
@@ -75,6 +76,8 @@ class OSMImageNoteAdmin(admin.ModelAdmin):
         return mark_safe(f'<a target="_osm" href="{self.osm_url(location)}">osm</a>')
 
     def image_(self, image_note):
+        if not image_note.image:
+            return 'No image.'
         return mark_safe(f'<img src="{settings.MEDIA_URL}{image_note.image}" style="max-width: calc(100vw-260px); max-height: 60vh"/>')
 
     def osm_edit(self, location):
