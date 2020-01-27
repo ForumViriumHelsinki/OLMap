@@ -14,7 +14,7 @@ import {Button} from "reactstrap";
 
 import './Map.css';
 
-const dotIcon = L.divIcon({className: "dotIcon", iconSize: [8, 8]});
+const dotIcon = L.divIcon({className: "dotIcon", iconSize: [16, 16]});
 
 export type MapMarker = Location & { onClick: () => any };
 

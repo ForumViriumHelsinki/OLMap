@@ -93,7 +93,7 @@ export default class OSMPhotoNotes extends Component<{}> {
                 <Modal title={selectedNote.comment || 'No comment.'}
                        onClose={() => this.setState({selectedNote: undefined})}>
                   {selectedNote.image &&
-                    <img src={selectedNote.image} style={{maxWidth: '100%', maxHeight: '80vh'}} />
+                    <img src={selectedNote.image} style={{maxWidth: '100%', maxHeight: '60vh', objectFit: 'contain'}} />
                   }
                 </Modal>
               }
