@@ -24,35 +24,42 @@ type MapProps = {
   dotMarkers?: MapMarker[]
 }
 
-export default class Map extends React.Component<MapProps, {currentPosition: null | Location}> {
+export default class Map extends React.Component<MapProps, {currentPosition: null | Location, userMovedMap: boolean}> {
   state = {
-    currentPosition: null
+    currentPosition: null,
+    userMovedMap: false
   };
 
   private leafletMap: any = null;
   private markers: {currentPosition?: any, selectedPosition?: any} = {};
-  private userMovedMap: boolean = false;
   private dotMarkers?: object[] = undefined;
 
   initMapState() {
     this.leafletMap = null;
     this.markers = {};
     this.dotMarkers = undefined;
-    this.userMovedMap = false;
   }
 
   render() {
     const {requestLocation, onLocationSelected} = this.props;
+    const {userMovedMap} = this.state;
 
     return <div className="position-relative">
-      <div className="position-absolute p-2 text-center w-100" style={{zIndex: 500}}>
-        {requestLocation &&
-          <Button color="primary" size="sm" onClick={() => this.onLocationSelected()}>
-            Select here
-          </Button>
-        }
-      </div>
-      <div id="leafletMap" style={{height: '70vh'}}> </div>
+      {requestLocation &&
+        <div className="position-absolute p-2 text-center w-100" style={{zIndex: 500}}>
+            <Button color="primary" size="sm" onClick={() => this.onLocationSelected()}>
+              Select here
+            </Button>
+        </div>
+      }
+      {userMovedMap &&
+        <div className="position-absolute" style={{zIndex: 500, right: 12, bottom: 36}}>
+            <Button color="primary" size="sm" onClick={() => this.setState({userMovedMap: false})}>
+              <i className="material-icons">my_location</i>
+            </Button>
+        </div>
+      }
+      <div id="leafletMap" style={{height: 'calc(100vh - 240px)'}}> </div>
       <Geolocator onLocation={([lon, lat]) => this.setState({currentPosition: {lat, lon}})}/>
     </div>;
   }
@@ -90,8 +97,8 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
         id: 'mapbox/streets-v11',
         accessToken: settings.MapBox.accessToken
       }).addTo(this.leafletMap);
-      this.leafletMap.on('zoomstart', () => this.userMovedMap = true);
-      this.leafletMap.on('movestart', () => this.userMovedMap = true);
+      this.leafletMap.on('zoomstart', () => this.setState({userMovedMap: true}));
+      this.leafletMap.on('movestart', () => this.setState({userMovedMap: true}));
       this.leafletMap.on('move', () => this.mapMoved());
     }
 
@@ -110,7 +117,7 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
       const latlng = [currentPosition.lat, currentPosition.lon];
       const marker = this.markers.currentPosition;
 
-      if (!this.userMovedMap) this.leafletMap.setView(latlng, 18);
+      if (!this.state.userMovedMap) this.leafletMap.setView(latlng, 18);
       if (marker) marker.setLatLng(latlng);
       else {
         const icon = new GlyphIcon({glyph: 'my_location', glyphSize: 20});
