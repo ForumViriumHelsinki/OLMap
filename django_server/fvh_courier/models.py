@@ -6,6 +6,10 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from twilio.rest import Client
+from PIL import Image as Img, UnidentifiedImageError
+from PIL import ExifTags
+from io import BytesIO
+from django.core.files import File
 
 
 class TimestampedModel(models.Model):
@@ -55,6 +59,39 @@ class OSMImageNote(BaseLocation):
 
     def __str__(self):
         return self.comment or f'OSMImageNote({self.id})'
+
+    def save(self, *args, **kwargs):
+        if not self.image:
+            return super().save(*args, **kwargs)
+
+        try:
+            pilImage = Img.open(BytesIO(self.image.read()))
+        except UnidentifiedImageError:
+            return super().save(*args, **kwargs)
+
+        for orientation in ExifTags.TAGS.keys():
+            if ExifTags.TAGS[orientation] == 'Orientation':
+                break
+
+        exif = pilImage._getexif()  # noqa
+        if not exif:
+            return super().save(*args, **kwargs)
+
+        exif = dict(exif.items())
+
+        if exif[orientation] == 3:
+            pilImage = pilImage.rotate(180, expand=True)
+        elif exif[orientation] == 6:
+            pilImage = pilImage.rotate(270, expand=True)
+        elif exif[orientation] == 8:
+            pilImage = pilImage.rotate(90, expand=True)
+
+        output = BytesIO()
+        pilImage.save(output, format='JPEG', quality=75)
+        output.seek(0)
+        self.image = File(output, self.image.name)
+
+        return super().save(*args, **kwargs)
 
 
 class UserLocation(BaseLocation):
