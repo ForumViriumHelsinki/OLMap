@@ -44,7 +44,6 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
 
   render() {
     const {origin, destination, onClose, currentPositionIndex=0, currentPosition} = this.props;
-    const {selectedNote, osmImageNotes} = this.state;
 
     return <Modal title={`${origin.street_address} to ${destination.street_address}`} onClose={onClose}>
       <OSMImageNotes onMapLayerLoaded={(mapLayer) => {this.imageNotesLayer = mapLayer; this.refreshMap()}}/>
