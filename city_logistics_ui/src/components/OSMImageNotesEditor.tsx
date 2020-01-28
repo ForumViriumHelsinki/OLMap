@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Map, {MapMarker} from 'util_components/Map';
+import Map from 'util_components/Map';
 // @ts-ignore
 import {Button, ListGroup, ListGroupItem} from "reactstrap";
 import Icon from "util_components/Icon";
@@ -17,6 +17,7 @@ import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
 import {OSMFeature, OSMImageNote} from "components/types";
 import Spinner from "util_components/Spinner";
+import OSMImageNotes from "components/OSMImageNotes";
 
 const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
 
@@ -31,17 +32,16 @@ const osmAttributes: string[][] = [
 
 const osmRegex = osmAttributes.map(([attr]) => attr).join('|');
 
-type OSMPhotoNotesState = OSMImageNote & {
+type OSMImageNotesEditorState = OSMImageNote & {
   status: 'initial' | 'locating' | 'relating' | 'commenting' | 'thanks',
   nearbyOSMFeatures: OSMFeature[],
   submitting?: boolean,
   error?: boolean,
-  osmImageNotes?: OSMImageNote[],
-  selectedNote?: OSMImageNote,
+  osmImageNotesLayer?: any,
   featuresLoading: boolean
 }
 
-const initialState: OSMPhotoNotesState = {
+const initialState: OSMImageNotesEditorState = {
   status: 'initial',
   nearbyOSMFeatures: [],
   lat: undefined,
@@ -51,33 +51,22 @@ const initialState: OSMPhotoNotesState = {
   osm_features: [],
   error: false,
   submitting: false,
-  selectedNote: undefined,
   featuresLoading: false
 };
 
-export default class OSMPhotoNotes extends Component<{}> {
-  state: OSMPhotoNotesState = initialState;
+export default class OSMImageNotesEditor extends Component<{}> {
+  state: OSMImageNotesEditorState = initialState;
 
   static bindMethods = [
     'onImageClick', 'onImageCaptured', 'onCommentClick',
     'onLocationSelected', 'onRelate', 'onCancel', 'onSubmit'
   ];
 
-  componentDidMount() {
-    this.loadImageNotes();
-  }
-
-  private loadImageNotes() {
-    sessionRequest(osmImageNotesUrl).then((response: any) => {
-      if (response.status < 300)
-        response.json().then((osmImageNotes: OSMImageNote[]) => this.setState({osmImageNotes}));
-    })
-  }
+  imageNotesRef = React.createRef<OSMImageNotes>();
 
   render() {
     const {
-      status, nearbyOSMFeatures, osm_features, lat, lon, submitting, error,
-      selectedNote, featuresLoading
+      status, nearbyOSMFeatures, osm_features, lat, lon, submitting, error, featuresLoading, osmImageNotesLayer
     } = this.state;
     const location = [lon, lat];
 
@@ -86,6 +75,8 @@ export default class OSMPhotoNotes extends Component<{}> {
         <input name="image" id="image" className="d-none" type="file"
                accept="image/*" capture="environment"
                onChange={this.onImageCaptured}/>
+        <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
+                       ref={this.imageNotesRef}/>
         {{
           initial:
             <>
@@ -95,14 +86,6 @@ export default class OSMPhotoNotes extends Component<{}> {
               <Button outline color="primary" size="sm" onClick={this.onCommentClick}>
                 <Icon icon="comment"/>
               </Button>
-              {selectedNote &&
-                <Modal title={selectedNote.comment || 'No comment.'}
-                       onClose={() => this.setState({selectedNote: undefined})}>
-                  {selectedNote.image &&
-                    <img src={selectedNote.image} style={{maxWidth: '100%', maxHeight: '60vh', objectFit: 'contain'}} />
-                  }
-                </Modal>
-              }
             </>,
           locating:
             <>
@@ -149,7 +132,7 @@ export default class OSMPhotoNotes extends Component<{}> {
       </div>
       <Map requestLocation={status == 'locating'}
            onLocationSelected={this.onLocationSelected}
-           dotMarkers={this.getImageNoteMarkers()}/>
+           extraLayers={osmImageNotesLayer && [osmImageNotesLayer]}/>
     </>;
   }
 
@@ -240,7 +223,7 @@ export default class OSMPhotoNotes extends Component<{}> {
     }).then((response: any) => {
       if ((response.status >= 300)) this.setState({error: true, submitting: false});
       else {
-        this.loadImageNotes();
+        if (this.imageNotesRef.current) this.imageNotesRef.current.loadImageNotes();
         this.setState({...initialState, status: "thanks"});
       }
     });
@@ -255,20 +238,6 @@ export default class OSMPhotoNotes extends Component<{}> {
     else
       osm_features.splice(index, 1);
     this.setState({osm_features})
-  }
-
-  private getImageNoteMarkers(): MapMarker[] {
-    const {osmImageNotes} = this.state;
-    if (!osmImageNotes) return [];
-    return osmImageNotes.map((osmImageNote) =>
-      ({lat: osmImageNote.lat as number,
-        lon: osmImageNote.lon as number,
-        id: osmImageNote.id,
-        onClick: () => this.onNoteSelect(osmImageNote)}))
-  }
-
-  private onNoteSelect(selectedNote: OSMImageNote) {
-    this.setState({selectedNote});
   }
 }
 

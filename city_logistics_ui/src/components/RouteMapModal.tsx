@@ -8,7 +8,8 @@ import styles from 'leaflet/dist/leaflet.css';
 
 import GlyphIcon from "util_components/GlyphIcon";
 import Geolocator from "util_components/Geolocator";
-import {Location, Address} from './types';
+import {Location, Address} from 'util_components/types';
+import OSMImageNotes from "components/OSMImageNotes";
 
 export type BaseMapProps = {
   origin: Address,
@@ -32,6 +33,7 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
   } = {};
   private path: any = null;
   private userMovedMap: boolean = false;
+  private imageNotesLayer?: any;
 
   initMapState() {
     this.leafletMap = null;
@@ -42,8 +44,10 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
 
   render() {
     const {origin, destination, onClose, currentPositionIndex=0, currentPosition} = this.props;
+    const {selectedNote, osmImageNotes} = this.state;
 
     return <Modal title={`${origin.street_address} to ${destination.street_address}`} onClose={onClose}>
+      <OSMImageNotes onMapLayerLoaded={(mapLayer) => {this.imageNotesLayer = mapLayer; this.refreshMap()}}/>
       <div id="leafletMap" style={{height: '70vh'}}> </div>
       {(currentPositionIndex > -1) && !currentPosition &&
         <Geolocator onLocation={([lat, lon]) => this.setState({currentPosition: {lat, lon}})}/>
@@ -88,6 +92,9 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
     else if (!this.userMovedMap) this.leafletMap.fitBounds(this.bounds());
 
     this.path.setLatLngs(this.coords().map(({lat, lon}) => [lat, lon]));
+
+    if (this.imageNotesLayer && !this.leafletMap.hasLayer(this.imageNotesLayer))
+      this.imageNotesLayer.addTo(this.leafletMap);
 
     Object.entries({origin, destination, currentPosition}).forEach(([name, coord]) => {
       if (!coord) return;

@@ -1,5 +1,5 @@
 import React from "react";
-import RouteMapModal, {BaseMapProps} from "util_components/RouteMapModal";
+import RouteMapModal, {BaseMapProps} from "components/RouteMapModal";
 
 export default class MapWidget extends React.Component<BaseMapProps> {
   state = {

@@ -1,6 +1,6 @@
 import React from 'react';
 import Card, {CardP} from "util_components/Card";
-import MapWidget from "util_components/MapWidget";
+import MapWidget from "components/MapWidget";
 import PackageDistances from "components/PackageDistances";
 import Button from "util_components/Button";
 import {Package} from "components/types";

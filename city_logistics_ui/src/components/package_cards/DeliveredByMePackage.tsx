@@ -1,6 +1,6 @@
 import React from 'react';
 import Card, {CardP} from "util_components/Card";
-import MapWidget from "util_components/MapWidget";
+import MapWidget from "components/MapWidget";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
 import {Package} from "components/types";
