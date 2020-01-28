@@ -124,3 +124,17 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         osm_image_note = serializer.save()
         osm_image_note.modified_by = self.request.user
         osm_image_note.save()
+
+    @action(methods=['GET'], detail=False, url_path='notes_as_geo.json')
+    def as_geojson(self, request, *args, **kwargs):
+        return Response({
+            "type": "FeatureCollection",
+            "features": [{
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [note.lon, note.lat]
+                },
+                "properties": self.get_serializer(note).data
+            } for note in self.get_queryset()]
+        })

@@ -83,7 +83,7 @@ class RestAPITests(FVHAPITestCase):
         with open(os.path.join(os.path.dirname(__file__), 'test_image.png'), 'rb') as file:
             file_content = file.read()
         uploaded_file = SimpleUploadedFile("image.png", file_content, content_type="image/png")
-        url = reverse('osmimagenote-detail', kwargs={'pk': 1})
+        url = reverse('osmimagenote-detail', kwargs={'pk': note.id})
         response = self.client.patch(url, data={'image': uploaded_file}, format='multipart')
 
         # Then an OK response is received:
@@ -91,4 +91,43 @@ class RestAPITests(FVHAPITestCase):
 
         # And a note is updated in db:
         note = models.OSMImageNote.objects.get()
-        self.assertEqual(note.image.name, 'osm_image_notes/1/image.png')
+        self.assertEqual(note.image.name, f'osm_image_notes/{note.id}/image.png')
+
+    def test_osm_image_notes_as_geojson(self):
+        # Given that a courier user is signed in
+        courier = self.create_and_login_courier()
+
+        # And given that there are some OSM image notes in the db
+        url = reverse('osmimagenote-list')
+        fields = {
+            'lat': '60.16134701761975',
+            'lon': '24.944593941327188',
+            'comment': 'Nice view',
+            'osm_features': [3330783778, 3336789583, 3330783754]
+        }
+        response = self.client.post(url, data=fields, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # When requesting the notes as geojson
+        url = reverse('osmimagenote-as-geojson')
+        response = self.client.get(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And it contains the notes as geojson:
+        self.assertDictEqual(response.json(), {
+            'type': 'FeatureCollection',
+            'features': [{
+                'type': 'Feature',
+                'geometry': {'type': 'Point', 'coordinates': [24.94459394, 60.16134702]},
+                'properties': {
+                    'id': 1,
+                    'comment': 'Nice view',
+                    'image': None,
+                    'lat': '60.16134702',
+                    'lon': '24.94459394',
+                    'osm_features': [3330783778, 3330783754, 3336789583]
+                }
+            }]
+        })
