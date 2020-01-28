@@ -16,7 +16,7 @@ import './Map.css';
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [16, 16]});
 
-export type MapMarker = Location & { onClick: () => any };
+export type MapMarker = Location & { id?: number, onClick: () => any };
 
 type MapProps = {
   requestLocation?: boolean,
@@ -32,12 +32,14 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
 
   private leafletMap: any = null;
   private markers: {currentPosition?: any, selectedPosition?: any} = {};
-  private dotMarkers?: object[] = undefined;
+  private userMovedMap: boolean = false;
+  private dotMarkers: { [id: string]: any } = {};
 
   initMapState() {
     this.leafletMap = null;
     this.markers = {};
-    this.dotMarkers = undefined;
+    this.dotMarkers = {};
+    this.userMovedMap = false;
   }
 
   render() {
@@ -124,13 +126,14 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
         this.markers.currentPosition = L.marker(latlng, {icon}).addTo(this.leafletMap);
       }
     }
-    if (dotMarkers && !(this.dotMarkers && this.dotMarkers.length))
-      this.dotMarkers = dotMarkers.map((dotMarker) => {
-        const marker = L.marker({lon: dotMarker.lon, lat: dotMarker.lat}, {icon: dotIcon})
-        marker.on('click', dotMarker.onClick)
-        marker.addTo(this.leafletMap);
-        return marker;
-      })
+    if (dotMarkers) dotMarkers.forEach((dotMarker) => {
+      const id = String(dotMarker.id);
+      if (this.dotMarkers[id]) return;
+      const marker = L.marker({lon: dotMarker.lon, lat: dotMarker.lat}, {icon: dotIcon})
+      marker.on('click', dotMarker.onClick)
+      marker.addTo(this.leafletMap);
+      this.dotMarkers[id] = marker;
+    })
   }
 
   private mapMoved() {
@@ -138,4 +141,3 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
     if (marker) marker.setLatLng(this.leafletMap.getCenter())
   }
 }
-

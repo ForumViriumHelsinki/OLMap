@@ -16,6 +16,7 @@ import {GeolibInputCoordinates} from "geolib/es/types";
 import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
 import {OSMFeature, OSMImageNote} from "components/types";
+import Spinner from "util_components/Spinner";
 
 const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
 
@@ -36,7 +37,8 @@ type OSMPhotoNotesState = OSMImageNote & {
   submitting?: boolean,
   error?: boolean,
   osmImageNotes?: OSMImageNote[],
-  selectedNote?: OSMImageNote
+  selectedNote?: OSMImageNote,
+  featuresLoading: boolean
 }
 
 const initialState: OSMPhotoNotesState = {
@@ -49,7 +51,8 @@ const initialState: OSMPhotoNotesState = {
   osm_features: [],
   error: false,
   submitting: false,
-  selectedNote: undefined
+  selectedNote: undefined,
+  featuresLoading: false
 };
 
 export default class OSMPhotoNotes extends Component<{}> {
@@ -72,7 +75,10 @@ export default class OSMPhotoNotes extends Component<{}> {
   }
 
   render() {
-    const {status, nearbyOSMFeatures, osm_features, lat, lon, submitting, error, selectedNote} = this.state;
+    const {
+      status, nearbyOSMFeatures, osm_features, lat, lon, submitting, error,
+      selectedNote, featuresLoading
+    } = this.state;
     const location = [lon, lat];
 
     return <>
@@ -100,7 +106,7 @@ export default class OSMPhotoNotes extends Component<{}> {
             </>,
           locating:
             <>
-              Scroll the map to select exact position{' '}
+              Scroll map to select position{' '}
               <Button outline color="danger" size="sm" onClick={this.onCancel}>
                 Cancel
               </Button>
@@ -112,24 +118,30 @@ export default class OSMPhotoNotes extends Component<{}> {
                   <OSMFeatureItem key={i} osmFeature={osmFeature} location={location as LocationTuple}
                                   active={osm_features.includes(osmFeature.id)}
                                   onClick={() => this.toggleRelatedFeature(osmFeature)} />)}
+                {featuresLoading &&
+                  <ListGroupItem><Spinner/></ListGroupItem>
+                }
               </ListGroup></div>
-              <Button color="primary" size="sm" onClick={this.onRelate}>
+              <Button block color="primary" size="sm" onClick={this.onRelate} className="mt-2">
                 Done
               </Button>
             </Modal>,
           commenting:
             <Modal title="Add comment" onClose={this.onCancel}>
               <Error status={error} message="Submit failed. Try again maybe?"/>
-              <textarea className="form-control" rows={5} placeholder="Describe the problem / note (optional)"
-                        onChange={(e) => this.setState({comment: e.target.value})} />
-              <Button disabled={submitting} color="primary" size="sm" onClick={submitting ? undefined : this.onSubmit}>
+              <textarea className="form-control" rows={5}
+                        placeholder="Describe the problem / note (optional)"
+                        onChange={(e) =>
+                          this.setState({comment: e.target.value})} />
+              <Button block disabled={submitting} color="primary" size="sm"
+                      onClick={submitting ? undefined : this.onSubmit}>
                 {submitting ? 'Submitting...' : 'Done'}
               </Button>
             </Modal>,
           thanks:
             <Modal title="Thank you" onClose={this.onCancel}>
               <p className="m-2">The comment was saved successfully.</p>
-              <Button color="primary" size="sm" onClick={this.onCancel}>
+              <Button block color="primary" size="sm" onClick={this.onCancel}>
                 Close
               </Button>
             </Modal>,
@@ -170,11 +182,11 @@ export default class OSMPhotoNotes extends Component<{}> {
         this.addNearbyFeature(response.data);
       },
       (err: any) => {
-        console.log(this.state.nearbyOSMFeatures);
-        if (!this.state.nearbyOSMFeatures.length) this.setState({status: 'commenting'});
+        if (!this.state.nearbyOSMFeatures.length) this.setState({status: 'commenting', featuresLoading: false});
+        else this.setState({featuresLoading: false})
       }
     );
-    this.setState({status: "relating", lon: location[0], lat: location[1]});
+    this.setState({status: "relating", lon: location[0], lat: location[1], featuresLoading: true});
   }
 
   private addNearbyFeature(osmFeature: OSMFeature) {
@@ -192,7 +204,7 @@ export default class OSMPhotoNotes extends Component<{}> {
       for (const i in osmAttributes)
         if (feature.tags[osmAttributes[i][0]]) return i;
       return osmAttributes.length;
-    }
+    };
 
     insertFeature: {
       for (const i in nearbyOSMFeatures)
@@ -251,6 +263,7 @@ export default class OSMPhotoNotes extends Component<{}> {
     return osmImageNotes.map((osmImageNote) =>
       ({lat: osmImageNote.lat as number,
         lon: osmImageNote.lon as number,
+        id: osmImageNote.id,
         onClick: () => this.onNoteSelect(osmImageNote)}))
   }
 
