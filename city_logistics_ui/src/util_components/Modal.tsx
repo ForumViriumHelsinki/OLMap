@@ -44,7 +44,7 @@ export default class Modal extends React.Component<ModalProps> {
                 }
               </div>
             }
-            {children}
+            <div style={{maxHeight: 'calc(100vh - 180px)', overflowY: 'auto'}}>{children}</div>
           </div>
         </div>
       </div>
