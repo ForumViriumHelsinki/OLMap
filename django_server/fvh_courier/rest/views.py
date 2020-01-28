@@ -109,6 +109,13 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     serializer_class = OSMImageNoteSerializer
     queryset = models.OSMImageNote.objects.all()
 
+    def get_permissions(self):
+        if self.action == 'as_geojson':
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = self.permission_classes
+        return [permission() for permission in permission_classes]
+
     def create(self, request, *args, **kwargs):
         for id in request.data['osm_features']:
             models.OSMFeature.objects.get_or_create(id=id)
@@ -125,7 +132,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         osm_image_note.modified_by = self.request.user
         osm_image_note.save()
 
-    @action(methods=['GET'], detail=False, url_path='as_geojson')
+    @action(methods=['GET'], detail=False)
     def as_geojson(self, request, *args, **kwargs):
         return Response({
             "type": "FeatureCollection",
