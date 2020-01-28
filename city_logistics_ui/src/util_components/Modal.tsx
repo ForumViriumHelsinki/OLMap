@@ -30,7 +30,7 @@ export default class Modal extends React.Component<ModalProps> {
     return (<>
       <div className="modal-backdrop show"> </div>
       <div className="modal show" tabIndex={-1} role="dialog" style={{display: 'block'}} onClick={onClose}>
-        <div className="modal-dialog modal-dialog-centered"
+        <div className="modal-dialog"
              role="document"
              onClick={(e) => e.stopPropagation()}>
           <div className="modal-content">
@@ -44,7 +44,7 @@ export default class Modal extends React.Component<ModalProps> {
                 }
               </div>
             }
-            <div style={{maxHeight: 'calc(100vh - 180px)', overflowY: 'auto'}}>{children}</div>
+            <div style={{maxHeight: 'calc(100vh - 200px)', overflowY: 'auto'}}>{children}</div>
           </div>
         </div>
       </div>
