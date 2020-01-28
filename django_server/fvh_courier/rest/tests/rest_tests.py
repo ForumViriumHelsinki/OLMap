@@ -109,7 +109,7 @@ class RestAPITests(FVHAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # When requesting the notes as geojson
-        url = reverse('osmimagenote-as-geojson')
+        url = reverse('osm_image_notes_geojson')
         response = self.client.get(url)
 
         # Then an OK response is received:

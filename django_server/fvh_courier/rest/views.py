@@ -1,7 +1,7 @@
 from django.utils import timezone
 from rest_framework import viewsets, mixins, permissions
 from rest_framework.decorators import action
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView
 from rest_framework.response import Response
 
 from drf_jsonschema import to_jsonschema
@@ -109,13 +109,6 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     serializer_class = OSMImageNoteSerializer
     queryset = models.OSMImageNote.objects.all()
 
-    def get_permissions(self):
-        if self.action == 'as_geojson':
-            permission_classes = [permissions.AllowAny]
-        else:
-            permission_classes = self.permission_classes
-        return [permission() for permission in permission_classes]
-
     def create(self, request, *args, **kwargs):
         for id in request.data['osm_features']:
             models.OSMFeature.objects.get_or_create(id=id)
@@ -132,8 +125,13 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         osm_image_note.modified_by = self.request.user
         osm_image_note.save()
 
-    @action(methods=['GET'], detail=False)
-    def as_geojson(self, request, *args, **kwargs):
+
+class OSMImageNotesGeoJSON(ListAPIView):
+    serializer_class = OSMImageNoteSerializer
+    queryset = models.OSMImageNote.objects.all()
+    permission_classes = [permissions.AllowAny]
+
+    def list(self, request, *args, **kwargs):
         return Response({
             "type": "FeatureCollection",
             "features": [{
