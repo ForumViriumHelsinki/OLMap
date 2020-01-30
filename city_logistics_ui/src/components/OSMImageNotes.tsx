@@ -42,7 +42,9 @@ export default class OSMImageNotes extends React.Component<OSMImageNotesProps, O
   render() {
     const {selectedNote} = this.state;
     return selectedNote ?
-      <Modal title={selectedNote.comment || 'No comment.'} onClose={() => this.setState({selectedNote: undefined})}>
+      <Modal title={selectedNote.comment || 'No comment.'}
+             className={selectedNote.image ? 'modal-xl' : 'modal-dialog-centered'}
+             onClose={() => this.setState({selectedNote: undefined})}>
         {selectedNote.image &&
           <img src={selectedNote.image} style={{maxWidth: '100%', maxHeight: '60vh', objectFit: 'contain'}} />
         }

@@ -22,15 +22,17 @@ export class ModalActions extends React.Component<{actions: Action[]}> {
   }
 }
 
-type ModalProps = {title: string, onClose: () => any, children: any}
+type ModalProps = {title: string, onClose: () => any, children: any, className: string}
 
 export default class Modal extends React.Component<ModalProps> {
+  static defaultProps = {className: ''};
+
   render() {
-    const {title, onClose, children} = this.props;
+    const {title, onClose, children, className} = this.props;
     return (<>
       <div className="modal-backdrop show"> </div>
-      <div className="modal show" tabIndex={-1} role="dialog" style={{display: 'block'}} onClick={onClose}>
-        <div className="modal-dialog"
+      <div className="modal show" tabIndex={-1} role="dialog" onClick={onClose}>
+        <div className={`modal-dialog ${className}`}
              role="document"
              onClick={(e) => e.stopPropagation()}>
           <div className="modal-content">

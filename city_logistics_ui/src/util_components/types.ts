@@ -12,3 +12,10 @@ export type Address = Location & {
 
 export type LocationTuple = [number, number] | number[]
 
+export type OSMFeature = {
+    type: "node" | "way" | "relation",
+    id: number,
+    lat: number,
+    lon: number,
+    tags: { [tag: string]: string }
+}
