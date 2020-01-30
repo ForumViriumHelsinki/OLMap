@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {CSSProperties} from 'react';
 import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl} from "urls";
 import {OSMImageNote} from "components/types";
@@ -25,6 +25,13 @@ export default class OSMImageNotes extends React.Component<OSMImageNotesProps, O
 
   state: OSMImageNotesState = {};
 
+  imageStyle: CSSProperties = {
+    maxWidth: '100%',
+    maxHeight: 'calc(100vh - 200px)',
+    objectFit: 'contain',
+    margin: '0 auto',
+    display: 'block'};
+
   componentDidMount() {
     this.loadImageNotes();
   }
@@ -46,7 +53,7 @@ export default class OSMImageNotes extends React.Component<OSMImageNotesProps, O
              className={selectedNote.image ? 'modal-xl' : 'modal-dialog-centered'}
              onClose={() => this.setState({selectedNote: undefined})}>
         {selectedNote.image &&
-          <img src={selectedNote.image} style={{maxWidth: '100%', maxHeight: '60vh', objectFit: 'contain'}} />
+          <img src={selectedNote.image} style={this.imageStyle} />
         }
       </Modal>
       : ''
