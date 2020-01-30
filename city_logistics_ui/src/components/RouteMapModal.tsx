@@ -49,7 +49,7 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
       <OSMImageNotes onMapLayerLoaded={(mapLayer) => {this.imageNotesLayer = mapLayer; this.refreshMap()}}/>
       <div id="leafletMap" style={{height: '70vh'}}> </div>
       {(currentPositionIndex > -1) && !currentPosition &&
-        <Geolocator onLocation={([lat, lon]) => this.setState({currentPosition: {lat, lon}})}/>
+        <Geolocator onLocation={([lon, lat]) => this.setState({currentPosition: {lat, lon}})}/>
       }
     </Modal>;
   }

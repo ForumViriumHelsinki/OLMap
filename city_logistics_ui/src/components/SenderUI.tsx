@@ -12,7 +12,7 @@ export default class SenderUI extends React.Component<{ user: User, onLogout: fu
     {
       header: 'New package',
       ChildComponent: NewPackage,
-      childProps: {onCreated: () => this.setState({activeTab: 'My packages'})},
+      childProps: {onCreated: () => this.tabsUI.current && this.tabsUI.current.switchTab('My packages')},
       icon: 'add_box',
       menuText: 'New'
     },
@@ -31,7 +31,9 @@ export default class SenderUI extends React.Component<{ user: User, onLogout: fu
     }
   ];
 
+  tabsUI = React.createRef<FVHTabsUI>();
+
   render() {
-    return <FVHTabsUI {...this.props} activeTab='New package' tabs={this.tabs}/>
+    return <FVHTabsUI {...this.props} activeTab='New package' tabs={this.tabs} ref={this.tabsUI}/>
   }
 }

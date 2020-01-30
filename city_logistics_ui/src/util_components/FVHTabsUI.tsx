@@ -61,7 +61,7 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, {activeTa
           <ul className="navbar-nav flex-row nav-fill flex-fill">
             {tabs.map(({icon, menuText, header}) => (
               <NavItem key={header} icon={icon} text={menuText} active={activeTab == header}
-                       onClick={() => this.setState({activeTab: header})}/>
+                       onClick={() => this.switchTab(header)}/>
             ))}
             <NavItem icon="logout" text="Logout" onClick={() => this.setState({showLogout: true})}/>
           </ul>
@@ -73,5 +73,9 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, {activeTa
         }
       </>
     );
+  }
+
+  switchTab(header: string) {
+    this.setState({activeTab: header});
   }
 }

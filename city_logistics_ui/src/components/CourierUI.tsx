@@ -18,7 +18,9 @@ export default class CourierUI extends React.Component<{user: User, onLogout: fu
     {
       header: 'Available',
       ChildComponent: AvailablePackages,
-      childProps: {onPackageReserved: () => this.setState({activeTab: 'myPackages'})},
+      childProps: {
+        onPackageReserved: () =>
+          this.tabsUI.current && this.tabsUI.current.switchTab('My packages')},
       icon: 'dynamic_feed',
       menuText: 'Available'
     },
@@ -31,7 +33,9 @@ export default class CourierUI extends React.Component<{user: User, onLogout: fu
     }
   ];
 
+  tabsUI = React.createRef<FVHTabsUI>();
+
   render() {
-    return <FVHTabsUI {...this.props} activeTab='My packages' tabs={this.tabs}/>
+    return <FVHTabsUI {...this.props} activeTab='My packages' tabs={this.tabs} ref={this.tabsUI}/>
   }
 }
