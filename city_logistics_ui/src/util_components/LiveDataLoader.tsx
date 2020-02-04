@@ -1,6 +1,6 @@
 import React from 'react';
 import sessionRequest from "sessionRequest";
-import Error from "util_components/Error";
+import ErrorAlert from "util_components/ErrorAlert";
 
 type LiveDataLoaderProps = {
   url: string,
@@ -41,6 +41,6 @@ export default class LiveDataLoader extends React.Component<LiveDataLoaderProps>
 
   render() {
     const {error} = this.state;
-    return <Error status={error} message="Failed to load items. Perhaps try reloading?" />
+    return <ErrorAlert status={error} message="Failed to load items. Perhaps try reloading?" />
   }
 }

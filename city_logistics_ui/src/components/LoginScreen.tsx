@@ -1,6 +1,6 @@
 import React, {FormEvent} from 'react';
 import sessionRequest, {login} from "sessionRequest";
-import Error from "util_components/Error";
+import ErrorAlert from "util_components/ErrorAlert";
 import Component from "util_components/Component";
 import {loginUrl} from "urls";
 
@@ -20,7 +20,7 @@ export default class LoginScreen extends Component<{onLogin: func}> {
           <p className="lead text-primary">Sign in</p>
         </div>
         <form onSubmit={this.submit}>
-          <Error status={this.state.error} message="Login failed. Please try again."/>
+          <ErrorAlert status={this.state.error} message="Login failed. Please try again."/>
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <input type="test" className="form-control" name="username"

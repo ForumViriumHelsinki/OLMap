@@ -7,7 +7,7 @@ import sessionRequest from "sessionRequest";
 import Spinner from "util_components/Spinner";
 
 import settings from "settings.json";
-import Error from "util_components/Error";
+import ErrorAlert from "util_components/ErrorAlert";
 import moment from "moment";
 import Component from "util_components/Component";
 
@@ -57,7 +57,7 @@ export default class NewPackage extends Component<{onCreated: func}> {
     const {schema, error} = this.state;
     if (schema) {
       return <>
-        <Error status={error} message="Creation failed. Try again maybe?"/>
+        <ErrorAlert status={error} message="Creation failed. Try again maybe?"/>
         <Form schema={schema} onSubmit={this.onSubmit}/>
       </>
     } else return <Spinner/>

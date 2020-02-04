@@ -7,7 +7,7 @@ import Icon from "util_components/Icon";
 import Component from "util_components/Component";
 import {LocationTuple} from "util_components/types";
 import Modal from "util_components/Modal";
-import Error from "util_components/Error";
+import ErrorAlert from "util_components/ErrorAlert";
 
 import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
@@ -79,7 +79,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
             </Modal>,
           commenting:
             <Modal title="Add comment" onClose={this.onCancel}>
-              <Error status={error} message="Submit failed. Try again maybe?"/>
+              <ErrorAlert status={error} message="Submit failed. Try again maybe?"/>
               <textarea className="form-control" rows={5}
                         placeholder="Describe the problem / note (optional)"
                         onChange={(e) =>
