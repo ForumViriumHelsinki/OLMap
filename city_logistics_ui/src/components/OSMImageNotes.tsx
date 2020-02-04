@@ -77,8 +77,10 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
         }
         <div className="list-group-item"><strong>Related places:</strong></div>
         <div onClick={() => readOnly && this.setState({readOnly: false})}>
-          <OSMFeaturesSelection location={location} onSelect={this.onFeaturesSelected} readOnly={readOnly}
-                                preselectedFeatureIds={selectedNote.osm_features}/>
+          <OSMFeaturesSelection
+            location={location} onSelect={this.onFeaturesSelected} readOnly={readOnly}
+            maxHeight={null}
+            preselectedFeatureIds={selectedNote.osm_features}/>
         </div>
       </Modal>
     )

@@ -11,8 +11,6 @@ import {GeolibGeoJSONPoint, GeolibInputCoordinates} from "geolib/es/types";
 // @ts-ignore
 import {Button, ListGroup, ListGroupItem} from "reactstrap";
 
-const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter')
-
 type OSMTags = { [tag: string]: string };
 
 type OSMFeatureType = {
@@ -104,7 +102,8 @@ type OSMFSProps = {
   onSelect: (featureIds: number[]) => any,
   distance: number,
   preselectedFeatureIds: number[],
-  readOnly: boolean
+  readOnly: boolean,
+  maxHeight: any
 }
 
 export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OSMFSState> {
@@ -113,7 +112,8 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
   static defaultProps = {
     distance: 20,
     preselectedFeatureIds: [],
-    readOnly: false
+    readOnly: false,
+    maxHeight: 'calc(100vh - 248px)'
   };
 
   render() {
@@ -121,10 +121,10 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
       nearbyOSMFeatures, selectedFeatureIds, featuresLoading
     } = this.state;
 
-    const {onSelect, readOnly} = this.props;
+    const {onSelect, readOnly, maxHeight} = this.props;
 
     return <>
-      <div style={{maxHeight: 'calc(100vh - 248px)', overflowY: 'auto'}}><ListGroup>
+      <div style={maxHeight ? {maxHeight, overflowY: 'auto'} : {}}><ListGroup>
         {nearbyOSMFeatures.map((osmFeature: any, i) =>
           readOnly ?
             selectedFeatureIds.includes(osmFeature.id) &&
@@ -152,8 +152,8 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
   }
 
   componentDidUpdate(prevProps: OSMFSProps) {
-    if (prevProps.location != this.props.location) this.reloadFeatures();
-    if (prevProps.preselectedFeatureIds != this.props.preselectedFeatureIds)
+    if (String(prevProps.location) != String(this.props.location)) this.reloadFeatures();
+    if (String(prevProps.preselectedFeatureIds) != String(this.props.preselectedFeatureIds))
       this.preselectFeatures();
   }
 
@@ -216,6 +216,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
       minlon: bounds[0].longitude, maxlon: bounds[1].longitude};
 
     const query = osmFeatureTypes.map(({requiredTag}) => `node['${requiredTag}']`).join(';') + ';way[name]';
+    const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter');
     overpassFrontend.BBoxQuery(query, overpassBounds, {},
       (err: any, response: any) => {
         if (err) console.error(err);
@@ -227,7 +228,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
       }
     );
 
-    this.setState({...initialState, featuresLoading: true});
+    this.setState({nearbyOSMFeatures: [], featuresLoading: true});
     this.preselectFeatures();
   }
 
