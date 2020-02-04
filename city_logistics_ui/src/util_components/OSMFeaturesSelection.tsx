@@ -102,14 +102,18 @@ const initialState: OSMFSState = {
 type OSMFSProps = {
   location: LocationTuple,
   onSelect: (featureIds: number[]) => any,
-  distance: number
+  distance: number,
+  preselectedFeatureIds: number[],
+  readOnly: boolean
 }
 
 export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OSMFSState> {
   state: OSMFSState = initialState;
 
   static defaultProps = {
-    distance: 20
+    distance: 20,
+    preselectedFeatureIds: [],
+    readOnly: false
   };
 
   render() {
@@ -117,32 +121,63 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
       nearbyOSMFeatures, selectedFeatureIds, featuresLoading
     } = this.state;
 
-    const {onSelect, location} = this.props;
+    const {onSelect, readOnly} = this.props;
 
     return <>
       <div style={{maxHeight: 'calc(100vh - 248px)', overflowY: 'auto'}}><ListGroup>
         {nearbyOSMFeatures.map((osmFeature: any, i) =>
-          // @ts-ignore
-          <OSMFeatureItem key={i} osmFeature={osmFeature} location={location as LocationTuple}
-                          active={selectedFeatureIds.includes(osmFeature.id)}
-                          onClick={() => this.toggleRelatedFeature(osmFeature)} />)}
+          readOnly ?
+            selectedFeatureIds.includes(osmFeature.id) &&
+              <ListGroupItem key={i}>{this.label(osmFeature)}</ListGroupItem>
+          :
+            <ListGroupItem key={i} active={selectedFeatureIds.includes(osmFeature.id)}
+                           onClick={() => this.toggleRelatedFeature(osmFeature)}>
+              {this.label(osmFeature)}
+            </ListGroupItem>
+        )}
+        {readOnly && !selectedFeatureIds.length &&
+          <ListGroupItem>No places selected</ListGroupItem>
+        }
         {featuresLoading &&
           <ListGroupItem><Spinner/></ListGroupItem>
         }
       </ListGroup></div>
-      <Button block color="primary"
-              onClick={() => onSelect(selectedFeatureIds)} className="mt-2">
-        Done
-      </Button>
+      {!readOnly &&
+        <Button block color="primary"
+                onClick={() => onSelect(selectedFeatureIds)} className="mt-2">
+          Done
+        </Button>
+      }
     </>;
   }
 
   componentDidUpdate(prevProps: OSMFSProps) {
-   if (prevProps.location != this.props.location) this.reloadFeatures();
+    if (prevProps.location != this.props.location) this.reloadFeatures();
+    if (prevProps.preselectedFeatureIds != this.props.preselectedFeatureIds)
+      this.preselectFeatures();
+  }
+
+  private preselectFeatures() {
+    this.setState({selectedFeatureIds: this.props.preselectedFeatureIds});
   }
 
   componentDidMount() {
-   this.reloadFeatures();
+    this.reloadFeatures();
+    this.preselectFeatures();
+  }
+
+  private label(osmFeature: OSMFeature) {
+    const {location} = this.props;
+    const {tags} = osmFeature;
+    let label = '';
+
+    osmFeatureTypes.forEach((osmFeatureType) => {
+      if (!label && tags[osmFeatureType.requiredTag]) label = osmFeatureType.label(tags);
+    });
+
+    if (osmFeature.type == 'node')
+      label += ` (${getDistance(osmFeature, location as GeolibInputCoordinates)}m)`
+    return label && (label[0].toUpperCase() + label.slice(1)).replace('_', ' ');
   }
 
   private addNearbyFeature(osmFeature: OSMFeature) {
@@ -193,6 +228,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
     );
 
     this.setState({...initialState, featuresLoading: true});
+    this.preselectFeatures();
   }
 
   private toggleRelatedFeature(osmFeature: OSMFeature) {
@@ -203,33 +239,5 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
     else
       selectedFeatureIds.splice(index, 1);
     this.setState({selectedFeatureIds})
-  }
-}
-
-type OSMFeatureItemProps = {
-  osmFeature: OSMFeature,
-  location: LocationTuple,
-  active: boolean,
-  onClick: () => any
-};
-
-class OSMFeatureItem extends React.Component<OSMFeatureItemProps> {
-  render() {
-    const {active, onClick} = this.props;
-    return <ListGroupItem active={active} onClick={onClick}>{this.label()}</ListGroupItem>;
-  }
-
-  private label() {
-    const {osmFeature, location} = this.props;
-    const {tags} = osmFeature;
-    let label = '';
-
-    osmFeatureTypes.forEach((osmFeatureType) => {
-      if (!label && tags[osmFeatureType.requiredTag]) label = osmFeatureType.label(tags);
-    });
-
-    if (osmFeature.type == 'node')
-      label += ` (${getDistance(osmFeature, location as GeolibInputCoordinates)}m)`
-    return label && (label[0].toUpperCase() + label.slice(1)).replace('_', ' ');
   }
 }

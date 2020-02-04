@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default class Component<P> extends React.Component {
+export default class Component<P, S={}> extends React.Component {
   static bindMethods: string[] = [];
   // @ts-ignore
   props: P;
