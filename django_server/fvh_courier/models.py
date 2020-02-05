@@ -44,7 +44,7 @@ def upload_osm_images_to(instance, filename):
 class OSMImageNote(BaseLocation):
     image = models.ImageField(null=True, blank=True, upload_to=upload_osm_images_to)
     comment = models.TextField(blank=True)
-    osm_features = models.ManyToManyField(OSMFeature)
+    osm_features = models.ManyToManyField(OSMFeature, blank=True)
 
     created_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name='created_notes')

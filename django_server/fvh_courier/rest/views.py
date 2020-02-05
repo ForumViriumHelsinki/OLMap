@@ -110,9 +110,16 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     queryset = models.OSMImageNote.objects.all()
 
     def create(self, request, *args, **kwargs):
-        for id in request.data['osm_features']:
-            models.OSMFeature.objects.get_or_create(id=id)
+        self.ensure_features(request)
         return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.ensure_features(request)
+        return super().update(request, *args, **kwargs)
+
+    def ensure_features(self, request):
+        for id in request.data.get('osm_features', []):
+            models.OSMFeature.objects.get_or_create(id=id)
 
     def perform_create(self, serializer):
         osm_image_note = serializer.save()
