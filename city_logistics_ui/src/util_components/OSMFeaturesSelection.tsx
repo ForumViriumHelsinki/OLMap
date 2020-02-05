@@ -120,28 +120,35 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
     const {
       nearbyOSMFeatures, selectedFeatureIds, featuresLoading
     } = this.state;
-
+    const selectedFeatures = this.selectedFeatures();
     const {onSelect, readOnly, maxHeight} = this.props;
 
     return <>
       <div style={maxHeight ? {maxHeight, overflowY: 'auto'} : {}}><ListGroup>
-        {nearbyOSMFeatures.map((osmFeature: any, i) =>
-          readOnly ?
-            selectedFeatureIds.includes(osmFeature.id) &&
+
+        {readOnly ?
+          selectedFeatures.length ?
+            selectedFeatures.map((osmFeature: any, i) =>
               <ListGroupItem key={i}>{this.label(osmFeature)}</ListGroupItem>
+            )
           :
+            <ListGroupItem>No places selected</ListGroupItem>
+
+        :
+          nearbyOSMFeatures.map((osmFeature: any, i) =>
             <ListGroupItem key={i} active={selectedFeatureIds.includes(osmFeature.id)}
                            onClick={() => this.toggleRelatedFeature(osmFeature)}>
               {this.label(osmFeature)}
             </ListGroupItem>
-        )}
-        {readOnly && !selectedFeatureIds.length &&
-          <ListGroupItem>No places selected</ListGroupItem>
+          )
         }
+
         {featuresLoading &&
           <ListGroupItem><Spinner/></ListGroupItem>
         }
+
       </ListGroup></div>
+
       {!readOnly &&
         <Button block color="primary"
                 onClick={() => onSelect(selectedFeatureIds)} className="mt-2">
@@ -149,6 +156,10 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
         </Button>
       }
     </>;
+  }
+
+  selectedFeatures() {
+    return this.state.nearbyOSMFeatures.filter(f => this.state.selectedFeatureIds.includes(f.id))
   }
 
   componentDidUpdate(prevProps: OSMFSProps) {

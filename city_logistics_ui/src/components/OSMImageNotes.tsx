@@ -90,11 +90,12 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     const {selectedNote} = this.state;
     if (!selectedNote) return;
     const url = osmImageNoteUrl(selectedNote.id as number);
+
     sessionRequest(url, {method: 'PATCH', data: {osm_features: featureIds}})
     .then((response) => {
       if (response.status < 300) {
         selectedNote.osm_features = featureIds;
-        this.setState(initialState);
+        this.setState({error: false, readOnly: true});
       } else this.setState({error: true});
     })
   }
