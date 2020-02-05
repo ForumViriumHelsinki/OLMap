@@ -105,12 +105,12 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
       this.markers.selectedPosition = undefined;
     }
 
-    if (currentPosition) {
-      // @ts-ignore
-      const latlng = [currentPosition.lat, currentPosition.lon];
-      const marker = this.markers.currentPosition;
+    // @ts-ignore
+    const latlng = currentPosition ? [currentPosition.lat, currentPosition.lon] : settings.defaultLocation;
+    if (!this.state.userMovedMap) this.leafletMap.setView(latlng, 18);
 
-      if (!this.state.userMovedMap) this.leafletMap.setView(latlng, 18);
+    if (currentPosition) {
+      const marker = this.markers.currentPosition;
       if (marker) marker.setLatLng(latlng);
       else {
         const icon = new GlyphIcon({glyph: 'my_location', glyphSize: 20});
