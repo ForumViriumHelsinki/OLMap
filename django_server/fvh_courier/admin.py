@@ -63,10 +63,12 @@ class TeleconnectedUserAdmin(UserAdmin):
 
 @admin.register(OSMImageNote)
 class OSMImageNoteAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'image', 'lat', 'lon', 'created_at', 'created_by', 'modified_at', 'modified_by', 'osm']
+    list_display = ['__str__', 'image', 'lat', 'lon', 'created_at', 'created_by', 'modified_at', 'modified_by',
+                    'reviewed_by', 'visible', 'osm']
     search_fields = ['comment']
     readonly_fields = ['image_', 'osm', 'osm_edit']
     filter_horizontal = ['osm_features']
+    list_filter = ['visible']
 
     def osm_url(self, location):
         return (f'https://www.openstreetmap.org/note/new?' +
