@@ -10,10 +10,10 @@ div.dotIcon::before {
     border: 2px solid #ff5000;
     border-radius: 50%;
     position: absolute;
-    top: 6px;
-    left: 6px;
-    right: 6px;
-    bottom: 6px;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
 }
 
 div.successDotIcon {
