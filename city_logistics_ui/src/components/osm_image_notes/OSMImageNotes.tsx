@@ -121,8 +121,8 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     if (!this.mapLayer) this.mapLayer = L.layerGroup();
     this.osmImageNotes.forEach((osmImageNote) => {
       const id = String(osmImageNote.id);
-      if (this.dotMarkers[id]) return;
       const icon = (user.is_reviewer && osmImageNote.is_reviewed) ? successDotIcon : dotIcon;
+      if (this.dotMarkers[id]) return this.dotMarkers[id].setIcon(icon);
       const marker = L.marker({lon: osmImageNote.lon, lat: osmImageNote.lat}, {icon: icon})
       marker.on('click', () => this.setState({selectedNote: osmImageNote, readOnly: true}));
       marker.addTo(this.mapLayer);
