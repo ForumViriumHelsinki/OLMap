@@ -1,0 +1,25 @@
+div.dotIcon {
+    background: rgba(255, 80, 0, 0.1);
+    border-radius: 50%;
+}
+
+div.dotIcon::before {
+    content: ' ';
+    display: block;
+    background: white;
+    border: 2px solid #ff5000;
+    border-radius: 50%;
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
+}
+
+div.successDotIcon {
+    background: rgba(24, 167, 69, 0.1);
+}
+
+div.successDotIcon::before {
+    border-color: #28a745;
+}

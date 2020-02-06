@@ -9,7 +9,7 @@ import styles from 'leaflet/dist/leaflet.css';
 import GlyphIcon from "util_components/GlyphIcon";
 import Geolocator from "util_components/Geolocator";
 import {Location, Address} from 'util_components/types';
-import OSMImageNotes from "components/OSMImageNotes";
+import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
 
 export type BaseMapProps = {
   origin: Address,

@@ -86,3 +86,17 @@ button.nav-link:focus {
 .modal {
   display: block
 }
+
+.modal-header-actions {
+  position: absolute;
+  right: 48px;
+  top: 8px;
+}
+
+.btn-compact {
+  padding: 0.1rem 0.5rem;
+}
+
+.material-icons {
+  line-height: 0.8;
+}

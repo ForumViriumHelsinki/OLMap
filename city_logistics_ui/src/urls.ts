@@ -15,3 +15,5 @@ export const uuidPackageUrl = (uuid: string) => `/rest/packages/${uuid}/`;
 
 export const osmImageNotesUrl = "/rest/osm_image_notes/";
 export const osmImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/`;
+export const acceptOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/mark_reviewed/`;
+export const rejectOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/hide_note/`;

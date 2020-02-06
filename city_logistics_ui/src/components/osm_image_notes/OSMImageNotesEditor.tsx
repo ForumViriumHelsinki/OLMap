@@ -12,7 +12,7 @@ import ErrorAlert from "util_components/ErrorAlert";
 import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
 import {OSMImageNote} from "components/types";
-import OSMImageNotes from "components/OSMImageNotes";
+import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
 import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
 
 type OSMImageNotesEditorState = OSMImageNote & {

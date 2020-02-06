@@ -3,7 +3,7 @@ import FVHTabsUI from "util_components/FVHTabsUI";
 import AvailablePackages from "components/package_lists/AvailablePackages";
 import ReservedPackageLists from "components/package_lists/ReservedPackageLists";
 import {User} from "components/types";
-import OSMImageNotesEditor from "components/OSMImageNotesEditor";
+import OSMImageNotesEditor from "components/osm_image_notes/OSMImageNotesEditor";
 
 type func = () => any;
 

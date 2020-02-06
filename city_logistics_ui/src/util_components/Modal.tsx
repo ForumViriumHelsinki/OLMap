@@ -22,13 +22,19 @@ export class ModalActions extends React.Component<{actions: Action[]}> {
   }
 }
 
-type ModalProps = {title: string, onClose: () => any, children: any, className: string}
+type ModalProps = {
+  title: string,
+  onClose: () => any,
+  children: any,
+  className: string,
+  headerContent?: any
+}
 
 export default class Modal extends React.Component<ModalProps> {
   static defaultProps = {className: ''};
 
   render() {
-    const {title, onClose, children, className} = this.props;
+    const {title, onClose, children, className, headerContent} = this.props;
     return (<>
       <div className="modal-backdrop show"> </div>
       <div className="modal show" tabIndex={-1} role="dialog" onClick={onClose}>
@@ -36,9 +42,10 @@ export default class Modal extends React.Component<ModalProps> {
              role="document"
              onClick={(e) => e.stopPropagation()}>
           <div className="modal-content">
-            {title &&
+            {(title || headerContent) &&
               <div className="modal-header">
-                <h6 className="modal-title">{title}</h6>
+                {title && <h6 className="modal-title">{title}</h6>}
+                {headerContent}
                 {onClose &&
                 <button type="button" className="close" aria-label="Close" onClick={onClose}>
                   <span aria-hidden="true">&times;</span>

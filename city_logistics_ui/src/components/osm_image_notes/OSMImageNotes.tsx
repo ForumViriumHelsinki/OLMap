@@ -1,19 +1,24 @@
 import React, {CSSProperties} from 'react';
-import sessionRequest from "sessionRequest";
-import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
-import {OSMImageNote} from "components/types";
-import Modal from "util_components/Modal";
-import ErrorAlert from "util_components/ErrorAlert";
 
 // @ts-ignore
 import * as L from 'leaflet';
+// @ts-ignore
+import _ from 'lodash';
 
-import './OSMImageNotes.css';
+import sessionRequest from "sessionRequest";
+import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
+import {AppContext, OSMImageNote} from "components/types";
+import Modal from "util_components/Modal";
+import ErrorAlert from "util_components/ErrorAlert";
+
+import 'components/osm_image_notes/OSMImageNotes.css';
 import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
 import {LocationTuple} from "util_components/types";
 import Component from "util_components/Component";
+import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
 
-const dotIcon = L.divIcon({className: "dotIcon", iconSize: [16, 16]});
+const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
+const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
 
 type OSMImageNotesProps = {
   onMapLayerLoaded: (mapLayer: any) => any
@@ -32,7 +37,8 @@ const initialState: OSMImageNotesState = {
 };
 
 export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImageNotesState> {
-  static bindMethods = ['onFeaturesSelected'];
+  static contextType = AppContext;
+  static bindMethods = ['onFeaturesSelected', 'refresh'];
 
   private osmImageNotes: OSMImageNote[] = [];
   private mapLayer?: any;
@@ -63,6 +69,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
 
   render() {
     const {selectedNote, readOnly, error} = this.state;
+    const {user} = this.context;
     if (!selectedNote) return '';
 
     const location = [selectedNote.lon, selectedNote.lat] as LocationTuple;
@@ -71,12 +78,15 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
       <Modal title={selectedNote.comment || 'No comment.'}
              className={selectedNote.image ? 'modal-xl' : 'modal-dialog-centered'}
              onClose={() => this.setState(initialState)}>
+        {user.is_reviewer &&
+          <OSMImageNoteReviewActions imageNote={selectedNote} onReviewed={this.refresh}/>
+        }
         <ErrorAlert status={error} message="Saving features failed. Try again perhaps?"/>
         {selectedNote.image &&
           <img src={selectedNote.image} style={this.imageStyle} />
         }
         <div className="list-group-item"><strong>Related places:</strong></div>
-        <div onClick={() => readOnly && this.setState({readOnly: false})}>
+        <div onClick={() => user.is_reviewer && readOnly && this.setState({readOnly: false})}>
           <OSMFeaturesSelection
             location={location} onSelect={this.onFeaturesSelected} readOnly={readOnly}
             maxHeight={null}
@@ -84,6 +94,11 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
         </div>
       </Modal>
     )
+  }
+
+  private refresh() {
+    this.setState(initialState);
+    this.loadImageNotes();
   }
 
   onFeaturesSelected(featureIds: number[]) {
@@ -101,14 +116,23 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
   }
 
   private getMapLayer() {
+    const {user} = this.context;
+
     if (!this.mapLayer) this.mapLayer = L.layerGroup();
     this.osmImageNotes.forEach((osmImageNote) => {
       const id = String(osmImageNote.id);
       if (this.dotMarkers[id]) return;
-      const marker = L.marker({lon: osmImageNote.lon, lat: osmImageNote.lat}, {icon: dotIcon})
+      const icon = (user.is_reviewer && osmImageNote.is_reviewed) ? successDotIcon : dotIcon;
+      const marker = L.marker({lon: osmImageNote.lon, lat: osmImageNote.lat}, {icon: icon})
       marker.on('click', () => this.setState({selectedNote: osmImageNote, readOnly: true}));
       marker.addTo(this.mapLayer);
       this.dotMarkers[id] = marker;
+    });
+
+    const index = _.keyBy(this.osmImageNotes, 'id');
+    Object.entries(this.dotMarkers).filter(([id]) => !index[id]).forEach(([id, marker]) => {
+      marker.remove();
+      delete this.dotMarkers[id];
     });
     return this.mapLayer;
   }

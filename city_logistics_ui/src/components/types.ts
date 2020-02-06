@@ -1,7 +1,9 @@
 import {Address, Location} from "util_components/types";
+import React from "react";
 
 export type User = {
     is_courier: boolean,
+    is_reviewer: boolean,
     username: string,
     first_name: string,
     last_name: string,
@@ -42,5 +44,11 @@ export type OSMImageNote = {
     lon?: number,
     comment?: string,
     osm_features: number[],
+    is_reviewed?: boolean
 };
 
+export type AppContextType = {
+    user?: User
+}
+
+export const AppContext = React.createContext({user: undefined} as AppContextType);

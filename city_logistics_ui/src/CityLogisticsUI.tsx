@@ -1,12 +1,6 @@
-import styles from 'leaflet/dist/leaflet.css';
-
 import React from 'react';
-import {
-  HashRouter as Router,
-  Switch,
-  Route,
-  useParams
-} from "react-router-dom"
+// @ts-ignore
+import {HashRouter as Router, Route, Switch, useParams} from "react-router-dom";
 
 import sessionRequest, {logout} from "sessionRequest";
 
@@ -15,14 +9,20 @@ import LoadScreen from "components/LoadScreen";
 import CourierUI from "components/CourierUI";
 import SenderUI from "components/SenderUI";
 import LivePackage from "components/LivePackage";
+import {AppContext, User} from "components/types";
 
-class CityLogisticsUI extends React.Component {
-  state = {
-    user: null,
+type UIState = {
+  user?: User,
+  dataFetched: boolean
+}
+
+class CityLogisticsUI extends React.Component<{}, UIState> {
+  state: UIState = {
+    user: undefined,
     dataFetched: false
   }
 
-  constructor(props) {
+  constructor(props: any) {
     super(props);
     this.logout = this.logout.bind(this);
   }
@@ -33,7 +33,7 @@ class CityLogisticsUI extends React.Component {
 
   refreshUser() {
     sessionRequest('/rest-auth/user/').then(response => {
-      if (response.status == 401) this.setState({user: null, dataFetched: true});
+      if (response.status == 401) this.setState({user: undefined, dataFetched: true});
       else response.json().then(user => this.setState({user, dataFetched: true}));
     })
   }
@@ -41,7 +41,7 @@ class CityLogisticsUI extends React.Component {
   logout() {
     sessionRequest('/rest-auth/logout/', {method: 'POST'}).then(response => {
       logout();
-      this.setState({user: null});
+      this.setState({user: undefined});
     });
   }
 
@@ -57,8 +57,10 @@ class CityLogisticsUI extends React.Component {
         <Route exact path=''>
           {dataFetched ?
             user ?
-              user.is_courier ? <CourierUI user={user} onLogout={this.logout} />
-              : <SenderUI user={user} onLogout={this.logout}/>
+              <AppContext.Provider value={{user}}>{
+                user.is_courier ? <CourierUI user={user} onLogout={this.logout}/>
+                  : <SenderUI user={user} onLogout={this.logout}/>
+              }</AppContext.Provider>
             : <LoginScreen onLogin={() => this.refreshUser()}/>
           : <LoadScreen/>}
         </Route>
