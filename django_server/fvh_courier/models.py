@@ -33,6 +33,9 @@ class BaseLocation(TimestampedModel):
 class OSMFeature(models.Model):
     id = models.BigIntegerField(primary_key=True)
 
+    class Meta:
+        ordering = ['id']
+
     def __str__(self):
         return f'OSMFeature({self.id})'
 
@@ -92,6 +95,9 @@ class OSMImageNote(BaseLocation):
         self.image = File(output, self.image.name)
 
         return super().save(*args, **kwargs)
+
+    def is_reviewed(self):
+        return bool(self.reviewed_by_id)
 
 
 class UserLocation(BaseLocation):

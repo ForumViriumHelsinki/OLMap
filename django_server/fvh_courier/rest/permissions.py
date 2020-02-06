@@ -1,6 +1,7 @@
 from rest_framework import permissions
 
 COURIER_GROUP = 'Courier'
+REVIEWER_GROUP = 'Reviewer'
 
 
 class UserBelongsToGroup(permissions.IsAuthenticated):
@@ -13,3 +14,7 @@ class UserBelongsToGroup(permissions.IsAuthenticated):
 
 class IsCourier(UserBelongsToGroup):
     group_name = COURIER_GROUP
+
+
+class IsReviewer(UserBelongsToGroup):
+    group_name = REVIEWER_GROUP

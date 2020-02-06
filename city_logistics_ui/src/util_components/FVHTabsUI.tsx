@@ -49,6 +49,8 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, {activeTa
     const {activeTab, showLogout} = this.state;
     const {ChildComponent, header, childProps, fullWidth} = tabs.find(t => t.header == activeTab) || tabs[0];
 
+    setTimeout(() => window.scrollTo(0, 10), 1000);
+
     return (
       <>
         <NavBar header={header}

@@ -5,7 +5,7 @@ from django.db.models import DecimalField
 from rest_framework import serializers
 
 from fvh_courier import models
-from .permissions import COURIER_GROUP
+from .permissions import COURIER_GROUP, REVIEWER_GROUP
 
 
 class RoundingDecimalField(serializers.DecimalField):
@@ -25,16 +25,23 @@ class AddressSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     phone_numbers = serializers.SlugRelatedField(many=True, read_only=True, slug_field='number')
     is_courier = serializers.SerializerMethodField()
+    is_reviewer = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'phone_numbers', 'is_courier']
+        fields = ['first_name', 'last_name', 'username', 'phone_numbers', 'is_courier', 'is_reviewer']
 
-    def get_is_courier(self, user):
+    def user_in_group(self, user, group_name):
         for group in user.groups.all():
-            if group.name == COURIER_GROUP:
+            if group.name == group_name:
                 return True
         return False
+
+    def get_is_courier(self, user):
+        return self.user_in_group(user, COURIER_GROUP)
+
+    def get_is_reviewer(self, user):
+        return self.user_in_group(user, REVIEWER_GROUP)
 
 
 class PackageSerializer(serializers.ModelSerializer):
@@ -88,4 +95,4 @@ class OutgoingPackageSerializer(PackageSerializer):
 class OSMImageNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OSMImageNote
-        fields = ['id', 'comment', 'image', 'lat', 'lon', 'osm_features']
+        fields = ['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed']

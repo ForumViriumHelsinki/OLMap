@@ -1,5 +1,5 @@
 from django.utils import timezone
-from rest_framework import viewsets, mixins, permissions
+from rest_framework import viewsets, mixins, permissions, decorators
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView
 from rest_framework.response import Response
@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from drf_jsonschema import to_jsonschema
 from fvh_courier import models
 from .serializers import PackageSerializer, OutgoingPackageSerializer, LocationSerializer, OSMImageNoteSerializer
-from .permissions import IsCourier
+from .permissions import IsCourier, IsReviewer
 
 
 class PackagesViewSetMixin:
@@ -107,7 +107,7 @@ class MyLocationView(RetrieveUpdateDestroyAPIView):
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OSMImageNoteSerializer
-    queryset = models.OSMImageNote.objects.all()
+    queryset = models.OSMImageNote.objects.filter(visible=True)
 
     def create(self, request, *args, **kwargs):
         self.ensure_features(request)
@@ -131,6 +131,24 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         osm_image_note = serializer.save()
         osm_image_note.modified_by = self.request.user
         osm_image_note.save()
+
+    @action(methods=['PUT'], detail=True)
+    @decorators.permission_classes([IsReviewer])
+    def mark_reviewed(self, request, *args, **kwargs):
+        osm_image_note = self.get_object()
+        osm_image_note.reviewed_by = request.user
+        osm_image_note.save()
+        return Response('OK')
+
+    @action(methods=['PUT'], detail=True)
+    @decorators.permission_classes([IsReviewer])
+    def hide_note(self, request, *args, **kwargs):
+        osm_image_note = self.get_object()
+        osm_image_note.reviewed_by = request.user
+        osm_image_note.visible = False
+        osm_image_note.hidden_reason = request.data.get('hidden_reason', '')
+        osm_image_note.save()
+        return Response('OK')
 
 
 class OSMImageNotesGeoJSON(ListAPIView):
