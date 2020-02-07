@@ -186,3 +186,9 @@ except ImportError:
 if 'test' in sys.argv:
     DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
     # INMEMORYSTORAGE_PERSIST = True
+
+ADMINS = [['FVH Django admins', 'django-admins@forumvirium.fi']]
+EMAIL_HOST = 'localhost'
+EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = ''
+EMAIL_PORT = 25
