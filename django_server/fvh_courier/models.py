@@ -81,12 +81,12 @@ class OSMImageNote(BaseLocation):
             return super().save(*args, **kwargs)
 
         exif = dict(exif.items())
-
-        if exif[orientation] == 3:
+        orientation = exif.get('orientation', None)
+        if orientation == 3:
             pilImage = pilImage.rotate(180, expand=True)
-        elif exif[orientation] == 6:
+        elif orientation == 6:
             pilImage = pilImage.rotate(270, expand=True)
-        elif exif[orientation] == 8:
+        elif orientation == 8:
             pilImage = pilImage.rotate(90, expand=True)
 
         output = BytesIO()
