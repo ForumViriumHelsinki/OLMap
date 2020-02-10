@@ -22,6 +22,7 @@ coverage=">=5.0"
 Pillow=">=7.0"
 dj-inmemorystorage=">=2.0"
 gunicorn=">=20.0"
+sentry-sdk=">=0.14.1"
 
 [requires]
 python_version = "3.7"
