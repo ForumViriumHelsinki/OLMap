@@ -44,7 +44,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
 
   static bindMethods = [
     'onImageClick', 'onImageCaptured', 'onCommentClick',
-    'onLocationSelected', 'onCancel', 'onSubmit'
+    'onLocationSelected', 'onCancel', 'onSubmit', 'reloadNotes'
   ];
 
   imageNotesRef = React.createRef<OSMImageNotes>();
@@ -73,6 +73,9 @@ export default class OSMImageNotesEditor extends Component<{}> {
               </Button>{' '}
               <Button outline color="primary" size="sm" onClick={this.onCommentClick}>
                 <Icon icon="comment"/>
+              </Button>{' '}
+              <Button outline color="primary" size="sm" onClick={this.reloadNotes}>
+                <Icon icon="refresh"/>
               </Button>{' '}
               {imagesUploading.length > 0 &&
                 <Button outline disabled size="sm">
