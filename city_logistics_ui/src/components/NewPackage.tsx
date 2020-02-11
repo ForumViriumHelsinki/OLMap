@@ -4,7 +4,7 @@ import React from 'react';
 import Form from "react-jsonschema-form";
 import places, { ReconfigurableOptions, Suggestion } from "places.js";
 import sessionRequest from "sessionRequest";
-import Spinner from "util_components/Spinner";
+import CenteredSpinner from "util_components/CenteredSpinner";
 
 import settings from "settings.json";
 import ErrorAlert from "util_components/ErrorAlert";
@@ -60,7 +60,7 @@ export default class NewPackage extends Component<{onCreated: func}> {
         <ErrorAlert status={error} message="Creation failed. Try again maybe?"/>
         <Form schema={schema} onSubmit={this.onSubmit}/>
       </>
-    } else return <Spinner/>
+    } else return <CenteredSpinner/>
   }
 
   setSchema(schema: any) {

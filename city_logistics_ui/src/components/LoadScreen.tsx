@@ -1,5 +1,5 @@
 import React from "react";
-import Spinner from "util_components/Spinner";
+import CenteredSpinner from "util_components/CenteredSpinner";
 
 export default class LoadScreen extends React.Component {
   render() {
@@ -9,7 +9,7 @@ export default class LoadScreen extends React.Component {
         <h3>FVH City Logistics</h3>
         <p className="lead text-primary mt-3">To confidently go where many a delivery man has gotten lost
           before.</p>
-        <Spinner/>
+        <CenteredSpinner/>
       </div>
     </div>;
   }

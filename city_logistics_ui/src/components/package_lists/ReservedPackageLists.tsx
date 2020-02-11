@@ -1,6 +1,6 @@
 import React from 'react';
 import LiveDataLoader from "util_components/LiveDataLoader";
-import Spinner from "util_components/Spinner";
+import CenteredSpinner from "util_components/CenteredSpinner";
 import TabbedCardList from "util_components/TabbedCardList";
 import {sessionRequest} from "sessionRequest";
 import Geolocator from "util_components/Geolocator";
@@ -42,7 +42,7 @@ export default class ReservedPackageLists extends Component<{}> {
     const {items} = this.state;
     return <>
       <LiveDataLoader url={myPackagesUrl} onLoad={this.packagesLoaded} ref={this.dataLoader}/>
-      {items ? <TabbedCardList items={items} tabs={this.tabs()}/> : <Spinner/>}
+      {items ? <TabbedCardList items={items} tabs={this.tabs()}/> : <CenteredSpinner/>}
       <Geolocator onLocation={this.locationUpdated}/>
     </>;
   }

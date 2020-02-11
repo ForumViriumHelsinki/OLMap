@@ -1,6 +1,6 @@
 import React from 'react';
 import LiveDataLoader from "util_components/LiveDataLoader";
-import Spinner from "util_components/Spinner";
+import CenteredSpinner from "util_components/CenteredSpinner";
 import TabbedCardList from "util_components/TabbedCardList";
 import PendingOutgoingPackage from "components/package_cards/PendingOutgoingPackage";
 import DeliveredOutgoingPackage from "components/package_cards/DeliveredOutgoingPackage";
@@ -26,7 +26,7 @@ export default class OutgoingPackageLists extends React.Component {
     const {items} = this.state;
     return <>
       <LiveDataLoader url={outgoingPackagesUrl} onLoad={(items) => this.setState({items})}/>
-      {items ? <TabbedCardList items={items} tabs={this.tabs}/> : <Spinner/>}
+      {items ? <TabbedCardList items={items} tabs={this.tabs}/> : <CenteredSpinner/>}
     </>;
   }
 }

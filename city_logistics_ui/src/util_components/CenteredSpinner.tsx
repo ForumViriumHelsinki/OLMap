@@ -1,6 +1,6 @@
 import React from "react";
 
-export default class Spinner extends React.Component {
+export default class CenteredSpinner extends React.Component {
   render() {
     return <div className="align-content-center">
       <div className="spinner-border text-secondary" role="status">

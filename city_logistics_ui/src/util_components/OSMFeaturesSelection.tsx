@@ -5,7 +5,7 @@ import _ from 'lodash';
 // @ts-ignore
 import OverpassFrontend from 'overpass-frontend';
 import {LocationTuple, OSMFeature} from "util_components/types";
-import Spinner from "util_components/Spinner";
+import CenteredSpinner from "util_components/CenteredSpinner";
 import {getBoundsOfDistance, getDistance} from "geolib";
 import {GeolibGeoJSONPoint, GeolibInputCoordinates} from "geolib/es/types";
 // @ts-ignore
@@ -144,7 +144,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
         }
 
         {featuresLoading &&
-          <ListGroupItem><Spinner/></ListGroupItem>
+          <ListGroupItem><CenteredSpinner/></ListGroupItem>
         }
 
       </ListGroup></div>
