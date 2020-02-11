@@ -158,10 +158,11 @@ export default class OSMImageNotesEditor extends Component<{}> {
     .then((response: any) => {
       if ((response.status >= 300)) return this.setState({error: true, submitting: false});
 
-      if (this.imageNotesRef.current) this.imageNotesRef.current.loadImageNotes();
       this.setState({...resetState, status: "thanks"});
 
-      if (image) response.json().then((data: OSMImageNote) => {
+      if (!image) return this.reloadNotes();
+
+      else response.json().then((data: OSMImageNote) => {
         let formData = new FormData();
         formData.append('image', image);
         this.setState({imagesUploading: imagesUploading.concat([data])})
@@ -170,9 +171,15 @@ export default class OSMImageNotesEditor extends Component<{}> {
             const uploading = this.state.imagesUploading.slice();
             uploading.splice(uploading.indexOf(data, 1))
             this.setState({imagesUploading: uploading});
+
             if ((response.status >= 300)) this.setState({imageError: true});
+            else this.reloadNotes();
           });
       });
     });
+  }
+
+  private reloadNotes() {
+    this.imageNotesRef.current && this.imageNotesRef.current.loadImageNotes();
   }
 }
