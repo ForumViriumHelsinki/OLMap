@@ -33,8 +33,21 @@ type ModalProps = {
 export default class Modal extends React.Component<ModalProps> {
   static defaultProps = {className: ''};
 
+  escFunction = (event: any) => {
+    if(event.keyCode === 27) this.props.onClose();
+  };
+
+  componentDidMount(){
+    document.addEventListener("keydown", this.escFunction, false);
+  }
+
+  componentWillUnmount(){
+    document.removeEventListener("keydown", this.escFunction, false);
+  }
+
   render() {
     const {title, onClose, children, className, headerContent} = this.props;
+
     return (<>
       <div className="modal-backdrop show"> </div>
       <div className="modal show" tabIndex={-1} role="dialog" onClick={onClose}>
