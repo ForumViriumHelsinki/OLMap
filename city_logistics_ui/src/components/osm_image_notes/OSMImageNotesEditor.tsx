@@ -2,7 +2,7 @@ import React from 'react';
 
 import Map from 'util_components/Map';
 // @ts-ignore
-import {Button} from "reactstrap";
+import {Button, Spinner} from "reactstrap";
 import Icon from "util_components/Icon";
 import Component from "util_components/Component";
 import {LocationTuple} from "util_components/types";
@@ -17,9 +17,11 @@ import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
 
 type OSMImageNotesEditorState = OSMImageNote & {
   status: 'initial' | 'locating' | 'relating' | 'commenting' | 'thanks',
-  submitting?: boolean,
-  error?: boolean,
-  osmImageNotesLayer?: any
+  submitting: boolean,
+  error: boolean,
+  imageError: boolean,
+  osmImageNotesLayer?: any,
+  imagesUploading: OSMImageNote[]
 }
 
 const initialState: OSMImageNotesEditorState = {
@@ -30,8 +32,12 @@ const initialState: OSMImageNotesEditorState = {
   comment: '',
   osm_features: [],
   error: false,
-  submitting: false
+  imageError: false,
+  submitting: false,
+  imagesUploading: []
 };
+
+const {imagesUploading, ...resetState} = initialState;
 
 export default class OSMImageNotesEditor extends Component<{}> {
   state: OSMImageNotesEditorState = initialState;
@@ -44,7 +50,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
   imageNotesRef = React.createRef<OSMImageNotes>();
 
   render() {
-    const {status, lat, lon, submitting, error, osmImageNotesLayer} = this.state;
+    const {status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading} = this.state;
     const location = [lon, lat] as LocationTuple;
 
     return <>
@@ -54,6 +60,11 @@ export default class OSMImageNotesEditor extends Component<{}> {
                onChange={this.onImageCaptured}/>
         <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
                        ref={this.imageNotesRef}/>
+        {imageError &&
+          <Modal title="Image error" onClose={() => this.setState({imageError: false})}>
+            There was an error uploading the image. Try again maybe?
+          </Modal>
+        }
         {{
           initial:
             <>
@@ -62,7 +73,12 @@ export default class OSMImageNotesEditor extends Component<{}> {
               </Button>{' '}
               <Button outline color="primary" size="sm" onClick={this.onCommentClick}>
                 <Icon icon="comment"/>
-              </Button>
+              </Button>{' '}
+              {imagesUploading.length > 0 &&
+                <Button outline disabled size="sm">
+                  <Icon icon="cloud_upload"/> {imagesUploading.length} <Spinner size="sm"/>
+                </Button>
+              }
             </>,
           locating:
             <>
@@ -92,6 +108,9 @@ export default class OSMImageNotesEditor extends Component<{}> {
           thanks:
             <Modal title="Thank you" onClose={this.onCancel}>
               <p className="m-2">The comment was saved successfully.</p>
+              {imagesUploading.length > 0 &&
+                <p className="m-2">{imagesUploading.length} images are uploading in background.</p>
+              }
               <Button block color="primary" size="sm" onClick={this.onCancel}>
                 Close
               </Button>
@@ -126,28 +145,34 @@ export default class OSMImageNotesEditor extends Component<{}> {
   }
 
   private onCancel() {
-    this.setState(initialState);
+    this.setState(resetState);
   }
 
   private onSubmit() {
-    const {comment, lon, lat, osm_features, image} = this.state;
+    const {comment, lon, lat, osm_features, image, imagesUploading} = this.state;
     const fields = {comment, lat, lon, osm_features};
+
+    this.setState({submitting: true});
 
     sessionRequest(osmImageNotesUrl, {method: 'POST', data: fields})
     .then((response: any) => {
-      if ((response.status >= 300) || !image) return response;
-      return response.json().then((data: any) => {
+      if ((response.status >= 300)) return this.setState({error: true, submitting: false});
+
+      if (this.imageNotesRef.current) this.imageNotesRef.current.loadImageNotes();
+      this.setState({...resetState, status: "thanks"});
+
+      if (image) response.json().then((data: OSMImageNote) => {
         let formData = new FormData();
         formData.append('image', image);
-        return sessionRequest(osmImageNoteUrl(data.id), {method: 'PATCH', body: formData})
+        this.setState({imagesUploading: imagesUploading.concat([data])})
+        sessionRequest(osmImageNoteUrl(data.id as number), {method: 'PATCH', body: formData})
+          .then((response: any) => {
+            const uploading = this.state.imagesUploading.slice();
+            uploading.splice(uploading.indexOf(data, 1))
+            this.setState({imagesUploading: uploading});
+            if ((response.status >= 300)) this.setState({imageError: true});
+          });
       });
-    }).then((response: any) => {
-      if ((response.status >= 300)) this.setState({error: true, submitting: false});
-      else {
-        if (this.imageNotesRef.current) this.imageNotesRef.current.loadImageNotes();
-        this.setState({...initialState, status: "thanks"});
-      }
     });
-    this.setState({submitting: true});
   }
 }
