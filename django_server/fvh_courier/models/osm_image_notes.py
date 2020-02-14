@@ -76,3 +76,8 @@ class OSMImageNote(BaseLocation):
 
     def is_reviewed(self):
         return bool(self.reviewed_by_id)
+
+
+class ImageNoteTag(models.Model):
+    tag = models.CharField(max_length=64)
+    image_note = models.ForeignKey(OSMImageNote, related_name='tags', on_delete=models.CASCADE)
