@@ -2,106 +2,11 @@ import uuid as uuid
 
 from django.conf import settings
 from django.contrib.auth.models import User
-# from django.contrib.gis.db.models import PointField
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from twilio.rest import Client
-from PIL import Image as Img, UnidentifiedImageError
-from PIL import ExifTags
-from io import BytesIO
-from django.core.files import File
 
-
-class TimestampedModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    modified_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        abstract = True
-
-
-class BaseLocation(TimestampedModel):
-    lat = models.DecimalField(max_digits=11, decimal_places=8)
-    lon = models.DecimalField(max_digits=11, decimal_places=8)
-
-    # coordinate = PointField()
-
-    class Meta:
-        abstract = True
-
-
-class OSMFeature(models.Model):
-    id = models.BigIntegerField(primary_key=True)
-
-    class Meta:
-        ordering = ['id']
-
-    def __str__(self):
-        return f'OSMFeature({self.id})'
-
-
-def upload_osm_images_to(instance, filename):
-    return f'osm_image_notes/{instance.id}/{filename}'
-
-
-class OSMImageNote(BaseLocation):
-    image = models.ImageField(null=True, blank=True, upload_to=upload_osm_images_to)
-    comment = models.TextField(blank=True)
-    osm_features = models.ManyToManyField(OSMFeature, blank=True)
-
-    created_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='created_notes')
-    modified_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='modified_notes')
-    reviewed_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='reviewed_notes')
-
-    visible = models.BooleanField(default=True)
-    hidden_reason = models.TextField(
-        blank=True, help_text="If reviewer decides to hide the note, document reason here.")
-
-    def __str__(self):
-        return self.comment or f'OSMImageNote({self.id})'
-
-    def save(self, *args, **kwargs):
-        if not self.image:
-            return super().save(*args, **kwargs)
-
-        try:
-            pilImage = Img.open(BytesIO(self.image.read()))
-        except UnidentifiedImageError:
-            return super().save(*args, **kwargs)
-
-        for orientation in ExifTags.TAGS.keys():
-            if ExifTags.TAGS[orientation] == 'Orientation':
-                break
-
-        exif = pilImage._getexif()  # noqa
-        if not exif:
-            return super().save(*args, **kwargs)
-
-        exif = dict(exif.items())
-        orientation = exif.get('orientation', None)
-        if orientation == 3:
-            pilImage = pilImage.rotate(180, expand=True)
-        elif orientation == 6:
-            pilImage = pilImage.rotate(270, expand=True)
-        elif orientation == 8:
-            pilImage = pilImage.rotate(90, expand=True)
-
-        output = BytesIO()
-        pilImage.save(output, format='JPEG', quality=75)
-        output.seek(0)
-        self.image = File(output, self.image.name)
-
-        return super().save(*args, **kwargs)
-
-    def is_reviewed(self):
-        return bool(self.reviewed_by_id)
-
-
-class UserLocation(BaseLocation):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='location')
+from .base import BaseLocation, TimestampedModel
 
 
 class Address(BaseLocation):
@@ -160,15 +65,6 @@ class Package(TimestampedModel):
         Return all packages for which delivery has been requested but which are not yet reserved by any courier.
         """
         return cls.objects.filter(courier__isnull=True)
-
-
-class PhoneNumber(TimestampedModel):
-    user = models.ForeignKey(User, related_name='phone_numbers', on_delete=models.CASCADE)
-    number = models.CharField(max_length=32, verbose_name=_('phone number'))
-
-    class Meta:
-        verbose_name = _('phone number')
-        verbose_name_plural = _('phone numbers')
 
 
 class PackageSMS(TimestampedModel):
