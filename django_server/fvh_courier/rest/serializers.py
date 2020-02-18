@@ -1,4 +1,4 @@
-import decimal
+from collections import OrderedDict
 
 from django.contrib.auth.models import User
 from django.db.models import DecimalField
@@ -92,7 +92,86 @@ class OutgoingPackageSerializer(PackageSerializer):
         return LocationSerializer(location).data
 
 
-class OSMImageNoteSerializer(serializers.ModelSerializer):
+class ImageNotePropertiesSerializer(serializers.ModelSerializer):
+    as_osm_tags = serializers.ReadOnlyField()
+
+    @classmethod
+    def get_subclass_for(cls, prop_type):
+        class PropSerializer(cls):
+            class Meta:
+                model = prop_type
+                exclude = ['image_note']
+        return PropSerializer
+    
+
+def manager_name(prop_type):
+    return prop_type.__name__.lower() + '_set'
+
+
+class CreateableSlugRelatedField(serializers.SlugRelatedField):
+    def to_internal_value(self, data):
+        try:
+            return self.get_queryset().model(**{self.slug_field: data})
+        except (TypeError, ValueError):
+            self.fail('invalid')
+
+
+class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
+    def __new__(mcs, name, bases, attrs):
+        # Automatically add serializer fields for all image note property types:
+        for prop_type in models.image_note_property_types:
+            PropSerializer = ImageNotePropertiesSerializer.get_subclass_for(prop_type)
+            attrs[manager_name(prop_type)] = PropSerializer(many=True, required=False)
+        return super().__new__(mcs, name, bases, attrs)
+
+
+class OSMImageNoteSerializer(serializers.ModelSerializer, metaclass=OSMImageNoteSerializerMeta):
+    tags = CreateableSlugRelatedField(
+        many=True, required=False, slug_field='tag', queryset=models.ImageNoteTag.objects.all())
+
     class Meta:
         model = models.OSMImageNote
-        fields = ['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed']
+        fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed', 'tags'] +
+                  [manager_name(prop_type) for prop_type in models.image_note_property_types])
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        return OrderedDict([(key, result[key]) for key in result if result[key] not in [None, []]])
+
+    def create(self, validated_data):
+        tags = validated_data.pop('tags', None)
+        relateds = self.extract_related_properties(validated_data)
+        instance = super().create(validated_data)
+        self.save_related_properties(instance, relateds, new=True)
+        self.save_tags(instance, tags)
+        return instance
+
+    def save_related_properties(self, instance, relateds, new=False):
+        for related_field, fields_list in relateds.items():
+            related_manager = getattr(instance, related_field)
+            if not new:
+                related_manager.all().delete()
+            for fields in fields_list:
+                related_manager.create(**fields)
+
+    def extract_related_properties(self, validated_data):
+        relateds = {}
+        for prop_type in models.image_note_property_types:
+            field = manager_name(prop_type)
+            if validated_data.get(field, None):
+                relateds[field] = validated_data.pop(field)
+        return relateds
+
+    def save_tags(self, instance, tags):
+        if not tags:
+            return
+        instance.tags.all().delete()
+        for tag in tags:
+            tag.image_note = instance
+            tag.save()
+
+    def update(self, instance, validated_data):
+        relateds = self.extract_related_properties(validated_data)
+        self.save_tags(instance, validated_data.get('tags', None))
+        self.save_related_properties(instance, relateds)
+        return super().update(instance, validated_data)

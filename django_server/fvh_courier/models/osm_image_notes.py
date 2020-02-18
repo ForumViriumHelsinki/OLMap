@@ -81,3 +81,6 @@ class OSMImageNote(BaseLocation):
 class ImageNoteTag(models.Model):
     tag = models.CharField(max_length=64)
     image_note = models.ForeignKey(OSMImageNote, related_name='tags', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.tag or (self.id and f'ImageNoteTag({self.id})') or 'New ImageNoteTag'

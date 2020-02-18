@@ -8,7 +8,19 @@ def dimension_field():
 
 
 def choices_field(choices, **kwargs):
-    return models.CharField(blank=True, max_length=16, choices=[[c, c] for c in choices], **kwargs)
+    return models.CharField(blank=True, max_length=32, choices=[[c, c] for c in choices], **kwargs)
+
+
+def filter_dict(d):
+    return dict([k, v] for (k, v) in d.items() if v)
+
+
+def as_dict(obj, *keys):
+    return dict([k, getattr(obj, k, None)] for k in keys)
+
+
+def bool_to_osm(b):
+    return {True: 'yes', False: 'no', None: None}[b]
 
 
 class ImageNoteProperties(models.Model):
@@ -16,6 +28,9 @@ class ImageNoteProperties(models.Model):
 
     class Meta:
         abstract = True
+
+    def as_osm_tags(self):
+        return {}
 
 
 class BaseAddress(ImageNoteProperties):
@@ -26,8 +41,15 @@ class BaseAddress(ImageNoteProperties):
     class Meta:
         abstract = True
 
+    def as_osm_tags(self):
+        return dict(super().as_osm_tags(), **filter_dict({
+            'addr:street': self.street,
+            'addr:housenumber': self.housenumber,
+            'addr:unit': self.unit
+        }))
 
-class Lockable(object):
+
+class Lockable(models.Model):
     accesses = ['yes', 'private', 'delivery', 'no']
     access = choices_field(accesses)
     width = dimension_field()
@@ -37,6 +59,17 @@ class Lockable(object):
     phone = models.CharField(blank=True, max_length=32)
     opening_hours = models.CharField(blank=True, max_length=64)
 
+    class Meta:
+        abstract = True
+
+    def as_osm_tags(self):
+        tags = hasattr(super(), 'as_osm_tags') and super().as_osm_tags() or {}
+        return filter_dict(dict(
+            tags,
+            description=(self.buzzer and 'With buzzer') or (self.keycode and 'With keycode'),
+            **as_dict(self, 'access', 'width', 'height', 'phone', 'opening_hours')
+        ))
+
 
 class Entrance(Lockable, BaseAddress):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Key:entrance'
@@ -45,6 +78,13 @@ class Entrance(Lockable, BaseAddress):
     type = choices_field(types)
     wheelchair = models.BooleanField(default=False)
     loadingdock = models.BooleanField(default=False)
+
+    def as_osm_tags(self):
+        return dict(super().as_osm_tags(), **filter_dict({
+            'entrance': self.type or 'yes',
+            'door': 'loadingdock' if self.loadingdock else None,
+            'wheelchair': 'yes' if self.wheelchair else None
+        }))
 
 
 class Steps(ImageNoteProperties):
@@ -56,11 +96,25 @@ class Steps(ImageNoteProperties):
     width = dimension_field()
     incline = choices_field(['up', 'down'], help_text="From street level")
 
+    def as_osm_tags(self):
+        return dict(super().as_osm_tags(), **filter_dict(dict(
+            highway='steps',
+            handrail=bool_to_osm(self.handrail),
+            ramp=bool_to_osm(self.ramp),
+            width=self.width,
+            incline=self.incline
+        )))
+
 
 class Gate(Lockable, ImageNoteProperties):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Tag:barrier%3Dgate'
 
     lift_gate = models.BooleanField(default=False)
+
+    def as_osm_tags(self):
+        return dict(super().as_osm_tags(), **filter_dict({
+            'barrier': 'lift_gate' if self.lift_gate else 'gate'
+        }))
 
 
 class Barrier(ImageNoteProperties):
@@ -68,6 +122,11 @@ class Barrier(ImageNoteProperties):
 
     types = ['fence', 'wall', 'block', 'bollard']
     type = choices_field(types)
+
+    def as_osm_tags(self):
+        return dict(super().as_osm_tags(), **filter_dict({
+            'barrier': self.type or 'yes'
+        }))
 
 
 class Company(BaseAddress):
@@ -79,18 +138,35 @@ class Company(BaseAddress):
     class Meta:
         abstract = True
 
+    def as_osm_tags(self):
+        return dict(super().as_osm_tags(), **filter_dict(
+            as_dict(self, 'name', 'phone', 'opening_hours', 'level')
+        ))
+
 
 class Office(Company):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Key:office'
     types = ['association', 'company', 'diplomatic', 'educational_institution', 'government']
     type = choices_field(types)
 
+    def as_osm_tags(self):
+        return dict(super().as_osm_tags(), office=self.type or 'yes')
+
 
 class Shop(Company):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Key:shop'
     type = models.CharField(blank=True, max_length=32, help_text=f'See {osm_url}')
 
+    def as_osm_tags(self):
+        return dict(super().as_osm_tags(), shop=self.type or 'yes')
+
 
 class Amenity(Company):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Key:amenity'
     type = models.CharField(max_length=32, help_text=f'See {osm_url}')
+
+    def as_osm_tags(self):
+        return dict(super().as_osm_tags(), amenity=self.type or 'yes')
+
+
+image_note_property_types = [Entrance, Steps, Gate, Barrier, Office, Shop, Amenity]

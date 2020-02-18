@@ -150,6 +150,14 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         osm_image_note.save()
         return Response('OK')
 
+    @action(detail=False, methods=['get'])
+    def property_schemas(self, request, pk=None):
+        serializer = self.get_serializer()
+        return Response(dict((
+            prop_type.__name__,
+            to_jsonschema(serializer.fields[prop_type.__name__.lower() + '_set'].child)
+        ) for prop_type in models.image_note_property_types))
+
 
 class OSMImageNotesGeoJSON(ListAPIView):
     serializer_class = OSMImageNoteSerializer
