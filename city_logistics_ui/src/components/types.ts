@@ -44,7 +44,14 @@ export type OSMImageNote = {
     lon?: number,
     comment?: string,
     osm_features: number[],
-    is_reviewed?: boolean
+    is_reviewed?: boolean,
+    tags?: string[]
+};
+
+export type JSONSchema = any
+
+export type OSMFeatureProps = {
+  [featureType: string]: JSONSchema
 };
 
 export type AppContextType = {

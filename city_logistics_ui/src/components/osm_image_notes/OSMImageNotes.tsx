@@ -6,8 +6,8 @@ import * as L from 'leaflet';
 import _ from 'lodash';
 
 import sessionRequest from "sessionRequest";
-import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
-import {AppContext, OSMImageNote} from "components/types";
+import {osmFeaturePropertiesUrl, osmImageNotesUrl, osmImageNoteUrl} from "urls";
+import {AppContext, OSMFeatureProps, OSMImageNote} from "components/types";
 import Modal from "util_components/Modal";
 import ErrorAlert from "util_components/ErrorAlert";
 
@@ -16,18 +16,21 @@ import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
 import {LocationTuple} from "util_components/types";
 import Component from "util_components/Component";
 import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
+import PillsSelection from "util_components/PillsSelection";
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
 const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
 
 type OSMImageNotesProps = {
   onMapLayerLoaded: (mapLayer: any) => any
+  onOSMFeaturePropertiesLoaded?: (osmFeatureProperties: OSMFeatureProps) => any
 }
 
 type OSMImageNotesState = {
   selectedNote?: OSMImageNote,
   readOnly: boolean,
   error: boolean
+  osmFeatureProperties?: OSMFeatureProps,
 }
 
 const initialState: OSMImageNotesState = {
@@ -38,7 +41,7 @@ const initialState: OSMImageNotesState = {
 
 export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImageNotesState> {
   static contextType = AppContext;
-  static bindMethods = ['onFeaturesSelected', 'refresh'];
+  static bindMethods = ['onFeaturesSelected', 'refresh', 'toggleTag'];
 
   private osmImageNotes: OSMImageNote[] = [];
   private mapLayer?: any;
@@ -55,6 +58,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
 
   componentDidMount() {
     this.loadImageNotes();
+    this.loadOSMFeatureProperties();
   }
 
   loadImageNotes() {
@@ -68,11 +72,14 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
   }
 
   render() {
-    const {selectedNote, readOnly, error} = this.state;
+    const {selectedNote, readOnly, error, osmFeatureProperties} = this.state;
     const {user} = this.context;
     if (!selectedNote) return '';
 
     const location = [selectedNote.lon, selectedNote.lat] as LocationTuple;
+
+    const tags = selectedNote.tags || [];
+    const allTags = Object.keys(osmFeatureProperties || {});
 
     return (
       <Modal title={selectedNote.comment || 'No comment.'}
@@ -85,6 +92,17 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
         {selectedNote.image &&
           <img src={selectedNote.image} style={this.imageStyle} />
         }
+        <>
+          <p className="m-2 ml-3"><strong>Tags:</strong></p>
+          <p className="m-2 ml-3">
+            {user.is_reviewer ?
+               <PillsSelection options={allTags} selected={tags} onClick={this.toggleTag}/>
+             :
+              (tags.length > 0) ? <PillsSelection options={tags} selected={tags}/>
+              : 'No tags selected.'
+            }
+          </p>
+        </>
         <div className="list-group-item"><strong>Related places:</strong></div>
         <div onClick={() => user.is_reviewer && readOnly && this.setState({readOnly: false})}>
           <OSMFeaturesSelection
@@ -102,16 +120,21 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
   }
 
   onFeaturesSelected(featureIds: number[]) {
+    this.updateSelectedNote({osm_features: featureIds}, {readOnly: true});
+  }
+
+  updateSelectedNote(data: any, nextState?: any) {
     const {selectedNote} = this.state;
     if (!selectedNote) return;
     const url = osmImageNoteUrl(selectedNote.id as number);
 
-    sessionRequest(url, {method: 'PATCH', data: {osm_features: featureIds}})
+    sessionRequest(url, {method: 'PATCH', data})
     .then((response) => {
-      if (response.status < 300) {
-        selectedNote.osm_features = featureIds;
-        this.setState({error: false, readOnly: true});
-      } else this.setState({error: true});
+      if (response.status < 300) response.json().then((note: OSMImageNote) => {
+        this.osmImageNotes.splice(this.osmImageNotes.indexOf(selectedNote), 1, note);
+        this.setState({error: false, selectedNote: note, ...(nextState || {})});
+      });
+      else this.setState({error: true});
     })
   }
 
@@ -135,5 +158,25 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
       delete this.dotMarkers[id];
     });
     return this.mapLayer;
+  }
+
+  private loadOSMFeatureProperties() {
+    const {onOSMFeaturePropertiesLoaded} = this.props;
+    sessionRequest(osmFeaturePropertiesUrl).then((response) => {
+      if (response.status < 300)
+        response.json().then((osmFeatureProperties) => {
+          this.setState({osmFeatureProperties})
+          onOSMFeaturePropertiesLoaded && onOSMFeaturePropertiesLoaded(osmFeatureProperties)
+        })
+    })
+  }
+
+  private toggleTag(tag: string) {
+    const {selectedNote} = this.state;
+    if (!selectedNote) return;
+    const tags = (selectedNote.tags || []).slice();
+    if (tags.includes(tag)) tags.splice(tags.indexOf(tag), 1);
+    else tags.push(tag);
+    this.updateSelectedNote({tags});
   }
 }

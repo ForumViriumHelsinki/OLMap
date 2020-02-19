@@ -11,9 +11,11 @@ import ErrorAlert from "util_components/ErrorAlert";
 
 import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
-import {OSMImageNote} from "components/types";
+import {OSMFeatureProps, OSMImageNote} from "components/types";
 import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
 import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
+import PillsSelection from "util_components/PillsSelection";
+
 
 type OSMImageNotesEditorState = OSMImageNote & {
   status: 'initial' | 'locating' | 'relating' | 'commenting' | 'thanks',
@@ -21,7 +23,9 @@ type OSMImageNotesEditorState = OSMImageNote & {
   error: boolean,
   imageError: boolean,
   osmImageNotesLayer?: any,
-  imagesUploading: OSMImageNote[]
+  imagesUploading: OSMImageNote[],
+  osmFeatureProperties?: OSMFeatureProps,
+  tags: string[]
 }
 
 const initialState: OSMImageNotesEditorState = {
@@ -34,7 +38,8 @@ const initialState: OSMImageNotesEditorState = {
   error: false,
   imageError: false,
   submitting: false,
-  imagesUploading: []
+  imagesUploading: [],
+  tags: []
 };
 
 const {imagesUploading, ...resetState} = initialState;
@@ -44,13 +49,16 @@ export default class OSMImageNotesEditor extends Component<{}> {
 
   static bindMethods = [
     'onImageClick', 'onImageCaptured', 'onCommentClick',
-    'onLocationSelected', 'onCancel', 'onSubmit', 'reloadNotes'
+    'onLocationSelected', 'onCancel', 'onSubmit', 'reloadNotes', 'toggleTag'
   ];
 
   imageNotesRef = React.createRef<OSMImageNotes>();
 
   render() {
-    const {status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading} = this.state;
+    const {
+      status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags
+    } = this.state;
+
     const location = [lon, lat] as LocationTuple;
 
     return <>
@@ -59,6 +67,8 @@ export default class OSMImageNotesEditor extends Component<{}> {
                accept="image/*" capture="environment"
                onChange={this.onImageCaptured}/>
         <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
+                       onOSMFeaturePropertiesLoaded={(osmFeatureProperties) =>
+                         this.setState({osmFeatureProperties})}
                        ref={this.imageNotesRef}/>
         {imageError &&
           <Modal title="Image error" onClose={() => this.setState({imageError: false})}>
@@ -103,6 +113,15 @@ export default class OSMImageNotesEditor extends Component<{}> {
                         placeholder="Describe the problem / note (optional)"
                         onChange={(e) =>
                           this.setState({comment: e.target.value})} />
+              {osmFeatureProperties &&
+                <>
+                  <p className="m-2">Select tags:</p>
+                  <p className="m-2">
+                    <PillsSelection options={Object.keys(osmFeatureProperties)}
+                                    selected={tags} onClick={this.toggleTag}/>
+                  </p>
+                </>
+              }
               <Button block disabled={submitting} color="primary" size="sm"
                       onClick={submitting ? undefined : this.onSubmit}>
                 {submitting ? 'Submitting...' : 'Done'}
@@ -152,8 +171,8 @@ export default class OSMImageNotesEditor extends Component<{}> {
   }
 
   private onSubmit() {
-    const {comment, lon, lat, osm_features, image, imagesUploading} = this.state;
-    const fields = {comment, lat, lon, osm_features};
+    const {comment, lon, lat, osm_features, image, imagesUploading, tags} = this.state;
+    const fields = {comment, lat, lon, osm_features, tags};
 
     this.setState({submitting: true});
 
@@ -184,5 +203,12 @@ export default class OSMImageNotesEditor extends Component<{}> {
 
   private reloadNotes() {
     this.imageNotesRef.current && this.imageNotesRef.current.loadImageNotes();
+  }
+
+  private toggleTag(tag: string) {
+    const tags = this.state.tags.slice();
+    if (tags.includes(tag)) tags.splice(tags.indexOf(tag), 1);
+    else tags.push(tag);
+    this.setState({tags})
   }
 }
