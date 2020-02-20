@@ -68,7 +68,8 @@ class OSMImageNoteAdmin(admin.ModelAdmin):
     search_fields = ['comment']
     readonly_fields = ['image_', 'osm', 'osm_edit']
     filter_horizontal = ['osm_features']
-    list_filter = ['visible']
+    list_filter = ['visible', 'created_by', 'reviewed_by']
+    date_hierarchy = 'created_at'
 
     def osm_url(self, location):
         return (f'https://www.openstreetmap.org/note/new?' +
