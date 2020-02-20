@@ -6,12 +6,20 @@ import Form from "react-jsonschema-form";
 import {JSONSchema, OSMImageNote} from "components/types";
 // @ts-ignore
 import {Button} from "reactstrap";
+import {OSMFeature} from "util_components/types";
+
+const valueFromOSMTags: {[tag: string]: (f: OSMFeature) => any} = {
+  'street': (f: OSMFeature) => f.tags['addr:street'] || (f.tags.highway && f.tags.name),
+  'housenumber': (f: OSMFeature) => f.tags['addr:housenumber'],
+  'unit': (f: OSMFeature) => f.tags['addr:unit']
+};
 
 type OSMFeaturePropertiesProps = {
   schema: JSONSchema,
   onSubmit: (data: any) => any,
   osmFeatureName: string,
-  osmImageNote: OSMImageNote
+  osmImageNote: OSMImageNote,
+  nearbyFeatures: OSMFeature[]
 }
 
 type OSMFeaturePropertiesState = {
@@ -26,7 +34,8 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
   state: OSMFeaturePropertiesState = initialState;
 
   static defaultProps = {
-    osmImageNote: {}
+    osmImageNote: {},
+    nearbyFeatures: []
   };
 
   render() {
@@ -74,10 +83,21 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
   }
 
   private valuesFromNote() {
-    const {osmImageNote} = this.props;
+    const {osmImageNote, nearbyFeatures, schema, osmFeatureName} = this.props;
     // @ts-ignore
     const propsList = osmImageNote[(this.getPropsFieldName())] || [];
-    return propsList[0];
+    if (propsList.length) return propsList[0];
+    const selectedFeatures = nearbyFeatures.filter((f) => osmImageNote.osm_features.includes(f.id));
+    const allFeatures = selectedFeatures.concat(nearbyFeatures);
+
+    const values: {[k: string]: any} = {};
+    Object.keys(schema.properties).forEach(fieldName => {
+      const valueFunction = valueFromOSMTags[fieldName];
+      if (!valueFunction) return;
+      const f = allFeatures.find(f => valueFunction(f))
+      if (f) values[fieldName] = valueFunction(f);
+    });
+    return values;
   }
 
   private getPropsFieldName() {

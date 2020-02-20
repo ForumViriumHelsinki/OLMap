@@ -103,7 +103,8 @@ type OSMFSProps = {
   distance: number,
   preselectedFeatureIds: number[],
   readOnly: boolean,
-  maxHeight: any
+  maxHeight: any,
+  onFeaturesLoaded: (features: OSMFeature[]) => any
 }
 
 export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OSMFSState> {
@@ -113,7 +114,8 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
     distance: 20,
     preselectedFeatureIds: [],
     readOnly: false,
-    maxHeight: 'calc(100vh - 248px)'
+    maxHeight: 'calc(100vh - 248px)',
+    onFeaturesLoaded: () => null
   };
 
   render() {
@@ -220,7 +222,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
   }
 
   reloadFeatures() {
-    const {location, distance, onSelect} = this.props;
+    const {location, distance, onSelect, onFeaturesLoaded} = this.props;
     const bounds = getBoundsOfDistance(location as GeolibGeoJSONPoint, distance);
     const overpassBounds = {
       minlat: bounds[0].latitude, maxlat: bounds[1].latitude,
@@ -235,7 +237,10 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
       },
       (err: any) => {
         if (!this.state.nearbyOSMFeatures.length) onSelect([]);
-        else this.setState({featuresLoading: false})
+        else {
+          this.setState({featuresLoading: false})
+          onFeaturesLoaded(this.state.nearbyOSMFeatures);
+        }
       }
     );
 

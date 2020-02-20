@@ -13,7 +13,7 @@ import ErrorAlert from "util_components/ErrorAlert";
 
 import 'components/osm_image_notes/OSMImageNotes.css';
 import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
-import {LocationTuple} from "util_components/types";
+import {LocationTuple, OSMFeature} from "util_components/types";
 import Component from "util_components/Component";
 import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
 import PillsSelection from "util_components/PillsSelection";
@@ -32,12 +32,14 @@ type OSMImageNotesState = {
   readOnly: boolean,
   error: boolean
   osmFeatureProperties?: OSMFeatureProps,
+  nearbyFeatures: OSMFeature[]
 }
 
 const initialState: OSMImageNotesState = {
   readOnly: true,
   error: false,
-  selectedNote: undefined
+  selectedNote: undefined,
+  nearbyFeatures: []
 };
 
 export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImageNotesState> {
@@ -73,7 +75,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
   }
 
   render() {
-    const {selectedNote, readOnly, error, osmFeatureProperties} = this.state;
+    const {selectedNote, readOnly, error, osmFeatureProperties, nearbyFeatures} = this.state;
     const {user} = this.context;
     if (!selectedNote) return '';
 
@@ -109,7 +111,8 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
           <OSMFeaturesSelection
             location={location} onSelect={this.onFeaturesSelected} readOnly={readOnly}
             maxHeight={null}
-            preselectedFeatureIds={selectedNote.osm_features}/>
+            preselectedFeatureIds={selectedNote.osm_features}
+            onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})} />
         </div>
         {osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
           <div key={osmFeatureName} className="mr-2 ml-3">
@@ -117,6 +120,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
                 schema={osmFeatureProperties[osmFeatureName]}
                 osmImageNote={selectedNote}
                 osmFeatureName={osmFeatureName}
+                nearbyFeatures={nearbyFeatures}
                 onSubmit={(data) => this.updateSelectedNote(data)}/>
           </div>
         )}
@@ -141,7 +145,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     sessionRequest(url, {method: 'PATCH', data})
     .then((response) => {
       if (response.status < 300) response.json().then((note: OSMImageNote) => {
-        this.osmImageNotes.splice(this.osmImageNotes.indexOf(selectedNote), 1, note);
+        Object.assign(selectedNote, note);
         this.setState({error: false, selectedNote: note, ...(nextState || {})});
       });
       else this.setState({error: true});
@@ -192,7 +196,6 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
 
   private getRelevantProperties() {
     const {selectedNote, osmFeatureProperties} = this.state;
-    const {user} = this.context;
     if (!selectedNote) return [];
     const tags = selectedNote.tags || [];
     const allTags = Object.keys(osmFeatureProperties || {});
