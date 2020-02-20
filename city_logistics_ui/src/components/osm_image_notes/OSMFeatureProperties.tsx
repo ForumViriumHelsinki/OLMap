@@ -69,7 +69,7 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
         :
         <>
           {osmTags &&
-          <textarea id={osmTextId} rows={Object.keys(osmTags).length}
+          <textarea id={osmTextId} rows={Object.keys(osmTags).length} className="form-control"
                     value={Object.entries(osmTags).map(([k, v]) => `${k}=${v}`).join('\n')}/>
           }
         </>
@@ -87,7 +87,8 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
     // @ts-ignore
     const propsList = osmImageNote[(this.getPropsFieldName())] || [];
     if (propsList.length) return propsList[0];
-    const selectedFeatures = nearbyFeatures.filter((f) => osmImageNote.osm_features.includes(f.id));
+    const selectedFeatureIds = osmImageNote.osm_features || [];
+    const selectedFeatures = nearbyFeatures.filter((f) => selectedFeatureIds.includes(f.id));
     const allFeatures = selectedFeatures.concat(nearbyFeatures);
 
     const values: {[k: string]: any} = {};
