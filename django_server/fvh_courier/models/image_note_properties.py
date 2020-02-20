@@ -35,7 +35,7 @@ class ImageNoteProperties(models.Model):
 
 class BaseAddress(ImageNoteProperties):
     street = models.CharField(max_length=64, blank=True)
-    housenumber = models.PositiveSmallIntegerField(null=True, blank=True)
+    housenumber = models.CharField(max_length=8, blank=True, null=True, help_text='E.g. 3-5')
     unit = models.CharField(max_length=8, blank=True)
 
     class Meta:
