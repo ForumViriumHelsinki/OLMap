@@ -99,6 +99,7 @@ class Steps(ImageNoteProperties):
     def as_osm_tags(self):
         return dict(super().as_osm_tags(), **filter_dict(dict(
             highway='steps',
+            step_count=self.step_count,
             handrail=bool_to_osm(self.handrail),
             ramp=bool_to_osm(self.ramp),
             width=self.width,
