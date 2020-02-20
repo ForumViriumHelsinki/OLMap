@@ -4,7 +4,7 @@ from .osm_image_notes import OSMImageNote
 
 
 def dimension_field():
-    return models.DecimalField(max_digits=3, decimal_places=1, help_text='In meters', blank=True, null=True)
+    return models.DecimalField(max_digits=4, decimal_places=2, help_text='In meters', blank=True, null=True)
 
 
 def choices_field(choices, **kwargs):
