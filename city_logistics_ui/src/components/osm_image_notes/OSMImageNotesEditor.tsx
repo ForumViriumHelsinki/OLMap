@@ -15,6 +15,7 @@ import {OSMFeatureProps, OSMImageNote} from "components/types";
 import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
 import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
 import PillsSelection from "util_components/PillsSelection";
+import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
 
 
 type OSMImageNotesEditorState = OSMImageNote & {
@@ -25,7 +26,8 @@ type OSMImageNotesEditorState = OSMImageNote & {
   osmImageNotesLayer?: any,
   imagesUploading: OSMImageNote[],
   osmFeatureProperties?: OSMFeatureProps,
-  tags: string[]
+  tags: string[],
+  osmProperties: any
 }
 
 const initialState: OSMImageNotesEditorState = {
@@ -39,7 +41,8 @@ const initialState: OSMImageNotesEditorState = {
   imageError: false,
   submitting: false,
   imagesUploading: [],
-  tags: []
+  tags: [],
+  osmProperties: {}
 };
 
 const {imagesUploading, ...resetState} = initialState;
@@ -56,7 +59,8 @@ export default class OSMImageNotesEditor extends Component<{}> {
 
   render() {
     const {
-      status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags
+      status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags,
+      osmProperties
     } = this.state;
 
     const location = [lon, lat] as LocationTuple;
@@ -120,6 +124,13 @@ export default class OSMImageNotesEditor extends Component<{}> {
                     <PillsSelection options={Object.keys(osmFeatureProperties)}
                                     selected={tags} onClick={this.toggleTag}/>
                   </p>
+                  <div className="ml-2 mr-2">
+                    {tags.map((tag) =>
+                      <OSMFeatureProperties key={tag} schema={osmFeatureProperties[tag]} osmFeatureName={tag}
+                                            osmImageNote={osmProperties}
+                                            onSubmit={(data) => this.addOSMProperties(data)} />
+                    )}
+                  </div>
                 </>
               }
               <Button block disabled={submitting} color="primary" size="sm"
@@ -143,6 +154,10 @@ export default class OSMImageNotesEditor extends Component<{}> {
            onLocationSelected={this.onLocationSelected}
            extraLayers={osmImageNotesLayer && [osmImageNotesLayer]}/>
     </>;
+  }
+
+  private addOSMProperties(data: any) {
+    this.setState({osmProperties: {...this.state.osmProperties, ...data}});
   }
 
   private onImageClick() {
@@ -171,8 +186,8 @@ export default class OSMImageNotesEditor extends Component<{}> {
   }
 
   private onSubmit() {
-    const {comment, lon, lat, osm_features, image, imagesUploading, tags} = this.state;
-    const fields = {comment, lat, lon, osm_features, tags};
+    const {comment, lon, lat, osm_features, image, imagesUploading, tags, osmProperties} = this.state;
+    const fields = {comment, lat, lon, osm_features, tags, ...osmProperties};
 
     this.setState({submitting: true});
 

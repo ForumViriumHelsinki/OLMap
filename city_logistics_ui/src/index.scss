@@ -105,3 +105,28 @@ button.nav-link:focus {
     color: $primary;
     background-color: rgba(255, 80, 0, 0.1);
 }
+
+form.compact {
+  .form-group {
+    position: relative;
+    margin-bottom: 0.5rem;
+
+    .control-label {
+      width: 40%
+    }
+    .form-control, .checkbox {
+      display: inline-block;
+      width: 55%;
+    }
+    .checkbox input {
+      margin-right: 0.5rem;
+    }
+    .field-description {
+      position: absolute;
+      top: 1.8rem;
+      left: 0;
+      font-size: 75%;
+      color: #999;
+    }
+  }
+}

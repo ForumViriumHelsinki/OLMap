@@ -17,6 +17,7 @@ import {LocationTuple} from "util_components/types";
 import Component from "util_components/Component";
 import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
 import PillsSelection from "util_components/PillsSelection";
+import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
 const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
@@ -110,6 +111,15 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
             maxHeight={null}
             preselectedFeatureIds={selectedNote.osm_features}/>
         </div>
+        {osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
+          <div key={osmFeatureName} className="mr-2 ml-3">
+              <OSMFeatureProperties
+                schema={osmFeatureProperties[osmFeatureName]}
+                osmImageNote={selectedNote}
+                osmFeatureName={osmFeatureName}
+                onSubmit={(data) => this.updateSelectedNote(data)}/>
+          </div>
+        )}
       </Modal>
     )
   }
@@ -178,5 +188,14 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     if (tags.includes(tag)) tags.splice(tags.indexOf(tag), 1);
     else tags.push(tag);
     this.updateSelectedNote({tags});
+  }
+
+  private getRelevantProperties() {
+    const {selectedNote, osmFeatureProperties} = this.state;
+    const {user} = this.context;
+    if (!selectedNote) return [];
+    const tags = selectedNote.tags || [];
+    const allTags = Object.keys(osmFeatureProperties || {});
+    return allTags.filter(tag => tags.includes(tag));
   }
 }
