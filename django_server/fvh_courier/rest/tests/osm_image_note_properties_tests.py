@@ -20,7 +20,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
             'tags': ['Entrance'],
             'entrance_set': [{
                 'street': 'Unioninkatu',
-                'housenumber': 24,
+                'housenumber': '24',
                 'access': 'private',
                 'width': '0.9',
                 'buzzer': True,
@@ -42,7 +42,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
         self.assertEqual(note.entrance_set.count(), 1)
         self.assertDictEqual(response.json()['entrance_set'][0]['as_osm_tags'], {
             'addr:street': 'Unioninkatu',
-            'addr:housenumber': 24,
+            'addr:housenumber': '24',
             'description': 'With buzzer',
             'access': 'private',
             'width': 0.9,
@@ -56,7 +56,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
         note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188')
         note.entrance_set.create(**{
             'street': 'Unioninkatu',
-            'housenumber': 24,
+            'housenumber': '24',
             'access': 'private',
             'width': '0.9',
             'buzzer': True,
@@ -68,7 +68,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
         fields = {
             'entrance_set': [{
                 'street': 'Bulevardi',
-                'housenumber': 31,
+                'housenumber': '31',
                 'access': 'private',
                 'type': 'service'}]}
         response = self.client.patch(url, data=fields, format='json')
@@ -94,7 +94,11 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
         # And it contains schemas to create the different types of OSM features:
         address_fields = {
             'street': {'type': 'string', 'maxLength': 64, 'title': 'Street'},
-            'housenumber': {'type': ['integer', 'null'], 'minimum': 0, 'maximum': 32767, 'title': 'Housenumber'},
+            'housenumber': {
+                'type': ['string', 'null'],
+                'maxLength': 8,
+                'title': 'Housenumber',
+                'description': 'E.g. 3-5'},
             'unit': {'type': 'string', 'maxLength': 8, 'title': 'Unit'}
         }
 
@@ -106,7 +110,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
 
         dimension_field = {
             'type': ['string', 'null'],
-            'pattern': '^\\-?[0-9]*(\\.[0-9]{1,1})?$',
+            'pattern': '^\\-?[0-9]*(\\.[0-9]{1,2})?$',
             'title': 'Width',
             'description': 'In meters'}
 
