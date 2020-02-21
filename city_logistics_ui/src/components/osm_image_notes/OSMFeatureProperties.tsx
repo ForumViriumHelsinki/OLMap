@@ -14,6 +14,8 @@ const valueFromOSMTags: {[tag: string]: (f: OSMFeature) => any} = {
   'unit': (f: OSMFeature) => f.tags['addr:unit']
 };
 
+type PKFeature = {[field: string]: any}
+
 type OSMFeaturePropertiesProps = {
   schema: JSONSchema,
   onSubmit: (data: any) => any,
@@ -23,11 +25,11 @@ type OSMFeaturePropertiesProps = {
 }
 
 type OSMFeaturePropertiesState = {
-  editMode: boolean
+  editingFeature?: PKFeature
 }
 
 const initialState: OSMFeaturePropertiesState = {
-  editMode: false
+  editingFeature: undefined
 };
 
 export default class OSMFeatureProperties extends React.Component<OSMFeaturePropertiesProps, OSMFeaturePropertiesState> {
@@ -39,75 +41,95 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
   };
 
   render() {
-    const {schema, osmFeatureName} = this.props;
-    const {editMode} = this.state;
-    const values = this.valuesFromNote();
-    const osmTags = values && values['as_osm_tags'];
-    const osmTextId = `${osmFeatureName}-as-osm`;
+    const {schema, osmFeatureName, osmImageNote} = this.props;
+    const {editingFeature} = this.state;
+    // @ts-ignore
+    const pkFeatures = (osmImageNote[(this.getFeatureListFieldName())] || []) as PKFeature[];
 
     return <>
-      <p className="mt-2">
-        <strong>{osmFeatureName}</strong>
-        {!editMode &&
-          <>
-            {' '}
-            <Button size="sm" color="primary" outline className="btn-compact"
-                    onClick={() => this.setState({editMode: true})}>Edit</Button>
-            {' '}
-            {osmTags ?
-              <Button size="sm" color="secondary" outline className="btn-compact"
-                      onClick={() => this.copyText(osmTextId)}>Copy</Button>
-              : values && `${Object.keys(values).length} values`
+      {pkFeatures.map(pkFeature =>
+        <div key={pkFeature.id}>
+          <p className="mt-2">
+            <strong>{osmFeatureName}</strong>
+            {(pkFeature != editingFeature) &&
+              <>
+                {' '}
+                <Button size="sm" color="primary" outline className="btn-compact"
+                        onClick={() => this.setState({editingFeature: pkFeature})}>Edit</Button>
+                {' '}
+                {pkFeature.as_osm_tags &&
+                  <Button size="sm" color="secondary" outline className="btn-compact"
+                          onClick={() => this.copyText(pkFeature.id + '-osm-text')}>Copy</Button>
+                }
+              </>
             }
-          </>
-        }
-      </p>
-      {editMode ?
-        <Form schema={schema} className="compact"
-              formData={values}
-              onSubmit={this.onSubmit}/>
-        :
-        <>
-          {osmTags &&
-          <textarea id={osmTextId} rows={Object.keys(osmTags).length} className="form-control"
-                    value={Object.entries(osmTags).map(([k, v]) => `${k}=${v}`).join('\n')}/>
+          </p>
+          {(pkFeature === editingFeature) ?
+            <Form schema={schema} className="compact"
+                  formData={pkFeature}
+                  onSubmit={this.onSubmit}/>
+            :
+            <>
+              {pkFeature.as_osm_tags &&
+              <textarea id={pkFeature.id + '-osm-text'}
+                        rows={Object.keys(pkFeature.as_osm_tags).length}
+                        className="form-control"
+                        readOnly
+                        value={Object.entries(pkFeature.as_osm_tags).map(([k, v]) => `${k}=${v}`).join('\n')}/>
+              }
+            </>
           }
-        </>
-      }
+        </div>
+      )}
+      <p className="mt-2">
+        <Button size="sm" color="primary" outline className="btn-compact" onClick={this.newPKFeature}>
+          New {osmFeatureName}
+        </Button>
+      </p>
     </>
   }
+
+  newPKFeature = () => {
+    const {osmImageNote, nearbyFeatures, schema} = this.props;
+    const listFieldName = this.getFeatureListFieldName();
+    // @ts-ignore
+    const pkFeatures = (osmImageNote[listFieldName] || []) as PKFeature[];
+    const selectedFeatureIds = osmImageNote.osm_features || [];
+    const selectedFeatures = nearbyFeatures.filter((f) => selectedFeatureIds.includes(f.id));
+    const allFeatures = selectedFeatures.concat(nearbyFeatures);
+
+    const newPKFeature: {[k: string]: any} = {};
+    Object.keys(schema.properties).forEach(fieldName => {
+      const valueFunction = valueFromOSMTags[fieldName];
+      if (!valueFunction) return;
+      const f = allFeatures.find(f => valueFunction(f))
+      if (f) newPKFeature[fieldName] = valueFunction(f);
+    });
+
+    pkFeatures.push(newPKFeature);
+    // @ts-ignore
+    osmImageNote[listFieldName] = pkFeatures;
+    this.setState({editingFeature: newPKFeature});
+  };
 
   private copyText(osmTextId: string) {
     (document.getElementById(osmTextId) as HTMLInputElement).select();
     document.execCommand('copy');
   }
 
-  private valuesFromNote() {
-    const {osmImageNote, nearbyFeatures, schema, osmFeatureName} = this.props;
-    // @ts-ignore
-    const propsList = osmImageNote[(this.getPropsFieldName())] || [];
-    if (propsList.length) return propsList[0];
-    const selectedFeatureIds = osmImageNote.osm_features || [];
-    const selectedFeatures = nearbyFeatures.filter((f) => selectedFeatureIds.includes(f.id));
-    const allFeatures = selectedFeatures.concat(nearbyFeatures);
-
-    const values: {[k: string]: any} = {};
-    Object.keys(schema.properties).forEach(fieldName => {
-      const valueFunction = valueFromOSMTags[fieldName];
-      if (!valueFunction) return;
-      const f = allFeatures.find(f => valueFunction(f))
-      if (f) values[fieldName] = valueFunction(f);
-    });
-    return values;
-  }
-
-  private getPropsFieldName() {
+  private getFeatureListFieldName() {
     return `${this.props.osmFeatureName.toLowerCase()}_set`;
   }
 
   onSubmit = (data: any) => {
-    const {onSubmit} = this.props;
-    const fieldName = this.getPropsFieldName();
-    Promise.resolve(onSubmit({[fieldName]: [data.formData]})).then(() => this.setState({editMode: false}));
+    const {onSubmit, osmImageNote} = this.props;
+    const {editingFeature} = this.state;
+    const fieldName = this.getFeatureListFieldName();
+
+    Object.assign(editingFeature, data.formData);
+
+    // @ts-ignore
+    Promise.resolve(onSubmit({[fieldName]: osmImageNote[fieldName]}))
+      .then(() => this.setState({editingFeature: undefined}));
   }
 }
