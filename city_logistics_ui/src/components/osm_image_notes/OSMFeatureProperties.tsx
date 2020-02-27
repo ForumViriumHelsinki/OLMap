@@ -3,7 +3,7 @@ import React from 'react';
 // @ts-ignore
 import Form from "react-jsonschema-form";
 
-import {JSONSchema, OSMImageNote} from "components/types";
+import {AppContext, JSONSchema, OSMImageNote} from "components/types";
 // @ts-ignore
 import {Button} from "reactstrap";
 import {OSMFeature} from "util_components/types";
@@ -35,6 +35,8 @@ const initialState: OSMFeaturePropertiesState = {
 export default class OSMFeatureProperties extends React.Component<OSMFeaturePropertiesProps, OSMFeaturePropertiesState> {
   state: OSMFeaturePropertiesState = initialState;
 
+  static contextType = AppContext;
+
   static defaultProps = {
     osmImageNote: {},
     nearbyFeatures: []
@@ -42,6 +44,8 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
 
   render() {
     const {schema, osmFeatureName, osmImageNote} = this.props;
+    const {user} = this.context;
+    const editable = user.is_reviewer || !osmImageNote.id;
     const {editingFeature} = this.state;
     // @ts-ignore
     const pkFeatures = (osmImageNote[(this.getFeatureListFieldName())] || []) as PKFeature[];
@@ -54,8 +58,8 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
             {(pkFeature != editingFeature) &&
               <>
                 {' '}
-                <Button size="sm" color="primary" outline className="btn-compact"
-                        onClick={() => this.setState({editingFeature: pkFeature})}>Edit</Button>
+                {editable && <Button size="sm" color="primary" outline className="btn-compact"
+                                     onClick={() => this.setState({editingFeature: pkFeature})}>Edit</Button>}
                 {' '}
                 {pkFeature.as_osm_tags &&
                   <Button size="sm" color="secondary" outline className="btn-compact"
@@ -81,11 +85,13 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
           }
         </div>
       )}
-      <p className="mt-2">
-        <Button size="sm" color="primary" outline className="btn-compact" onClick={this.newPKFeature}>
-          New {osmFeatureName}
-        </Button>
-      </p>
+      {editable &&
+        <p className="mt-2">
+          <Button size="sm" color="primary" outline className="btn-compact" onClick={this.newPKFeature}>
+            New {osmFeatureName}
+          </Button>
+        </p>
+      }
     </>
   }
 

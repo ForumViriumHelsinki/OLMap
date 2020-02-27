@@ -117,6 +117,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         self.ensure_features(request)
         return super().create(request, *args, **kwargs)
 
+    @decorators.permission_classes([IsReviewer])
     def update(self, request, *args, **kwargs):
         self.ensure_features(request)
         return super().update(request, *args, **kwargs)
