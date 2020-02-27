@@ -171,3 +171,11 @@ class Amenity(Company):
 
 
 image_note_property_types = [Entrance, Steps, Gate, Barrier, Office, Shop, Amenity]
+
+
+def manager_name(prop_type):
+    return prop_type.__name__.lower() + '_set'
+
+
+def prefetch_properties(image_note_qset):
+    return image_note_qset.prefetch_related(*[manager_name(p) for p in image_note_property_types])

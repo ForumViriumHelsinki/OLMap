@@ -124,8 +124,6 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_L10N = True
-
 USE_TZ = True
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -182,15 +180,6 @@ FRONTEND_ROOT = "https://app.citylogistiikka.fi/"
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-try:
-    from .local_settings import *  # noqa
-except ImportError:
-    pass
-
-if 'test' in sys.argv:
-    DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
-    # INMEMORYSTORAGE_PERSIST = True
-
 ADMINS = [['FVH Django admins', 'django-admins@forumvirium.fi']]
 EMAIL_HOST = 'localhost'
 EMAIL_HOST_PASSWORD = ''
@@ -206,3 +195,15 @@ if not DEBUG:
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True
     )
+
+DATETIME_FORMAT = "Y-m-d H:i:s"
+
+try:
+    from .local_settings import *  # noqa
+except ImportError:
+    pass
+
+if 'test' in sys.argv:
+    DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
+    # INMEMORYSTORAGE_PERSIST = True
+

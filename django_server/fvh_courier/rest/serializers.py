@@ -5,6 +5,7 @@ from django.db.models import DecimalField
 from rest_framework import serializers
 
 from fvh_courier import models
+from fvh_courier.models.image_note_properties import manager_name
 from .permissions import COURIER_GROUP, REVIEWER_GROUP
 
 
@@ -102,10 +103,6 @@ class ImageNotePropertiesSerializer(serializers.ModelSerializer):
                 model = prop_type
                 exclude = ['image_note']
         return PropSerializer
-    
-
-def manager_name(prop_type):
-    return prop_type.__name__.lower() + '_set'
 
 
 class CreateableSlugRelatedField(serializers.SlugRelatedField):

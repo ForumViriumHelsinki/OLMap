@@ -6,6 +6,8 @@ from rest_framework.response import Response
 
 from drf_jsonschema import to_jsonschema
 from fvh_courier import models
+from fvh_courier.models.image_note_properties import prefetch_properties
+
 from .serializers import PackageSerializer, OutgoingPackageSerializer, LocationSerializer, OSMImageNoteSerializer
 from .permissions import IsCourier, IsReviewer
 
@@ -107,7 +109,9 @@ class MyLocationView(RetrieveUpdateDestroyAPIView):
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OSMImageNoteSerializer
-    queryset = models.OSMImageNote.objects.filter(visible=True)
+    queryset = prefetch_properties(
+        models.OSMImageNote.objects.filter(visible=True)
+        .prefetch_related('tags', 'osm_features'))
 
     def create(self, request, *args, **kwargs):
         self.ensure_features(request)
