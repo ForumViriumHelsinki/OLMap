@@ -10,6 +10,7 @@ import CourierUI from "components/CourierUI";
 import SenderUI from "components/SenderUI";
 import LivePackage from "components/LivePackage";
 import {AppContext, User} from "components/types";
+import OLMapUI from "components/OLMapUI";
 
 type UIState = {
   user?: User,
@@ -59,7 +60,8 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
             user ?
               <AppContext.Provider value={{user}}>{
                 user.is_courier ? <CourierUI user={user} onLogout={this.logout}/>
-                  : <SenderUI user={user} onLogout={this.logout}/>
+                : user.is_sender ? <SenderUI user={user} onLogout={this.logout}/>
+                : <OLMapUI onLogout={this.logout}/>
               }</AppContext.Provider>
             : <LoginScreen onLogin={() => this.refreshUser()}/>
           : <LoadScreen/>}

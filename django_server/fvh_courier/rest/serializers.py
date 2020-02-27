@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from fvh_courier import models
 from fvh_courier.models.image_note_properties import manager_name
-from .permissions import COURIER_GROUP, REVIEWER_GROUP
+from .permissions import COURIER_GROUP, REVIEWER_GROUP, SENDER_GROUP
 
 
 class RoundingDecimalField(serializers.DecimalField):
@@ -27,10 +27,11 @@ class UserSerializer(serializers.ModelSerializer):
     phone_numbers = serializers.SlugRelatedField(many=True, read_only=True, slug_field='number')
     is_courier = serializers.SerializerMethodField()
     is_reviewer = serializers.SerializerMethodField()
+    is_sender = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'phone_numbers', 'is_courier', 'is_reviewer']
+        fields = ['first_name', 'last_name', 'username', 'phone_numbers', 'is_courier', 'is_reviewer', 'is_sender']
 
     def user_in_group(self, user, group_name):
         for group in user.groups.all():
@@ -43,6 +44,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_reviewer(self, user):
         return self.user_in_group(user, REVIEWER_GROUP)
+
+    def get_is_sender(self, user):
+        return self.user_in_group(user, SENDER_GROUP)
 
 
 class PackageSerializer(serializers.ModelSerializer):

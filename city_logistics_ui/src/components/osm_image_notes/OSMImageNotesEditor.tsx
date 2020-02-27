@@ -57,6 +57,14 @@ export default class OSMImageNotesEditor extends Component<{}> {
 
   imageNotesRef = React.createRef<OSMImageNotes>();
 
+  styles = {
+    mapTools: {zIndex: 500, right: 0, background: 'rgba(255, 255, 255, 0.4)'}
+  };
+
+  childProps = {
+    toolButton: {outline: true, color: "primary", size: "sm", className: 'bg-white'}
+  };
+
   render() {
     const {
       status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags,
@@ -65,8 +73,8 @@ export default class OSMImageNotesEditor extends Component<{}> {
 
     const location = [lon, lat] as LocationTuple;
 
-    return <>
-      <div className="m-2 mt-0" style={{height: 36}}>
+    return <div className="flex-grow-1">
+      <div className="position-absolute map-tools p-3" style={this.styles.mapTools}>
         <input name="image" id="image" className="d-none" type="file"
                accept="image/*" capture="environment"
                onChange={this.onImageCaptured}/>
@@ -82,13 +90,13 @@ export default class OSMImageNotesEditor extends Component<{}> {
         {{
           initial:
             <>
-              <Button outline color="primary" size="sm" onClick={this.onImageClick}>
+              <Button {...this.childProps.toolButton} onClick={this.onImageClick}>
                 <Icon icon="camera_alt"/>
               </Button>{' '}
-              <Button outline color="primary" size="sm" onClick={this.onCommentClick}>
+              <Button {...this.childProps.toolButton} onClick={this.onCommentClick}>
                 <Icon icon="comment"/>
               </Button>{' '}
-              <Button outline color="primary" size="sm" onClick={this.reloadNotes}>
+              <Button {...this.childProps.toolButton} onClick={this.reloadNotes}>
                 <Icon icon="refresh"/>
               </Button>{' '}
               {imagesUploading.length > 0 &&
@@ -98,12 +106,12 @@ export default class OSMImageNotesEditor extends Component<{}> {
               }
             </>,
           locating:
-            <>
+            <div className="mt-4 text-right">
               Scroll map to select position{' '}
-              <Button outline color="danger" size="sm" onClick={this.onCancel}>
+              <Button  {...this.childProps.toolButton} onClick={this.onCancel}>
                 Cancel
               </Button>
-            </>,
+            </div>,
           relating:
             <Modal title="Add relations (optional)" onClose={this.onCancel}>
               <OSMFeaturesSelection
@@ -153,7 +161,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
       <Map requestLocation={status == 'locating'}
            onLocationSelected={this.onLocationSelected}
            extraLayers={osmImageNotesLayer && [osmImageNotesLayer]}/>
-    </>;
+    </div>;
   }
 
   private addOSMProperties(data: any) {

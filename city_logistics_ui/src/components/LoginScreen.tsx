@@ -16,7 +16,7 @@ export default class LoginScreen extends Component<{onLogin: func}> {
       <div className="container">
         <div className="text-center">
           <img className="w-50" src="images/FORUM_VIRIUM_logo_orange.png" alt="logo"/>
-          <h3>FVH City Logistics</h3>
+          <h3>Open Logistics Map</h3>
           <p className="lead text-primary">Sign in</p>
         </div>
         <form onSubmit={this.submit}>

@@ -2,6 +2,7 @@ from rest_framework import permissions
 
 COURIER_GROUP = 'Courier'
 REVIEWER_GROUP = 'Reviewer'
+SENDER_GROUP = 'Sender'
 
 
 class UserBelongsToGroup(permissions.IsAuthenticated):

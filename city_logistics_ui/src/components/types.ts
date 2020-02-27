@@ -4,6 +4,7 @@ import React from "react";
 export type User = {
     is_courier: boolean,
     is_reviewer: boolean,
+    is_sender: boolean,
     username: string,
     first_name: string,
     last_name: string,
