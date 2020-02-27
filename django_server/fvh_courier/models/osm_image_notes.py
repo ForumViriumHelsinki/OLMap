@@ -47,7 +47,7 @@ class OSMImageNote(BaseLocation):
 
         try:
             pilImage = Img.open(BytesIO(self.image.read()))
-        except UnidentifiedImageError:
+        except (UnidentifiedImageError, FileNotFoundError):
             return super().save(*args, **kwargs)
 
         for orientation in ExifTags.TAGS.keys():

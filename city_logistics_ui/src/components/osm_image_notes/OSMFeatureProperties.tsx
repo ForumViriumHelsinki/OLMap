@@ -71,7 +71,11 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
           {(pkFeature === editingFeature) ?
             <Form schema={schema} className="compact"
                   formData={pkFeature}
-                  onSubmit={this.onSubmit}/>
+                  onSubmit={this.onSubmit}>
+              <Button size="sm" color="primary" type="submit" className="btn-compact pl-4 pr-4 mr-2">Save</Button>
+              <Button tag="span" size="sm" color="secondary" outline className="btn-compact pl-4 pr-4"
+                      onClick={this.onCancel}>Cancel</Button>
+            </Form>
             :
             <>
               {pkFeature.as_osm_tags &&
@@ -94,6 +98,17 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
       }
     </>
   }
+
+  private onCancel = () => {
+    const {osmImageNote} = this.props;
+    const {editingFeature} = this.state;
+    const fieldName = this.getFeatureListFieldName();
+    // @ts-ignore
+    const featureList = osmImageNote[fieldName];
+    // @ts-ignore
+    if (!editingFeature.id) featureList.splice(featureList.indexOf(editingFeature, 1));
+    this.setState({editingFeature: undefined})
+  };
 
   newPKFeature = () => {
     const {osmImageNote, nearbyFeatures, schema} = this.props;
