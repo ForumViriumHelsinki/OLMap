@@ -23,3 +23,15 @@ div.successDotIcon {
 div.successDotIcon::before {
     border-color: #28a745;
 }
+
+img.noteImage {
+    width: 100%;
+    max-height: 50vh;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block
+}
+
+img.noteImage:hover {
+    object-fit: none;
+}

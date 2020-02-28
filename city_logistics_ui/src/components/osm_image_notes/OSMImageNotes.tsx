@@ -52,13 +52,6 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
 
   state: OSMImageNotesState = initialState;
 
-  imageStyle: CSSProperties = {
-    maxWidth: '100%',
-    maxHeight: 'calc(100vh - 200px)',
-    objectFit: 'contain',
-    margin: '0 auto',
-    display: 'block'};
-
   componentDidMount() {
     this.loadImageNotes();
     this.loadOSMFeatureProperties();
@@ -93,7 +86,8 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
         }
         <ErrorAlert status={error} message="Saving features failed. Try again perhaps?"/>
         {selectedNote.image &&
-          <img src={selectedNote.image} style={this.imageStyle} />
+          <img src={selectedNote.image} className="noteImage"
+               onMouseMove={this.positionImage} onMouseOut={this.restoreImage}/>
         }
         <>
           <p className="m-2 ml-3"><strong>Tags:</strong></p>
@@ -127,6 +121,20 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
       </Modal>
     )
   }
+
+  positionImage = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+    const target = e.target as HTMLImageElement;
+    const {width, height, naturalWidth, naturalHeight} = target;
+    const {offsetX, offsetY} = e.nativeEvent;
+    const posX = -(offsetX / width) * (naturalWidth - width);
+    const posY = -(offsetY / height) * (naturalHeight - height);
+    target.style.objectPosition = `${posX}px ${posY}px`
+  };
+
+  restoreImage = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+    const target = e.target as HTMLElement;
+    target.style.objectPosition = '';
+  };
 
   private refresh() {
     this.setState(initialState);

@@ -2,7 +2,7 @@
   "name": "city_logistics_ui",
   "version": "0.1.0",
   "private": true,
-  "description": "UI for the FVH City Logistics POC application",
+  "description": "UI for the Open Logistics Map application",
   "scripts": {
     "start": "react-scripts start --no-cache",
     "build": "react-scripts build",
