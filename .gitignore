@@ -13,3 +13,4 @@ __pycache__
 /django_server/staticfiles/
 /django_server/.coverage
 /django_server/uploads/
+/tunnel_db.sh

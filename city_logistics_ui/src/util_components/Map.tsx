@@ -46,7 +46,7 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
         </div>
       }
       {userMovedMap &&
-        <div className="position-absolute" style={{zIndex: 500, right: 12, bottom: 36}}>
+        <div className="position-absolute" style={{zIndex: 400, right: 12, bottom: 36}}>
             <Button color="primary" size="sm" onClick={() => this.setState({userMovedMap: false})}>
               <i className="material-icons">my_location</i>
             </Button>
