@@ -24,7 +24,8 @@ const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize:
 
 type OSMImageNotesProps = {
   onMapLayerLoaded: (mapLayer: any) => any
-  onOSMFeaturePropertiesLoaded?: (osmFeatureProperties: OSMFeatureProps) => any
+  onOSMFeaturePropertiesLoaded?: (osmFeatureProperties: OSMFeatureProps) => any,
+  myNotesOnly: boolean
 }
 
 type OSMImageNotesState = {
@@ -44,6 +45,10 @@ const initialState: OSMImageNotesState = {
 
 export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImageNotesState> {
   static contextType = AppContext;
+  static defaultProps = {
+    myNotesOnly: false
+  };
+
   static bindMethods = ['onFeaturesSelected', 'refresh', 'toggleTag'];
 
   private osmImageNotes: OSMImageNote[] = [];
@@ -55,6 +60,10 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
   componentDidMount() {
     this.loadImageNotes();
     this.loadOSMFeatureProperties();
+  }
+
+  componentDidUpdate(prevProps: OSMImageNotesProps) {
+    if (prevProps.myNotesOnly != this.props.myNotesOnly) this.getMapLayer();
   }
 
   loadImageNotes() {
@@ -162,9 +171,14 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
 
   private getMapLayer() {
     const {user} = this.context;
+    const {myNotesOnly} = this.props;
 
     if (!this.mapLayer) this.mapLayer = L.layerGroup();
-    this.osmImageNotes.forEach((osmImageNote) => {
+    const osmImageNotes =
+      myNotesOnly ? this.osmImageNotes.filter(n => n.created_by == user.id)
+      : this.osmImageNotes;
+
+    osmImageNotes.forEach((osmImageNote) => {
       const id = String(osmImageNote.id);
       const icon = (user.is_reviewer && osmImageNote.is_reviewed) ? successDotIcon : dotIcon;
       if (this.dotMarkers[id]) return this.dotMarkers[id].setIcon(icon);
@@ -174,7 +188,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
       this.dotMarkers[id] = marker;
     });
 
-    const index = _.keyBy(this.osmImageNotes, 'id');
+    const index = _.keyBy(osmImageNotes, 'id');
     Object.entries(this.dotMarkers).filter(([id]) => !index[id]).forEach(([id, marker]) => {
       marker.remove();
       delete this.dotMarkers[id];

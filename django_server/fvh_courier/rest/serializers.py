@@ -31,7 +31,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'phone_numbers', 'is_courier', 'is_reviewer', 'is_sender']
+        fields = ['id', 'first_name', 'last_name', 'username',
+                  'phone_numbers', 'is_courier', 'is_reviewer', 'is_sender']
 
     def user_in_group(self, user, group_name):
         for group in user.groups.all():
@@ -132,7 +133,7 @@ class OSMImageNoteSerializer(serializers.ModelSerializer, metaclass=OSMImageNote
 
     class Meta:
         model = models.OSMImageNote
-        fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed', 'tags'] +
+        fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed', 'tags', 'created_by'] +
                   [manager_name(prop_type) for prop_type in models.image_note_property_types])
 
     def to_representation(self, instance):

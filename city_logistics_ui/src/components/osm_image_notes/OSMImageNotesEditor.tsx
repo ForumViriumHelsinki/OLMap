@@ -27,7 +27,8 @@ type OSMImageNotesEditorState = OSMImageNote & {
   imagesUploading: OSMImageNote[],
   osmFeatureProperties?: OSMFeatureProps,
   tags: string[],
-  osmProperties: any
+  osmProperties: any,
+  myNotesOnly: boolean
 }
 
 const initialState: OSMImageNotesEditorState = {
@@ -42,7 +43,8 @@ const initialState: OSMImageNotesEditorState = {
   submitting: false,
   imagesUploading: [],
   tags: [],
-  osmProperties: {}
+  osmProperties: {},
+  myNotesOnly: false
 };
 
 const {imagesUploading, ...resetState} = initialState;
@@ -68,7 +70,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
   render() {
     const {
       status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags,
-      osmProperties
+      osmProperties, myNotesOnly
     } = this.state;
 
     const location = [lon, lat] as LocationTuple;
@@ -81,7 +83,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
         <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
                        onOSMFeaturePropertiesLoaded={(osmFeatureProperties) =>
                          this.setState({osmFeatureProperties})}
-                       ref={this.imageNotesRef}/>
+                       ref={this.imageNotesRef} myNotesOnly={myNotesOnly}/>
         {imageError &&
           <Modal title="Image error" onClose={() => this.setState({imageError: false})}>
             There was an error uploading the image. Try again maybe?
@@ -90,6 +92,11 @@ export default class OSMImageNotesEditor extends Component<{}> {
         {{
           initial:
             <>
+              {imagesUploading.length > 0 &&
+                <Button outline disabled size="sm">
+                  <Icon icon="cloud_upload"/> {imagesUploading.length} <Spinner size="sm"/>
+                </Button>
+              }
               <Button {...this.childProps.toolButton} onClick={this.onImageClick}>
                 <Icon icon="camera_alt"/>
               </Button>{' '}
@@ -99,11 +106,12 @@ export default class OSMImageNotesEditor extends Component<{}> {
               <Button {...this.childProps.toolButton} onClick={this.reloadNotes}>
                 <Icon icon="refresh"/>
               </Button>{' '}
-              {imagesUploading.length > 0 &&
-                <Button outline disabled size="sm">
-                  <Icon icon="cloud_upload"/> {imagesUploading.length} <Spinner size="sm"/>
-                </Button>
-              }
+              <Button {...this.childProps.toolButton}
+                      className={myNotesOnly ? '' : 'bg-white'}
+                      outline={!myNotesOnly}
+                      onClick={() => this.setState({myNotesOnly: !myNotesOnly})}>
+                <Icon icon="account_circle"/>
+              </Button>{' '}
             </>,
           locating:
             <div className="mt-4 text-right">

@@ -2,6 +2,7 @@ import {Address, Location} from "util_components/types";
 import React from "react";
 
 export type User = {
+    id: number,
     is_courier: boolean,
     is_reviewer: boolean,
     is_sender: boolean,
@@ -46,7 +47,8 @@ export type OSMImageNote = {
     comment?: string,
     osm_features: number[],
     is_reviewed?: boolean,
-    tags?: string[]
+    tags?: string[],
+    created_by?: number
 };
 
 export type JSONSchema = any
