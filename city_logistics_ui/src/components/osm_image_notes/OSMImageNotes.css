@@ -32,6 +32,6 @@ img.noteImage {
     display: block
 }
 
-img.noteImage:hover {
+img.noteImage.zoom {
     object-fit: none;
 }

@@ -33,14 +33,16 @@ type OSMImageNotesState = {
   readOnly: boolean,
   error: boolean
   osmFeatureProperties?: OSMFeatureProps,
-  nearbyFeatures: OSMFeature[]
+  nearbyFeatures: OSMFeature[],
+  imageZoom: boolean
 }
 
 const initialState: OSMImageNotesState = {
   readOnly: true,
   error: false,
   selectedNote: undefined,
-  nearbyFeatures: []
+  nearbyFeatures: [],
+  imageZoom: false
 };
 
 export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImageNotesState> {
@@ -96,7 +98,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
         <ErrorAlert status={error} message="Saving features failed. Try again perhaps?"/>
         {selectedNote.image &&
           <img src={selectedNote.image} className="noteImage"
-               onMouseMove={this.positionImage} onMouseOut={this.restoreImage}/>
+               onMouseMove={this.positionImage} onMouseOut={this.restoreImage} onClick={this.toggleImgZoom}/>
         }
         <>
           <p className="m-2 ml-3"><strong>Tags:</strong></p>
@@ -131,18 +133,37 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     )
   }
 
-  positionImage = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+  toggleImgZoom = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
+    const imageZoom = !this.state.imageZoom;
+    const target = e.target as HTMLElement;
+    this.setState({imageZoom});
+    if (imageZoom) {
+      target.classList.add('zoom')
+      this.positionImage(e, true);
+    } else this.restoreImage(e);
+  };
+
+  positionImage = (e: React.MouseEvent<HTMLImageElement, MouseEvent>, force?: boolean) => {
+    if (!(force || this.state.imageZoom)) return;
+
     const target = e.target as HTMLImageElement;
     const {width, height, naturalWidth, naturalHeight} = target;
+    const imgAreaRatio = width / height;
+    const imgRatio = naturalWidth / naturalHeight;
+    const xScale = imgRatio / imgAreaRatio;
+    const [shownWidth, offset] = (imgAreaRatio > imgRatio) ? [width * xScale, width * (1 - xScale) / 2] : [width, 0];
     const {offsetX, offsetY} = e.nativeEvent;
-    const posX = -(offsetX / width) * (naturalWidth - width);
-    const posY = -(offsetY / height) * (naturalHeight - height);
+    const scaledX = offsetX - offset;
+    const posX = -(scaledX / shownWidth) * naturalWidth + width / 2;
+    const posY = -(offsetY / height) * naturalHeight + height / 2;
     target.style.objectPosition = `${posX}px ${posY}px`
   };
 
   restoreImage = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
     const target = e.target as HTMLElement;
+    target.classList.remove('zoom')
     target.style.objectPosition = '';
+    this.setState({imageZoom: false});
   };
 
   private refresh() {
