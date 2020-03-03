@@ -18,6 +18,7 @@ import Component from "util_components/Component";
 import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
 import PillsSelection from "util_components/PillsSelection";
 import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
+import Icon from "util_components/Icon";
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
 const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
@@ -88,6 +89,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     const tags = selectedNote.tags || [];
     const allTags = Object.keys(osmFeatureProperties || {});
 
+    const editable = user.is_reviewer && readOnly;
     return (
       <Modal title={selectedNote.comment || 'No comment.'}
              className={selectedNote.image ? 'modal-xl' : 'modal-dialog-centered'}
@@ -111,8 +113,12 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
             }
           </p>
         </>
-        <div className="list-group-item"><strong>Related places:</strong></div>
-        <div onClick={() => user.is_reviewer && readOnly && this.setState({readOnly: false})}>
+        <div onClick={() => editable && this.setState({readOnly: false})}
+             className={editable ? "clickable": ''}>
+          <div className="list-group-item">
+            <strong>Related places:</strong>
+            {editable && <div className="float-right"><Icon icon={'edit'}/></div>}
+          </div>
           <OSMFeaturesSelection
             location={location} onSelect={this.onFeaturesSelected} readOnly={readOnly}
             maxHeight={null}
