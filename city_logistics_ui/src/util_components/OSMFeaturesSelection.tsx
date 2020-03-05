@@ -10,6 +10,7 @@ import {getBoundsOfDistance, getDistance} from "geolib";
 import {GeolibGeoJSONPoint, GeolibInputCoordinates} from "geolib/es/types";
 // @ts-ignore
 import {Button, ListGroup, ListGroupItem} from "reactstrap";
+import PillsSelection from "util_components/PillsSelection";
 
 type OSMTags = { [tag: string]: string };
 
@@ -30,7 +31,7 @@ const osmFeatureTypes: OSMFeatureType[] = [
     label: (tags) => {
       const {entrance} = tags;
       const address = osmAddressString(tags);
-      return `${entrance == 'yes' ? 'entrance' : entrance}${address && `: ${address}`}`;
+      return `${address && `${address} `} ${entrance == 'yes' ? '' : entrance} (entrance)`;
     }
   },
   {
@@ -75,7 +76,7 @@ const osmFeatureTypes: OSMFeatureType[] = [
     requiredTag: 'name',
     label: (tags) => {
       const {highway, name} = tags;
-      return `${highway ? `${highway} road: ` : ''}${name}`;
+      return `${name}${highway ? ` (${highway} road)` : ''}`;
     }
   },
   {
@@ -85,16 +86,34 @@ const osmFeatureTypes: OSMFeatureType[] = [
   }
 ];
 
+type sortOption = 'relevance' | 'distance' | 'name';
+const sortOptions: sortOption[] = ['relevance', 'distance', 'name'];
+
+type filterOption = 'entrance' | 'place' | 'address' | 'street' | 'barrier';
+const filterOptions: filterOption[] = ['entrance', 'place', 'address', 'street', 'barrier'];
+
+const filters: {[key: string]: (f: OSMFeature) => boolean | null} = {
+  'entrance': (f) => Boolean(f.tags.entrance),
+  'place': (f) => Boolean(f.tags.name && (f.type != 'way')),
+  'address': (f) => Boolean(f.tags['addr:housenumber'] && !f.tags.name),
+  'street': (f) => Boolean(f.type == "way"),
+  'barrier': (f) => Boolean(f.tags.barrier)
+};
+
 type OSMFSState = {
   nearbyOSMFeatures: OSMFeature[],
   featuresLoading: boolean,
   selectedFeatureIds: number[]
+  sortBy: sortOption,
+  selectedFilters: filterOption[]
 }
 
 const initialState: OSMFSState = {
   nearbyOSMFeatures: [],
   featuresLoading: false,
-  selectedFeatureIds: []
+  selectedFeatureIds: [],
+  sortBy: sortOptions[0],
+  selectedFilters: []
 };
 
 type OSMFSProps = {
@@ -111,7 +130,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
   state: OSMFSState = initialState;
 
   static defaultProps = {
-    distance: 20,
+    distance: 30,
     preselectedFeatureIds: [],
     readOnly: false,
     maxHeight: 'calc(100vh - 248px)',
@@ -119,9 +138,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
   };
 
   render() {
-    const {
-      nearbyOSMFeatures, selectedFeatureIds, featuresLoading
-    } = this.state;
+    const {selectedFeatureIds, featuresLoading, sortBy, selectedFilters} = this.state;
     const selectedFeatures = this.selectedFeatures();
     const {onSelect, readOnly, maxHeight} = this.props;
 
@@ -133,16 +150,29 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
             selectedFeatures.map((osmFeature: any, i) =>
               <ListGroupItem key={i}>{this.label(osmFeature)}</ListGroupItem>
             )
-          :
+            :
             <ListGroupItem>No places selected</ListGroupItem>
-
         :
-          nearbyOSMFeatures.map((osmFeature: any, i) =>
-            <ListGroupItem key={i} active={selectedFeatureIds.includes(osmFeature.id)}
-                           onClick={() => this.toggleRelatedFeature(osmFeature)}>
-              {this.label(osmFeature)}
+          <>
+            <ListGroupItem>
+              <span className="d-inline-block mr-3">
+                Sort by:{' '}
+                <PillsSelection options={sortOptions} selected={[sortBy]} color="secondary"
+                                onClick={this.sortBy}/>
+              </span>
+              <span className="d-inline-block mt-2 mt-sm-0">
+                Filter:{' '}
+                <PillsSelection options={filterOptions} selected={selectedFilters} color="secondary"
+                                onClick={this.toggleFilter}/>
+              </span>
             </ListGroupItem>
-          )
+            {this.getNearbyOSMFeatures().map((osmFeature: any, i: number) =>
+              <ListGroupItem key={i} active={selectedFeatureIds.includes(osmFeature.id)}
+                             onClick={() => this.toggleRelatedFeature(osmFeature)}>
+                {this.label(osmFeature)}
+              </ListGroupItem>
+            )}
+          </>
         }
 
         {featuresLoading &&
@@ -159,6 +189,19 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
       }
     </>;
   }
+
+  sortBy = (opt: string) => {
+    const sortBy = opt as sortOption;
+    this.setState({sortBy});
+  };
+
+  toggleFilter = (f: string) => {
+    const selectedFilters = this.state.selectedFilters.slice();
+    const filter = f as filterOption;
+    if (selectedFilters.includes(filter)) selectedFilters.splice(selectedFilters.indexOf(filter), 1);
+    else selectedFilters.push(filter);
+    this.setState({selectedFilters});
+  };
 
   selectedFeatures() {
     return this.state.nearbyOSMFeatures.filter(f => this.state.selectedFeatureIds.includes(f.id))
@@ -203,21 +246,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
         f => (f.type == 'way') && (f.tags.name == osmFeature.tags.name));
       if (duplicate) return;
     }
-
-    const order = (feature: OSMFeature) => {
-      for (const i in osmFeatureTypes)
-        if (feature.tags[osmFeatureTypes[i].requiredTag]) return i;
-      return osmFeatureTypes.length;
-    };
-
-    insertFeature: {
-      for (const i in nearbyOSMFeatures)
-        if (order(osmFeature) < order(nearbyOSMFeatures[i])) {
-          nearbyOSMFeatures.splice(Number(i), 0, osmFeature);
-          break insertFeature;
-        }
-      nearbyOSMFeatures.push(osmFeature);
-    }
+    nearbyOSMFeatures.push(osmFeature);
     this.setState({nearbyOSMFeatures});
   }
 
@@ -256,5 +285,24 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
     else
       selectedFeatureIds.splice(index, 1);
     this.setState({selectedFeatureIds})
+  }
+
+  private getNearbyOSMFeatures() {
+    const {sortBy, selectedFilters, nearbyOSMFeatures} = this.state;
+    const {location} = this.props;
+
+    const sortFn = {
+      'name': (f: OSMFeature) => this.label(f),
+      'distance': (f: OSMFeature) => f.type == 'node' ? getDistance(f, location as GeolibInputCoordinates): 40,
+      'relevance': (f: OSMFeature) => {
+        for (const i in osmFeatureTypes)
+          if (f.tags[osmFeatureTypes[i].requiredTag]) return i;
+        return osmFeatureTypes.length;
+      }
+    }[sortBy];
+    const features = selectedFilters.length ?
+      nearbyOSMFeatures.filter(f => _.some(selectedFilters.map(filter => filters[filter](f))))
+      : nearbyOSMFeatures;
+    return _.sortBy(features, sortFn);
   }
 }

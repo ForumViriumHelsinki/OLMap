@@ -5,14 +5,17 @@ import {Button} from "reactstrap";
 type PillsSelectionProps = {
   options: string[],
   selected: string[],
-  onClick?: (tag: string) => any
+  onClick?: (tag: string) => any,
+  color: 'primary' | 'secondary' | 'info' | 'dark'
 }
 
 export default class PillsSelection extends React.Component<PillsSelectionProps> {
+  static defaultProps = {color: 'primary'};
+
   render() {
-    const {options, selected} = this.props;
+    const {options, selected, color} = this.props;
     return options.map(tag =>
-      <Button size="sm" outline={!selected.includes(tag)} color="primary" className="rounded-pill mr-1 mb-1"
+      <Button size="sm" outline={!selected.includes(tag)} color={color} className="rounded-pill mr-1 mb-1"
               key={tag} onClick={(e: Event) => this.onClick(e, tag)}>
         {tag}
       </Button>

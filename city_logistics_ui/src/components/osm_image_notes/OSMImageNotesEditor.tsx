@@ -121,7 +121,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
               </Button>
             </div>,
           relating:
-            <Modal title="Choose related features (optional)" onClose={this.onCancel}>
+            <Modal title="Choose related places (optional)" onClose={this.onCancel}>
               <OSMFeaturesSelection
                 location={location}
                 onSelect={osm_features => this.setState({osm_features, status: 'commenting'})}/>

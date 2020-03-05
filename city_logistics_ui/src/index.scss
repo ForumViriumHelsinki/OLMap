@@ -101,6 +101,19 @@ button.nav-link:focus {
   padding: 0.1rem 0.5rem;
 }
 
+.btn-outline-primary:active, .btn-outline-secondary:active,
+.btn-outline-primary:hover, .btn-outline-secondary:hover {
+  background-color: white !important;
+}
+
+.btn-outline-primary:active, .btn-outline-primary:hover {
+  color: $primary !important;
+}
+
+.btn-outline-secondary:active, .btn-outline-secondary:hover {
+  color: $secondary !important;
+}
+
 .material-icons {
   line-height: 0.8;
 }
