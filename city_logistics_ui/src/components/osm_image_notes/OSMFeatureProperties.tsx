@@ -51,8 +51,8 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
     const pkFeatures = (osmImageNote[(this.getFeatureListFieldName())] || []) as PKFeature[];
 
     return <>
-      {pkFeatures.map(pkFeature =>
-        <div key={pkFeature.id}>
+      {pkFeatures.map((pkFeature, i) =>
+        <div key={pkFeature.id || i}>
           <p className="mt-2">
             <strong>{osmFeatureName}</strong>
             {(pkFeature != editingFeature) &&
@@ -63,7 +63,7 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
                 {' '}
                 {pkFeature.as_osm_tags &&
                   <Button size="sm" color="secondary" outline className="btn-compact"
-                          onClick={() => this.copyText(pkFeature.id + '-osm-text')}>Copy</Button>
+                          onClick={() => this.copyText((pkFeature.id || i) + '-osm-text')}>Copy</Button>
                 }
               </>
             }
@@ -79,7 +79,7 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
             :
             <>
               {pkFeature.as_osm_tags &&
-              <textarea id={pkFeature.id + '-osm-text'}
+              <textarea id={(pkFeature.id || i) + '-osm-text'}
                         rows={Object.keys(pkFeature.as_osm_tags).length}
                         className="form-control"
                         readOnly

@@ -190,7 +190,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     .then((response) => {
       if (response.status < 300) response.json().then((note: OSMImageNote) => {
         Object.assign(selectedNote, note);
-        this.setState({error: false, selectedNote: note, ...(nextState || {})});
+        this.setState({error: false, selectedNote, ...(nextState || {})});
       });
       else this.setState({error: true});
     })
