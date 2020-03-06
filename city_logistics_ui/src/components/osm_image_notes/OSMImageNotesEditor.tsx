@@ -14,8 +14,8 @@ import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
 import {OSMFeatureProps, OSMImageNote} from "components/types";
 import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
 import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
-import PillsSelection from "util_components/PillsSelection";
 import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
+import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 
 
 type OSMImageNotesEditorState = OSMImageNote & {
@@ -54,7 +54,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
 
   static bindMethods = [
     'onImageClick', 'onImageCaptured', 'onCommentClick',
-    'onLocationSelected', 'onCancel', 'onSubmit', 'reloadNotes', 'toggleTag'
+    'onLocationSelected', 'onCancel', 'onSubmit', 'reloadNotes'
   ];
 
   imageNotesRef = React.createRef<OSMImageNotes>();
@@ -137,11 +137,10 @@ export default class OSMImageNotesEditor extends Component<{}> {
                 <>
                   <p className="m-2">Select tags:</p>
                   <p className="m-2">
-                    <PillsSelection options={Object.keys(osmFeatureProperties)}
-                                    selected={tags} onClick={this.toggleTag}/>
+                    <OSMImageNoteTags {...{tags, osmFeatureProperties}} onChange={tags => this.setState({tags})}/>
                   </p>
                   <div className="ml-2 mr-2">
-                    {tags.map((tag) =>
+                    {tags.filter(tag => osmFeatureProperties[tag]).map((tag) =>
                       <OSMFeatureProperties key={tag} schema={osmFeatureProperties[tag]} osmFeatureName={tag}
                                             osmImageNote={osmProperties}
                                             onSubmit={(data) => this.addOSMProperties(data)} />
@@ -234,12 +233,5 @@ export default class OSMImageNotesEditor extends Component<{}> {
 
   private reloadNotes() {
     this.imageNotesRef.current && this.imageNotesRef.current.loadImageNotes();
-  }
-
-  private toggleTag(tag: string) {
-    const tags = this.state.tags.slice();
-    if (tags.includes(tag)) tags.splice(tags.indexOf(tag), 1);
-    else tags.push(tag);
-    this.setState({tags})
   }
 }

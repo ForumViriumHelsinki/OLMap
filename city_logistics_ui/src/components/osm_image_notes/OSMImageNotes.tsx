@@ -16,12 +16,13 @@ import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
 import {LocationTuple, OSMFeature} from "util_components/types";
 import Component from "util_components/Component";
 import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
-import PillsSelection from "util_components/PillsSelection";
 import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
 import Icon from "util_components/Icon";
+import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
 const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
+const problemDotIcon = L.divIcon({className: "dotIcon problemDotIcon", iconSize: [24, 24]});
 
 type OSMImageNotesProps = {
   onMapLayerLoaded: (mapLayer: any) => any
@@ -52,7 +53,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     myNotesOnly: false
   };
 
-  static bindMethods = ['onFeaturesSelected', 'refresh', 'toggleTag'];
+  static bindMethods = ['onFeaturesSelected', 'refresh'];
 
   private osmImageNotes: OSMImageNote[] = [];
   private mapLayer?: any;
@@ -87,7 +88,6 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     const location = [selectedNote.lon, selectedNote.lat] as LocationTuple;
 
     const tags = selectedNote.tags || [];
-    const allTags = Object.keys(osmFeatureProperties || {});
 
     const editable = user.is_reviewer && readOnly;
     return (
@@ -105,12 +105,8 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
         <>
           <p className="m-2 ml-3"><strong>Tags:</strong></p>
           <p className="m-2 ml-3">
-            {user.is_reviewer ?
-               <PillsSelection options={allTags} selected={tags} onClick={this.toggleTag}/>
-             :
-              (tags.length > 0) ? <PillsSelection options={tags} selected={tags}/>
-              : 'No tags selected.'
-            }
+             <OSMImageNoteTags {...{tags, osmFeatureProperties}} readOnly={!user.is_reviewer}
+                               onChange={tags => this.updateSelectedNote({tags})}/>
           </p>
         </>
         <div onClick={() => editable && this.setState({readOnly: false})}
@@ -207,7 +203,11 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
 
     osmImageNotes.forEach((osmImageNote) => {
       const id = String(osmImageNote.id);
-      const icon = (user.is_reviewer && osmImageNote.is_reviewed) ? successDotIcon : dotIcon;
+      const icon = (osmImageNote.tags || []).includes('Problem')
+        ? problemDotIcon
+        : (user.is_reviewer && !osmImageNote.is_reviewed)
+          ? dotIcon
+          : successDotIcon;
       if (this.dotMarkers[id]) return this.dotMarkers[id].setIcon(icon);
       const marker = L.marker({lon: osmImageNote.lon, lat: osmImageNote.lat}, {icon: icon})
       marker.on('click', () => this.setState({selectedNote: osmImageNote, readOnly: true}));
@@ -232,15 +232,6 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
           onOSMFeaturePropertiesLoaded && onOSMFeaturePropertiesLoaded(osmFeatureProperties)
         })
     })
-  }
-
-  private toggleTag(tag: string) {
-    const {selectedNote} = this.state;
-    if (!selectedNote) return;
-    const tags = (selectedNote.tags || []).slice();
-    if (tags.includes(tag)) tags.splice(tags.indexOf(tag), 1);
-    else tags.push(tag);
-    this.updateSelectedNote({tags});
   }
 
   private getRelevantProperties() {
