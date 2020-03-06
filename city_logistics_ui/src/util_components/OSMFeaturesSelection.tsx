@@ -11,6 +11,7 @@ import {GeolibGeoJSONPoint, GeolibInputCoordinates} from "geolib/es/types";
 // @ts-ignore
 import {Button, ListGroup, ListGroupItem} from "reactstrap";
 import PillsSelection from "util_components/PillsSelection";
+import Toggle from "util_components/Toggle";
 
 type OSMTags = { [tag: string]: string };
 
@@ -154,16 +155,18 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
             <ListGroupItem>No places selected</ListGroupItem>
         :
           <>
-            <ListGroupItem>
-              <span className="d-inline-block mr-3">
-                Sort by:{' '}
-                <PillsSelection options={sortOptions} selected={[sortBy]} color="secondary"
-                                onClick={this.sortBy}/>
+            <ListGroupItem className="pt-1 pt-sm-2">
+              <span className="d-inline-block mr-1">
+                <Toggle off='Sort' on='Sort by: '>
+                  <PillsSelection options={sortOptions} selected={[sortBy]} color="secondary"
+                                  onClick={this.sortBy}/>
+                </Toggle>
               </span>
               <span className="d-inline-block mt-2 mt-sm-0">
-                Filter:{' '}
-                <PillsSelection options={filterOptions} selected={selectedFilters} color="secondary"
-                                onClick={this.toggleFilter}/>
+                <Toggle off='Filter' on='Filter: '>
+                  <PillsSelection options={filterOptions} selected={selectedFilters} color="secondary"
+                                  onClick={this.toggleFilter}/>
+                </Toggle>
               </span>
             </ListGroupItem>
             {this.getNearbyOSMFeatures().map((osmFeature: any, i: number) =>
