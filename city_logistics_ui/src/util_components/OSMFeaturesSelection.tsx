@@ -119,7 +119,8 @@ const initialState: OSMFSState = {
 
 type OSMFSProps = {
   location: LocationTuple,
-  onSelect: (featureIds: number[]) => any,
+  onSelect?: (featureIds: number[]) => any,
+  onChange?: (featureIds: number[]) => any,
   distance: number,
   preselectedFeatureIds: number[],
   readOnly: boolean,
@@ -184,7 +185,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
 
       </ListGroup></div>
 
-      {!readOnly &&
+      {!readOnly && onSelect &&
         <Button block color="primary"
                 onClick={() => onSelect(selectedFeatureIds)} className="mt-2">
           Done
@@ -268,7 +269,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
         this.addNearbyFeature(response.data);
       },
       (err: any) => {
-        if (!this.state.nearbyOSMFeatures.length) onSelect([]);
+        if (!this.state.nearbyOSMFeatures.length && onSelect) onSelect([]);
         else {
           this.setState({featuresLoading: false})
           onFeaturesLoaded(this.state.nearbyOSMFeatures);
@@ -281,6 +282,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
   }
 
   private toggleRelatedFeature(osmFeature: OSMFeature) {
+    const {onChange} = this.props;
     const selectedFeatureIds = this.state.selectedFeatureIds.slice();
     const index = selectedFeatureIds.indexOf(osmFeature.id);
     if (index == -1)
@@ -288,6 +290,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
     else
       selectedFeatureIds.splice(index, 1);
     this.setState({selectedFeatureIds})
+    if (onChange) onChange(selectedFeatureIds);
   }
 
   private getNearbyOSMFeatures() {

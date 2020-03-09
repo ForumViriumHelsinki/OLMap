@@ -114,9 +114,17 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
           <div className="list-group-item">
             <strong>Related places:</strong>
             {editable && <div className="float-right"><Icon icon={'edit'}/></div>}
+            {!readOnly &&
+              <div className="float-right">
+                <button className="btn btn-light btn-sm btn-compact"
+                        onClick={() => this.setState({readOnly: true})}>
+                  Close <Icon icon={'close'}/>
+                </button>
+              </div>
+            }
           </div>
           <OSMFeaturesSelection
-            location={location} onSelect={this.onFeaturesSelected} readOnly={readOnly}
+            location={location} onChange={this.onFeaturesSelected} readOnly={readOnly}
             maxHeight={null}
             preselectedFeatureIds={selectedNote.osm_features}
             onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})} />
@@ -174,7 +182,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
   }
 
   onFeaturesSelected(featureIds: number[]) {
-    this.updateSelectedNote({osm_features: featureIds}, {readOnly: true});
+    this.updateSelectedNote({osm_features: featureIds});
   }
 
   updateSelectedNote(data: any, nextState?: any) {
