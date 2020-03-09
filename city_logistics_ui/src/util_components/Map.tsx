@@ -34,7 +34,7 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
   }
 
   render() {
-    const {requestLocation, onLocationSelected} = this.props;
+    const {requestLocation} = this.props;
     const {userMovedMap} = this.state;
 
     return <div className="position-relative">
@@ -46,7 +46,7 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
         </div>
       }
       {userMovedMap &&
-        <div className="position-absolute" style={{zIndex: 400, right: 12, bottom: 36}}>
+        <div className="position-absolute" style={{zIndex: 500, right: 12, bottom: 36}}>
             <Button color="primary" size="sm" onClick={() => this.setState({userMovedMap: false})}>
               <i className="material-icons">my_location</i>
             </Button>
@@ -79,9 +79,12 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
   refreshMap() {
     const {currentPosition} = this.state;
     const {requestLocation, extraLayers} = this.props;
+    // @ts-ignore
+    const latlng = currentPosition ? [currentPosition.lat, currentPosition.lon] : settings.defaultLocation;
 
     if (!this.leafletMap) {
       this.leafletMap = L.map('leafletMap');
+      this.leafletMap.setView(latlng, 18);
       L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'RouteMapModal data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
                      '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -105,8 +108,6 @@ export default class Map extends React.Component<MapProps, {currentPosition: nul
       this.markers.selectedPosition = undefined;
     }
 
-    // @ts-ignore
-    const latlng = currentPosition ? [currentPosition.lat, currentPosition.lon] : settings.defaultLocation;
     if (!this.state.userMovedMap) this.leafletMap.setView(latlng, 18);
 
     if (currentPosition) {
