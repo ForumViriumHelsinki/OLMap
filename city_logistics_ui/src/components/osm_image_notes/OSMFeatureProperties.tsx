@@ -69,7 +69,7 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
             }
           </p>
           {(pkFeature === editingFeature) ?
-            <Form schema={schema} className="compact"
+            <Form schema={schema} uiSchema={this.getUISchema()} className="compact"
                   formData={pkFeature}
                   onSubmit={this.onSubmit}>
               <Button size="sm" color="primary" type="submit" className="btn-compact pl-4 pr-4 mr-2">Save</Button>
@@ -152,5 +152,20 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
     // @ts-ignore
     Promise.resolve(onSubmit({[fieldName]: osmImageNote[fieldName]}))
       .then(() => this.setState({editingFeature: undefined}));
+  }
+
+  private getUISchema() {
+    const {schema} = this.props;
+    const uiSchema = Object.fromEntries(
+      Object.entries(schema.properties)
+        .filter(([field, spec]) =>
+          // @ts-ignore
+          String(spec.type) == String(["boolean", "null"]))
+        .map(([field, spec]) => {
+          // @ts-ignore
+          spec.enum = [true, false];
+          return [field, {"ui:widget": "select"}]
+        }));
+    return uiSchema
   }
 }

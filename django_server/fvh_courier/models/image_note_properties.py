@@ -54,8 +54,8 @@ class Lockable(models.Model):
     access = choices_field(accesses)
     width = dimension_field()
     height = dimension_field()
-    buzzer = models.BooleanField(default=False)
-    keycode = models.BooleanField(default=False)
+    buzzer = models.BooleanField(blank=True, null=True)
+    keycode = models.BooleanField(blank=True, null=True)
     phone = models.CharField(blank=True, max_length=32)
     opening_hours = models.CharField(blank=True, max_length=64)
 
@@ -76,14 +76,14 @@ class Entrance(Lockable, BaseAddress):
 
     types = ['main', 'secondary', 'service', 'staircase']
     type = choices_field(types)
-    wheelchair = models.BooleanField(default=False)
+    wheelchair = models.BooleanField(blank=True, null=True)
     loadingdock = models.BooleanField(default=False)
 
     def as_osm_tags(self):
         return dict(super().as_osm_tags(), **filter_dict({
             'entrance': self.type or 'yes',
             'door': 'loadingdock' if self.loadingdock else None,
-            'wheelchair': 'yes' if self.wheelchair else None
+            'wheelchair': bool_to_osm(self.wheelchair)
         }))
 
 
