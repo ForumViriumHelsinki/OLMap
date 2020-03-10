@@ -121,8 +121,8 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
                 'title': 'Access'},
             'width': dict(dimension_field, title='Width'),
             'height': dict(dimension_field, title='Height'),
-            'buzzer': {'type': 'boolean', 'title': 'Buzzer'},
-            'keycode': {'type': 'boolean', 'title': 'Keycode'},
+            'buzzer': {'type': ['boolean', 'null'], 'title': 'Buzzer'},
+            'keycode': {'type': ['boolean', 'null'], 'title': 'Keycode'},
             'phone': {'type': 'string', 'maxLength': 32, 'title': 'Phone'},
             'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours'},
         }
@@ -135,7 +135,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
                         'type': 'string',
                         'enum': ['', 'main', 'secondary', 'service', 'staircase'],
                         'title': 'Type'},
-                    'wheelchair': {'type': 'boolean', 'title': 'Wheelchair'},
+                    'wheelchair': {'type': ['boolean', 'null'], 'title': 'Wheelchair'},
                     'loadingdock': {'type': 'boolean', 'title': 'Loadingdock'},
                 })},
 
