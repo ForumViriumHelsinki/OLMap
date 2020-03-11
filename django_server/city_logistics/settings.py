@@ -41,7 +41,11 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
     'rest_auth',
+    'rest_auth.registration',
     'city_logistics.apps.AdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -197,6 +201,10 @@ if not DEBUG:
     )
 
 DATETIME_FORMAT = "Y-m-d H:i:s"
+
+SITE_ID = 1
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 try:
     from .local_settings import *  # noqa

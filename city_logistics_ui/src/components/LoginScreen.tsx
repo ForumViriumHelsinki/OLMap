@@ -1,62 +1,50 @@
-import React, {FormEvent} from 'react';
-import sessionRequest, {login, logout} from "sessionRequest";
-import ErrorAlert from "util_components/ErrorAlert";
-import Component from "util_components/Component";
-import {loginUrl} from "urls";
+import React from 'react';
+import {loginUrl, registerUrl} from "urls";
+import LoginForm from "util_components/LoginForm";
+import RegisterForm from "util_components/RegisterForm";
 
 type func = () => any;
 
-export default class LoginScreen extends Component<{onLogin: func}> {
-  static bindMethods = ['submit'];
+type LoginScreenProps = { onLogin: func };
+type LoginScreenState = { mode: 'login' | 'register' };
 
-  state = {username: '', password: '', error: false};
+export default class LoginScreen extends React.Component<LoginScreenProps, LoginScreenState> {
+  state: LoginScreenState = {mode: 'login'};
 
   render() {
+    const {onLogin} = this.props;
+    const {mode} = this.state;
+
     return (
       <div className="container">
         <div className="text-center">
           <img className="w-50" src="images/FORUM_VIRIUM_logo_orange.png" alt="logo"/>
           <h3>Open Logistics Map</h3>
-          <p className="lead text-primary">Sign in</p>
+          <p className="lead">
+            {mode == 'login' ?
+              <>
+                <span className="text-primary">Sign in</span> or{' '}
+                <button className="btn btn-outline-primary"
+                        onClick={() => this.setState({mode: 'register'})}>
+                  Register
+                </button>
+              </>
+            :
+              <>
+                <button className="btn btn-outline-primary"
+                        onClick={() => this.setState({mode: 'login'})}>
+                  Sign in
+                </button> or{' '}
+                <span className="text-primary">Register</span>
+              </>
+            }
+          </p>
         </div>
-        <form onSubmit={this.submit}>
-          <ErrorAlert status={this.state.error} message="Login failed. Please try again."/>
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input type="test" className="form-control" name="username"
-                   defaultValue={this.state.username}
-                   onBlur={this.focusPassword}
-                   autoFocus={true}/>
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input type="password" className="form-control" name="password" id="password" defaultValue={this.state.password}/>
-          </div>
-          <button type="submit" className="btn btn-primary">Submit</button>
-        </form>
+        {mode == 'login' ?
+          <LoginForm loginUrl={loginUrl} onLogin={onLogin}/>
+        : <RegisterForm url={registerUrl} loginUrl={loginUrl} onLogin={onLogin}/>
+        }
       </div>
     );
-  }
-
-  focusPassword() {
-    const input = document.getElementById('password');
-    if (input) input.focus();
-  }
-
-  submit(e: any) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    let data = {};
-    // @ts-ignore
-    formData.forEach((value: any, key: string) => data[key] = value);
-    this.setState({error: false, ...data});
-    logout();
-    sessionRequest(loginUrl, {method: 'POST', data: data }).then((response) => {
-      if (response.status == 200) response.json().then((data) => {
-        login(data.key);
-        this.props.onLogin();
-      });
-      else this.setState({error: true});
-    })
   }
 }
