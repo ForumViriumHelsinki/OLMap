@@ -1,4 +1,4 @@
-import React, {CSSProperties} from 'react';
+import React from 'react';
 
 // @ts-ignore
 import * as L from 'leaflet';
@@ -12,6 +12,7 @@ import Modal from "util_components/Modal";
 import ErrorAlert from "util_components/ErrorAlert";
 
 import 'components/osm_image_notes/OSMImageNotes.css';
+
 import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
 import {LocationTuple, OSMFeature} from "util_components/types";
 import Component from "util_components/Component";
@@ -19,6 +20,7 @@ import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteRe
 import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
 import Icon from "util_components/Icon";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
+import ZoomableImage from "util_components/ZoomableImage";
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
 const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
@@ -98,10 +100,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
           <OSMImageNoteReviewActions imageNote={selectedNote} onReviewed={this.refresh}/>
         }
         <ErrorAlert status={error} message="Saving features failed. Try again perhaps?"/>
-        {selectedNote.image &&
-          <img src={selectedNote.image} className="noteImage"
-               onMouseMove={this.positionImage} onMouseOut={this.restoreImage} onClick={this.toggleImgZoom}/>
-        }
+        {selectedNote.image && <ZoomableImage src={selectedNote.image} className="noteImage"/>}
         <>
           <p className="m-2 ml-3"><strong>Tags:</strong></p>
           <p className="m-2 ml-3">
@@ -129,7 +128,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
             preselectedFeatureIds={selectedNote.osm_features}
             onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})} />
         </div>
-        {osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
+        {user.isReviewer && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
           <div key={osmFeatureName} className="mr-2 ml-3">
               <OSMFeatureProperties
                 schema={osmFeatureProperties[osmFeatureName]}
@@ -142,39 +141,6 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
       </Modal>
     )
   }
-
-  toggleImgZoom = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-    const imageZoom = !this.state.imageZoom;
-    const target = e.target as HTMLElement;
-    this.setState({imageZoom});
-    if (imageZoom) {
-      target.classList.add('zoom')
-      this.positionImage(e, true);
-    } else this.restoreImage(e);
-  };
-
-  positionImage = (e: React.MouseEvent<HTMLImageElement, MouseEvent>, force?: boolean) => {
-    if (!(force || this.state.imageZoom)) return;
-
-    const target = e.target as HTMLImageElement;
-    const {width, height, naturalWidth, naturalHeight} = target;
-    const imgAreaRatio = width / height;
-    const imgRatio = naturalWidth / naturalHeight;
-    const xScale = imgRatio / imgAreaRatio;
-    const [shownWidth, offset] = (imgAreaRatio > imgRatio) ? [width * xScale, width * (1 - xScale) / 2] : [width, 0];
-    const {offsetX, offsetY} = e.nativeEvent;
-    const scaledX = offsetX - offset;
-    const posX = -(scaledX / shownWidth) * naturalWidth + width / 2;
-    const posY = -(offsetY / height) * naturalHeight + height / 2;
-    target.style.objectPosition = `${posX}px ${posY}px`
-  };
-
-  restoreImage = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
-    const target = e.target as HTMLElement;
-    target.classList.remove('zoom')
-    target.style.objectPosition = '';
-    this.setState({imageZoom: false});
-  };
 
   private refresh() {
     this.setState(initialState);

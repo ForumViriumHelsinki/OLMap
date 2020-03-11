@@ -39,7 +39,3 @@ img.noteImage {
     margin: 0 auto;
     display: block
 }
-
-img.noteImage.zoom {
-    object-fit: none;
-}
