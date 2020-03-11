@@ -170,6 +170,38 @@ class OSMImageNotesTests(FVHAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, [])
 
+    def test_vote_on_osm_image_note(self):
+        # Given that a user is signed in
+        courier = self.create_and_login_courier()
+
+        # And given a successfully created OSM image note
+        note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188')
+
+        # When requesting to upvote the OSM image note over ReST
+        url = reverse('osmimagenote-upvote', kwargs={'pk': note.id})
+        response = self.client.put(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And the upvote is created:
+        note = models.OSMImageNote.objects.get()
+        self.assertSetEqual(set(response.json()['upvotes']), set([courier.id]))
+        self.assertSetEqual(set(note.upvotes.values_list('user_id', flat=True)), set([courier.id]))
+
+        # And when subsequently requesting to downvote the note
+        url = reverse('osmimagenote-downvote', kwargs={'pk': note.id})
+        response = self.client.put(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And the votes have been changed:
+        note = models.OSMImageNote.objects.get()
+        self.assertSetEqual(set(note.upvotes.values_list('user_id', flat=True)), set())
+        self.assertSetEqual(set(response.json()['downvotes']), set([courier.id]))
+        self.assertSetEqual(set(note.downvotes.values_list('user_id', flat=True)), set([courier.id]))
+
     def test_osm_image_notes_as_geojson(self):
         # Given that a user is signed in
         courier = self.create_and_login_courier()

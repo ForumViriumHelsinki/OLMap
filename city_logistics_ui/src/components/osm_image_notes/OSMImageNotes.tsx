@@ -21,6 +21,7 @@ import OSMFeatureProperties from "components/osm_image_notes/OSMFeaturePropertie
 import Icon from "util_components/Icon";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 import ZoomableImage from "util_components/ZoomableImage";
+import OSMImageNoteVotes from "components/osm_image_notes/OSMImageNoteVotes";
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
 const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
@@ -38,15 +39,13 @@ type OSMImageNotesState = {
   error: boolean
   osmFeatureProperties?: OSMFeatureProps,
   nearbyFeatures: OSMFeature[],
-  imageZoom: boolean
 }
 
 const initialState: OSMImageNotesState = {
   readOnly: true,
   error: false,
   selectedNote: undefined,
-  nearbyFeatures: [],
-  imageZoom: false
+  nearbyFeatures: []
 };
 
 export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImageNotesState> {
@@ -99,6 +98,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
         {user.is_reviewer &&
           <OSMImageNoteReviewActions imageNote={selectedNote} onReviewed={this.refresh}/>
         }
+        <OSMImageNoteVotes osmImageNote={selectedNote} onUpdate={this.noteUpdated}/>
         <ErrorAlert status={error} message="Saving features failed. Try again perhaps?"/>
         {selectedNote.image && <ZoomableImage src={selectedNote.image} className="noteImage"/>}
         <>
@@ -159,12 +159,17 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     sessionRequest(url, {method: 'PATCH', data})
     .then((response) => {
       if (response.status < 300) response.json().then((note: OSMImageNote) => {
-        Object.assign(selectedNote, note);
-        this.setState({error: false, selectedNote, ...(nextState || {})});
+        this.noteUpdated(note, nextState);
       });
       else this.setState({error: true});
     })
   }
+
+  noteUpdated = (note: OSMImageNote, nextState?: any) => {
+    const {selectedNote} = this.state;
+    Object.assign(selectedNote, note);
+    this.setState({error: false, selectedNote, ...(nextState || {})});
+  };
 
   private getMapLayer() {
     const {user} = this.context;

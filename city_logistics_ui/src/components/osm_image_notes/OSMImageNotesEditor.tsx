@@ -80,10 +80,6 @@ export default class OSMImageNotesEditor extends Component<{}> {
         <input name="image" id="image" className="d-none" type="file"
                accept="image/*" capture="environment"
                onChange={this.onImageCaptured}/>
-        <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
-                       onOSMFeaturePropertiesLoaded={(osmFeatureProperties) =>
-                         this.setState({osmFeatureProperties})}
-                       ref={this.imageNotesRef} myNotesOnly={myNotesOnly}/>
         {imageError &&
           <Modal title="Image error" onClose={() => this.setState({imageError: false})}>
             There was an error uploading the image. Try again maybe?
@@ -168,6 +164,10 @@ export default class OSMImageNotesEditor extends Component<{}> {
       <Map requestLocation={status == 'locating'}
            onLocationSelected={this.onLocationSelected}
            extraLayers={osmImageNotesLayer && [osmImageNotesLayer]}/>
+      <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
+                     onOSMFeaturePropertiesLoaded={(osmFeatureProperties) =>
+                       this.setState({osmFeatureProperties})}
+                     ref={this.imageNotesRef} myNotesOnly={myNotesOnly}/>
     </div>;
   }
 

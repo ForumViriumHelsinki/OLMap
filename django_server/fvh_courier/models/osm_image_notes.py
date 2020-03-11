@@ -87,3 +87,19 @@ class ImageNoteTag(models.Model):
 
     def __str__(self):
         return self.tag or (self.id and f'ImageNoteTag({self.id})') or 'New ImageNoteTag'
+
+
+class ImageNoteUpvote(models.Model):
+    user = models.ForeignKey(User, related_name='image_note_upvotes', on_delete=models.CASCADE)
+    image_note = models.ForeignKey(OSMImageNote, related_name='upvotes', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.id and f'ImageNoteUpvote({self.id})' or 'New ImageNoteUpvote'
+
+
+class ImageNoteDownvote(models.Model):
+    user = models.ForeignKey(User, related_name='image_note_downvotes', on_delete=models.CASCADE)
+    image_note = models.ForeignKey(OSMImageNote, related_name='downvotes', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.id and f'ImageNoteDownvote({self.id})' or 'New ImageNoteDownvote'

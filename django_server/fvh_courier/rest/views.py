@@ -111,7 +111,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     serializer_class = OSMImageNoteSerializer
     queryset = prefetch_properties(
         models.OSMImageNote.objects.filter(visible=True)
-        .prefetch_related('tags', 'osm_features'))
+        .prefetch_related('tags', 'osm_features', 'upvotes', 'downvotes'))
 
     def create(self, request, *args, **kwargs):
         self.ensure_features(request)
@@ -154,6 +154,22 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         osm_image_note.hidden_reason = request.data.get('hidden_reason', '')
         osm_image_note.save()
         return Response('OK')
+
+    @action(methods=['PUT'], detail=True)
+    def upvote(self, request, *args, **kwargs):
+        osm_image_note = self.get_object()
+        osm_image_note.upvotes.get_or_create(user=request.user)
+        osm_image_note.downvotes.filter(user=request.user).delete()
+        serializer = self.get_serializer(osm_image_note)
+        return Response(serializer.data)
+
+    @action(methods=['PUT'], detail=True)
+    def downvote(self, request, *args, **kwargs):
+        osm_image_note = self.get_object()
+        osm_image_note.downvotes.get_or_create(user=request.user)
+        osm_image_note.upvotes.filter(user=request.user).delete()
+        serializer = self.get_serializer(osm_image_note)
+        return Response(serializer.data)
 
     @action(detail=False, methods=['get'])
     def property_schemas(self, request, pk=None):

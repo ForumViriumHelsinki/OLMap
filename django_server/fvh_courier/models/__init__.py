@@ -1,4 +1,6 @@
-from .osm_image_notes import OSMFeature, OSMImageNote, ImageNoteTag, upload_osm_images_to
+from .osm_image_notes import (
+    OSMFeature, OSMImageNote, ImageNoteTag, upload_osm_images_to,
+    ImageNoteUpvote, ImageNoteDownvote)
 from .package_models import Package, PackageSMS, Address
 from .phone_number import PhoneNumber
 from .user_location import UserLocation
