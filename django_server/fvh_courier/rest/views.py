@@ -160,6 +160,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         osm_image_note = self.get_object()
         osm_image_note.upvotes.get_or_create(user=request.user)
         osm_image_note.downvotes.filter(user=request.user).delete()
+        osm_image_note = self.get_object() # Reload from db
         serializer = self.get_serializer(osm_image_note)
         return Response(serializer.data)
 
@@ -168,6 +169,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         osm_image_note = self.get_object()
         osm_image_note.downvotes.get_or_create(user=request.user)
         osm_image_note.upvotes.filter(user=request.user).delete()
+        osm_image_note = self.get_object() # Reload from db
         serializer = self.get_serializer(osm_image_note)
         return Response(serializer.data)
 
