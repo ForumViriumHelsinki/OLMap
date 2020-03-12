@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
 from django.conf import settings
-from fvh_courier.models import Package, Address, PhoneNumber, PackageSMS, OSMImageNote
+from fvh_courier.models import Package, Address, PhoneNumber, PackageSMS, OSMImageNote, OSMImageNoteComment
 
 
 class PackageSMSInline(admin.TabularInline):
@@ -94,3 +94,11 @@ class OSMImageNoteAdmin(admin.ModelAdmin):
     def osm_edit(self, location):
         url = f'https://www.openstreetmap.org/edit#map=23/{location.lat}/{location.lon}'
         return mark_safe(f'<a target="_osm_edit" href="{url}">edit</a>')
+
+
+@admin.register(OSMImageNoteComment)
+class OSMImageNoteCommentAdmin(admin.ModelAdmin):
+    list_display = ['comment', 'image_note', 'user', 'created_at']
+    search_fields = ['comment']
+    list_filter = ['user']
+    date_hierarchy = 'created_at'
