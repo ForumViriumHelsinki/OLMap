@@ -22,6 +22,7 @@ import Icon from "util_components/Icon";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 import ZoomableImage from "util_components/ZoomableImage";
 import OSMImageNoteVotes from "components/osm_image_notes/OSMImageNoteVotes";
+import OSMImageNoteComments from "components/osm_image_notes/OSMImageNoteComments";
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
 const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
@@ -138,6 +139,15 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
                 onSubmit={(data) => this.updateSelectedNote(data)}/>
           </div>
         )}
+        <div className="m-2 ml-3">
+          <p>
+            <strong>Comments ({(selectedNote.comments || []).length}) </strong>
+            <button className="btn btn-light btn-sm btn-compact float-right" onClick={this.refreshNote}>
+              <Icon icon={'refresh'}/>
+            </button>
+          </p>
+          <OSMImageNoteComments osmImageNote={selectedNote} refreshNote={this.refreshNote}/>
+        </div>
       </Modal>
     )
   }
@@ -170,6 +180,14 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     Object.assign(selectedNote, note);
     this.setState({error: false, selectedNote, ...(nextState || {})});
   };
+
+  refreshNote = () => {
+    const {selectedNote} = this.state;
+    if (!selectedNote) return;
+    sessionRequest(osmImageNoteUrl(selectedNote.id as  number))
+    .then(response => response.json())
+    .then((newNote: OSMImageNote) => this.noteUpdated(newNote))
+  }
 
   private getMapLayer() {
     const {user} = this.context;

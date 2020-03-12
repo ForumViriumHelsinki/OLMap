@@ -202,6 +202,40 @@ class OSMImageNotesTests(FVHAPITestCase):
         self.assertSetEqual(set(response.json()['downvotes']), set([courier.id]))
         self.assertSetEqual(set(note.downvotes.values_list('user_id', flat=True)), set([courier.id]))
 
+    def test_comment_on_osm_image_note(self):
+        # Given that a user is signed in
+        courier = self.create_and_login_courier()
+
+        # And given a successfully created OSM image note
+        note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188')
+
+        # When requesting to comment the OSM image note over ReST
+        url = reverse('osmimagenotecomment-list')
+        response = self.client.post(url, {'image_note': note.id, 'comment': 'nice!'})
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # And the comment is created:
+        note = models.OSMImageNote.objects.get()
+        self.assertSetEqual(set(note.comments.values_list('comment', flat=True)), set(['nice!']))
+
+        # And it is included with the note when fetched over ReST
+        url = reverse('osmimagenote-detail', kwargs={'pk': note.id})
+        response = self.client.get(url)
+        self.assertEqual(response.json()['comments'][0]['comment'], 'nice!')
+
+        # And when subsequently requesting to delete the note
+        url = reverse('osmimagenotecomment-detail', kwargs={'pk': note.comments.first().id})
+        response = self.client.delete(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # And the comment is deleted:
+        note = models.OSMImageNote.objects.get()
+        self.assertSetEqual(set(note.comments.values_list('comment', flat=True)), set([]))
+
     def test_osm_image_notes_as_geojson(self):
         # Given that a user is signed in
         courier = self.create_and_login_courier()

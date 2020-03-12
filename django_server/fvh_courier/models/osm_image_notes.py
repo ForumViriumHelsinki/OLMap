@@ -103,3 +103,16 @@ class ImageNoteDownvote(models.Model):
 
     def __str__(self):
         return self.id and f'ImageNoteDownvote({self.id})' or 'New ImageNoteDownvote'
+
+
+class OSMImageNoteComment(models.Model):
+    user = models.ForeignKey(User, related_name='image_note_comments', on_delete=models.CASCADE)
+    image_note = models.ForeignKey(OSMImageNote, related_name='comments', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    comment = models.TextField()
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return self.comment

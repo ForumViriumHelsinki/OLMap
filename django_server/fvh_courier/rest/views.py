@@ -8,7 +8,9 @@ from drf_jsonschema import to_jsonschema
 from fvh_courier import models
 from fvh_courier.models.image_note_properties import prefetch_properties
 
-from .serializers import PackageSerializer, OutgoingPackageSerializer, LocationSerializer, OSMImageNoteSerializer
+from .serializers import (
+    PackageSerializer, OutgoingPackageSerializer, LocationSerializer,
+    OSMImageNoteSerializer, OSMImageNoteCommentSerializer)
 from .permissions import IsCourier, IsReviewer
 
 
@@ -111,7 +113,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     serializer_class = OSMImageNoteSerializer
     queryset = prefetch_properties(
         models.OSMImageNote.objects.filter(visible=True)
-        .prefetch_related('tags', 'osm_features', 'upvotes', 'downvotes'))
+        .prefetch_related('tags', 'osm_features', 'upvotes', 'downvotes', 'comments'))
 
     def create(self, request, *args, **kwargs):
         self.ensure_features(request)
@@ -180,6 +182,18 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
             prop_type.__name__,
             to_jsonschema(serializer.fields[prop_type.__name__.lower() + '_set'].child)
         ) for prop_type in models.image_note_property_types))
+
+
+class OSMImageNoteCommentsViewSet(viewsets.ModelViewSet):
+    queryset = models.OSMImageNoteComment.objects.all().select_related('user')
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OSMImageNoteCommentSerializer
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        return serializer.save(user=self.request.user)
 
 
 class OSMImageNotesGeoJSON(ListAPIView):

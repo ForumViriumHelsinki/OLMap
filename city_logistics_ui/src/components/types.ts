@@ -41,6 +41,13 @@ export type packageAction = 'pickup' | 'delivery';
 
 type userId = number
 
+export type OSMImageNoteComment = {
+    created_at: string,
+    comment: string,
+    user: string,
+    id: number
+}
+
 export type OSMImageNote = {
     id?: number,
     image?: any,
@@ -52,7 +59,8 @@ export type OSMImageNote = {
     tags?: string[],
     created_by?: number,
     upvotes?: userId[],
-    downvotes?: userId[]
+    downvotes?: userId[],
+    comments?: OSMImageNoteComment[]
 };
 
 export type JSONSchema = any

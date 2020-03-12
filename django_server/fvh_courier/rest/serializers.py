@@ -127,16 +127,25 @@ class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
         return super().__new__(mcs, name, bases, attrs)
 
 
+class OSMImageNoteCommentSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = models.OSMImageNoteComment
+        fields = '__all__'
+
+
 class OSMImageNoteSerializer(serializers.ModelSerializer, metaclass=OSMImageNoteSerializerMeta):
     tags = CreateableSlugRelatedField(
         many=True, required=False, slug_field='tag', queryset=models.ImageNoteTag.objects.all())
     upvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
     downvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
+    comments = OSMImageNoteCommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.OSMImageNote
         fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed', 'tags',
-                   'created_by', 'upvotes', 'downvotes'] +
+                   'created_by', 'upvotes', 'downvotes', 'comments'] +
                   [manager_name(prop_type) for prop_type in models.image_note_property_types])
 
     def to_representation(self, instance):

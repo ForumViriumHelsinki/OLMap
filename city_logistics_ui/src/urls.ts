@@ -20,5 +20,6 @@ export const acceptOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id
 export const rejectOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/hide_note/`;
 export const upvoteOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/upvote/`;
 export const downvoteOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/downvote/`;
+export const osmImageNoteCommentsUrl = `/rest/osm_image_note_comments/`;
 
 export const osmFeaturePropertiesUrl = "/rest/osm_image_notes/property_schemas/";
