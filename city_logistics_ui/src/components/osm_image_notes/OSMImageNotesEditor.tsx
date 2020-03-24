@@ -13,7 +13,7 @@ import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
 import {OSMFeatureProps, OSMImageNote} from "components/types";
 import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
-import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
+import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
 import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 

@@ -10,6 +10,7 @@ from .base import BaseLocation
 
 class OSMFeature(models.Model):
     id = models.BigIntegerField(primary_key=True)
+    associated_entrances = models.ManyToManyField('OSMFeature', related_name='associated_features', blank=True)
 
     class Meta:
         ordering = ['id']

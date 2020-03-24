@@ -236,6 +236,32 @@ class OSMImageNotesTests(FVHAPITestCase):
         note = models.OSMImageNote.objects.get()
         self.assertSetEqual(set(note.comments.values_list('comment', flat=True)), set([]))
 
+    def test_associate_entrance(self):
+        # Given that a user is signed in
+        courier = self.create_and_login_courier()
+
+        # When requesting to associate an entrance with businesses over ReST, giving OSM ids for the entrance &
+        # businesses:
+        url = reverse('osmentrance-detail', kwargs={'pk': 12345678})
+        response = self.client.patch(url, {'associated_features': [23456789, 98765432]}, format='json')
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And the entrance, businesses & relations are created in the db:
+        entrance = models.OSMFeature.objects.get(id=12345678)
+        self.assertSetEqual(set(entrance.associated_features.values_list('id', flat=True)), {23456789, 98765432})
+
+        # And when subsequently requesting the associated entrances for any of the associated features over ReST:
+        url = reverse('osmfeature-detail', kwargs={'pk': 23456789})
+        response = self.client.get(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And the entrance is included in the response:
+        self.assertEqual(response.json()['associated_entrances'][0], 12345678)
+
     def test_osm_image_notes_as_geojson(self):
         # Given that a user is signed in
         courier = self.create_and_login_courier()

@@ -4,7 +4,8 @@ from rest_framework import routers
 from .views import (
     AvailablePackagesViewSet, MyPackagesViewSet, OutgoingPackagesViewSet,
     PackagesByUUIDReadOnlyViewSet, MyLocationView,
-    OSMImageNotesViewSet, OSMImageNoteCommentsViewSet, OSMImageNotesGeoJSON)
+    OSMImageNotesViewSet, OSMImageNoteCommentsViewSet, OSMImageNotesGeoJSON,
+    OSMEntrancesViewSet, OSMFeaturesViewSet)
 
 
 router = routers.DefaultRouter()
@@ -14,6 +15,8 @@ router.register('outgoing_packages', OutgoingPackagesViewSet, 'outgoing_package'
 router.register('packages', PackagesByUUIDReadOnlyViewSet, 'uuid_package')
 router.register('osm_image_notes', OSMImageNotesViewSet)
 router.register('osm_image_note_comments', OSMImageNoteCommentsViewSet)
+router.register('osm_entrances', OSMEntrancesViewSet, basename='osmentrance')
+router.register('osm_features', OSMFeaturesViewSet)
 
 urlpatterns = [
     path('my_location/', MyLocationView.as_view(), name='user_location'),

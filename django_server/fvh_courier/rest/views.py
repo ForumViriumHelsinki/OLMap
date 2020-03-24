@@ -10,7 +10,7 @@ from fvh_courier.models.image_note_properties import prefetch_properties
 
 from .serializers import (
     PackageSerializer, OutgoingPackageSerializer, LocationSerializer,
-    OSMImageNoteSerializer, OSMImageNoteCommentSerializer)
+    OSMImageNoteSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer, OSMFeatureSerializer)
 from .permissions import IsCourier, IsReviewer
 
 
@@ -194,6 +194,26 @@ class OSMImageNoteCommentsViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
+
+
+class OSMEntrancesViewSet(viewsets.ModelViewSet):
+    queryset = models.OSMFeature.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OSMEntranceSerializer
+
+    def update(self, request, *args, **kwargs):
+        self.ensure_features(request)
+        return super().update(request, *args, **kwargs)
+
+    def ensure_features(self, request):
+        for id in request.data.get('associated_features', []) + [self.kwargs['pk']]:
+            models.OSMFeature.objects.get_or_create(id=id)
+
+
+class OSMFeaturesViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.OSMFeature.objects.all()
+    permission_classes = [permissions.AllowAny]
+    serializer_class = OSMFeatureSerializer
 
 
 class OSMImageNotesGeoJSON(ListAPIView):

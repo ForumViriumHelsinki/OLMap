@@ -189,3 +189,15 @@ class OSMImageNoteSerializer(serializers.ModelSerializer, metaclass=OSMImageNote
         self.save_tags(instance, validated_data.get('tags', None))
         self.save_related_properties(instance, relateds)
         return super().update(instance, validated_data)
+
+
+class OSMFeatureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.OSMFeature
+        fields = ['id', 'associated_entrances']
+
+
+class OSMEntranceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.OSMFeature
+        fields = ['id', 'associated_features']

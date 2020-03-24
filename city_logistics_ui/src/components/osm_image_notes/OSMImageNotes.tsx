@@ -13,8 +13,8 @@ import ErrorAlert from "util_components/ErrorAlert";
 
 import 'components/osm_image_notes/OSMImageNotes.css';
 
-import OSMFeaturesSelection from "util_components/OSMFeaturesSelection";
-import {LocationTuple, OSMFeature} from "util_components/types";
+import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
+import {LocationTuple} from "util_components/types";
 import Component from "util_components/Component";
 import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
 import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
@@ -23,6 +23,8 @@ import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 import ZoomableImage from "util_components/ZoomableImage";
 import OSMImageNoteVotes from "components/osm_image_notes/OSMImageNoteVotes";
 import OSMImageNoteComments from "components/osm_image_notes/OSMImageNoteComments";
+import AssociateEntranceModal from "components/osm_image_notes/AssociateEntranceModal";
+import {OSMFeature} from "util_components/osm/types";
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
 const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
@@ -40,6 +42,7 @@ type OSMImageNotesState = {
   error: boolean
   osmFeatureProperties?: OSMFeatureProps,
   nearbyFeatures: OSMFeature[],
+  linkingEntrance?: OSMFeature
 }
 
 const initialState: OSMImageNotesState = {
@@ -83,7 +86,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
   }
 
   render() {
-    const {selectedNote, readOnly, error, osmFeatureProperties, nearbyFeatures} = this.state;
+    const {selectedNote, readOnly, error, osmFeatureProperties, nearbyFeatures, linkingEntrance} = this.state;
     const {user} = this.context;
     if (!selectedNote) return '';
 
@@ -92,8 +95,12 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     const tags = selectedNote.tags || [];
 
     const editable = user.is_reviewer && readOnly;
-    return (
-      <Modal title={selectedNote.comment || 'No comment.'}
+    const relatedFeatures =
+      selectedNote.osm_features
+        ? nearbyFeatures.filter(f => selectedNote.osm_features.includes(f.id))
+        : nearbyFeatures;
+
+    return <Modal title={selectedNote.comment || 'No comment.'}
              className={selectedNote.image ? 'modal-xl' : 'modal-dialog-centered'}
              onClose={() => this.setState(initialState)}>
         {user.is_reviewer &&
@@ -127,7 +134,15 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
             location={location} onChange={this.onFeaturesSelected} readOnly={readOnly}
             maxHeight={null}
             preselectedFeatureIds={selectedNote.osm_features}
-            onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})} />
+            onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
+            featureActions={
+              (feature: OSMFeature) =>
+                feature.tags.entrance && selectedNote?.osm_features.includes(feature.id) &&
+                  <button className="btn btn-light btn-compact float-right"
+                          onClick={(e) => this.linkEntrance(e, feature)}>
+                    <Icon icon="link"/>
+                  </button>
+            }/>
         </div>
         {user.isReviewer && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
           <div key={osmFeatureName} className="mr-2 ml-3">
@@ -148,8 +163,12 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
           </p>
           <OSMImageNoteComments osmImageNote={selectedNote} refreshNote={this.refreshNote}/>
         </div>
-      </Modal>
-    )
+
+        {linkingEntrance && <AssociateEntranceModal
+          entrance={linkingEntrance}
+          nearbyFeatures={relatedFeatures}
+          onClose={() => this.setState({linkingEntrance: undefined})}/>}
+    </Modal>
   }
 
   private refresh() {
@@ -237,5 +256,10 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     const tags = selectedNote.tags || [];
     const allTags = Object.keys(osmFeatureProperties || {});
     return allTags.filter(tag => tags.includes(tag));
+  }
+
+  linkEntrance(e: React.MouseEvent, entrance: OSMFeature) {
+    e.stopPropagation();
+    this.setState({linkingEntrance: entrance})
   }
 }

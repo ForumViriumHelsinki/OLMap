@@ -23,3 +23,5 @@ export const downvoteOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${
 export const osmImageNoteCommentsUrl = `/rest/osm_image_note_comments/`;
 
 export const osmFeaturePropertiesUrl = "/rest/osm_image_notes/property_schemas/";
+
+export const osmEntranceUrl = (id: number) => `/rest/osm_entrances/${id}/`;

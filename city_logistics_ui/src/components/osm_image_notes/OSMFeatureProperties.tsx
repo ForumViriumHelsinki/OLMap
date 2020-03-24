@@ -6,7 +6,7 @@ import Form from "react-jsonschema-form";
 import {AppContext, JSONSchema, OSMImageNote} from "components/types";
 // @ts-ignore
 import {Button} from "reactstrap";
-import {OSMFeature} from "util_components/types";
+import {OSMFeature} from "util_components/osm/types";
 
 const valueFromOSMTags: {[tag: string]: (f: OSMFeature) => any} = {
   'street': (f: OSMFeature) => f.tags['addr:street'] || (f.tags.highway && f.tags.name),
