@@ -144,7 +144,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
                   </button>
             }/>
         </div>
-        {user.isReviewer && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
+        {user.is_reviewer && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
           <div key={osmFeatureName} className="mr-2 ml-3">
               <OSMFeatureProperties
                 schema={osmFeatureProperties[osmFeatureName]}
