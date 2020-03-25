@@ -12,7 +12,7 @@ import Toggle from "util_components/Toggle";
 import {OSMFeature, osmFeatureTypes} from "util_components/osm/types";
 
 type sortOption = 'relevance' | 'distance' | 'name';
-const sortOptions: sortOption[] = ['relevance', 'distance', 'name'];
+const sortOptions: sortOption[] = ['distance', 'relevance', 'name'];
 
 type filterOption = 'entrance' | 'place' | 'address' | 'street' | 'barrier';
 const filterOptions: filterOption[] = ['entrance', 'place', 'address', 'street', 'barrier'];
