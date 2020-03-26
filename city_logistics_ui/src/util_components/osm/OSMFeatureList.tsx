@@ -10,6 +10,7 @@ import {ListGroup, ListGroupItem} from "reactstrap";
 import PillsSelection from "util_components/PillsSelection";
 import Toggle from "util_components/Toggle";
 import {OSMFeature, osmFeatureTypes} from "util_components/osm/types";
+import OSMFeatureMapPopup from "util_components/osm/OSMFeatureMapPopup";
 
 type sortOption = 'relevance' | 'distance' | 'name';
 const sortOptions: sortOption[] = ['distance', 'relevance', 'name'];
@@ -36,7 +37,8 @@ type OSMFeatureListProps = {
 
 type OSMFeatureListState = {
   sortBy: sortOption,
-  selectedFilters: filterOption[]
+  selectedFilters: filterOption[],
+  featureMap?: OSMFeature
 }
 
 const initialState: OSMFeatureListState = {
@@ -48,9 +50,9 @@ export default class OSMFeatureList extends React.Component<OSMFeatureListProps,
   state = initialState;
 
   render() {
-    const {sortBy, selectedFilters} = this.state;
+    const {sortBy, selectedFilters, featureMap} = this.state;
     const selectedFeatures = this.selectedFeatures();
-    const {OSMFeatures, selectedFeatureIds, readOnly, featureActions} = this.props;
+    const {OSMFeatures, selectedFeatureIds, readOnly, featureActions, location} = this.props;
 
     return <ListGroup>
       {readOnly ?
@@ -58,6 +60,7 @@ export default class OSMFeatureList extends React.Component<OSMFeatureListProps,
           selectedFeatures.map((osmFeature: any, i) =>
             <ListGroupItem key={i}>
               {featureActions && featureActions(osmFeature)}
+              <OSMFeatureMapPopup osmFeature={osmFeature} location={location}/>
               {this.label(osmFeature)}
             </ListGroupItem>
           )
@@ -85,6 +88,8 @@ export default class OSMFeatureList extends React.Component<OSMFeatureListProps,
             <ListGroupItem key={i} active={selectedFeatureIds.includes(osmFeature.id)}
                            onClick={() => this.toggleSelectedFeature(osmFeature)}>
               {featureActions && featureActions(osmFeature)}
+
+              <OSMFeatureMapPopup osmFeature={osmFeature} location={location}/>
               {this.label(osmFeature)}
             </ListGroupItem>
           )}

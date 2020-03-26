@@ -206,7 +206,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     sessionRequest(osmImageNoteUrl(selectedNote.id as  number))
     .then(response => response.json())
     .then((newNote: OSMImageNote) => this.noteUpdated(newNote))
-  }
+  };
 
   private getMapLayer() {
     const {user} = this.context;

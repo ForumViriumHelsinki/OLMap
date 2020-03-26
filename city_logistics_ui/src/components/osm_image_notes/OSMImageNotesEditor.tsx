@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Map from 'util_components/Map';
+import MyPositionMap from 'util_components/MyPositionMap';
 // @ts-ignore
 import {Button, Spinner} from "reactstrap";
 import Icon from "util_components/Icon";
@@ -161,9 +161,9 @@ export default class OSMImageNotesEditor extends Component<{}> {
             </Modal>,
         }[status]}
       </div>
-      <Map requestLocation={status == 'locating'}
-           onLocationSelected={this.onLocationSelected}
-           extraLayers={osmImageNotesLayer && [osmImageNotesLayer]}/>
+      <MyPositionMap requestLocation={status == 'locating'}
+                     onLocationSelected={this.onLocationSelected}
+                     extraLayers={osmImageNotesLayer && [osmImageNotesLayer]}/>
       <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
                      onOSMFeaturePropertiesLoaded={(osmFeatureProperties) =>
                        this.setState({osmFeatureProperties})}
