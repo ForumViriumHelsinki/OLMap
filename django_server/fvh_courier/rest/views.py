@@ -10,7 +10,8 @@ from fvh_courier.models.image_note_properties import prefetch_properties
 
 from .serializers import (
     PackageSerializer, OutgoingPackageSerializer, LocationSerializer,
-    OSMImageNoteSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer, OSMFeatureSerializer)
+    OSMImageNoteWithPropsSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer,
+    OSMFeatureSerializer, BaseOSMImageNoteSerializer)
 from .permissions import IsCourier, IsReviewer
 
 
@@ -110,7 +111,7 @@ class MyLocationView(RetrieveUpdateDestroyAPIView):
 
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = OSMImageNoteSerializer
+    serializer_class = OSMImageNoteWithPropsSerializer
     queryset = prefetch_properties(
         models.OSMImageNote.objects.filter(visible=True)
         .prefetch_related('tags', 'osm_features', 'upvotes', 'downvotes', 'comments'))
@@ -217,7 +218,7 @@ class OSMFeaturesViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class OSMImageNotesGeoJSON(ListAPIView):
-    serializer_class = OSMImageNoteSerializer
+    serializer_class = BaseOSMImageNoteSerializer
     queryset = models.OSMImageNote.objects.all()
     permission_classes = [permissions.AllowAny]
 

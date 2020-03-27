@@ -118,6 +118,37 @@ class CreateableSlugRelatedField(serializers.SlugRelatedField):
             self.fail('invalid')
 
 
+class OSMImageNoteCommentSerializer(serializers.ModelSerializer):
+    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+
+    class Meta:
+        model = models.OSMImageNoteComment
+        fields = '__all__'
+
+
+class BaseOSMImageNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.OSMImageNote
+        fields = ['id', 'comment', 'image', 'lat', 'lon', 'is_reviewed', 'created_by']
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        return OrderedDict([(key, result[key]) for key in result if result[key] not in [None, []]])
+
+
+class OSMImageNoteSerializer(BaseOSMImageNoteSerializer):
+    tags = CreateableSlugRelatedField(
+        many=True, required=False, slug_field='tag', queryset=models.ImageNoteTag.objects.all())
+    upvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
+    downvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
+    comments = OSMImageNoteCommentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.OSMImageNote
+        fields = ['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed', 'tags',
+                  'created_by', 'upvotes', 'downvotes', 'comments']
+
+
 class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
     def __new__(mcs, name, bases, attrs):
         # Automatically add serializer fields for all image note property types:
@@ -127,30 +158,12 @@ class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
         return super().__new__(mcs, name, bases, attrs)
 
 
-class OSMImageNoteCommentSerializer(serializers.ModelSerializer):
-    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
-
-    class Meta:
-        model = models.OSMImageNoteComment
-        fields = '__all__'
-
-
-class OSMImageNoteSerializer(serializers.ModelSerializer, metaclass=OSMImageNoteSerializerMeta):
-    tags = CreateableSlugRelatedField(
-        many=True, required=False, slug_field='tag', queryset=models.ImageNoteTag.objects.all())
-    upvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
-    downvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
-    comments = OSMImageNoteCommentSerializer(many=True, read_only=True)
-
+class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImageNoteSerializerMeta):
     class Meta:
         model = models.OSMImageNote
         fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed', 'tags',
                    'created_by', 'upvotes', 'downvotes', 'comments'] +
                   [manager_name(prop_type) for prop_type in models.image_note_property_types])
-
-    def to_representation(self, instance):
-        result = super().to_representation(instance)
-        return OrderedDict([(key, result[key]) for key in result if result[key] not in [None, []]])
 
     def create(self, validated_data):
         tags = validated_data.pop('tags', None)
@@ -192,9 +205,11 @@ class OSMImageNoteSerializer(serializers.ModelSerializer, metaclass=OSMImageNote
 
 
 class OSMFeatureSerializer(serializers.ModelSerializer):
+    image_notes = OSMImageNoteSerializer(many=True, read_only=True)
+
     class Meta:
         model = models.OSMFeature
-        fields = ['id', 'associated_entrances']
+        fields = ['id', 'associated_entrances', 'image_notes']
 
 
 class OSMEntranceSerializer(serializers.ModelSerializer):

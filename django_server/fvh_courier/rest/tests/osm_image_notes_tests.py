@@ -97,6 +97,16 @@ class OSMImageNotesTests(FVHAPITestCase):
         note = models.OSMImageNote.objects.get()
         self.assertEqual(note.osm_features.count(), 2)
 
+        # And when subsequently requesting any of the associated features over ReST:
+        url = reverse('osmfeature-detail', kwargs={'pk': 37812542837})
+        response = self.client.get(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And the image note is included in the response:
+        self.assertEqual(response.json()['image_notes'][0]['id'], note.id)
+
     def test_update_osm_image_note_tags(self):
         # Given that a user is signed in
         courier = self.create_and_login_courier()
@@ -292,7 +302,6 @@ class OSMImageNotesTests(FVHAPITestCase):
                     'comment': 'Nice view',
                     'lat': '60.16134702',
                     'lon': '24.94459394',
-                    'osm_features': [3330783754, 3330783778, 3336789583],
                     'is_reviewed': False
                 }
             }]
