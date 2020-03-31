@@ -4,7 +4,9 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 
+from holvi_orders.test_data import holvi_order_webhook_payload
 from .base import FVHAPITestCase
+from fvh_courier import models
 
 
 class OutgoingPackagesTests(FVHAPITestCase):
@@ -48,22 +50,22 @@ class OutgoingPackagesTests(FVHAPITestCase):
             'properties': {
                 'pickup_at': {
                     'type': 'object',
-                    'required': ['lat', 'lon', 'street_address', 'postal_code', 'city', 'country'],
+                    'required': ['street_address', 'postal_code', 'city', 'country'],
                     'title': 'Pickup at'
                 },
                 'deliver_to': {
                     'type': 'object',
-                    'required': ['lat', 'lon', 'street_address', 'postal_code', 'city', 'country'],
+                    'required': ['street_address', 'postal_code', 'city', 'country'],
                     'title': 'Deliver to'
                 },
                 'height': {
-                    'type': 'integer', 'title': 'Height', 'description': 'in cm'},
+                    'type': ['integer', 'null'], 'title': 'Height', 'description': 'in cm'},
                 'width': {
-                    'type': 'integer', 'title': 'Width', 'description': 'in cm'},
+                    'type': ['integer', 'null'], 'title': 'Width', 'description': 'in cm'},
                 'depth': {
-                    'type': 'integer', 'title': 'Depth', 'description': 'in cm'},
+                    'type': ['integer', 'null'], 'title': 'Depth', 'description': 'in cm'},
                 'weight': {
-                    'type': 'string',
+                    'type': ['string', 'null'],
                     'pattern': '^\\-?[0-9]*(\\.[0-9]{1,2})?$',
                     'title': 'Weight',
                     'description': 'in kg'},
@@ -81,7 +83,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
                     'type': 'string', 'format': 'date-time', 'title': 'Latest delivery time'}
             },
             'required': [
-                'pickup_at', 'deliver_to', 'height', 'width', 'depth', 'weight', 'recipient', 'recipient_phone',
+                'pickup_at', 'deliver_to', 'recipient', 'recipient_phone',
                 'earliest_pickup_time', 'latest_pickup_time', 'earliest_delivery_time', 'latest_delivery_time'
             ]
         })
@@ -108,8 +110,8 @@ class OutgoingPackagesTests(FVHAPITestCase):
                     'maxLength': 64,
                     'minLength': 1,
                     'title': 'Country'},
-                'lat': {'type': 'string', 'pattern': '^\\-?[0-9]*(\\.[0-9]{1,8})?$', 'title': 'Lat'},
-                'lon': {'type': 'string', 'pattern': '^\\-?[0-9]*(\\.[0-9]{1,8})?$', 'title': 'Lon'}
+                'lat': {'type': ['string', 'null'], 'pattern': '^\\-?[0-9]*(\\.[0-9]{1,8})?$', 'title': 'Lat'},
+                'lon': {'type': ['string', 'null'], 'pattern': '^\\-?[0-9]*(\\.[0-9]{1,8})?$', 'title': 'Lon'}
             }
         })
 
@@ -169,3 +171,46 @@ class OutgoingPackagesTests(FVHAPITestCase):
         # And it contains the registered package:
         self.assertEqual(len(response.data), 1)
         self.assert_dict_contains(response.data[0], fields)
+
+    def test_outgoing_package_from_holvi_order(self):
+        # Given a valid Holvi webhook payload
+        data = holvi_order_webhook_payload
+
+        # And a token identifying a sender account
+        sender = self.create_sender()
+        models.Address.objects.create(
+            user=sender,
+            street_address="Paradisäppelvägen 123",
+            postal_code="00123",
+            city="Ankeborg",
+            country="Ankerige")
+        webshop = sender.holvi_webshops.create()
+
+        # When POSTing the payload to the holvi order endpoint
+        url = reverse('holvi_order', kwargs={'token': webshop.token})
+        response = self.client.post(url, data, format='json')
+
+        # Then an OK response is received
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # And a new outgoing package is created
+        self.client.force_login(sender)
+        url = reverse('outgoing_package-list')
+        response = self.client.get(url)
+
+        self.assert_dict_contains(response.json()[0], {
+            'pickup_at': {
+                'street_address': 'Paradisäppelvägen 123',
+                'postal_code': '00123',
+                'city': 'Ankeborg',
+                'country': 'Ankerige'},
+            'deliver_to': {
+                'street_address': 'Porthaninkatu 13',
+                'postal_code': '00530',
+                'city': 'Helsinki',
+                'country': 'FI'},
+            'sender': {
+                'first_name': 'Cedrik',
+                'last_name': 'Sender'},
+            'recipient': 'Mark Smith',
+            'recipient_phone': '+35888445544'})

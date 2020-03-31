@@ -27,6 +27,17 @@ class HolviOrder(models.Model):
     create_time = models.DateTimeField(null=True, blank=True)
     paid_time = models.DateTimeField(null=True, blank=True)
 
+    def sender_address(self):
+        return self.shop.sender.address
+
+    def sender(self):
+        return self.shop.sender
+
+    def recipient_str(self):
+        if self.company:
+            return f'{self.firstname} {self.lastname}, {self.company}'
+        return f'{self.firstname} {self.lastname}'
+
 
 class HolviPurchase(models.Model):
     order = models.ForeignKey(HolviOrder, related_name='purchases', on_delete=models.CASCADE)

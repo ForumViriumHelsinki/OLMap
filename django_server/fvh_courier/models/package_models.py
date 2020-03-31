@@ -1,19 +1,26 @@
+import datetime
 import uuid as uuid
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from twilio.rest import Client
 
-from .base import BaseLocation, TimestampedModel
+from holvi_orders.signals import order_received
+from .base import TimestampedModel
 
 
-class Address(BaseLocation):
+class Address(TimestampedModel):
+    user = models.OneToOneField(User, related_name='address', on_delete=models.SET_NULL, null=True)
     street_address = models.CharField(verbose_name=_('street address'), max_length=128)
     postal_code = models.CharField(verbose_name=_('postal code'), max_length=16)
     city = models.CharField(verbose_name=_('city'), max_length=64)
     country = models.CharField(verbose_name=_('country'), max_length=64)
+
+    lat = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True)
+    lon = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True)
 
     class Meta:
         verbose_name = _('address')
@@ -29,11 +36,12 @@ class Package(TimestampedModel):
     deliver_to = models.ForeignKey(Address, verbose_name=_('destination'), related_name='inbound_packages',
                                    on_delete=models.PROTECT)
 
-    height = models.PositiveIntegerField(verbose_name=_('height'), help_text=_('in cm'))
-    width = models.PositiveIntegerField(verbose_name=_('width'), help_text=_('in cm'))
-    depth = models.PositiveIntegerField(verbose_name=_('depth'), help_text=_('in cm'))
+    height = models.PositiveIntegerField(verbose_name=_('height'), help_text=_('in cm'), null=True, blank=True)
+    width = models.PositiveIntegerField(verbose_name=_('width'), help_text=_('in cm'), null=True, blank=True)
+    depth = models.PositiveIntegerField(verbose_name=_('depth'), help_text=_('in cm'), null=True, blank=True)
 
-    weight = models.DecimalField(verbose_name=_('weight'), help_text=_('in kg'), max_digits=7, decimal_places=2)
+    weight = models.DecimalField(verbose_name=_('weight'), help_text=_('in kg'),
+                                 max_digits=7, decimal_places=2, null=True, blank=True)
 
     sender = models.ForeignKey(User, verbose_name=_('sender'), related_name='sent_packages', on_delete=models.PROTECT)
 
@@ -138,3 +146,39 @@ class PackageSMS(TimestampedModel):
     def get_twilio_client(cls):
         if settings.TWILIO['ACCOUNT_SID'] != 'configure in local settings':
             return Client(settings.TWILIO['ACCOUNT_SID'], settings.TWILIO['AUTH_TOKEN'])
+
+
+class HolviPackage(models.Model):
+    package = models.OneToOneField(Package, on_delete=models.CASCADE)
+    order = models.OneToOneField('holvi_orders.HolviOrder', on_delete=models.CASCADE)
+
+    @classmethod
+    def create_package_for_order(cls, order):
+        return cls(order=order).create_package()
+
+    def create_package(self):
+        self.package = Package.objects.create(
+            pickup_at=self.order.sender_address(),
+            deliver_to=Address.objects.get_or_create(
+                street_address=self.order.street,
+                city=self.order.city,
+                postal_code=self.order.postcode,
+                country=self.order.country
+            )[0],
+            sender=self.order.sender(),
+            recipient=self.order.recipient_str(),
+            recipient_phone=self.order.phone,
+            earliest_pickup_time=timezone.now() + datetime.timedelta(minutes=10),
+            latest_pickup_time=timezone.now() + datetime.timedelta(minutes=30),
+
+            earliest_delivery_time=timezone.now() + datetime.timedelta(minutes=10),
+            latest_delivery_time=timezone.now() + datetime.timedelta(minutes=60))
+        self.save()
+        return self.package
+
+
+def on_order_received(sender, order=None, **kwargs):
+    HolviPackage.create_package_for_order(order)
+
+
+order_received.connect(on_order_received)

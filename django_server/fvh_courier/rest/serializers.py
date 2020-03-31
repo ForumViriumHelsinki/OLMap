@@ -20,7 +20,7 @@ serializers.ModelSerializer.serializer_field_mapping[DecimalField] = RoundingDec
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Address
-        fields = '__all__'
+        exclude = ['user', 'id', 'created_at', 'modified_at']
 
 
 class UserSerializer(serializers.ModelSerializer):
