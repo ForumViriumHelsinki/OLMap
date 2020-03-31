@@ -15,4 +15,7 @@ class HolviPurchaseInline(admin.TabularInline):
 
 @admin.register(models.HolviOrder)
 class HolviOrderAdmin(admin.ModelAdmin):
+    list_display = ['code', 'shop_id', 'firstname', 'lastname', 'street', 'paid_time']
+    list_filter = ['shop']
+    date_hierarchy = 'paid_time'
     inlines = [HolviPurchaseInline]
