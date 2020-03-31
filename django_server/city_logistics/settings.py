@@ -38,6 +38,7 @@ ALLOWED_HOSTS = ['citylogistiikka.fvh.io', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'fvh_courier',
+    'holvi_orders',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',

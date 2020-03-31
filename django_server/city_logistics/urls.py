@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
 from rest_framework.schemas import get_schema_view
-
+from holvi_orders import views as holvi_views
 from fvh_courier import rest
 
 
@@ -32,6 +32,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('rest/', include(rest.urlpatterns)),
+    path('rest/', include(holvi_views.urlpatterns)),
     path('rest-auth/', include('rest_auth.urls')),
     path('rest-auth/registration/', include('rest_auth.registration.urls')),
     path('openapi/', schema_view, name='openapi-schema'),
