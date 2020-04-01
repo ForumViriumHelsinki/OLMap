@@ -187,7 +187,7 @@ GATEWAY_API = {
     'SECRET': 'configure in local settings',
     'TOKEN': 'configure in local settings'
 }
-SMS_PLATFORM = 'GatewayAPI'
+SMS_PLATFORM = 'None'
 
 FRONTEND_ROOT = "https://app.olmap.org/"
 
