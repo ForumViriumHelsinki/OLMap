@@ -1,4 +1,5 @@
 import datetime
+import re
 import uuid as uuid
 
 import geocoder
@@ -29,6 +30,16 @@ class Address(TimestampedModel):
 
     def __str__(self):
         return self.street_address
+
+    def with_latlng(self):
+        if self.lat and self.lon:
+            return self
+        [self.lat, self.lon] = geocoder.osm(f'{self.building_address()}, {self.city}').latlng
+        self.save()
+        return self
+
+    def building_address(self):
+        return re.sub(r'(\d+).*?$', r'\1', self.street_address)
 
 
 class Package(TimestampedModel):
@@ -158,16 +169,14 @@ class HolviPackage(models.Model):
         return cls(order=order).create_package()
 
     def create_package(self):
-        [lat, lon] = geocoder.osm(f'{self.order.street}, {self.order.city}').latlng
         self.package = Package.objects.create(
             pickup_at=self.order.sender_address(),
             deliver_to=Address.objects.get_or_create(
                 street_address=self.order.street,
                 city=self.order.city,
                 postal_code=self.order.postcode,
-                country=self.order.country,
-                lat=lat, lon=lon
-            )[0],
+                country=self.order.country
+            )[0].with_latlng(),
             sender=self.order.sender(),
             recipient=self.order.recipient_str(),
             recipient_phone=self.order.phone,
