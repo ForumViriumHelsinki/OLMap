@@ -8,10 +8,18 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from smsframework import Gateway, OutgoingMessage
+from smsframework_gatewayapi import GatewayAPIProvider
 from twilio.rest import Client
 
 from holvi_orders.signals import order_received
 from .base import TimestampedModel
+
+
+if settings.SMS_PLATFORM == 'GatewayAPI':
+    gateway = Gateway()
+    gateway.add_provider('gapi', GatewayAPIProvider,
+                         key=settings.GATEWAY_API['KEY'], secret=settings.GATEWAY_API['SECRET'])
 
 
 class Address(TimestampedModel):
@@ -126,13 +134,19 @@ class PackageSMS(TimestampedModel):
             message_type=cls.types_by_name[message_type],
             recipient_number=to_number,
             content=cls.render_message(message_type, package, referer))
-        client = cls.get_twilio_client()
-        if client:
-            twilio_msg = client.messages.create(
-                body=message.content,
-                to=to_number,
-                from_=settings.TWILIO['SENDER_NR'])
-            message.twilio_sid = twilio_msg.sid
+
+        if settings.SMS_PLATFORM == 'Twilio':
+            client = cls.get_twilio_client()
+            if client:
+                twilio_msg = client.messages.create(
+                    body=message.content,
+                    to=to_number,
+                    from_=settings.TWILIO['SENDER_NR'])
+                message.twilio_sid = twilio_msg.sid
+
+        elif settings.SMS_PLATFORM == 'GatewayAPI':
+            gateway.send(OutgoingMessage(to_number, message.content))
+
         message.save()
 
     @classmethod

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cea91e176340526e30b3fb2b763fe54037470251cad0866b6da4602565537671"
+            "sha256": "700d9d07484675eca4adc3dbb2e89d75279bedff7f445a602b7488d6fa5d231a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -454,6 +454,21 @@
                 "sha256:8f3cd2e254d8f793e7f3d6d9df77b92252b52637291d0f0da013c76ea2724b6c"
             ],
             "version": "==1.14.0"
+        },
+        "smsframework": {
+            "hashes": [
+                "sha256:6a7124abae6a3e3af547464d8c1b57d3c8ae9a6a53ae6b6216917d4813dbbc33",
+                "sha256:aebd8ec6263863e0e5b52e3fa581607223a211dd4461e617358134b230c68618"
+            ],
+            "version": "==0.0.9.post3"
+        },
+        "smsframework-gatewayapi": {
+            "hashes": [
+                "sha256:0366761ff39c28c4ffd2731ebf6926e613fc81e7053db7bc7784d84d36e5ca4a",
+                "sha256:3da883dd2002c03497e8a3725d7187d437d252e9d752e24a898e353e6e774b8d"
+            ],
+            "index": "pypi",
+            "version": "==0.0.1"
         },
         "sqlparse": {
             "hashes": [
