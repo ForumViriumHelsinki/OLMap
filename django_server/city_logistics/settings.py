@@ -215,5 +215,7 @@ except ImportError:
 
 if 'test' in sys.argv:
     DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
+    TEST = True
     # INMEMORYSTORAGE_PERSIST = True
-
+else:
+    TEST = False

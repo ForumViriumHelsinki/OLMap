@@ -1,6 +1,7 @@
 import datetime
 import uuid as uuid
 
+import geocoder
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
@@ -157,13 +158,15 @@ class HolviPackage(models.Model):
         return cls(order=order).create_package()
 
     def create_package(self):
+        [lat, lon] = geocoder.osm(f'{self.order.street}, {self.order.city}').latlng
         self.package = Package.objects.create(
             pickup_at=self.order.sender_address(),
             deliver_to=Address.objects.get_or_create(
                 street_address=self.order.street,
                 city=self.order.city,
                 postal_code=self.order.postcode,
-                country=self.order.country
+                country=self.order.country,
+                lat=lat, lon=lon
             )[0],
             sender=self.order.sender(),
             recipient=self.order.recipient_str(),
