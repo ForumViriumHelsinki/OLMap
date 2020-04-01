@@ -182,7 +182,14 @@ TWILIO = {
     'AUTH_TOKEN': 'configure in local settings',
     'SENDER_NR': 'configure in local settings'
 }
-FRONTEND_ROOT = "https://app.citylogistiikka.fi/"
+GATEWAY_API = {
+    'KEY': 'configure in local settings',
+    'SECRET': 'configure in local settings',
+    'TOKEN': 'configure in local settings'
+}
+SMS_PLATFORM = 'GatewayAPI'
+
+FRONTEND_ROOT = "https://app.olmap.org/"
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
