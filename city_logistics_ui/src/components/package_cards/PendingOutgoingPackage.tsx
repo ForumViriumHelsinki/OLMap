@@ -9,15 +9,20 @@ import {Package} from "components/types";
 export default class PendingOutgoingPackage extends React.Component<{package: Package}> {
   render() {
     const {
-      created_at, pickup_at, deliver_to, recipient, courier,
+      created_at, pickup_at, deliver_to, recipient, courier, name, details,
       picked_up_time, delivered_time, courier_location} = this.props.package;
     const currentPositionIndex = !courier_location ? -1 : picked_up_time ? 1 : 0;
 
     const title = <>
         <MapWidget origin={pickup_at} destination={deliver_to}
                    currentPositionIndex={currentPositionIndex} currentPosition={courier_location}/>
-        To {recipient}
+        {name || ('To ' + recipient)}
       </>;
+
+    const detailsEl = <CardP>
+      Order details:<br/>
+      <pre className="mb-0">{details}</pre>
+    </CardP>;
 
     return (
       <Card title={title} subtitles={[deliver_to.street_address, formatTimestamp(created_at)]}>
@@ -38,10 +43,10 @@ export default class PendingOutgoingPackage extends React.Component<{package: Pa
                   : <CardP>Delivery in progress</CardP>
                 }
               </>
-              : <CardP>Awaiting pickup.</CardP>
+              : <><CardP>Awaiting pickup.</CardP>{detailsEl}</>
             }
           </>
-          : <CardP>No courier assigned.</CardP>
+          : <><CardP>Awaiting pickup.</CardP>{detailsEl}</>
         }
       </Card>
     );

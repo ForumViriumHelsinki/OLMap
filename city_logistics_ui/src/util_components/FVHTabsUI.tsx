@@ -56,7 +56,7 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, {activeTa
         <NavBar header={header}
                 icon={user.is_courier ? "directions_bike" : "account_circle"}
                 iconText={user.username}/>
-        <div className={'d-flex flex-grow-1 overflow-auto' + (fullWidth ? '' : " container")}>
+        <div className={'flex-grow-1 overflow-auto' + (fullWidth ? '' : " container")}>
           <ChildComponent {...childProps}/>
         </div>
         <nav className="navbar navbar-dark bg-primary p-0">

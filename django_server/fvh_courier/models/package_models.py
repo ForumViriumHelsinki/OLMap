@@ -193,15 +193,20 @@ class HolviPackage(models.Model):
 
     def create_package(self):
         delivery_instructions = ''
+        details = ''
         purchases = [p for p in self.order.purchases.all() if p.product_name != "Shipping fee"]
+
         for p in purchases:
+            details += p.product_name
             for a in p.answers.all():
+                details += f'\n  {a.label}: {a.answer}'
                 if a.answer and a.label == 'Delivery instructions':
                     delivery_instructions += a.answer
+            details += '\n'
 
         self.package = Package.objects.create(
             name=f'{len(purchases)} meals to {self.order.recipient_str()}'[:64],
-            details='\n'.join(p.product_name for p in self.order.purchases.all()),
+            details=details,
             delivery_instructions=delivery_instructions,
             pickup_at=self.order.sender_address(),
             deliver_to=Address.objects.get_or_create(
