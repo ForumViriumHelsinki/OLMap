@@ -20,7 +20,7 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
     const {
       earliest_pickup_time, latest_pickup_time,
       earliest_delivery_time, latest_delivery_time,
-      pickup_at, deliver_to, weight, width, height, depth,
+      pickup_at, deliver_to, weight, width, height, depth, name, delivery_instructions,
       picked_up_time, recipient, recipient_phone, sender, id} = this.props.package;
 
     const {currentLocation, onPackageAction} = this.props;
@@ -34,7 +34,7 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
       </>;
 
     return (
-      <Card title={title} subtitles={[formatTimestamp(earliest_pickup_time)]}>
+      <Card title={title} subtitles={[formatTimestamp(earliest_pickup_time), name]}>
       {(weight || width || height || depth) &&
         <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>}
       <PackageDistances package={this.props.package} courierLocation={currentLocation && {lat, lon}}/>
@@ -45,6 +45,8 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
               <TimeInterval label="Delivery" from={earliest_delivery_time} to={latest_delivery_time}/>
             </CardP>
             <Contacts phone={recipient_phone} title="Recipient" name={recipient}/>
+            {delivery_instructions &&
+              <CardP>{delivery_instructions}</CardP>}
             <Button onClick={() => onPackageAction(id, 'delivery')}>Register delivery</Button>
           </>
         : <>
@@ -53,6 +55,8 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
               <TimeInterval label="Delivery" from={earliest_delivery_time} to={latest_delivery_time}/>
             </CardP>
             <Contacts phone={sender.phone_numbers} title="Sender" name={`${sender.first_name} ${sender.last_name}`}/>
+            {delivery_instructions &&
+              <CardP>{delivery_instructions}</CardP>}
             <Button onClick={() => onPackageAction(id, 'pickup')}>Register pickup</Button>
           </>
       }

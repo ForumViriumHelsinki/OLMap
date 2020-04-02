@@ -13,6 +13,9 @@ export type User = {
 };
 
 export type Package = {
+    name: string,
+    details: string,
+    delivery_instructions: string,
     created_at: string,
     recipient: string,
     recipient_phone: string,

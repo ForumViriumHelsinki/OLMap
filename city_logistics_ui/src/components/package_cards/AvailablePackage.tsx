@@ -18,7 +18,7 @@ export default class AvailablePackage extends React.Component<AvailablePackagePr
     const {
       earliest_pickup_time, latest_pickup_time,
       earliest_delivery_time, latest_delivery_time,
-      pickup_at, deliver_to,
+      pickup_at, deliver_to, name,
       weight, width, height, depth, id} = this.props.package;
 
     const {currentLocation, onPackageReserve} = this.props;
@@ -30,7 +30,7 @@ export default class AvailablePackage extends React.Component<AvailablePackagePr
       </>;
 
     return (
-      <Card title={title} subtitles={[deliver_to.street_address]}>
+      <Card title={title} subtitles={[name]}>
         {(weight || width || height || depth) &&
           <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>}
         <PackageDistances package={this.props.package} courierLocation={currentLocation && {lat, lon}}/>
