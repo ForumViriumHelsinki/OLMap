@@ -10,6 +10,7 @@ import settings from "settings.json";
 import ErrorAlert from "util_components/ErrorAlert";
 import moment from "moment";
 import Component from "util_components/Component";
+import {newPackageSchemaUrl, pendingOutgoingPackagesUrl} from "urls";
 
 type func = () => any;
 
@@ -34,7 +35,7 @@ export default class NewPackage extends Component<{onCreated: func}> {
   static bindMethods = ['onSubmit'];
 
   componentDidMount() {
-    sessionRequest('/rest/outgoing_packages/jsonschema/')
+    sessionRequest(newPackageSchemaUrl)
     .then((response) => response.json())
     .then((schema) => this.setSchema(schema))
   }
@@ -85,7 +86,7 @@ export default class NewPackage extends Component<{onCreated: func}> {
 
   // @ts-ignore
   onSubmit({formData}) {
-    sessionRequest('/rest/outgoing_packages/', {method: 'POST', data: {...formData, ...this.selectedAddresses}})
+    sessionRequest(pendingOutgoingPackagesUrl, {method: 'POST', data: {...formData, ...this.selectedAddresses}})
     .then((response) => {
       if (response.status == 201) this.props.onCreated();
       else this.setState({error: true});

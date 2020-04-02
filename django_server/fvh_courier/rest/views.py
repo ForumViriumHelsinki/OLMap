@@ -47,7 +47,7 @@ class MyPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsCourier]
 
     def get_base_queryset(self):
-        return self.request.user.delivered_packages.all()
+        return self.request.user.delivered_packages.filter(delivered_time__isnull=True)
 
     @action(detail=True, methods=['put'])
     def register_pickup(self, request, pk=None):
@@ -74,12 +74,19 @@ class MyPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class OutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
+class MyDeliveredPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsCourier]
+
+    def get_base_queryset(self):
+        return self.request.user.delivered_packages.filter(delivered_time__isnull=False)
+
+
+class PendingOutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OutgoingPackageSerializer
 
     def get_base_queryset(self):
-        return self.request.user.sent_packages.all()
+        return self.request.user.sent_packages.filter(delivered_time=None)
 
     def perform_create(self, serializer):
         serializer.save(sender=self.request.user)
@@ -87,6 +94,14 @@ class OutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMixin, vie
     @action(detail=False, methods=['get'])
     def jsonschema(self, request, pk=None):
         return Response(to_jsonschema(self.get_serializer()))
+
+
+class DeliveredOutgoingPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OutgoingPackageSerializer
+
+    def get_base_queryset(self):
+        return self.request.user.sent_packages.filter(delivered_time__isnull=False)
 
 
 class PackagesByUUIDReadOnlyViewSet(PackagesViewSetMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):

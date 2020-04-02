@@ -11,7 +11,7 @@ class NavItem extends React.Component<NavItemProps> {
     const {icon, text, onClick, active} = this.props;
 
     return <li className={`nav-item${active ? ' active' : ''}`}>
-      <button className="nav-link p-2" onClick={(e) => {
+      <button className="nav-link p-1 pt-2" onClick={(e) => {
         e.preventDefault();
         onClick();
       }}>
@@ -52,14 +52,14 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, {activeTa
     setTimeout(() => window.scrollTo(0, 10), 1000);
 
     return (
-      <>
+      <div style={{height: window.innerHeight}} className="flex-column d-flex">
         <NavBar header={header}
                 icon={user.is_courier ? "directions_bike" : "account_circle"}
                 iconText={user.username}/>
-        <div className={fullWidth ? '' : "container"} style={{marginBottom: 96}}>
+        <div className={'d-flex flex-grow-1 overflow-auto' + (fullWidth ? '' : " container")}>
           <ChildComponent {...childProps}/>
         </div>
-        <nav className="navbar fixed-bottom navbar-dark bg-primary">
+        <nav className="navbar navbar-dark bg-primary p-0">
           <ul className="navbar-nav flex-row nav-fill flex-fill">
             {tabs.map(({icon, menuText, header}) => (
               <NavItem key={header} icon={icon} text={menuText} active={activeTab == header}
@@ -73,7 +73,7 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, {activeTa
                  onClose={() => this.setState({showLogout: false})}
                  onConfirm={onLogout}/>
         }
-      </>
+      </div>
     );
   }
 

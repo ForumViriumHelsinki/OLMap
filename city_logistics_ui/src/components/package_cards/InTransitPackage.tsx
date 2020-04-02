@@ -35,7 +35,8 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
 
     return (
       <Card title={title} subtitles={[formatTimestamp(earliest_pickup_time)]}>
-      <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>
+      {(weight || width || height || depth) &&
+        <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>}
       <PackageDistances package={this.props.package} courierLocation={currentLocation && {lat, lon}}/>
       {picked_up_time
         ?

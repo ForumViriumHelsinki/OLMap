@@ -1,32 +1,38 @@
 import React from 'react';
-import LiveDataLoader from "util_components/LiveDataLoader";
-import CenteredSpinner from "util_components/CenteredSpinner";
-import TabbedCardList from "util_components/TabbedCardList";
 import PendingOutgoingPackage from "components/package_cards/PendingOutgoingPackage";
 import DeliveredOutgoingPackage from "components/package_cards/DeliveredOutgoingPackage";
-import {Package} from "components/types";
-import {outgoingPackagesUrl} from "urls";
+import {pendingOutgoingPackagesUrl, deliveredOutgoingPackagesUrl} from "urls";
+import NavPills from "util_components/NavPills";
+import NewPackage from "components/NewPackage";
+import LiveList from "util_components/LiveList";
 
 export default class OutgoingPackageLists extends React.Component {
-  state: {items?: Package[]} = {items: undefined};
-
-  tabs = [
-    {
-      name: 'Pending',
-      filter: (item: Package) => !item.delivered_time,
-      renderItem: (item: Package) => <PendingOutgoingPackage package={item}/>
-    }, {
-      name: 'Delivered',
-      filter: (item: Package) => item.delivered_time,
-      renderItem: (item: Package) => <DeliveredOutgoingPackage package={item}/>
-    }
-  ]
+  state: {activeTab: string} = {activeTab: 'Pending'};
 
   render() {
-    const {items} = this.state;
-    return <>
-      <LiveDataLoader url={outgoingPackagesUrl} onLoad={(items) => this.setState({items})}/>
-      {items ? <TabbedCardList items={items} tabs={this.tabs}/> : <CenteredSpinner/>}
-    </>;
+    const {activeTab} = this.state;
+
+    const tabs = [
+      {
+        name: 'Pending',
+        render: () => <LiveList url={pendingOutgoingPackagesUrl}
+                                item={(item: any) => <PendingOutgoingPackage package={item}/>}/>
+      }, {
+        name: 'Delivered',
+        render: () => <LiveList url={deliveredOutgoingPackagesUrl}
+                                item={(item: any) => <DeliveredOutgoingPackage package={item}/>}/>
+      }, {
+        name: 'New',
+        render: () => <NewPackage onCreated={() => this.setState({activeTab: 'Pending'})}/>
+      }
+    ];
+
+    const activeTabSpec = tabs.find(({name}) => name == activeTab) || tabs[0];
+    return <div className="mt-2">
+      <NavPills onSelect={(activeTab) => this.setState({activeTab})}
+                navs={tabs.map(({name}) => name)}
+                active={activeTab} disabled={[]}/>
+      {activeTabSpec.render()}
+    </div>;
   }
 }

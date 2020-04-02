@@ -24,6 +24,13 @@ export default class LiveDataLoader extends React.Component<LiveDataLoaderProps>
     this._isMounted = true;
   }
 
+  componentDidUpdate(prevProps: Readonly<LiveDataLoaderProps>) {
+    if (prevProps.url != this.props.url) {
+      this.setState({error: false});
+      this.refreshItems();
+    }
+  }
+
   componentWillUnmount() {
     if (this.fetchInterval) clearInterval(this.fetchInterval);
     this.fetchInterval = null;

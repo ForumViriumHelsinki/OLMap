@@ -10,19 +10,10 @@ type func = () => any;
 export default class CourierUI extends React.Component<{user: User, onLogout: func}> {
   tabs = [
     {
-      header: 'My packages',
+      header: 'Packages',
       ChildComponent: ReservedPackageLists,
       icon: 'directions_bike',
       menuText: 'Packages'
-    },
-    {
-      header: 'Available',
-      ChildComponent: AvailablePackages,
-      childProps: {
-        onPackageReserved: () =>
-          this.tabsUI.current && this.tabsUI.current.switchTab('My packages')},
-      icon: 'dynamic_feed',
-      menuText: 'Available'
     },
     {
       header: 'Notes',

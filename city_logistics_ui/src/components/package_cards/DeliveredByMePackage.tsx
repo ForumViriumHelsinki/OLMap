@@ -18,7 +18,8 @@ export default class DeliveredByMePackage extends React.Component<{package: Pack
 
     return (
       <Card title={title}>
-        <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>
+        {(weight || width || height || depth) &&
+          <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>}
         <PackageDistances package={this.props.package}/>
         <CardP>
           <Icon icon={icons.origin}/> Picked up at {formatTimestamp(picked_up_time)}<br/>

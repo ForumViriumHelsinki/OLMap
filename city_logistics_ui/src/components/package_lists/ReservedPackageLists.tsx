@@ -1,71 +1,83 @@
 import React from 'react';
-import LiveDataLoader from "util_components/LiveDataLoader";
-import CenteredSpinner from "util_components/CenteredSpinner";
-import TabbedCardList from "util_components/TabbedCardList";
+
+import {
+  availablePackagesUrl,
+  myDeliveredPackagesUrl,
+  myLocationUrl, myPackageActionUrl, myPackagesUrl, reservePackageUrl
+} from "urls";
+
 import {sessionRequest} from "sessionRequest";
 import Geolocator from "util_components/Geolocator";
 import DeliveredByMePackage from "components/package_cards/DeliveredByMePackage";
 import InTransitPackage from "components/package_cards/InTransitPackage";
-import Component from "util_components/Component";
 import {LocationTuple} from "util_components/types";
-import {Package, packageAction} from "components/types";
-import {myLocationUrl, myPackageActionUrl, myPackagesUrl} from "urls";
+import {packageAction} from "components/types";
+import NavPills from "util_components/NavPills";
+import LiveList from "util_components/LiveList";
+import AvailablePackage from "components/package_cards/AvailablePackage";
 
-export default class ReservedPackageLists extends Component<{}> {
-  static bindMethods = ['locationUpdated', 'packageAction', 'packagesLoaded'];
-  dataLoader = React.createRef<LiveDataLoader>();
+type State = {
+  activeTab: string,
+  currentLocation?: LocationTuple
+};
 
-  state: {currentLocation?: LocationTuple, items?: Package[]} = {
-    currentLocation: undefined,
-    items: undefined
-  };
-  locationSaveNeeded = false;
+export default class ReservedPackageLists extends React.Component {
+  state: State = {activeTab: 'Pending'};
 
-  tabs() {
-    return [
-      {
-        name: 'Pending',
-        filter: (item: Package) => !item.delivered_time,
-        renderItem: (item: Package) =>
-          <InTransitPackage package={item}
-                            currentLocation={this.state.currentLocation}
-                            onPackageAction={this.packageAction}/>
-      }, {
-        name: 'Delivered',
-        filter: (item: Package) => item.delivered_time,
-        renderItem: (item: Package) => <DeliveredByMePackage package={item}/>
-      }
-    ];
-  }
+  liveList = React.createRef<LiveList>();
 
   render() {
-    const {items} = this.state;
-    return <>
-      <LiveDataLoader url={myPackagesUrl} onLoad={this.packagesLoaded} ref={this.dataLoader}/>
-      {items ? <TabbedCardList items={items} tabs={this.tabs()}/> : <CenteredSpinner/>}
+    const {activeTab, currentLocation} = this.state;
+
+    const tabs = [
+      {
+        name: 'Pending',
+        render: () => <LiveList ref={this.liveList} url={myPackagesUrl} item={(item: any) =>
+            <InTransitPackage package={item}
+                              currentLocation={currentLocation}
+                              onPackageAction={this.packageAction}/>}/>
+      }, {
+        name: 'Available',
+        render: () => <LiveList url={availablePackagesUrl} item={(item: any) =>
+          <AvailablePackage key={item.id} package={item} currentLocation={currentLocation}
+                            onPackageReserve={this.reservePackage}/>}/>
+      }, {
+        name: 'Delivered',
+        render: () => <LiveList url={myDeliveredPackagesUrl}
+                                item={(item: any) => <DeliveredByMePackage package={item}/>}/>
+      }
+    ];
+
+    const activeTabSpec = tabs.find(({name}) => name == activeTab) || tabs[0];
+
+    return <div className="mt-2">
       <Geolocator onLocation={this.locationUpdated}/>
-    </>;
+      <NavPills onSelect={(activeTab) => this.setState({activeTab})}
+                navs={tabs.map(({name}) => name)}
+                active={activeTab} disabled={[]}/>
+      {activeTabSpec.render()}
+    </div>;
   }
 
-  packageAction(id: number, action: packageAction) {
+  packageAction = (id: number, action: packageAction) => {
     sessionRequest(myPackageActionUrl(id, action), {method: 'PUT'})
     .then((response) => {
-      if ((response.status == 200) && this.dataLoader.current) this.dataLoader.current.refreshItems();
+      if ((response.status == 200) && this.liveList.current) this.liveList.current.refreshItems();
       else this.setState({error: true});
     })
-  }
+  };
 
-  // If there are undelivered but reserved packages, courier location should be saved to db:
-  packagesLoaded(items: Package[]) {
-    this.setState({items});
-    this.locationSaveNeeded = items.filter((p) => !p.delivered_time).length > 0;
-  }
+  reservePackage = (id: number) => {
+    sessionRequest(reservePackageUrl(id), {method: 'PUT'})
+    .then((response) => {
+      if (response.status == 200) this.setState({activeTab: 'Pending'});
+      else this.setState({error: true});
+    })
+  };
 
-  locationUpdated(currentLocation: LocationTuple) {
+  locationUpdated = (currentLocation: LocationTuple) => {
+    const [lon, lat] = currentLocation;
     this.setState({currentLocation});
-    if (this.locationSaveNeeded) {
-      const [lon, lat] = currentLocation;
-      sessionRequest(myLocationUrl, {method: 'PUT', data: {lat, lon}});
-    }
-  }
+    sessionRequest(myLocationUrl, {method: 'PUT', data: {lat, lon}});
+  };
 }

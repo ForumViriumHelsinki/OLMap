@@ -13,7 +13,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
     def test_list_outgoing_packages_anonymous(self):
         # Given that no user is signed in
         # When requesting the list of outgoing packages
-        url = reverse('outgoing_package-list')
+        url = reverse('pending_outgoing_package-list')
         response = self.client.get(url)
 
         # Then an Unauthorized response is received:
@@ -25,7 +25,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
         self.create_and_login_courier()
 
         # When requesting the list of outgoing packages
-        url = reverse('outgoing_package-list')
+        url = reverse('pending_outgoing_package-list')
         response = self.client.get(url)
 
         # Then an OK response is received:
@@ -39,7 +39,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
         self.create_and_login_courier()
 
         # When requesting the schema for a new package over ReST
-        url = reverse('outgoing_package-jsonschema')
+        url = reverse('pending_outgoing_package-jsonschema')
         response = self.client.get(url)
 
         # Then an OK response is received:
@@ -122,7 +122,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
         self.client.force_login(sender)
 
         # When requesting to register a new package for delivery
-        url = reverse('outgoing_package-list')
+        url = reverse('pending_outgoing_package-list')
         now = timezone.now()
         fields = {
             "pickup_at": {
@@ -195,7 +195,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
 
         # And a new outgoing package is created
         self.client.force_login(sender)
-        url = reverse('outgoing_package-list')
+        url = reverse('pending_outgoing_package-list')
         response = self.client.get(url)
 
         self.assert_dict_contains(response.json()[0], {

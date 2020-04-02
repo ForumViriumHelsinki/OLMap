@@ -31,7 +31,8 @@ export default class AvailablePackage extends React.Component<AvailablePackagePr
 
     return (
       <Card title={title} subtitles={[deliver_to.street_address]}>
-        <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>
+        {(weight || width || height || depth) &&
+          <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>}
         <PackageDistances package={this.props.package} courierLocation={currentLocation && {lat, lon}}/>
         <CardP>
           <TimeInterval label="Pickup" from={earliest_pickup_time} to={latest_pickup_time}/><br />
