@@ -199,9 +199,10 @@ class HolviPackage(models.Model):
         for p in purchases:
             details += p.product_name
             for a in p.answers.all():
-                details += f'\n  {a.label}: {a.answer}'
-                if a.answer and a.label == 'Delivery instructions':
-                    delivery_instructions += a.answer
+                if a.answer:
+                    details += f'\n  {a.label}:\n  {a.answer}'
+                    if a.label == 'Delivery instructions':
+                        delivery_instructions += a.answer
             details += '\n'
 
         self.package = Package.objects.create(

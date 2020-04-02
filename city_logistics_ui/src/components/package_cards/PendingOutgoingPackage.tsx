@@ -46,7 +46,7 @@ export default class PendingOutgoingPackage extends React.Component<{package: Pa
               : <><CardP>Awaiting pickup.</CardP>{detailsEl}</>
             }
           </>
-          : <><CardP>Awaiting pickup.</CardP>{detailsEl}</>
+        : <><CardP>No courier assigned.</CardP>{detailsEl}</>
         }
       </Card>
     );
