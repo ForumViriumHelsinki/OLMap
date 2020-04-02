@@ -38,8 +38,8 @@ holvi_order_webhook_payload = {
             "answers": [
                 {
                     "question": "7e27fead0b0c42b345d91c4936bd44a5",
-                    "label": "Allergies",
-                    "answer": "nuts"
+                    "label": "Delivery instructions",
+                    "answer": "Watch your steps"
                 },
                 {
                     "question": "40f5dcea45e04a6f66f09de6ff755f53",

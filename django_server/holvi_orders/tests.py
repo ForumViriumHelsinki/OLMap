@@ -32,7 +32,7 @@ class HolviOrderTests(APITestCase):
             'purchases': [
                 {'answers': [], 'product_name': 'Shipping fee'},
                 {'answers': [
-                    {'label': 'Allergies', 'answer': 'nuts'},
+                    {'label': 'Delivery instructions', 'answer': 'Watch your steps'},
                     {'label': 'Toppings', 'answer': 'ketchup, pinapple'}],
                     'product_name': 'Tasty Pizza'}],
             'pool': 'ybD2Fp',

@@ -213,4 +213,5 @@ class OutgoingPackagesTests(FVHAPITestCase):
                 'first_name': 'Cedrik',
                 'last_name': 'Sender'},
             'recipient': 'Mark Smith',
-            'recipient_phone': '+35888445544'})
+            'recipient_phone': '+35888445544',
+            'delivery_instructions': 'Watch your steps'})

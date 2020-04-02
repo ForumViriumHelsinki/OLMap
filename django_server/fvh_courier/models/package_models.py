@@ -51,6 +51,8 @@ class Address(TimestampedModel):
 
 
 class Package(TimestampedModel):
+    name = models.CharField(max_length=64, blank=True)
+    details = models.TextField(blank=True)
     pickup_at = models.ForeignKey(Address, verbose_name=_('pickup location'), related_name='outbound_packages',
                                   on_delete=models.PROTECT)
     deliver_to = models.ForeignKey(Address, verbose_name=_('destination'), related_name='inbound_packages',
@@ -67,6 +69,7 @@ class Package(TimestampedModel):
 
     recipient = models.CharField(max_length=128, verbose_name=_('recipient'))
     recipient_phone = models.CharField(max_length=32, verbose_name=_('recipient phone number'))
+    delivery_instructions = models.CharField(max_length=256, blank=True)
 
     courier = models.ForeignKey(User, verbose_name=_('courier'), null=True, blank=True,
                                 related_name='delivered_packages', on_delete=models.PROTECT)
@@ -93,6 +96,11 @@ class Package(TimestampedModel):
         Return all packages for which delivery has been requested but which are not yet reserved by any courier.
         """
         return cls.objects.filter(courier__isnull=True)
+
+    def save(self, **kwargs):
+        if not self.name:
+            self.name = f'Package {self.id} to {self.recipient}'
+        return super().save(**kwargs)
 
 
 class PackageSMS(TimestampedModel):
@@ -183,7 +191,16 @@ class HolviPackage(models.Model):
         return cls(order=order).create_package()
 
     def create_package(self):
+        delivery_instructions = ''
+        for p in self.order.purchases.all():
+            for a in p.answers.all():
+                if a.answer and a.label == 'Delivery instructions':
+                    delivery_instructions += a.answer
+
         self.package = Package.objects.create(
+            name=f'{len(self.order.purchases.all())} meals to {self.order.recipient_str()}'[:64],
+            details='\n'.join(p.product_name for p in self.order.purchases.all()),
+            delivery_instructions=delivery_instructions,
             pickup_at=self.order.sender_address(),
             deliver_to=Address.objects.get_or_create(
                 street_address=self.order.street,
