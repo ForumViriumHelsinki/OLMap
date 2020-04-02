@@ -143,17 +143,18 @@ class PackageSMS(TimestampedModel):
             recipient_number=to_number,
             content=cls.render_message(message_type, package, referer))
 
-        if settings.SMS_PLATFORM == 'Twilio':
-            client = cls.get_twilio_client()
-            if client:
-                twilio_msg = client.messages.create(
-                    body=message.content,
-                    to=to_number,
-                    from_=settings.TWILIO['SENDER_NR'])
-                message.twilio_sid = twilio_msg.sid
+        if not settings.TEST:
+            if settings.SMS_PLATFORM == 'Twilio':
+                client = cls.get_twilio_client()
+                if client:
+                    twilio_msg = client.messages.create(
+                        body=message.content,
+                        to=to_number,
+                        from_=settings.TWILIO['SENDER_NR'])
+                    message.twilio_sid = twilio_msg.sid
 
-        elif settings.SMS_PLATFORM == 'GatewayAPI':
-            gateway.send(OutgoingMessage(to_number, message.content))
+            elif settings.SMS_PLATFORM == 'GatewayAPI':
+                gateway.send(OutgoingMessage(to_number, message.content))
 
         message.save()
 
