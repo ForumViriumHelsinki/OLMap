@@ -20,9 +20,14 @@ class FVHAPITestCase(APITestCase):
                     full_path, expected, received
                 )
 
-    def create_and_login_courier(self):
+    def create_courier(self):
         user = User.objects.create(username='courier', first_name='Coranne', last_name='Courier')
+        user.phone_numbers.create(number='+358505436657')
         user.groups.add(Group.objects.get(name=COURIER_GROUP))
+        return user
+
+    def create_and_login_courier(self):
+        user = self.create_courier()
         self.client.force_login(user)
         return user
 

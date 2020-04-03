@@ -3,7 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
 from django.conf import settings
-from fvh_courier.models import Package, Address, PhoneNumber, PackageSMS, OSMImageNote, OSMImageNoteComment
+from fvh_courier.models import Package, Address, PhoneNumber, PackageSMS, OSMImageNote, OSMImageNoteComment, \
+    PrimaryCourier
 
 
 class PackageSMSInline(admin.TabularInline):
@@ -56,9 +57,15 @@ class PhoneNumberInline(admin.TabularInline):
     extra = 0
 
 
+class PrimaryCourierInline(admin.TabularInline):
+    model = PrimaryCourier
+    extra = 0
+    fk_name = 'sender'
+
+
 @admin.register(User)
 class TeleconnectedUserAdmin(UserAdmin):
-    inlines = UserAdmin.inlines + [PhoneNumberInline]
+    inlines = UserAdmin.inlines + [PhoneNumberInline, PrimaryCourierInline]
 
 
 @admin.register(OSMImageNote)

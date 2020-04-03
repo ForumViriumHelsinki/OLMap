@@ -13,6 +13,7 @@ from smsframework_gatewayapi import GatewayAPIProvider
 from twilio.rest import Client
 
 from holvi_orders.signals import order_received
+from .phone_number import PhoneNumber
 from .base import TimestampedModel
 
 
@@ -105,6 +106,9 @@ class Package(TimestampedModel):
 
 class PackageSMS(TimestampedModel):
     message_types = [{
+        'name': 'courier_notification',
+        'template': 'New package delivery request from {sender}: {url}'
+    }, {
         'name': 'reservation',
         'template': 'Your package to {recipient} was reserved by {courier}. See delivery progress: {url}'
     }, {
@@ -128,15 +132,15 @@ class PackageSMS(TimestampedModel):
         ordering = ['-created_at']
 
     @classmethod
-    def render_message(cls, message_type, package, referer):
+    def render_message(cls, message_type, package, referer=None):
         return cls.templates_by_name[message_type].format(
             recipient=package.recipient,
             sender=package.sender.get_full_name(),
-            courier=package.courier.get_full_name(),
+            courier=package.courier and package.courier.get_full_name(),
             url='{}#/package/{}'.format(referer or settings.FRONTEND_ROOT, package.uuid))
 
     @classmethod
-    def send_message(cls, package, message_type, to_number, referer):
+    def send_message(cls, package, message_type, to_number, referer=None):
         message = cls(
             package=package,
             message_type=cls.types_by_name[message_type],
@@ -183,6 +187,17 @@ class PackageSMS(TimestampedModel):
             return Client(settings.TWILIO['ACCOUNT_SID'], settings.TWILIO['AUTH_TOKEN'])
 
 
+class PrimaryCourier(models.Model):
+    sender = models.OneToOneField(User, on_delete=models.CASCADE, related_name='primary_courier')
+    courier = models.ForeignKey(User, on_delete=models.CASCADE, related_name='is_primary_courier_for')
+
+    @classmethod
+    def notify_new_package(cls, package):
+        phone = PhoneNumber.objects.filter(user__is_primary_courier_for__sender=package.sender_id).first()
+        if phone:
+            PackageSMS.send_message(package, 'courier_notification', phone)
+
+
 class HolviPackage(models.Model):
     package = models.OneToOneField(Package, on_delete=models.CASCADE)
     order = models.OneToOneField('holvi_orders.HolviOrder', on_delete=models.CASCADE)
@@ -225,6 +240,7 @@ class HolviPackage(models.Model):
             earliest_delivery_time=timezone.now() + datetime.timedelta(minutes=10),
             latest_delivery_time=timezone.now() + datetime.timedelta(minutes=60))
         self.save()
+        PrimaryCourier.notify_new_package(self.package)
         return self.package
 
 

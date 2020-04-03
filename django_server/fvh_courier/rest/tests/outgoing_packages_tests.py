@@ -176,8 +176,10 @@ class OutgoingPackagesTests(FVHAPITestCase):
         # Given a valid Holvi webhook payload
         data = holvi_order_webhook_payload
 
-        # And a token identifying a sender account
+        # And a token identifying a sender account with a primary courier attached
         sender = self.create_sender()
+        courier = self.create_courier()
+        models.PrimaryCourier.objects.create(sender=sender, courier=courier)
         models.Address.objects.create(
             user=sender,
             street_address="Paradisäppelvägen 123",
@@ -215,3 +217,6 @@ class OutgoingPackagesTests(FVHAPITestCase):
             'recipient': 'Mark Smith',
             'recipient_phone': '+35888445544',
             'delivery_instructions': 'Watch your steps'})
+
+        # And the primary courier is informed by SMS
+        models.PackageSMS.objects.get(message_type=models.PackageSMS.types_by_name['courier_notification'])
