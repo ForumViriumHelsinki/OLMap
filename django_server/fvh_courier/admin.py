@@ -63,9 +63,15 @@ class PrimaryCourierInline(admin.TabularInline):
     fk_name = 'sender'
 
 
+class AddressInline(admin.TabularInline):
+    model = Address
+    extra = 0
+    max_num = 1
+
+
 @admin.register(User)
 class TeleconnectedUserAdmin(UserAdmin):
-    inlines = UserAdmin.inlines + [PhoneNumberInline, PrimaryCourierInline]
+    inlines = UserAdmin.inlines + [PhoneNumberInline, PrimaryCourierInline, AddressInline]
 
 
 @admin.register(OSMImageNote)
