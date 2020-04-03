@@ -106,9 +106,6 @@ class Package(TimestampedModel):
 
 class PackageSMS(TimestampedModel):
     message_types = [{
-        'name': 'courier_notification',
-        'template': 'New package delivery request from {sender}: {url}'
-    }, {
         'name': 'reservation',
         'template': 'Your package to {recipient} was reserved by {courier}. See delivery progress: {url}'
     }, {
@@ -117,6 +114,9 @@ class PackageSMS(TimestampedModel):
     }, {
         'name': 'delivery',
         'template': 'Your package to {recipient} has been delivered.'
+    }, {
+        'name': 'courier_notification',
+        'template': 'New package delivery request from {sender}: {url}'
     }]
 
     types_by_name = dict((t['name'], i) for i, t in enumerate(message_types))
@@ -195,7 +195,7 @@ class PrimaryCourier(models.Model):
     def notify_new_package(cls, package):
         phone = PhoneNumber.objects.filter(user__is_primary_courier_for__sender=package.sender_id).first()
         if phone:
-            PackageSMS.send_message(package, 'courier_notification', phone)
+            PackageSMS.send_message(package, 'courier_notification', phone.number)
 
 
 class HolviPackage(models.Model):
