@@ -21,9 +21,16 @@ export type MapProps = BaseMapProps & {
   onClose: () => any
 }
 
-export default class RouteMapModal extends React.Component<MapProps, {currentPosition: null | Location}> {
-  state = {
-    currentPosition: null
+type State = {
+  currentPosition: null | Location,
+  showNotes: boolean,
+  imageNotesLayer?: any
+};
+
+export default class RouteMapModal extends React.Component<MapProps, State> {
+  state: State = {
+    currentPosition: null,
+    showNotes: false
   };
 
   private leafletMap: any = null;
@@ -33,7 +40,6 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
   private path: any = null;
   private pathLayer: any = null;
   private userMovedMap: boolean = false;
-  private imageNotesLayer?: any;
 
   initMapState() {
     this.leafletMap = null;
@@ -45,11 +51,20 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
 
   render() {
     const {origin, destination, onClose, currentPositionIndex=0} = this.props;
+    const {showNotes} = this.state;
     const currentPosition = this.getCurrentPosition();
 
     return <Modal title={`${origin.street_address} to ${destination.street_address}`} onClose={onClose}>
-      <OSMImageNotes onMapLayerLoaded={(mapLayer) => {this.imageNotesLayer = mapLayer; this.refreshMap()}}/>
-      <div style={{height: '70vh'}}>
+      {showNotes &&
+        <OSMImageNotes onMapLayerLoaded={imageNotesLayer => this.setState({imageNotesLayer})} />
+      }
+      <div style={{height: '70vh', position: 'relative'}}>
+        <div className="position-absolute map-tools p-3">
+          <button className={`btn btn-sm btn-compact ${showNotes ? 'btn-primary' : 'btn-outline-primary bg-white'}`}
+                  onClick={this.toggleNotes}>
+            {showNotes ? 'Hide notes' : 'Show notes'}
+          </button>
+        </div>
         <Map extraLayers={this.getMapLayers()}
              latLng={currentPosition ? [currentPosition.lat, currentPosition.lon] : undefined}
              onMapInitialized={this.setMap}/>
@@ -59,6 +74,12 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
       }
     </Modal>;
   }
+
+  toggleNotes = () => {
+    const {showNotes, imageNotesLayer} = this.state;
+    this.setState({showNotes: !showNotes, imageNotesLayer: undefined});
+    if (imageNotesLayer) imageNotesLayer.remove();
+  };
 
   setMap = (leafletMap: any) => {
     this.leafletMap = leafletMap;
@@ -80,6 +101,7 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
 
   getMapLayers() {
     const {origin, destination} = this.props;
+    const {imageNotesLayer} = this.state;
     const currentPosition = this.getCurrentPosition();
 
     if (!this.pathLayer) {
@@ -101,7 +123,7 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
         ).addTo(this.pathLayer);
     });
 
-    if (this.imageNotesLayer) return [this.imageNotesLayer, this.pathLayer];
+    if (imageNotesLayer) return [imageNotesLayer, this.pathLayer];
     else return [this.pathLayer];
   }
 

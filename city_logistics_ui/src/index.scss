@@ -160,3 +160,9 @@ form.compact {
 div.leaflet-top, div.leaflet-bottom {
   z-index: 400;
 }
+
+.map-tools {
+  z-index: 500;
+  right: 0;
+  background: rgba(255, 255, 255, 0.4)
+}

@@ -59,10 +59,6 @@ export default class OSMImageNotesEditor extends Component<{}> {
 
   imageNotesRef = React.createRef<OSMImageNotes>();
 
-  styles = {
-    mapTools: {zIndex: 500, right: 0, background: 'rgba(255, 255, 255, 0.4)'}
-  };
-
   childProps = {
     toolButton: {outline: true, color: "primary", size: "sm", className: 'bg-white'}
   };
@@ -76,7 +72,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
     const location = [lon, lat] as LocationTuple;
 
     return <div className="flex-grow-1">
-      <div className="position-absolute map-tools p-3" style={this.styles.mapTools}>
+      <div className="position-absolute map-tools p-3">
         <input name="image" id="image" className="d-none" type="file"
                accept="image/*" capture="environment"
                onChange={this.onImageCaptured}/>
