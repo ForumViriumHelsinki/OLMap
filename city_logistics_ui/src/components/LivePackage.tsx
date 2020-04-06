@@ -21,7 +21,8 @@ export default class LivePackage extends React.Component<{uuid: string}> {
         <LiveDataLoader url={uuidPackageUrl(uuid)} onLoad={(pkg) => this.setState({pkg})}/>
         {pkg ? <PendingOutgoingPackage package={pkg}/> : <CenteredSpinner/>}
         <p className="mt-4">
-          <a className="btn btn-outline-primary btn-block mt-3" href="/">Sign in</a>
+          Courier or sender?
+          <a className="btn btn-outline-primary btn-block mt-2 mb-2" href="/">Sign in</a>
           to register changes to packages
         </p>
       </div>
