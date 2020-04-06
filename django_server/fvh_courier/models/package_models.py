@@ -124,7 +124,7 @@ class PackageSMS(TimestampedModel):
 
     message_type = models.PositiveSmallIntegerField(choices=((i, t['name']) for i, t in enumerate(message_types)))
     recipient_number = models.CharField(max_length=32)
-    twilio_sid = models.CharField(max_length=64)
+    twilio_sid = models.CharField(max_length=64, blank=True)
     package = models.ForeignKey(Package, on_delete=models.CASCADE, related_name='sms_messages')
     content = models.TextField()
 

@@ -56,7 +56,10 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
             </CardP>
             <Contacts phone={sender.phone_numbers} title="Sender" name={`${sender.first_name} ${sender.last_name}`}/>
             {delivery_instructions &&
-              <CardP>{delivery_instructions}</CardP>}
+              <CardP>
+                <strong>Destination: {deliver_to.street_address}</strong><br/>
+                {delivery_instructions}
+              </CardP>}
             <Button onClick={() => onPackageAction(id, 'pickup')}>Register pickup</Button>
           </>
       }
