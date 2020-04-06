@@ -4,10 +4,9 @@ import Modal from "util_components/Modal";
 import * as L from 'leaflet';
 import settings from 'settings.json';
 
-import styles from 'leaflet/dist/leaflet.css';
-
 import GlyphIcon from "util_components/GlyphIcon";
 import Geolocator from "util_components/Geolocator";
+import Map from "util_components/Map";
 import {Location, Address} from 'util_components/types';
 import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
 
@@ -32,6 +31,7 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
     origin?: any, destination?: any, currentPosition?: any
   } = {};
   private path: any = null;
+  private pathLayer: any = null;
   private userMovedMap: boolean = false;
   private imageNotesLayer?: any;
 
@@ -39,27 +39,38 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
     this.leafletMap = null;
     this.markers = {};
     this.path = null;
+    this.pathLayer = null;
     this.userMovedMap = false;
   }
 
   render() {
-    const {origin, destination, onClose, currentPositionIndex=0, currentPosition} = this.props;
+    const {origin, destination, onClose, currentPositionIndex=0} = this.props;
+    const currentPosition = this.getCurrentPosition();
 
     return <Modal title={`${origin.street_address} to ${destination.street_address}`} onClose={onClose}>
       <OSMImageNotes onMapLayerLoaded={(mapLayer) => {this.imageNotesLayer = mapLayer; this.refreshMap()}}/>
-      <div id="leafletMap" style={{height: '70vh'}}> </div>
-      {(currentPositionIndex > -1) && !currentPosition &&
+      <div style={{height: '70vh'}}>
+        <Map extraLayers={this.getMapLayers()}
+             latLng={currentPosition ? [currentPosition.lat, currentPosition.lon] : undefined}
+             onMapInitialized={this.setMap}/>
+      </div>
+      {(currentPositionIndex > -1) && !this.props.currentPosition &&
         <Geolocator onLocation={([lon, lat]) => this.setState({currentPosition: {lat, lon}})}/>
       }
     </Modal>;
   }
+
+  setMap = (leafletMap: any) => {
+    this.leafletMap = leafletMap;
+    this.leafletMap.on('zoomstart', () => this.userMovedMap = true);
+    this.leafletMap.on('movestart', () => this.userMovedMap = true);
+  };
 
   componentDidMount() {
     this.refreshMap();
   }
 
   componentWillUnmount() {
-    if (this.leafletMap) this.leafletMap.remove();
     this.initMapState()
   }
 
@@ -67,33 +78,16 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
     this.refreshMap();
   }
 
-  refreshMap() {
+  getMapLayers() {
     const {origin, destination} = this.props;
     const currentPosition = this.getCurrentPosition();
 
-    if (!this.leafletMap) {
-      this.leafletMap = L.map('leafletMap');
-      this.leafletMap.fitBounds(this.bounds());
-      L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-        attribution: 'RouteMapModal data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-                     '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                     'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-        maxZoom: 18,
-        id: 'mapbox/streets-v11',
-        accessToken: settings.MapBox.accessToken
-      }).addTo(this.leafletMap);
+    if (!this.pathLayer) {
+      this.pathLayer = L.layerGroup();
       this.path = L.polyline([]);
-      this.path.addTo(this.leafletMap);
-
-      this.leafletMap.on('zoomstart', () => this.userMovedMap = true);
-      this.leafletMap.on('movestart', () => this.userMovedMap = true);
+      this.path.addTo(this.pathLayer);
     }
-    else if (!this.userMovedMap) this.leafletMap.fitBounds(this.bounds());
-
     this.path.setLatLngs(this.coords().map(({lat, lon}) => [lat, lon]));
-
-    if (this.imageNotesLayer && !this.leafletMap.hasLayer(this.imageNotesLayer))
-      this.imageNotesLayer.addTo(this.leafletMap);
 
     Object.entries({origin, destination, currentPosition}).forEach(([name, coord]) => {
       if (!coord) return;
@@ -104,8 +98,15 @@ export default class RouteMapModal extends React.Component<MapProps, {currentPos
       else this.markers[name] = L.marker(
           [coord.lat, coord.lon],
           {icon: new GlyphIcon({glyph, glyphSize: 20})}
-        ).addTo(this.leafletMap);
+        ).addTo(this.pathLayer);
     });
+
+    if (this.imageNotesLayer) return [this.imageNotesLayer, this.pathLayer];
+    else return [this.pathLayer];
+  }
+
+  refreshMap() {
+    if (!this.userMovedMap) this.leafletMap.fitBounds(this.bounds());
   }
 
   getCurrentPosition() {
