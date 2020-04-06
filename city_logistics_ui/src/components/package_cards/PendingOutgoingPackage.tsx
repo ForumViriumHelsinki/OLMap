@@ -21,7 +21,7 @@ export default class PendingOutgoingPackage extends React.Component<{package: Pa
 
     const detailsEl = <CardP>
       Order details:<br/>
-      <pre className="mb-0">{details}</pre>
+      <pre className="mb-0" style={{fontFamily: 'inherit'}}>{details}</pre>
     </CardP>;
 
     return (

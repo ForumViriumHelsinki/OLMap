@@ -221,7 +221,7 @@ class HolviPackage(models.Model):
             details += '\n'
 
         self.package = Package.objects.create(
-            name=f'{len(purchases)} meals to {self.order.recipient_str()}'[:64],
+            name=f'{len(purchases)} meal{len(purchases) > 1 and "s" or ""} to {self.order.recipient_str()}'[:64],
             details=details,
             delivery_instructions=delivery_instructions,
             pickup_at=self.order.sender_address(),
