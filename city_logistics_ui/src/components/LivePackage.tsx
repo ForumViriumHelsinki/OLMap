@@ -5,6 +5,7 @@ import CenteredSpinner from "util_components/CenteredSpinner";
 import NavBar from "util_components/NavBar";
 import {Package} from "components/types";
 import {uuidPackageUrl} from "urls";
+import Terms from "components/Terms";
 
 export default class LivePackage extends React.Component<{uuid: string}> {
   state: {pkg?: Package} = {
@@ -25,6 +26,7 @@ export default class LivePackage extends React.Component<{uuid: string}> {
           <a className="btn btn-outline-primary btn-block mt-2 mb-2" href="/">Sign in</a>
           to register changes to packages
         </p>
+        <Terms/>
       </div>
     </>;
   }

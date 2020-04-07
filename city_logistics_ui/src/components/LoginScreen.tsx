@@ -2,18 +2,27 @@ import React from 'react';
 import {loginUrl, registerUrl} from "urls";
 import LoginForm from "util_components/LoginForm";
 import RegisterForm from "util_components/RegisterForm";
+import Modal from "util_components/Modal";
+import Terms from "components/Terms";
 
 type func = () => any;
 
 type LoginScreenProps = { onLogin: func };
-type LoginScreenState = { mode: 'login' | 'register' };
+
+type LoginScreenState = {
+  mode: 'login' | 'register',
+  showTerms: boolean
+};
 
 export default class LoginScreen extends React.Component<LoginScreenProps, LoginScreenState> {
-  state: LoginScreenState = {mode: 'login'};
+  state: LoginScreenState = {
+    mode: 'login',
+    showTerms: false
+  };
 
   render() {
     const {onLogin} = this.props;
-    const {mode} = this.state;
+    const {mode, showTerms} = this.state;
 
     return (
       <div className="container">
@@ -44,6 +53,7 @@ export default class LoginScreen extends React.Component<LoginScreenProps, Login
           <LoginForm loginUrl={loginUrl} onLogin={onLogin}/>
         : <RegisterForm url={registerUrl} loginUrl={loginUrl} onLogin={onLogin}/>
         }
+        <Terms/>
       </div>
     );
   }
