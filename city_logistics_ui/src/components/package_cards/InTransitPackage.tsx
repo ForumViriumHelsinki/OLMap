@@ -8,14 +8,20 @@ import Button from "util_components/Button";
 import {Package, packageAction, User} from "components/types";
 import {LocationTuple} from "util_components/types";
 import TimeInterval from "util_components/TimeInterval";
+import {sessionRequest} from "sessionRequest";
+import {myPackageActionUrl} from "urls";
 
 type InTransitPackageProps = {
     package: Package,
     currentLocation?: LocationTuple,
-    onPackageAction: (id: number, action: packageAction) => any
+    onPackageUpdate: (item: Package) => any
 }
 
-export default class InTransitPackage extends React.Component<InTransitPackageProps> {
+type State = { error: boolean };
+
+export default class InTransitPackage extends React.Component<InTransitPackageProps, State> {
+  state: State = {error: false};
+
   render() {
     const {
       earliest_pickup_time, latest_pickup_time,
@@ -23,7 +29,7 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
       pickup_at, deliver_to, weight, width, height, depth, name, delivery_instructions,
       picked_up_time, recipient, recipient_phone, sender, id} = this.props.package;
 
-    const {currentLocation, onPackageAction} = this.props;
+    const {currentLocation} = this.props;
     const [lon, lat] = currentLocation || [];
 
     const currentPositionIndex = picked_up_time ? 1 : 0;
@@ -35,6 +41,7 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
 
     return (
       <Card title={title} subtitles={[formatTimestamp(earliest_pickup_time), name]}>
+
       {(weight || width || height || depth) &&
         <CardP>{weight} kg, {width}*{height}*{depth}cm</CardP>}
       <PackageDistances package={this.props.package} courierLocation={currentLocation && {lat, lon}}/>
@@ -47,7 +54,7 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
             <Contacts phone={recipient_phone} title="Recipient" name={recipient}/>
             {delivery_instructions &&
               <CardP>{delivery_instructions}</CardP>}
-            <Button onClick={() => onPackageAction(id, 'delivery')}>Register delivery</Button>
+            <Button onClick={() => this.packageAction('delivery')}>Register delivery</Button>
           </>
         : <>
             <CardP>
@@ -60,10 +67,20 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
                 <strong>Destination: {deliver_to.street_address}</strong><br/>
                 {delivery_instructions}
               </CardP>}
-            <Button onClick={() => onPackageAction(id, 'pickup')}>Register pickup</Button>
-          </>
+            <Button onClick={() => this.packageAction('pickup')}>Register pickup</Button>
+           </>
       }
       </Card>
     );
   }
+
+  packageAction = (action: packageAction) => {
+    const {onPackageUpdate} = this.props;
+    const {id} = this.props.package;
+    sessionRequest(myPackageActionUrl(id, action), {method: 'PUT'})
+    .then((response) => {
+      if (response.status == 200) response.json().then(onPackageUpdate)
+      else this.setState({error: true});
+    })
+  };
 }

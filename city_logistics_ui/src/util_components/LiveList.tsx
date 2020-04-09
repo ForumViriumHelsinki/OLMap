@@ -27,7 +27,7 @@ export default class LiveList extends React.Component<LiveListProps, LiveListSta
         {items && (this.state.url == url) ?
           items.length ?
             items.map((itemData, i) =>
-              <React.Fragment key={i}>{item(itemData)}</React.Fragment>)
+              <div className="mb-2" key={i}>{item(itemData)}</div>)
             : <p>No items.</p>
         : <CenteredSpinner/>}
       </div>

@@ -11,10 +11,11 @@ import Geolocator from "util_components/Geolocator";
 import DeliveredByMePackage from "components/package_cards/DeliveredByMePackage";
 import InTransitPackage from "components/package_cards/InTransitPackage";
 import {LocationTuple} from "util_components/types";
-import {packageAction} from "components/types";
+import {Package} from "components/types";
 import NavPills from "util_components/NavPills";
 import LiveList from "util_components/LiveList";
 import AvailablePackage from "components/package_cards/AvailablePackage";
+import LivePackagesMap from "components/LivePackagesMap";
 
 type State = {
   activeTab: string,
@@ -35,12 +36,15 @@ export default class ReservedPackageLists extends React.Component {
         render: () => <LiveList ref={this.liveList} url={myPackagesUrl} item={(item: any) =>
             <InTransitPackage package={item}
                               currentLocation={currentLocation}
-                              onPackageAction={this.packageAction}/>}/>
+                              onPackageUpdate={this.onPackageUpdate}/>}/>
       }, {
         name: 'Available',
         render: () => <LiveList url={availablePackagesUrl} item={(item: any) =>
           <AvailablePackage key={item.id} package={item} currentLocation={currentLocation}
-                            onPackageReserve={this.reservePackage}/>}/>
+                            onPackageUpdate={this.onPackageUpdate}/>}/>
+      }, {
+        name: 'Map',
+        render: () => <LivePackagesMap/>
       }, {
         name: 'Delivered',
         render: () => <LiveList url={myDeliveredPackagesUrl}
@@ -59,20 +63,10 @@ export default class ReservedPackageLists extends React.Component {
     </div>;
   }
 
-  packageAction = (id: number, action: packageAction) => {
-    sessionRequest(myPackageActionUrl(id, action), {method: 'PUT'})
-    .then((response) => {
-      if ((response.status == 200) && this.liveList.current) this.liveList.current.refreshItems();
-      else this.setState({error: true});
-    })
-  };
-
-  reservePackage = (id: number) => {
-    sessionRequest(reservePackageUrl(id), {method: 'PUT'})
-    .then((response) => {
-      if (response.status == 200) this.setState({activeTab: 'Pending'});
-      else this.setState({error: true});
-    })
+  onPackageUpdate = (item: Package) => {
+    if (item.courier && this.state.activeTab == 'Available')
+      this.setState({activeTab: 'Pending'});
+    else if (this.liveList.current) this.liveList.current.refreshItems();
   };
 
   locationUpdated = (currentLocation: LocationTuple) => {

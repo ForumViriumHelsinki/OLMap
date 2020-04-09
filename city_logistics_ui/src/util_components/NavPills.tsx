@@ -21,6 +21,6 @@ export default class NavPills extends React.Component<NavPillProps> {
 
   getClassName(nav: string) {
     const {active, disabled} = this.props;
-    return `nav-link${(nav == active) ? ' active' : ''}${disabled.includes(nav) ? ' disabled' : ''}`;
+    return `nav-link p-1 ${(nav == active) ? ' active' : ''}${disabled.includes(nav) ? ' disabled' : ''}`;
   }
 }

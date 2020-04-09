@@ -7,17 +7,19 @@ export function CardP({children}: {children: any}) {
 type CardProps = {
   title: string | React.ReactNode,
   subtitles: string[],
-  children: any
+  children: any,
+  className: string
 }
 
 export default class Card extends React.Component<CardProps> {
   static defaultProps = {
-    subtitles: []
-  }
+    subtitles: [],
+    className: ''
+  };
 
   render() {
-    const {title, subtitles, children} = this.props;
-    return <div className="card mb-2">
+    const {title, subtitles, children, className} = this.props;
+    return <div className={"card " + className}>
       <div className="card-body">
         <h5 className="card-title">{title}</h5>
         {subtitles.map((subtitle, i) =>

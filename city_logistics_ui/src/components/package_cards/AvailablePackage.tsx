@@ -6,11 +6,13 @@ import Button from "util_components/Button";
 import {Package} from "components/types";
 import {LocationTuple} from "util_components/types";
 import TimeInterval from "util_components/TimeInterval";
+import {sessionRequest} from "sessionRequest";
+import {reservePackageUrl} from "urls";
 
 type AvailablePackageProps = {
     package: Package,
     currentLocation?: LocationTuple,
-    onPackageReserve: (id: number) => any
+    onPackageUpdate: (item: Package) => any
 }
 
 export default class AvailablePackage extends React.Component<AvailablePackageProps> {
@@ -21,7 +23,7 @@ export default class AvailablePackage extends React.Component<AvailablePackagePr
       pickup_at, deliver_to, name,
       weight, width, height, depth, id} = this.props.package;
 
-    const {currentLocation, onPackageReserve} = this.props;
+    const {currentLocation} = this.props;
     const [lon, lat] = currentLocation || [];
 
     const title = <>
@@ -38,8 +40,17 @@ export default class AvailablePackage extends React.Component<AvailablePackagePr
           <TimeInterval label="Pickup" from={earliest_pickup_time} to={latest_pickup_time}/><br />
           <TimeInterval label="Delivery" from={earliest_delivery_time} to={latest_delivery_time}/>
         </CardP>
-        <Button confirm="Reserve for delivery?" onClick={() => onPackageReserve(id)}>Reserve</Button>
+        <Button confirm="Reserve for delivery?" onClick={this.reservePackage}>Reserve</Button>
       </Card>
     );
   }
+
+  reservePackage = () => {
+    const {id} = this.props.package;
+    sessionRequest(reservePackageUrl(id), {method: 'PUT'})
+    .then((response) => {
+      if (response.status == 200) response.json().then(this.props.onPackageUpdate);
+      else this.setState({error: true});
+    })
+  };
 }
