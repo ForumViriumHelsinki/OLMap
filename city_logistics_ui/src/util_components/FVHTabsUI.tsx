@@ -69,10 +69,10 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, State> {
         <NavBar header={header}
                 icon={user.is_courier ? "directions_bike" : "account_circle"}
                 iconText={user.username}/>
-        <div className={'flex-grow-1 overflow-auto' + (fullWidth ? '' : " container")}>
+        <div className={'flex-grow-1  flex-shrink-1 overflow-auto' + (fullWidth ? '' : " container")}>
           <ChildComponent {...childProps}/>
         </div>
-        <nav className="navbar navbar-dark bg-primary p-0">
+        <nav className="navbar navbar-dark bg-primary p-0 flex-shrink-0">
           <ul className="navbar-nav flex-row nav-fill flex-fill">
             {tabs.map(({icon, menuText, header}) => (
               <NavItem key={header} icon={icon} text={menuText} active={activeTab == header}

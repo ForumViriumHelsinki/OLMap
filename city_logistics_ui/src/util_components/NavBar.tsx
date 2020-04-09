@@ -11,7 +11,7 @@ export default class NavBar extends React.Component<NavBarProps> {
   render() {
     const {icon, iconText, header, onIconClick} = this.props;
 
-    return <nav className="navbar navbar-dark bg-primary p-0">
+    return <nav className="navbar navbar-dark bg-primary p-0 flex-shrink-0">
       <div className="w-25">
         <div className="text-center text-light d-inline-block ml-2 mt-1" onClick={onIconClick}>
           {icon && <Icon icon={icon} text={iconText}/>}
