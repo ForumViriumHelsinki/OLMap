@@ -62,8 +62,8 @@ class PackageSerializer(serializers.ModelSerializer):
         Overridden create method to allow creating / referring to addresses; vanilla DRF create does not
         support creation of related objects.
         """
-        pickup_at = models.Address.objects.get_or_create(**validated_data.pop('pickup_at'))[0]
-        deliver_to = models.Address.objects.get_or_create(**validated_data.pop('deliver_to'))[0]
+        pickup_at = models.Address.objects.get_or_create(**validated_data.pop('pickup_at'))[0].with_latlng()
+        deliver_to = models.Address.objects.get_or_create(**validated_data.pop('deliver_to'))[0].with_latlng()
         return models.Package.objects.create(pickup_at=pickup_at, deliver_to=deliver_to, **validated_data)
 
     class Meta:

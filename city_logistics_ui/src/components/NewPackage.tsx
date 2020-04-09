@@ -69,7 +69,7 @@ export default class NewPackage extends Component<{onCreated: func}> {
       schema.properties[field] = {...this.stringField, title: schema.properties[field].title});
     Object.entries(this.timeFieldDefaults).forEach(([field, hours]) =>
       schema.properties[field].default = moment().startOf('hour').add(hours + 1, 'hours').format()
-    )
+    );
     this.setState({schema});
   }
 
@@ -78,9 +78,7 @@ export default class NewPackage extends Component<{onCreated: func}> {
       street_address: address.name,
       postal_code: address.postcode,
       city: address.city,
-      country: address.country,
-      lat: address.latlng.lat,
-      lon: address.latlng.lng
+      country: address.country
     };
   }
 
