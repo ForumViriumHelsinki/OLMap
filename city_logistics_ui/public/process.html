@@ -4,11 +4,20 @@
     <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+      .process:hover .card, .process:hover img {
+        opacity: 0.8;
+      }
+      .process:hover .card:hover, .process:hover img:hover {
+        opacity: 1;
+        box-shadow: 0rem 0rem 1rem rgba(255,80,0,1)!important;
+      }
+    </style>
   </head>
   <body>
     <div class="fixed-top bg-light shadow-lg">
       <div class="container">
-        <h3 class="text-center m-3">OLMap package delivery process</h3>
+        <h3 class="text-center m-3">Assi orders a meal from Rafael</h3>
 
         <div class="row">
           <div class="col">
@@ -24,7 +33,7 @@
       </div>
     </div>
 
-    <div class="container mb-5" style="margin-top: 136px">
+    <div class="container mb-5 process" style="margin-top: 136px">
       <div class="row">
         <div class="col">
         </div>
@@ -40,20 +49,14 @@
       <div class="row">
         <div class="col">
           <img class="w-100 m-2 shadow-lg" src="images/delivery-process/1-courier-new-request.jpg"/>
-        </div>
-        <div class="col">
-        </div>
-        <div class="col">
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col">
           <img class="w-100 m-2 shadow-lg" src="images/delivery-process/2-courier-new-available-package.jpg"/>
+          <img class="w-100 m-2 shadow-lg" src="images/delivery-process/3-2-courier-packages-map.jpg"/>
           <img class="w-100 m-2 shadow-lg" src="images/delivery-process/3-courier-map.jpg"/>
           <img class="w-100 m-2 shadow-lg" src="images/delivery-process/4-courier-reserve.jpg"/>
         </div>
         <div class="col">
+          <div class="card bg-white p-3 shadow-lg" style="margin-right: -48px">Restaurant is notified by the webshop.</div>
+          <img class="w-100 m-2 shadow-lg" src="images/delivery-process/2-restaurant-new-order.jpg"/>
         </div>
         <div class="col">
         </div>
