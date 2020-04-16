@@ -137,7 +137,7 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
             onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
             featureActions={
               (feature: OSMFeature) =>
-                feature.tags.entrance && selectedNote?.osm_features.includes(feature.id) &&
+                feature.tags.entrance && selectedNote.osm_features && selectedNote.osm_features.includes(feature.id) &&
                   <button className="btn btn-light btn-compact float-right"
                           onClick={(e) => this.linkEntrance(e, feature)}>
                     <Icon icon="link"/>
