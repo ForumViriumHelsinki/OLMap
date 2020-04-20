@@ -200,12 +200,14 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     this.setState({error: false, selectedNote, ...(nextState || {})});
   };
 
+  fetchNote(id: number) {
+    return sessionRequest(osmImageNoteUrl(id)).then(response => response.json())
+  }
+
   refreshNote = () => {
     const {selectedNote} = this.state;
-    if (!selectedNote) return;
-    sessionRequest(osmImageNoteUrl(selectedNote.id as  number))
-    .then(response => response.json())
-    .then((newNote: OSMImageNote) => this.noteUpdated(newNote))
+    if (selectedNote)
+      this.fetchNote(selectedNote.id as number).then((newNote: OSMImageNote) => this.noteUpdated(newNote))
   };
 
   private getMapLayer() {
@@ -226,7 +228,10 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
           : successDotIcon;
       if (this.dotMarkers[id]) return this.dotMarkers[id].setIcon(icon);
       const marker = L.marker({lon: osmImageNote.lon, lat: osmImageNote.lat}, {icon: icon})
-      marker.on('click', () => this.setState({selectedNote: osmImageNote, readOnly: true}));
+      marker.on('click', () =>
+        this.fetchNote(osmImageNote.id as number)
+        .then(selectedNote => this.setState({selectedNote, readOnly: true}))
+      );
       marker.addTo(this.mapLayer);
       this.dotMarkers[id] = marker;
     });

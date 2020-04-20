@@ -127,9 +127,15 @@ class MyLocationView(RetrieveUpdateDestroyAPIView):
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OSMImageNoteWithPropsSerializer
-    queryset = prefetch_properties(
-        models.OSMImageNote.objects.filter(visible=True)
-        .prefetch_related('tags', 'osm_features', 'upvotes', 'downvotes', 'comments'))
+    queryset = models.OSMImageNote.objects.filter(visible=True)
+
+    # Use simple serializer for list to improve performance:
+    serializer_classes = {
+        'list': BaseOSMImageNoteSerializer
+    }
+
+    def get_serializer_class(self):
+        return self.serializer_classes.get(self.action, self.serializer_class)
 
     def create(self, request, *args, **kwargs):
         self.ensure_features(request)

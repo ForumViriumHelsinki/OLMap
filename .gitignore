@@ -14,3 +14,4 @@ __pycache__
 /django_server/.coverage
 /django_server/uploads/
 /tunnel_db.sh
+/update_qa_server.sh
