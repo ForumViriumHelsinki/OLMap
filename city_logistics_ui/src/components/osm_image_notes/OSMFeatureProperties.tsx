@@ -163,8 +163,7 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
           String(spec.type) == String(["boolean", "null"]))
         .map(([field, spec]) => {
           // @ts-ignore
-          spec.enum = [true, false];
-          return [field, {"ui:widget": "select"}]
+          return [field, {"ui:widget": "radio"}]
         }));
     return uiSchema
   }

@@ -154,6 +154,19 @@ form.compact {
       font-size: 75%;
       color: #999;
     }
+    .field-radio-group {
+      padding-left: 40%;
+      margin-top: -2rem;
+
+      .radio {
+        display: inline-block;
+        padding-right: 1rem;
+
+        input {
+          margin-right: 0.5rem;
+        }
+      }
+    }
   }
 }
 
