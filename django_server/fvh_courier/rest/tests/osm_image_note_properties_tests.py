@@ -48,6 +48,26 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
             'width': 0.9,
             'entrance': 'staircase'})
 
+    def test_save_osm_image_note_with_empty_property_list(self):
+        # Given that a user is signed in
+        courier = self.create_and_login_courier()
+
+        # When requesting to save an OSM image note over ReST, supplying an empty list of properties
+        url = reverse('osmimagenote-list')
+        fields = {
+            'lat': '60.16134701761975',
+            'lon': '24.944593941327188',
+            'comment': 'Nice view',
+            'entrance_set': []
+        }
+        response = self.client.post(url, data=fields, format='json')
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # And a note is created in db:
+        note = models.OSMImageNote.objects.get()
+
     def test_update_osm_image_note_properties(self):
         # Given that a user is signed in
         courier = self.create_and_login_courier()

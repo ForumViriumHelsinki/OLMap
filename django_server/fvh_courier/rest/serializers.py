@@ -185,8 +185,8 @@ class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImage
         relateds = {}
         for prop_type in models.image_note_property_types:
             field = manager_name(prop_type)
-            if validated_data.get(field, None):
-                relateds[field] = validated_data.pop(field)
+            if validated_data.get(field, None) is not None:
+                relateds[field] = validated_data.pop(field, [])
         return relateds
 
     def save_tags(self, instance, tags):
