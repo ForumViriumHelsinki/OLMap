@@ -35,19 +35,19 @@ type FVHTabsUIProps = {
   onLogout: () => any
 }
 
-type State = { activeTab: string, showLogout: boolean, height: number };
+type State = { activeTab: string, showLogout: boolean };
 
 export default class FVHTabsUI extends React.Component<FVHTabsUIProps, State> {
   constructor(props: FVHTabsUIProps) {
     super(props);
     this.state = {
       activeTab: this.props.activeTab,
-      showLogout: false,
-      height: window.innerHeight
+      showLogout: false
     };
   }
 
-  onResize = () => this.setState({height: window.innerHeight});
+  // @ts-ignore
+  onResize = () => document.getElementById('FVHTabsUI').style.height = window.innerHeight;
 
   componentDidMount() {
     window.addEventListener('resize', this.onResize)
@@ -59,13 +59,13 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, State> {
 
   render() {
     const {user, onLogout, tabs} = this.props;
-    const {activeTab, showLogout, height} = this.state;
+    const {activeTab, showLogout} = this.state;
     const {ChildComponent, header, childProps, fullWidth} = tabs.find(t => t.header == activeTab) || tabs[0];
 
     setTimeout(() => window.scrollTo(0, 10), 1000);
 
     return (
-      <div style={{height}} className="flex-column d-flex">
+      <div style={{height: window.innerHeight}} className="flex-column d-flex" id="FVHTabsUI">
         <NavBar header={header}
                 icon={user.is_courier ? "directions_bike" : "account_circle"}
                 iconText={user.username}/>

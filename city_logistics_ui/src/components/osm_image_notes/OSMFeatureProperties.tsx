@@ -152,7 +152,7 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
     // @ts-ignore
     Promise.resolve(onSubmit({[fieldName]: osmImageNote[fieldName]}))
       .then(() => this.setState({editingFeature: undefined}));
-  }
+  };
 
   private getUISchema() {
     const {schema} = this.props;
