@@ -7,13 +7,14 @@ import Confirm from "util_components/Confirm";
 type func = () => any;
 
 type OLMapUIProps = {onLogout: func}
-type OLMapUIState = {showLogout?: boolean, height: number}
+type OLMapUIState = {showLogout?: boolean}
 
 export default class OLMapUI extends React.Component<OLMapUIProps, OLMapUIState> {
   static contextType = AppContext;
-  state: OLMapUIState = {height: window.innerHeight};
+  state: OLMapUIState = {};
 
-  onResize = () => this.setState({height: window.innerHeight});
+  // @ts-ignore
+  onResize = () => document.getElementById('OLMapUI').style.height = window.innerHeight;
 
   componentDidMount() {
     window.addEventListener('resize', this.onResize)
@@ -26,9 +27,9 @@ export default class OLMapUI extends React.Component<OLMapUIProps, OLMapUIState>
   render() {
     const {user} = this.context;
     const {onLogout} = this.props;
-    const {showLogout, height} = this.state;
+    const {showLogout} = this.state;
 
-    return <div style={{height}} className="flex-column d-flex">
+    return <div style={{height: window.innerHeight}} className="flex-column d-flex" id="OLMapUI">
       <NavBar header='OLMap' onIconClick={() => this.setState({showLogout: true})}
         icon={user.is_courier ? "directions_bike" : "account_circle"}
         iconText={user.username}/>
