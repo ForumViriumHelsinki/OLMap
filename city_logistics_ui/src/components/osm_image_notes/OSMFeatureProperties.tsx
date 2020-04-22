@@ -7,6 +7,7 @@ import {AppContext, JSONSchema, OSMImageNote} from "components/types";
 // @ts-ignore
 import {Button} from "reactstrap";
 import {OSMFeature} from "util_components/osm/types";
+import ConfirmButton from "util_components/ConfirmButton";
 
 const valueFromOSMTags: {[tag: string]: (f: OSMFeature) => any} = {
   'street': (f: OSMFeature) => f.tags['addr:street'] || (f.tags.highway && f.tags.name),
@@ -58,12 +59,19 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
             {(pkFeature != editingFeature) &&
               <>
                 {' '}
-                {editable && <Button size="sm" color="primary" outline className="btn-compact"
-                                     onClick={() => this.setState({editingFeature: pkFeature})}>Edit</Button>}
+                {editable &&
+                  <Button size="sm" color="primary" outline className="btn-compact"
+                          onClick={() => this.setState({editingFeature: pkFeature})}>Edit</Button>
+                }
                 {' '}
                 {pkFeature.as_osm_tags &&
                   <Button size="sm" color="secondary" outline className="btn-compact"
                           onClick={() => this.copyText((pkFeature.id || i) + '-osm-text')}>Copy</Button>
+                }
+                {editable &&
+                  <ConfirmButton onClick={() => this.onDelete(pkFeature)}
+                                 className="btn-outline-danger btn-compact btn-sm float-right"
+                                 confirm={`Really delete ${osmFeatureName}?`}>Delete</ConfirmButton>
                 }
               </>
             }
@@ -75,6 +83,9 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
               <Button size="sm" color="primary" type="submit" className="btn-compact pl-4 pr-4 mr-2">Save</Button>
               <Button tag="span" size="sm" color="secondary" outline className="btn-compact pl-4 pr-4"
                       onClick={this.onCancel}>Cancel</Button>
+              <ConfirmButton onClick={() => this.onDelete(pkFeature)}
+                             className="btn-outline-danger btn-compact btn-sm float-right"
+                             confirm={`Really delete ${osmFeatureName}?`}>Delete</ConfirmButton>
             </Form>
             :
             <>
@@ -108,6 +119,18 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
     // @ts-ignore
     if (!editingFeature.id) featureList.splice(featureList.indexOf(editingFeature, 1));
     this.setState({editingFeature: undefined})
+  };
+
+  onDelete = (feature: PKFeature) => {
+    const {osmImageNote, onSubmit} = this.props;
+    const fieldName = this.getFeatureListFieldName();
+    // @ts-ignore
+    const featureList = osmImageNote[fieldName];
+    // @ts-ignore
+    featureList.splice(featureList.indexOf(feature, 1));
+    // @ts-ignore
+    Promise.resolve(onSubmit({[fieldName]: featureList}))
+      .then(() => {if (feature == this.state.editingFeature) this.setState({editingFeature: undefined})});
   };
 
   newPKFeature = () => {

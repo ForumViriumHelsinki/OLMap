@@ -4,7 +4,7 @@ import MapWidget from "components/MapWidget";
 import Contacts from "util_components/Contacts";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
-import Button from "util_components/Button";
+import ConfirmButton from "util_components/ConfirmButton";
 import {Package, packageAction, User} from "components/types";
 import {LocationTuple} from "util_components/types";
 import TimeInterval from "util_components/TimeInterval";
@@ -54,7 +54,7 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
             <Contacts phone={recipient_phone} title="Recipient" name={recipient}/>
             {delivery_instructions &&
               <CardP>{delivery_instructions}</CardP>}
-            <Button onClick={() => this.packageAction('delivery')}>Register delivery</Button>
+            <ConfirmButton onClick={() => this.packageAction('delivery')}>Register delivery</ConfirmButton>
           </>
         : <>
             <CardP>
@@ -67,7 +67,7 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
                 <strong>Destination: {deliver_to.street_address}</strong><br/>
                 {delivery_instructions}
               </CardP>}
-            <Button onClick={() => this.packageAction('pickup')}>Register pickup</Button>
+            <ConfirmButton onClick={() => this.packageAction('pickup')}>Register pickup</ConfirmButton>
            </>
       }
       </Card>

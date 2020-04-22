@@ -1,24 +1,26 @@
 import React from "react";
-import * as PropTypes from "prop-types";
 import Confirm from "util_components/Confirm";
 
 type ButtonProps = {
   onClick: () => any,
   children: any,
-  confirm?: string
+  confirm?: string,
+  className: string
 };
 
-export default class Button extends React.Component<ButtonProps> {
+export default class ConfirmButton extends React.Component<ButtonProps> {
   state = {
     showConfirmation: false
   };
 
+  static defaultProps = {className: 'btn-secondary'};
+
   render() {
-    const {onClick, children, confirm} = this.props;
+    const {onClick, children, confirm, className} = this.props;
     const {showConfirmation} = this.state;
 
     return <>
-        <button className="btn btn-secondary"
+        <button className={`btn ${className}`}
                 onClick={(e) => {
                   e.preventDefault();
                   this.setState({showConfirmation: true})

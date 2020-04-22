@@ -2,7 +2,7 @@ import React from 'react';
 import Card, {CardP} from "util_components/Card";
 import MapWidget from "components/MapWidget";
 import PackageDistances from "components/PackageDistances";
-import Button from "util_components/Button";
+import ConfirmButton from "util_components/ConfirmButton";
 import {Package} from "components/types";
 import {LocationTuple} from "util_components/types";
 import TimeInterval from "util_components/TimeInterval";
@@ -40,7 +40,7 @@ export default class AvailablePackage extends React.Component<AvailablePackagePr
           <TimeInterval label="Pickup" from={earliest_pickup_time} to={latest_pickup_time}/><br />
           <TimeInterval label="Delivery" from={earliest_delivery_time} to={latest_delivery_time}/>
         </CardP>
-        <Button confirm="Reserve for delivery?" onClick={this.reservePackage}>Reserve</Button>
+        <ConfirmButton confirm="Reserve for delivery?" onClick={this.reservePackage}>Reserve</ConfirmButton>
       </Card>
     );
   }
