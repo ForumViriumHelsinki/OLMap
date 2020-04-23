@@ -1,0 +1,73 @@
+<html>
+  <head>
+    <title>OLMap - Open Logistics Map</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+      .img {
+        margin: 0.5rem auto;
+        display: block;
+      }
+      .mobile-img {
+        max-width: 360px;
+        margin: 0.5rem auto;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h3 class="text-center m-3">Open Logistics Map - OLMap</h3>
+      <h4 class="text-center m-3">Collection process for map data</h4>
+      <p>
+        The OLMap data collection tool has been developed to help improve OSM data on features of interest to
+        logistics companies, especially entrances, gates and other barriers. It is designed for data collection
+        "in the field" using a smartphone, and subsequent data processing using a computer and the iD OSM editor.
+        It may also be used as a more general map commenting & data collection tool. It enables:
+        <ul>
+          <li>Collecting points of interest on the map, in the form of images and/or textual notes.</li>
+          <li>Linking the collected notes to nearby OSM features (entrances, barriers, addresses, named features such as companies & streets)</li>
+          <li>Categorizing the notes by the type of information documented (e.g. entrance, barrier, problem)</li>
+          <li>Entering the most relevant OSM tags related to the documented features (e.g. wheelchair access, opening hours, number of steps)</li>
+          <li>Serving the notes as a GeoJSON dataset to support OSM editing by layering on top of the iD edit view</li>
+          <li>Exporting the entered tags as a text blob directly copyable to the iD tags input field.</li>
+        </ul>
+        The remainder of this document will go into detail as to how these different goals are achieved.
+      </p>
+      <h5>Adding an image note to the map</h5>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/1-notes-view.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/2-take-picture.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/3-select-position.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/4-choose-related.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/5-comment-and-tag.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/6-steps-info.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/7-save-note.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/8-note-saved.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/9-view-saved-note.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/10-note-as-osm-tags.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/11-entrance-picture.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/12-related-places.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/13-entrance-details.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/14-entrance-note-saved.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/15-shop-details.jpg"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/16-zoom-image.jpg"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/17-open-osm.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/18-osm-id-data-layer.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/19-notes-in-id-editor.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/20-copy-tags-from-olmap.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/21-tags-in-id-editor.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/22-accept-steps-when-in-osm.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/23-new-point-for-entrance-in-id-editor.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/24-copy-entrance-tags.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/25-entrance-tags-in-id-editor.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/26-copy-shop-info.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/27-save-osm-changeset.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/28-relate-new-entrance.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/29-link-entrance-button.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/30-link-entrance-window.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/31-accept-entrance-note.png"/>
+      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/32-notes-accepted-and-done.png"/>
+    </div>
+  </body>
+</html>
