@@ -11,13 +11,14 @@
       }
       .mobile-img {
         max-width: 360px;
-        margin: 0.5rem auto;
-        display: block;
+      }
+      .md-img {
+        max-width: 640px;
       }
     </style>
   </head>
   <body>
-    <div class="container">
+    <div class="container mb-5">
       <h3 class="text-center m-3">Open Logistics Map - OLMap</h3>
       <h4 class="text-center m-3">Collection process for map data</h4>
       <p>
@@ -35,39 +36,185 @@
         </ul>
         The remainder of this document will go into detail as to how these different goals are achieved.
       </p>
-      <h5>Adding an image note to the map</h5>
+
+
+      <h5 class="mt-5">Adding an image note to the map</h5>
+
       <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/1-notes-view.jpg"/>
+      <p>
+        The notes view (which is the default view for most users) shows the user's position on the map,
+        as detected by the device's location sensors. The view offers four action buttons on the top right; in order:
+        <ul>
+          <li>Take a photo</li>
+          <li>Make a textual map note</li>
+          <li>Reload notes on map</li>
+          <li>Limit notes shown to my own notes</li>
+        </ul>
+        By tapping on the photo action, the device camera is activated to take a new photo:
+      </p>
       <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/2-take-picture.jpg"/>
+
+      <p class="mt-5">
+        Once you are happy with the photo, the system will request the exact position of the pictured feature.
+        Use surrounding features on the map background to pinpoint the location:
+      </p>
       <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/3-select-position.jpg"/>
+
+      <p class="mt-5">
+        When you have selected the location, OLMap will search for nearby OSM features of interest and allow you
+        to link the note to one or more existing features. Point features have a location button showing a popup of
+        the location of the feature relative to your new note. Select any features directly related to the subject of
+        the note:
+      </p>
       <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/4-choose-related.jpg"/>
+
+      <p class="mt-5">
+        Now, OLMap will allow you to enter a free text description for the note; you can also tag it to mark
+        the intention of the note. Most tags are associated with a particular type of OSM feature; selecting the tag
+        allows you to then enter more specific information on that feature. This may in some cases be
+        more convenient to do later with a computer, given that the relevant information is visible in the picture
+        or the free text description:
+      </p>
       <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/5-comment-and-tag.jpg"/>
-      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/6-steps-info.jpg"/>
+
+      <p class="mt-5">
+        When all the relevant information has been entered in the field, tap the Done button in the very bottom
+        of the active window. A verification notice on successful save should be shown:
+      </p>
       <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/7-save-note.jpg"/>
+
+      <p class="mt-5">
+        Now the new note is visible as a circle on the map to you and all other users of the system. Reviewers
+        will see the new note as orange (as opposed to green) to highlight that it has not yet been
+        reviewed and added to OSM:
+      </p>
       <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/8-note-saved.jpg"/>
+
+      <p class="mt-5">
+        Tapping on the note on the map will open a popup showing the information as entered. Pictured
+        here is the view as shown to a reviewer user; some features are only shown to reviewers:
+        <ul>
+          <li>The OSM / Accept / Reject actions for OSM editing & note reviewing</li>
+          <li>The opportunity to change the tags after note creation.</li>
+        </ul>
+      </p>
       <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/9-view-saved-note.jpg"/>
+
+
+
+      <h5 class="mt-5">Documenting stairs</h5>
+      <p>
+        Choosing the steps tag allows you to enter basic information on the stairs that would be relevant
+        for someone planning to use them while delivering a package:
+      </p>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/6-steps-info.jpg"/>
+
+      <p class="mt-5">
+        Once the note has been saved, reviewers are provided with the option to copy the given OSM tags
+        as one text field for transfer to OSM via the iD editor:
+      </p>
       <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/10-note-as-osm-tags.jpg"/>
-      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/11-entrance-picture.jpg"/>
-      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/12-related-places.jpg"/>
-      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/13-entrance-details.jpg"/>
+
+
+
+
+      <h5 class="mt-5">Documenting entrances</h5>
       <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/14-entrance-note-saved.jpg"/>
-      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/15-shop-details.jpg"/>
+      <p class="mt-5">
+        When documenting an entrance, the process starts as described in <b>Adding an image note to the map</b> above.
+        After tagging the note as an entrance, the <b>New Entrance</b> button appears; tapping it gives you the
+        opportunity to add entrance-specific fields:
+      </p>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/13-entrance-details.jpg"/>
+
+      <p class="mt-5">
+        When opening a saved image note, tapping on the image zooms in to the tapped point; this can be useful
+        especially when documenting texts and other essential details around entrances:
+      </p>
       <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/16-zoom-image.jpg"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/17-open-osm.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/18-osm-id-data-layer.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/19-notes-in-id-editor.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/20-copy-tags-from-olmap.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/21-tags-in-id-editor.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/22-accept-steps-when-in-osm.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/23-new-point-for-entrance-in-id-editor.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/24-copy-entrance-tags.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/25-entrance-tags-in-id-editor.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/26-copy-shop-info.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/27-save-osm-changeset.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/28-relate-new-entrance.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/29-link-entrance-button.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/30-link-entrance-window.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/31-accept-entrance-note.png"/>
-      <img class="w-100 m-2 shadow-lg"  style="max-width: 640px" src="images/editing-process/32-notes-accepted-and-done.png"/>
+
+
+
+      <h5 class="mt-5">Documenting companies and services</h5>
+      <p>
+        The <b>shop</b>, <b>amenity</b> and <b>office</b> tags give you the opportunity to input information
+        relevant to companies reachable through the documented entrances:
+      </p>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/15-shop-details.jpg"/>
+
+
+      <h5 class="mt-5">Editing OSM with iD and OLMap</h5>
+
+      <p>
+        After collecting the data in the field, it can be refined and integrated into OSM. It is recommendded to use
+        a computer with a large screen for this; the process is generally most efficient if you have space to open
+        OLMap and iD side by side.
+      </p>
+
+      <p>
+        When opening a newly saved note on the map, reviewers are provided with an <b>OSM</b> button in the top
+        left corner; clicking the button will open the iD editor in a new browser window, zoomed in to the location
+        of the open OLMap note:
+      </p>
+      <img class="w-100 img md-img shadow-lg" style="max-width: 640px" src="images/editing-process/17-open-osm.png"/>
+
+      <p class="mt-5">
+        After opening iD, it is recommended to move & resize the OLMap & iD windows to a side-by-side scheme.
+        Then, open the <b>Data layers</b> -> <b>Custom map data</b> option in the iD side menu and enter the url
+        <b>https://api.olmap.org/rest/osm_image_notes.geojson</b> :
+      </p>
+      <img class="w-100 m-2 shadow-lg img" src="images/editing-process/18-osm-id-data-layer.png"/>
+
+      <p class="mt-5">
+        Now, OLMap image notes should show as pink circles on the map in the iD editor:
+      </p>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/19-notes-in-id-editor.png"/>
+
+      <p class="mt-5">
+        To get the documented tags into OSM, a reviewer can copy all the tags for one feature from OLMap in
+        the format expected by the iD tags input field:
+      </p>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/20-copy-tags-from-olmap.png"/>
+      <img class="w-100 shadow-lg img mobile-img" src="images/editing-process/21-tags-in-id-editor.png"/>
+
+      <p class="mt-5">
+        When adding new point features with this process, it is most efficient to just choose Point as the type;
+        the more specific type will be automatically recognized from the fields copied from OLMap:
+      </p>
+      <img class="w-100 shadow-lg img mobile-img"  src="images/editing-process/23-new-point-for-entrance-in-id-editor.png"/>
+      <img class="w-100 shadow-lg img mobile-img"  src="images/editing-process/24-copy-entrance-tags.png"/>
+      <img class="w-100 m-2 shadow-lg" src="images/editing-process/25-entrance-tags-in-id-editor.png"/>
+
+
+      <h5 class="mt-5">Linking newly created features & entrances</h5>
+      <p>
+        Once a changeset with new features created from OLMap notes has been committed to OSM, one more step is
+        recommended; linking the newly created OSM features back to the OLMap notes, and explicitly linking any newly
+        created companies and entrances with each other. The purpose of this is to allow e.g. OLMap-aware OSM-based
+        navigation apps to display relavant OLMap notes for OSM-based routes, and to recommend the correct entrance
+        when routing to a company.
+      </p>
+
+      <p>
+        Linking new features to notes is achieved with the <b>Related places</b> section in the UI, in the same way as
+        any original related features were selected when creating the note. When listing entrances in the related
+        places list, an additional <b>link button</b> is shown; clicking the button opens a separate list of
+        possible companies to link to the entrance. Select any companies reachable using the selected entrance:
+      </p>
+
+      <img class="w-100 shadow-lg img md-img" src="images/editing-process/29-link-entrance-button.png"/>
+      <img class="w-100 shadow-lg img md-img" src="images/editing-process/30-link-entrance-window.png"/>
+
+      <h5 class="mt-5">Marking notes as reviewed</h5>
+      <p>
+        Once all needed changes to OSM suggested by the note have been made, and the new features have been linked back,
+        the note can be marked as reviewed; reviewed notes will show up as green on the map to reviewers, allowing
+        easy distinction between processed and unprocessed notes. Marking the note as reviewed happens by clicking the
+        <b>Accept</b> button on the top of the note window; upon accepting, the note changes color on the map:
+      </p>
+
+      <img class="w-100 shadow-lg img md-img" src="images/editing-process/31-accept-entrance-note.png"/>
+      <img class="w-100 shadow-lg img md-img mb-5" src="images/editing-process/32-notes-accepted-and-done.png"/>
     </div>
   </body>
 </html>
