@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 
-from holvi_orders.test_data import holvi_order_webhook_payload
+from holvi_orders.test_data import holvi_order_webhook_payload, holvi_delivery_order_webhook_payload
 from .base import FVHAPITestCase
 from fvh_courier import models
 
@@ -172,9 +172,38 @@ class OutgoingPackagesTests(FVHAPITestCase):
         self.assertEqual(len(response.data), 1)
         self.assert_dict_contains(response.data[0], fields)
 
-    def test_outgoing_package_from_holvi_order(self):
-        # Given a valid Holvi webhook payload
+    def test_pickup_holvi_order(self):
+        # Given a valid Holvi webhook payload without home delivery ordered (i.e. a pickup order):
         data = holvi_order_webhook_payload
+
+        # And a token identifying a sender account with a primary courier attached
+        sender = self.create_sender()
+        courier = self.create_courier()
+        models.PrimaryCourier.objects.create(sender=sender, courier=courier)
+        models.Address.objects.create(
+            user=sender,
+            street_address="Paradisäppelvägen 123",
+            postal_code="00123",
+            city="Ankeborg",
+            country="Ankerige")
+        webshop = sender.holvi_webshops.create()
+
+        # When POSTing the payload to the holvi order endpoint
+        url = reverse('holvi_order', kwargs={'token': webshop.token})
+        response = self.client.post(url, data, format='json')
+
+        # Then an OK response is received
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # And no new outgoing package is created
+        self.client.force_login(sender)
+        url = reverse('pending_outgoing_package-list')
+        response = self.client.get(url)
+        self.assertEqual(response.json(), [])
+
+    def test_outgoing_package_from_holvi_order(self):
+        # Given a valid Holvi webhook payload, including an order for home delivery:
+        data = holvi_delivery_order_webhook_payload
 
         # And a token identifying a sender account with a primary courier attached
         sender = self.create_sender()

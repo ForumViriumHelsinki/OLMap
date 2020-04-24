@@ -85,3 +85,11 @@ holvi_order_webhook_payload = {
     "country_code": "FI",
     "country_name": "Finland"
 }
+
+holvi_delivery_order_webhook_payload = dict(
+    holvi_order_webhook_payload,
+    purchases=holvi_order_webhook_payload['purchases'] + [{
+        "answers": [],
+        "product_name": "Kotiinkuljetus"
+    }]
+)

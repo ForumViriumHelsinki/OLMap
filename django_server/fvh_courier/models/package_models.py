@@ -202,21 +202,33 @@ class HolviPackage(models.Model):
     package = models.OneToOneField(Package, on_delete=models.CASCADE)
     order = models.OneToOneField('holvi_orders.HolviOrder', on_delete=models.CASCADE)
 
+    ignore_products = ["Shipping fee"]
+    delivery_products = ['Kotiinkuljetus', 'Home delivery']
+    instruction_questions = ['Delivery instructions', 'Ohjeet kuljettajalle']
+
     @classmethod
     def create_package_for_order(cls, order):
-        return cls(order=order).create_package()
+        if cls.order_needs_delivery(order):
+            return cls(order=order).create_package()
+
+    @classmethod
+    def order_needs_delivery(cls, order):
+        for p in order.purchases.all():
+            if p.product_name in cls.delivery_products:
+                return True
+        return False
 
     def create_package(self):
         delivery_instructions = ''
         details = ''
-        purchases = [p for p in self.order.purchases.all() if p.product_name != "Shipping fee"]
+        purchases = [p for p in self.order.purchases.all() if p.product_name not in self.ignore_products]
 
         for p in purchases:
             details += p.product_name
             for a in p.answers.all():
                 if a.answer:
                     details += f'\n  {a.label}:\n  {a.answer}'
-                    if a.label == 'Delivery instructions':
+                    if a.label in self.instruction_questions:
                         delivery_instructions += a.answer
             details += '\n'
 
