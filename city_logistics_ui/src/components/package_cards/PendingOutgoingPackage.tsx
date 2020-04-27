@@ -10,7 +10,7 @@ export default class PendingOutgoingPackage extends React.Component<{package: Pa
   render() {
     const {
       created_at, pickup_at, deliver_to, recipient, courier, name, details,
-      picked_up_time, delivered_time, courier_location} = this.props.package;
+      picked_up_time, delivered_time, courier_location, recipient_phone} = this.props.package;
     const currentPositionIndex = !courier_location ? -1 : picked_up_time ? 1 : 0;
 
     const title = <>
@@ -26,11 +26,18 @@ export default class PendingOutgoingPackage extends React.Component<{package: Pa
 
     return (
       <Card title={title} subtitles={[deliver_to.street_address, formatTimestamp(created_at)]}>
+        {courier && courier_location &&
+          <PackageDistances courierLocation={courier_location} package={this.props.package}/>
+        }
+
+        {!picked_up_time &&
+          <Contacts
+            title="Recipient"
+            name={recipient}
+            phone={recipient_phone}/>
+        }
         {courier ?
           <>
-            {courier_location &&
-              <PackageDistances courierLocation={courier_location} package={this.props.package}/>
-            }
             <Contacts
               title="Courier"
               name={`${courier.first_name} ${courier.last_name}`}
