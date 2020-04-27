@@ -240,7 +240,7 @@ class OSMFeaturesViewSet(viewsets.ReadOnlyModelViewSet):
 
 class OSMImageNotesGeoJSON(ListAPIView):
     serializer_class = BaseOSMImageNoteSerializer
-    queryset = models.OSMImageNote.objects.all()
+    queryset = models.OSMImageNote.objects.filter(visible=True)
     permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):

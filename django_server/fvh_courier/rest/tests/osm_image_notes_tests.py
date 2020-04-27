@@ -273,10 +273,7 @@ class OSMImageNotesTests(FVHAPITestCase):
         self.assertEqual(response.json()['associated_entrances'][0], 12345678)
 
     def test_osm_image_notes_as_geojson(self):
-        # Given that a user is signed in
-        courier = self.create_and_login_courier()
-
-        # And given that there are some OSM image notes in the db
+        # Given that there are some OSM image notes in the db
         note = models.OSMImageNote.objects.create(**{
             'lat': '60.16134701761975',
             'lon': '24.944593941327188',
@@ -305,4 +302,25 @@ class OSMImageNotesTests(FVHAPITestCase):
                     'is_reviewed': False
                 }
             }]
+        })
+
+    def test_rejected_image_notes_not_in_geojson(self):
+        # And given that there are some OSM image notes in the db marked as not visible
+        note = models.OSMImageNote.objects.create(**{
+            'lat': '60.16134701761975',
+            'lon': '24.944593941327188',
+            'comment': 'Nice view',
+            'visible': False})
+
+        # When requesting the notes as geojson
+        url = reverse('osm_image_notes_geojson')
+        response = self.client.get(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And it does not contain the invisible notes:
+        self.assertDictEqual(response.json(), {
+            'type': 'FeatureCollection',
+            'features': []
         })
