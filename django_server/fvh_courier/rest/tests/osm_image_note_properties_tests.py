@@ -126,6 +126,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
             'name': {'type': 'string', 'maxLength': 64, 'title': 'Name'},
             'phone': {'type': 'string', 'maxLength': 32, 'title': 'Phone'},
             'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours'},
+            'opening_hours_covid19': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours covid19'},
             'level': {'type': 'string', 'maxLength': 8, 'title': 'Level', 'description': 'Floor(s), e.g. 1-3'}})
 
         dimension_field = {
@@ -200,6 +201,8 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
             'Amenity': {
                 'type': 'object',
                 'properties': dict(company_fields, **{
+                    'delivery_covid19': {'type': 'string', 'maxLength': 64, 'title': 'Delivery covid19'},
+                    'takeaway_covid19': {'type': 'string', 'maxLength': 64, 'title': 'Takeaway covid19'},
                     'type': {
                         'type': 'string', 'maxLength': 32, 'minLength': 1, 'title': 'Type',
                         'description': 'See https://wiki.openstreetmap.org/wiki/Key:amenity'}}),
