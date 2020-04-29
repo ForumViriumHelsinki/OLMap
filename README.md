@@ -3,14 +3,15 @@ Proof of concept app for last mile city logistics
 
 ## Installation
 
-**Prerequisites**: Python 3.7, Node.js 13.3
+**Prerequisites**: Python 3.7, Node.js 13.3, Postgres with a db available as configured in django_server/city_logistics/settings.py
 
 In project root:
 
 ```
 pip install pipenv
-pipenv install
 cd django_server
+pipenv install
+pipenv shell
 python manage.py migrate
 python manage.py createsuperuser
 <Configure user to your satisfaction>
