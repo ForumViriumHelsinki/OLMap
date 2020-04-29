@@ -206,6 +206,11 @@ class HolviPackage(models.Model):
     delivery_products = ['Kotiinkuljetus', 'Home delivery']
     instruction_questions = ['Delivery instructions', 'Ohjeet kuljettajalle']
 
+    minute_limits = {
+        'pickup': [20, 40],
+        'delivery': [20, 60]
+    }
+
     @classmethod
     def create_package_for_order(cls, order):
         if cls.order_needs_delivery(order):
@@ -246,11 +251,11 @@ class HolviPackage(models.Model):
             sender=self.order.sender(),
             recipient=self.order.recipient_str(),
             recipient_phone=self.order.phone,
-            earliest_pickup_time=timezone.now() + datetime.timedelta(minutes=10),
-            latest_pickup_time=timezone.now() + datetime.timedelta(minutes=30),
+            earliest_pickup_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['pickup'][0]),
+            latest_pickup_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['pickup'][1]),
 
-            earliest_delivery_time=timezone.now() + datetime.timedelta(minutes=10),
-            latest_delivery_time=timezone.now() + datetime.timedelta(minutes=60))
+            earliest_delivery_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['delivery'][0]),
+            latest_delivery_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['delivery'][1]))
         self.save()
         PrimaryCourier.notify_new_package(self.package)
         return self.package
