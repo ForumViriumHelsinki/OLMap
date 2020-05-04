@@ -203,7 +203,7 @@ class HolviPackage(models.Model):
     order = models.OneToOneField('holvi_orders.HolviOrder', on_delete=models.CASCADE)
 
     ignore_products = ["Shipping fee"]
-    delivery_products = ['Kotiinkuljetus', 'Home delivery']
+    delivery_products = ['Kotiinkuljetus', 'Home delivery', 'ILMAINEN KOTIINKULJETUS']
     instruction_questions = ['Delivery instructions', 'Ohjeet kuljettajalle']
 
     minute_limits = {
