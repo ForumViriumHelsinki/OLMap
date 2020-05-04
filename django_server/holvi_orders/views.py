@@ -17,7 +17,15 @@ class HolviOrderView(CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         request.data['shop'] = get_object_or_404(models.HolviWebshop, token=self.kwargs['token']).id
-        return super().create(request, *args, **kwargs)
+        try:
+            response = super().create(request, *args, **kwargs)
+        except Exception as e:
+            if settings.DEBUG:
+                print(e)
+            else:
+                capture_exception(e)
+            raise e
+        return response
 
     def perform_create(self, serializer):
         order = serializer.save()
