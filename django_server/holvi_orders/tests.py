@@ -50,3 +50,9 @@ class HolviOrderTests(APITestCase):
             'create_time': '2020-03-27T12:57:45.442000Z',
             'paid_time': '2020-03-27T12:59:04.582000Z',
             'shop': webshop.id})
+
+        # And when subsequently POSTing the same payload again
+        response = self.client.post(url, data, format='json')
+
+        # Then an OK response is received
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

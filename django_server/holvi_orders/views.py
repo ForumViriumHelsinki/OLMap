@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.urls import path
-from rest_framework import permissions
+from rest_framework import permissions, status
 from rest_framework.generics import CreateAPIView
+from rest_framework.response import Response
 from sentry_sdk import capture_exception
 
 from holvi_orders import models
@@ -17,6 +18,9 @@ class HolviOrderView(CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         request.data['shop'] = get_object_or_404(models.HolviWebshop, token=self.kwargs['token']).id
+        if self.queryset.filter(code=request.data['code']).exists():
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
         try:
             response = super().create(request, *args, **kwargs)
         except Exception as e:
