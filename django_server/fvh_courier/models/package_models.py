@@ -204,7 +204,7 @@ class HolviPackage(models.Model):
 
     ignore_products = ["Shipping fee"]
     delivery_products = ['Kotiinkuljetus', 'Home delivery', 'ILMAINEN KOTIINKULJETUS']
-    instruction_questions = ['Delivery instructions', 'Ohjeet kuljettajalle']
+    instruction_regex = re.compile('Delivery instructions|Ohjeet kuljettajalle', re.IGNORECASE)
 
     minute_limits = {
         'pickup': [20, 40],
@@ -233,12 +233,13 @@ class HolviPackage(models.Model):
             for a in p.answers.all():
                 if a.answer:
                     details += f'\n  {a.label}:\n  {a.answer}'
-                    if a.label in self.instruction_questions:
+                    if re.search(self.instruction_regex, a.label):
                         delivery_instructions += a.answer
             details += '\n'
 
+        meals = len(purchases) - 1  # Home delivery is one product, hence - 1
         self.package = Package.objects.create(
-            name=f'{len(purchases)} meal{len(purchases) > 1 and "s" or ""} to {self.order.recipient_str()}'[:64],
+            name=f'{meals} meal{meals > 1 and "s" or ""} to {self.order.recipient_str()}'[:64],
             details=details,
             delivery_instructions=delivery_instructions,
             pickup_at=self.order.sender_address(),

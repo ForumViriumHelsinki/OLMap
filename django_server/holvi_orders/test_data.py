@@ -38,7 +38,7 @@ holvi_order_webhook_payload = {
             "answers": [
                 {
                     "question": "7e27fead0b0c42b345d91c4936bd44a5",
-                    "label": "Delivery instructions",
+                    "label": "* OHJEET KULJETTAJALLE: Kirjoita tänne tiedoksi: Jos on ovikoodia jne.",
                     "answer": "Watch your steps"
                 },
                 {
