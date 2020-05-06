@@ -6,6 +6,8 @@ import PackageDistances from "components/PackageDistances";
 import {Package} from "components/types";
 import {markerIcons as icons} from "settings.json"
 import Icon from "util_components/Icon";
+import CopyTsvWidget from "util_components/CopyTsvWidget";
+import {packageAsTsv} from "components/package_cards/packageUtils";
 
 export default class DeliveredByMePackage extends React.Component<{package: Package}> {
   render() {
@@ -13,6 +15,7 @@ export default class DeliveredByMePackage extends React.Component<{package: Pack
 
     const title = <>
       <MapWidget origin={pickup_at} destination={deliver_to} currentPositionIndex={-1}/>
+      <CopyTsvWidget values={packageAsTsv(this.props.package)} className="float-right mr-2"/>
       {pickup_at.street_address} to {deliver_to.street_address}
     </>;
 

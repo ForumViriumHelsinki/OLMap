@@ -8,6 +8,8 @@ import {LocationTuple} from "util_components/types";
 import TimeInterval from "util_components/TimeInterval";
 import {sessionRequest} from "sessionRequest";
 import {reservePackageUrl} from "urls";
+import CopyTsvWidget from "util_components/CopyTsvWidget";
+import {packageAsTsv} from "components/package_cards/packageUtils";
 
 type AvailablePackageProps = {
     package: Package,
@@ -28,6 +30,7 @@ export default class AvailablePackage extends React.Component<AvailablePackagePr
 
     const title = <>
         <MapWidget origin={pickup_at} destination={deliver_to} currentPositionIndex={0}/>
+        <CopyTsvWidget values={packageAsTsv(this.props.package)} className="float-right mr-2"/>
         {pickup_at.street_address} to {deliver_to.street_address}
       </>;
 

@@ -10,6 +10,8 @@ import {LocationTuple} from "util_components/types";
 import TimeInterval from "util_components/TimeInterval";
 import {sessionRequest} from "sessionRequest";
 import {myPackageActionUrl} from "urls";
+import CopyTsvWidget from "util_components/CopyTsvWidget";
+import {packageAsTsv} from "components/package_cards/packageUtils";
 
 type InTransitPackageProps = {
     package: Package,
@@ -36,6 +38,7 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
 
     const title = <>
         <MapWidget origin={pickup_at} destination={deliver_to} currentPositionIndex={currentPositionIndex}/>
+        <CopyTsvWidget values={packageAsTsv(this.props.package)} className="float-right mr-2"/>
         {pickup_at.street_address} to {deliver_to.street_address}
       </>;
 
