@@ -3,6 +3,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from .base import FVHAPITestCase
+from fvh_courier import models
 
 
 class AvailablePackagesTests(FVHAPITestCase):
@@ -91,3 +92,39 @@ class AvailablePackagesTests(FVHAPITestCase):
             "picked_up_time": None,
             "delivered_time": None
         })
+
+    def test_list_of_available_packages_for_courier_company(self):
+        # Given that a courier user is signed in
+        courier = self.create_and_login_courier()
+
+        # And that there are packages available for delivery, earmarked for the courier's company
+        sender = self.create_sender()
+        self.create_package(sender, courier_company=courier.company)
+
+        # When requesting the list of available packages
+        url = reverse('available_package-list')
+        response = self.client.get(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And it contains the deliverable packages:
+        self.assertEqual(len(response.data), 1)
+
+    def test_list_of_available_packages_for_other_courier_company(self):
+        # Given that a courier user is signed in
+        courier = self.create_and_login_courier()
+
+        # And that there are packages available for delivery, earmarked for another courier company
+        sender = self.create_sender()
+        self.create_package(sender, courier_company=models.CourierCompany.objects.create())
+
+        # When requesting the list of available packages
+        url = reverse('available_package-list')
+        response = self.client.get(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And it does not contain the deliverable packages:
+        self.assertEqual(len(response.data), 0)

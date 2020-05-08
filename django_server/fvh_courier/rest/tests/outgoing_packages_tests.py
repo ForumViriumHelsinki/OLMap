@@ -118,7 +118,8 @@ class OutgoingPackagesTests(FVHAPITestCase):
     def test_register_outgoing_package(self):
         # Given that there are no packages registered for delivery
         # And that a user is signed in
-        sender = self.create_sender()
+        courier = self.create_courier()
+        sender = self.create_sender(courier_company=courier.company)
         self.client.force_login(sender.user)
 
         # When requesting to register a new package for delivery
@@ -161,6 +162,9 @@ class OutgoingPackagesTests(FVHAPITestCase):
         # Then an OK response is received with the created package:
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assert_dict_contains(response.data, fields)
+
+        # And the package is allocated to the courier company preferred by the sender:
+        self.assertEqual(models.Package.objects.get().courier_company_id, sender.courier_company_id)
 
         # And when subsequently requesting the list of outgoing packages
         response = self.client.get(url)

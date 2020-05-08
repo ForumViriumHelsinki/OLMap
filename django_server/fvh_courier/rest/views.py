@@ -6,7 +6,6 @@ from rest_framework.response import Response
 
 from drf_jsonschema import to_jsonschema
 from fvh_courier import models
-from fvh_courier.models.image_note_properties import prefetch_properties
 
 from .serializers import (
     PackageSerializer, OutgoingPackageSerializer, LocationSerializer,
@@ -27,7 +26,7 @@ class AvailablePackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewS
     permission_classes = [IsCourier]
 
     def get_base_queryset(self):
-        return models.Package.available_packages()
+        return models.Package.available_packages_for_courier(self.request.user.courier)
 
     @action(detail=True, methods=['put'])
     def reserve(self, request, pk=None):
@@ -88,7 +87,7 @@ class PendingOutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMix
         return models.Package.sent_by_user(self.request.user).filter(delivered_time=None)
 
     def perform_create(self, serializer):
-        serializer.save(sender=self.request.user.sender)
+        serializer.save(sender=self.request.user.sender, courier_company_id=self.request.user.sender.courier_company_id)
 
     @action(detail=False, methods=['get'])
     def jsonschema(self, request, pk=None):

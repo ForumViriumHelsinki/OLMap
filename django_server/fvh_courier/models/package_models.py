@@ -4,6 +4,7 @@ import uuid as uuid
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from smsframework import Gateway, OutgoingMessage
@@ -63,11 +64,13 @@ class Package(TimestampedModel):
         ordering = ['-earliest_pickup_time']
 
     @classmethod
-    def available_packages(cls):
+    def available_packages_for_courier(cls, courier):
         """
         Return all packages for which delivery has been requested but which are not yet reserved by any courier.
         """
-        return cls.objects.filter(courier__isnull=True)
+        return cls.objects.filter(
+            Q(courier_company=None) | Q(courier_company=courier.company_id),
+            courier__isnull=True)
 
     def save(self, **kwargs):
         if not self.name:
