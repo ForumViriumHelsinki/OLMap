@@ -64,7 +64,7 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
               <TimeInterval label="Pickup" from={earliest_pickup_time} to={latest_pickup_time}/><br />
               <TimeInterval label="Delivery" from={earliest_delivery_time} to={latest_delivery_time}/>
             </CardP>
-            <Contacts phone={sender.phone_numbers} title="Sender" name={`${sender.first_name} ${sender.last_name}`}/>
+            <Contacts phone={sender.phone_number} title="Sender" name={`${sender.first_name} ${sender.last_name}`}/>
             <Contacts phone={recipient_phone} title="Recipient" name={recipient}/>
             {delivery_instructions &&
               <CardP>

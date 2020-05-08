@@ -27,9 +27,6 @@ class HolviOrder(models.Model):
     create_time = models.DateTimeField(null=True, blank=True)
     paid_time = models.DateTimeField(null=True, blank=True)
 
-    def sender_address(self):
-        return self.shop.sender.address
-
     def sender(self):
         return self.shop.sender
 

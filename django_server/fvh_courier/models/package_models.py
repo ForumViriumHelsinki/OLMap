@@ -2,9 +2,7 @@ import datetime
 import re
 import uuid as uuid
 
-import geocoder
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -13,42 +11,14 @@ from smsframework_gatewayapi import GatewayAPIProvider
 from twilio.rest import Client
 
 from holvi_orders.signals import order_received
-from .phone_number import PhoneNumber
-from .base import TimestampedModel
+from .base import Address, TimestampedModel
+from .courier_models import CourierCompany, Courier, Sender
 
 
 if settings.SMS_PLATFORM == 'GatewayAPI':
     gateway = Gateway()
     gateway.add_provider('gapi', GatewayAPIProvider,
                          key=settings.GATEWAY_API['KEY'], secret=settings.GATEWAY_API['SECRET'])
-
-
-class Address(TimestampedModel):
-    user = models.OneToOneField(User, related_name='address', on_delete=models.SET_NULL, null=True, blank=True)
-    street_address = models.CharField(verbose_name=_('street address'), max_length=128)
-    postal_code = models.CharField(verbose_name=_('postal code'), max_length=16)
-    city = models.CharField(verbose_name=_('city'), max_length=64)
-    country = models.CharField(verbose_name=_('country'), max_length=64)
-
-    lat = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True)
-    lon = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True)
-
-    class Meta:
-        verbose_name = _('address')
-        verbose_name_plural = _('addresses')
-
-    def __str__(self):
-        return self.street_address
-
-    def with_latlng(self):
-        if self.lat and self.lon:
-            return self
-        [self.lat, self.lon] = geocoder.osm(f'{self.building_address()}, {self.city}').latlng
-        self.save()
-        return self
-
-    def building_address(self):
-        return re.sub(r'(\d+).*?$', r'\1', self.street_address)
 
 
 class Package(TimestampedModel):
@@ -66,14 +36,15 @@ class Package(TimestampedModel):
     weight = models.DecimalField(verbose_name=_('weight'), help_text=_('in kg'),
                                  max_digits=7, decimal_places=2, null=True, blank=True)
 
-    sender = models.ForeignKey(User, verbose_name=_('sender'), related_name='sent_packages', on_delete=models.PROTECT)
+    sender = models.ForeignKey(Sender, null=True, verbose_name=_('sender'), related_name='sent_packages', on_delete=models.PROTECT)
 
     recipient = models.CharField(max_length=128, verbose_name=_('recipient'))
     recipient_phone = models.CharField(max_length=32, verbose_name=_('recipient phone number'))
     delivery_instructions = models.CharField(max_length=256, blank=True)
 
-    courier = models.ForeignKey(User, verbose_name=_('courier'), null=True, blank=True,
-                                related_name='delivered_packages', on_delete=models.PROTECT)
+    courier_company = models.ForeignKey(CourierCompany, related_name='packages', null=True, on_delete=models.SET_NULL)
+    courier = models.ForeignKey(Courier, verbose_name=_('courier'), null=True, blank=True,
+                                 related_name='delivered_packages', on_delete=models.PROTECT)
 
     earliest_pickup_time = models.DateTimeField(verbose_name=_('earliest pickup time'))
     latest_pickup_time = models.DateTimeField(verbose_name=_('latest pickup time'))
@@ -102,6 +73,14 @@ class Package(TimestampedModel):
         if not self.name:
             self.name = f'Package {self.id} to {self.recipient}'
         return super().save(**kwargs)
+
+    @classmethod
+    def sent_by_user(cls, user):
+        return cls.objects.filter(sender__user=user)
+
+    @classmethod
+    def delivered_by_user(cls, user):
+        return cls.objects.filter(courier__user=user)
 
 
 class PackageSMS(TimestampedModel):
@@ -164,10 +143,7 @@ class PackageSMS(TimestampedModel):
 
     @classmethod
     def message_sender(cls, package, message_type, referer):
-        sender_phones = package.sender.phone_numbers.all()
-        if not len(sender_phones):
-            return
-        cls.send_message(package, message_type, sender_phones[0].number, referer)
+        cls.send_message(package, message_type, package.sender.phone_number, referer)
 
     @classmethod
     def notify_sender_of_reservation(cls, package, referer):
@@ -185,17 +161,6 @@ class PackageSMS(TimestampedModel):
     def get_twilio_client(cls):
         if settings.TWILIO['ACCOUNT_SID'] != 'configure in local settings':
             return Client(settings.TWILIO['ACCOUNT_SID'], settings.TWILIO['AUTH_TOKEN'])
-
-
-class PrimaryCourier(models.Model):
-    sender = models.OneToOneField(User, on_delete=models.CASCADE, related_name='primary_courier')
-    courier = models.ForeignKey(User, on_delete=models.CASCADE, related_name='is_primary_courier_for')
-
-    @classmethod
-    def notify_new_package(cls, package):
-        phone = PhoneNumber.objects.filter(user__is_primary_courier_for__sender=package.sender_id).first()
-        if phone:
-            PackageSMS.send_message(package, 'courier_notification', phone.number)
 
 
 class HolviPackage(models.Model):
@@ -238,18 +203,21 @@ class HolviPackage(models.Model):
             details += '\n'
 
         meals = len(purchases) - 1  # Home delivery is one product, hence - 1
+        sender_user = self.order.sender()
+        sender = sender_user.sender
         self.package = Package.objects.create(
             name=f'{meals} meal{meals > 1 and "s" or ""} to {self.order.recipient_str()}'[:64],
             details=details,
             delivery_instructions=delivery_instructions,
-            pickup_at=self.order.sender_address(),
+            pickup_at=sender.address,
             deliver_to=Address.objects.get_or_create(
                 street_address=self.order.street,
                 city=self.order.city,
                 postal_code=self.order.postcode,
                 country=self.order.country
             )[0].with_latlng(),
-            sender=self.order.sender(),
+            sender=sender,
+            courier_company=sender.courier_company,
             recipient=self.order.recipient_str(),
             recipient_phone=self.order.phone,
             earliest_pickup_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['pickup'][0]),
@@ -258,7 +226,7 @@ class HolviPackage(models.Model):
             earliest_delivery_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['delivery'][0]),
             latest_delivery_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['delivery'][1]))
         self.save()
-        PrimaryCourier.notify_new_package(self.package)
+        CourierCompany.notify_new_package(self.package)
         return self.package
 
 

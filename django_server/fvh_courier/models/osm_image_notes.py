@@ -5,25 +5,23 @@ from django.contrib.auth.models import User
 from django.core.files import File
 from django.db import models
 
-from .base import BaseLocation
+from . import base
+from .base import BaseLocation, TimestampedModel
 
 
-class OSMFeature(models.Model):
+class OSMFeature(base.Model):
     id = models.BigIntegerField(primary_key=True)
     associated_entrances = models.ManyToManyField('OSMFeature', related_name='associated_features', blank=True)
 
     class Meta:
         ordering = ['id']
 
-    def __str__(self):
-        return f'OSMFeature({self.id})'
-
 
 def upload_osm_images_to(instance, filename):
     return f'osm_image_notes/{instance.id}/{filename}'
 
 
-class OSMImageNote(BaseLocation):
+class OSMImageNote(BaseLocation, TimestampedModel):
     image = models.ImageField(null=True, blank=True, upload_to=upload_osm_images_to)
     comment = models.TextField(blank=True)
     osm_features = models.ManyToManyField(OSMFeature, blank=True, related_name='image_notes')
@@ -40,7 +38,7 @@ class OSMImageNote(BaseLocation):
         blank=True, help_text="If reviewer decides to hide the note, document reason here.")
 
     def __str__(self):
-        return self.comment or f'OSMImageNote({self.id})'
+        return self.comment or super().__str__()
 
     def save(self, *args, **kwargs):
         if not self.image:
@@ -82,31 +80,25 @@ class OSMImageNote(BaseLocation):
         return bool(self.reviewed_by_id)
 
 
-class ImageNoteTag(models.Model):
+class ImageNoteTag(base.Model):
     tag = models.CharField(max_length=64)
     image_note = models.ForeignKey(OSMImageNote, related_name='tags', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.tag or (self.id and f'ImageNoteTag({self.id})') or 'New ImageNoteTag'
+        return self.tag or super().__str__()
 
 
-class ImageNoteUpvote(models.Model):
+class ImageNoteUpvote(base.Model):
     user = models.ForeignKey(User, related_name='image_note_upvotes', on_delete=models.CASCADE)
     image_note = models.ForeignKey(OSMImageNote, related_name='upvotes', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.id and f'ImageNoteUpvote({self.id})' or 'New ImageNoteUpvote'
 
-
-class ImageNoteDownvote(models.Model):
+class ImageNoteDownvote(base.Model):
     user = models.ForeignKey(User, related_name='image_note_downvotes', on_delete=models.CASCADE)
     image_note = models.ForeignKey(OSMImageNote, related_name='downvotes', on_delete=models.CASCADE)
 
-    def __str__(self):
-        return self.id and f'ImageNoteDownvote({self.id})' or 'New ImageNoteDownvote'
 
-
-class OSMImageNoteComment(models.Model):
+class OSMImageNoteComment(base.Model):
     user = models.ForeignKey(User, related_name='image_note_comments', on_delete=models.CASCADE)
     image_note = models.ForeignKey(OSMImageNote, related_name='comments', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -116,4 +108,4 @@ class OSMImageNoteComment(models.Model):
         ordering = ['created_at']
 
     def __str__(self):
-        return self.comment
+        return self.comment or super().__str__()

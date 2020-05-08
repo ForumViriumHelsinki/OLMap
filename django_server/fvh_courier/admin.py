@@ -3,8 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
 from django.conf import settings
-from fvh_courier.models import Package, Address, PhoneNumber, PackageSMS, OSMImageNote, OSMImageNoteComment, \
-    PrimaryCourier
+from fvh_courier.models import Package, Address, PackageSMS, OSMImageNote, OSMImageNoteComment, Sender, Courier, \
+    CourierCompany
 
 
 class PackageSMSInline(admin.TabularInline):
@@ -15,11 +15,12 @@ class PackageSMSInline(admin.TabularInline):
 @admin.register(Package)
 class PackageAdmin(admin.ModelAdmin):
     list_display = ['created_at', 'delivered_time', 'pickup_at', 'deliver_to', 'sender', 'recipient', 'courier']
+    list_select_related = ['sender__user', 'courier__user']
     search_fields = [
         'pickup_at__street_address', 'deliver_to__street_address',
-        'sender__username', 'sender__first_name', 'sender__last_name',
+        'sender__user__username', 'sender__user__first_name', 'sender__user__last_name',
         'recipient',
-        'courier__username', 'courier__first_name', 'courier__last_name',
+        'courier__user__username', 'courier__user__first_name', 'courier__user__last_name',
     ]
     date_hierarchy = 'created_at'
     inlines = [PackageSMSInline]
@@ -36,7 +37,7 @@ class PackageSMSAdmin(admin.ModelAdmin):
     list_display = [
         'created_at', 'package_id', 'message_type', 'recipient_number',
         'package_sender', 'package_recipient', 'courier']
-    list_select_related = ['package__sender', 'package__courier']
+    list_select_related = ['package__sender__user', 'package__courier__user']
     date_hierarchy = 'created_at'
 
     def package_sender(self, msg):
@@ -52,26 +53,24 @@ class PackageSMSAdmin(admin.ModelAdmin):
 admin.site.unregister(User)
 
 
-class PhoneNumberInline(admin.TabularInline):
-    model = PhoneNumber
+class SenderInline(admin.TabularInline):
+    model = Sender
     extra = 0
 
 
-class PrimaryCourierInline(admin.TabularInline):
-    model = PrimaryCourier
+class CourierInline(admin.TabularInline):
+    model = Courier
     extra = 0
-    fk_name = 'sender'
-
-
-class AddressInline(admin.TabularInline):
-    model = Address
-    extra = 0
-    max_num = 1
 
 
 @admin.register(User)
-class TeleconnectedUserAdmin(UserAdmin):
-    inlines = UserAdmin.inlines + [PhoneNumberInline, PrimaryCourierInline, AddressInline]
+class UserWithRolesAdmin(UserAdmin):
+    inlines = UserAdmin.inlines + [SenderInline, CourierInline]
+
+
+@admin.register(CourierCompany)
+class CourierCompanyAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(OSMImageNote)

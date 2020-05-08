@@ -9,7 +9,7 @@ export type User = {
     username: string,
     first_name: string,
     last_name: string,
-    phone_numbers: string[]
+    phone_number: string
 };
 
 export type Package = {

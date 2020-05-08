@@ -1,7 +1,7 @@
 from django.utils import timezone
 from rest_framework import viewsets, mixins, permissions, decorators
 from rest_framework.decorators import action
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView, get_object_or_404
 from rest_framework.response import Response
 
 from drf_jsonschema import to_jsonschema
@@ -20,8 +20,7 @@ class PackagesViewSetMixin:
 
     def get_queryset(self):
         return self.get_base_queryset()\
-            .select_related('pickup_at', 'deliver_to', 'courier__location', 'sender')\
-            .prefetch_related('courier__phone_numbers', 'courier__groups', 'sender__phone_numbers', 'sender__groups')
+            .select_related('pickup_at', 'deliver_to', 'sender__user', 'courier__user')
 
 
 class AvailablePackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
@@ -36,7 +35,7 @@ class AvailablePackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewS
         Action for courier to reserve an available package for delivery.
         """
         package = self.get_object()
-        package.courier = self.request.user
+        package.courier = self.request.user.courier
         package.save()
         models.PackageSMS.notify_sender_of_reservation(package, referer=request.headers.get('referer', None))
         serializer = self.get_serializer(package)
@@ -47,7 +46,7 @@ class MyPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsCourier]
 
     def get_base_queryset(self):
-        return self.request.user.delivered_packages.filter(delivered_time__isnull=True)
+        return models.Package.delivered_by_user(self.request.user).filter(delivered_time__isnull=True)
 
     @action(detail=True, methods=['put'])
     def register_pickup(self, request, pk=None):
@@ -78,7 +77,7 @@ class MyDeliveredPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelVie
     permission_classes = [IsCourier]
 
     def get_base_queryset(self):
-        return self.request.user.delivered_packages.filter(delivered_time__isnull=False)
+        return models.Package.delivered_by_user(self.request.user).filter(delivered_time__isnull=False)
 
 
 class PendingOutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):
@@ -86,10 +85,10 @@ class PendingOutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMix
     serializer_class = OutgoingPackageSerializer
 
     def get_base_queryset(self):
-        return self.request.user.sent_packages.filter(delivered_time=None)
+        return models.Package.sent_by_user(self.request.user).filter(delivered_time=None)
 
     def perform_create(self, serializer):
-        serializer.save(sender=self.request.user)
+        serializer.save(sender=self.request.user.sender)
 
     @action(detail=False, methods=['get'])
     def jsonschema(self, request, pk=None):
@@ -101,7 +100,7 @@ class DeliveredOutgoingPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyMo
     serializer_class = OutgoingPackageSerializer
 
     def get_base_queryset(self):
-        return self.request.user.sent_packages.filter(delivered_time__isnull=False)
+        return models.Package.sent_by_user(self.request.user).filter(delivered_time__isnull=False)
 
 
 class PackagesByUUIDReadOnlyViewSet(PackagesViewSetMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
@@ -118,10 +117,7 @@ class MyLocationView(RetrieveUpdateDestroyAPIView):
     serializer_class = LocationSerializer
 
     def get_object(self):
-        try:
-            return self.request.user.location
-        except models.UserLocation.DoesNotExist:
-            return models.UserLocation(user=self.request.user)
+        return get_object_or_404(models.Courier, user=self.request.user)
 
 
 class OSMImageNotesViewSet(viewsets.ModelViewSet):

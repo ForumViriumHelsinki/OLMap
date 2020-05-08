@@ -39,8 +39,8 @@ class OSMImageNotesTests(FVHAPITestCase):
         note = models.OSMImageNote.objects.get()
 
         # And it registers the user as the creator of the note:
-        self.assertEqual(note.created_by_id, courier.id)
-        self.assertEqual(note.modified_by_id, courier.id)
+        self.assertEqual(note.created_by_id, courier.user_id)
+        self.assertEqual(note.modified_by_id, courier.user_id)
 
         # And it creates any passed tags:
         self.assertSetEqual(set(note.tags.values_list('tag', flat=True)), set(fields['tags']))
@@ -196,8 +196,8 @@ class OSMImageNotesTests(FVHAPITestCase):
 
         # And the upvote is created:
         note = models.OSMImageNote.objects.get()
-        self.assertSetEqual(set(response.json()['upvotes']), set([courier.id]))
-        self.assertSetEqual(set(note.upvotes.values_list('user_id', flat=True)), set([courier.id]))
+        self.assertSetEqual(set(response.json()['upvotes']), set([courier.user_id]))
+        self.assertSetEqual(set(note.upvotes.values_list('user_id', flat=True)), set([courier.user_id]))
 
         # And when subsequently requesting to downvote the note
         url = reverse('osmimagenote-downvote', kwargs={'pk': note.id})
@@ -209,8 +209,8 @@ class OSMImageNotesTests(FVHAPITestCase):
         # And the votes have been changed:
         note = models.OSMImageNote.objects.get()
         self.assertSetEqual(set(note.upvotes.values_list('user_id', flat=True)), set())
-        self.assertSetEqual(set(response.json()['downvotes']), set([courier.id]))
-        self.assertSetEqual(set(note.downvotes.values_list('user_id', flat=True)), set([courier.id]))
+        self.assertSetEqual(set(response.json()['downvotes']), set([courier.user_id]))
+        self.assertSetEqual(set(note.downvotes.values_list('user_id', flat=True)), set([courier.user_id]))
 
     def test_comment_on_osm_image_note(self):
         # Given that a user is signed in

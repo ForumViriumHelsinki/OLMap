@@ -1,12 +1,14 @@
 from collections import OrderedDict
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import DecimalField
 from rest_framework import serializers
 
+import fvh_courier.models.base
 from fvh_courier import models
 from fvh_courier.models.image_note_properties import manager_name
-from .permissions import COURIER_GROUP, REVIEWER_GROUP, SENDER_GROUP
+from .permissions import REVIEWER_GROUP
 
 
 class RoundingDecimalField(serializers.DecimalField):
@@ -19,12 +21,12 @@ serializers.ModelSerializer.serializer_field_mapping[DecimalField] = RoundingDec
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Address
-        exclude = ['user', 'id', 'created_at', 'modified_at']
+        model = fvh_courier.models.base.Address
+        exclude = ['id', 'created_at', 'modified_at']
 
 
 class UserSerializer(serializers.ModelSerializer):
-    phone_numbers = serializers.SlugRelatedField(many=True, read_only=True, slug_field='number')
+    phone_number = serializers.SerializerMethodField()
     is_courier = serializers.SerializerMethodField()
     is_reviewer = serializers.SerializerMethodField()
     is_sender = serializers.SerializerMethodField()
@@ -32,7 +34,13 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'username',
-                  'phone_numbers', 'is_courier', 'is_reviewer', 'is_sender']
+                  'phone_number', 'is_courier', 'is_reviewer', 'is_sender']
+
+    def get_phone_number(self, user):
+        if self.get_is_courier(user):
+            return user.courier.phone_number
+        if self.get_is_sender(user):
+            return user.sender.phone_number
 
     def user_in_group(self, user, group_name):
         for group in user.groups.all():
@@ -41,21 +49,46 @@ class UserSerializer(serializers.ModelSerializer):
         return False
 
     def get_is_courier(self, user):
-        return self.user_in_group(user, COURIER_GROUP)
+        try:
+            return bool(user.courier.id)
+        except (ObjectDoesNotExist, AttributeError):
+            return False
 
     def get_is_reviewer(self, user):
         return self.user_in_group(user, REVIEWER_GROUP)
 
     def get_is_sender(self, user):
-        return self.user_in_group(user, SENDER_GROUP)
+        try:
+            return bool(user.sender.id)
+        except (ObjectDoesNotExist, AttributeError):
+            return False
+
+
+class UserRoleSerializer(serializers.ModelSerializer):
+    first_name = serializers.ReadOnlyField(source='user.first_name')
+    last_name = serializers.ReadOnlyField(source='user.last_name')
+    username = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        fields = ['id', 'first_name', 'last_name', 'username', 'phone_number']
+
+
+class SenderSerializer(UserRoleSerializer):
+    class Meta(UserRoleSerializer.Meta):
+        model = models.Sender
+
+
+class CourierSerializer(UserRoleSerializer):
+    class Meta(UserRoleSerializer.Meta):
+        model = models.Courier
 
 
 class PackageSerializer(serializers.ModelSerializer):
     pickup_at = AddressSerializer(read_only=False)
     deliver_to = AddressSerializer(read_only=False)
 
-    sender = UserSerializer(required=False, read_only=True)
-    courier = UserSerializer(required=False, read_only=True)
+    sender = SenderSerializer(required=False, read_only=True)
+    courier = CourierSerializer(required=False, read_only=True)
 
     def create(self, validated_data):
         """
@@ -74,8 +107,8 @@ class PackageSerializer(serializers.ModelSerializer):
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.UserLocation
-        exclude = ['user']
+        model = models.Courier
+        fields = ['lat', 'lon']
 
 
 class OutgoingPackageSerializer(PackageSerializer):
@@ -87,15 +120,15 @@ class OutgoingPackageSerializer(PackageSerializer):
             return None
 
         try:
-            location = package.courier.location
-        except models.UserLocation.DoesNotExist:
+            courier = package.courier
+        except models.Courier.DoesNotExist:
             return None
 
         # Do not return some old location for the courier that may not be related to this package:
-        if location.modified_at < package.modified_at:
+        if courier.modified_at < package.modified_at:
             return None
 
-        return LocationSerializer(location).data
+        return LocationSerializer(courier).data
 
 
 class ImageNotePropertiesSerializer(serializers.ModelSerializer):

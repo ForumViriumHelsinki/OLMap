@@ -52,5 +52,7 @@ class RestAPITests(FVHAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # And the user location is saved:
-        self.assertEqual(courier.location.lat, Decimal(location['lat']))
-        self.assertEqual(courier.location.lon, Decimal(location['lon']))
+        courier.refresh_from_db()
+        self.assertEqual(courier.lat, Decimal(location['lat']))
+        self.assertEqual(courier.lon, Decimal(location['lon']))
+        self.assertEqual(courier.user.username, 'courier')

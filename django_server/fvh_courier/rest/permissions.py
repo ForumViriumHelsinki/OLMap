@@ -1,7 +1,10 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import permissions
 
-COURIER_GROUP = 'Courier'
 REVIEWER_GROUP = 'Reviewer'
+
+# Deprecated in favor of UserRole subclasses:
+COURIER_GROUP = 'Courier'
 SENDER_GROUP = 'Sender'
 
 
@@ -13,8 +16,12 @@ class UserBelongsToGroup(permissions.IsAuthenticated):
                 request.user.groups.filter(name=self.group_name).exists())
 
 
-class IsCourier(UserBelongsToGroup):
-    group_name = COURIER_GROUP
+class IsCourier(permissions.IsAuthenticated):
+    def has_permission(self, request, view):
+        try:
+            return bool(request.user.courier.id)
+        except (ObjectDoesNotExist, AttributeError):
+            return False
 
 
 class IsReviewer(UserBelongsToGroup):

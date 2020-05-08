@@ -79,7 +79,7 @@ class AvailablePackagesTests(FVHAPITestCase):
             "sender": {
                 "first_name": "Cedrik",
                 "last_name": "Sender",
-                "phone_numbers": ["+358505436657"]
+                "phone_number": "+358505436657"
             },
             "courier": None,
             "height": 20,

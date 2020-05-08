@@ -119,7 +119,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
         # Given that there are no packages registered for delivery
         # And that a user is signed in
         sender = self.create_sender()
-        self.client.force_login(sender)
+        self.client.force_login(sender.user)
 
         # When requesting to register a new package for delivery
         url = reverse('pending_outgoing_package-list')
@@ -177,16 +177,9 @@ class OutgoingPackagesTests(FVHAPITestCase):
         data = holvi_order_webhook_payload
 
         # And a token identifying a sender account with a primary courier attached
-        sender = self.create_sender()
         courier = self.create_courier()
-        models.PrimaryCourier.objects.create(sender=sender, courier=courier)
-        models.Address.objects.create(
-            user=sender,
-            street_address="Paradisäppelvägen 123",
-            postal_code="00123",
-            city="Ankeborg",
-            country="Ankerige")
-        webshop = sender.holvi_webshops.create()
+        sender = self.create_sender(courier_company=courier.company)
+        webshop = sender.user.holvi_webshops.create()
 
         # When POSTing the payload to the holvi order endpoint
         url = reverse('holvi_order', kwargs={'token': webshop.token})
@@ -196,7 +189,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # And no new outgoing package is created
-        self.client.force_login(sender)
+        self.client.force_login(sender.user)
         url = reverse('pending_outgoing_package-list')
         response = self.client.get(url)
         self.assertEqual(response.json(), [])
@@ -206,16 +199,9 @@ class OutgoingPackagesTests(FVHAPITestCase):
         data = holvi_delivery_order_webhook_payload
 
         # And a token identifying a sender account with a primary courier attached
-        sender = self.create_sender()
         courier = self.create_courier()
-        models.PrimaryCourier.objects.create(sender=sender, courier=courier)
-        models.Address.objects.create(
-            user=sender,
-            street_address="Paradisäppelvägen 123",
-            postal_code="00123",
-            city="Ankeborg",
-            country="Ankerige")
-        webshop = sender.holvi_webshops.create()
+        sender = self.create_sender(courier_company=courier.company)
+        webshop = sender.user.holvi_webshops.create()
 
         # When POSTing the payload to the holvi order endpoint
         url = reverse('holvi_order', kwargs={'token': webshop.token})
@@ -225,7 +211,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # And a new outgoing package is created
-        self.client.force_login(sender)
+        self.client.force_login(sender.user)
         url = reverse('pending_outgoing_package-list')
         response = self.client.get(url)
 

@@ -41,7 +41,7 @@ export default class PendingOutgoingPackage extends React.Component<{package: Pa
             <Contacts
               title="Courier"
               name={`${courier.first_name} ${courier.last_name}`}
-              phone={courier.phone_numbers}/>
+              phone={courier.phone_number}/>
             {picked_up_time
               ? <>
                 <CardP>Picked up at {formatTimestamp(picked_up_time)}</CardP>
