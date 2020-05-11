@@ -1,5 +1,5 @@
 from django.utils import timezone
-from rest_framework import viewsets, mixins, permissions, decorators
+from rest_framework import viewsets, mixins, permissions, decorators, status
 from rest_framework.decorators import action
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView, get_object_or_404
 from rest_framework.response import Response
@@ -33,9 +33,18 @@ class AvailablePackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewS
         """
         Action for courier to reserve an available package for delivery.
         """
+        courier_id = request.data.get('courier', None)
+        if courier_id:
+            courier = models.Courier.objects.filter(id=courier_id, company__coordinator__user=request.user).first()
+            if not courier:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            courier = self.request.user.courier
+
         package = self.get_object()
-        package.courier = self.request.user.courier
+        package.courier = courier
         package.save()
+
         models.PackageSMS.notify_sender_of_reservation(package, referer=request.headers.get('referer', None))
         serializer = self.get_serializer(package)
         return Response(serializer.data)
@@ -45,7 +54,8 @@ class MyPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsCourier]
 
     def get_base_queryset(self):
-        return models.Package.delivered_by_user(self.request.user).filter(delivered_time__isnull=True)
+        user = self.request.user
+        return models.CourierCompany.packages_for_user(user).filter(delivered_time__isnull=True)
 
     @action(detail=True, methods=['put'])
     def register_pickup(self, request, pk=None):
@@ -76,7 +86,7 @@ class MyDeliveredPackagesViewSet(PackagesViewSetMixin, viewsets.ReadOnlyModelVie
     permission_classes = [IsCourier]
 
     def get_base_queryset(self):
-        return models.Package.delivered_by_user(self.request.user).filter(delivered_time__isnull=False)
+        return models.CourierCompany.packages_for_user(self.request.user).filter(delivered_time__isnull=False)
 
 
 class PendingOutgoingPackagesViewSet(PackagesViewSetMixin, mixins.CreateModelMixin, viewsets.ReadOnlyModelViewSet):

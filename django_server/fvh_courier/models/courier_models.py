@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 from .base import TimestampedModel, Address, BaseLocation
@@ -20,6 +21,11 @@ class CourierCompany(TimestampedModel):
         except AttributeError:
             return
         PackageSMS.send_message(package, 'courier_notification', number)
+
+    @classmethod
+    def packages_for_user(cls, user):
+        from fvh_courier.models import Package
+        return Package.objects.filter(Q(courier__company__coordinator__user=user) | Q(courier__user=user)).distinct()
 
 
 class UserRoleManager(models.Manager):

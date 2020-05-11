@@ -119,8 +119,10 @@ export default class LivePackagesMap extends React.Component<LivePackagesMapProp
       .forEach(id => {markers[id].remove(); delete markers[id] });
     });
 
-    const lats = packages.map(p => p.deliver_to.lat);
-    const lons = packages.map(p => p.deliver_to.lon);
+    if (!packages.length) return;
+
+    const lats = packages.map(p => p.deliver_to.lat).concat(packages.map(p => p.pickup_at.lat));
+    const lons = packages.map(p => p.deliver_to.lon).concat(packages.map(p => p.pickup_at.lon));
     const bounds = [[Math.min(...lats), Math.min(...lons)], [Math.max(...lats), Math.max(...lons)]];
 
     if (this.map && !this.userMovedMap) {

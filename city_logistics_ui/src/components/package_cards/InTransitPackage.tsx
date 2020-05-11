@@ -5,7 +5,7 @@ import Contacts from "util_components/Contacts";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
 import ConfirmButton from "util_components/ConfirmButton";
-import {Package, packageAction, User} from "components/types";
+import {AppContext, Package, packageAction} from "components/types";
 import {LocationTuple} from "util_components/types";
 import TimeInterval from "util_components/TimeInterval";
 import {sessionRequest} from "sessionRequest";
@@ -22,6 +22,8 @@ type InTransitPackageProps = {
 type State = { error: boolean };
 
 export default class InTransitPackage extends React.Component<InTransitPackageProps, State> {
+  static contextType = AppContext;
+
   state: State = {error: false};
 
   render() {
@@ -29,8 +31,9 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
       earliest_pickup_time, latest_pickup_time,
       earliest_delivery_time, latest_delivery_time,
       pickup_at, deliver_to, weight, width, height, depth, name, delivery_instructions,
-      picked_up_time, recipient, recipient_phone, sender, id} = this.props.package;
+      picked_up_time, recipient, recipient_phone, sender, courier, id} = this.props.package;
 
+    const {user} = this.context;
     const {currentLocation} = this.props;
     const [lon, lat] = currentLocation || [];
 
@@ -65,6 +68,9 @@ export default class InTransitPackage extends React.Component<InTransitPackagePr
               <TimeInterval label="Delivery" from={earliest_delivery_time} to={latest_delivery_time}/>
             </CardP>
             <Contacts phone={sender.phone_number} title="Sender" name={`${sender.first_name} ${sender.last_name}`}/>
+            {courier && (user.courier.id != courier.id) &&
+              <Contacts phone={courier.phone_number} title="Courier" name={`${courier.first_name} ${courier.last_name}`}/>
+            }
             <Contacts phone={recipient_phone} title="Recipient" name={recipient}/>
             {delivery_instructions &&
               <CardP>

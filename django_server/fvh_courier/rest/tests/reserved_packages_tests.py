@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
@@ -62,6 +63,28 @@ class ReservedPackagesTests(FVHAPITestCase):
 
         # And it contains the reserved packages:
         self.assertEqual(len(response.data), 1)
+
+    def test_reserve_package_as_coordinator(self):
+        # Given that a courier coordinator user is signed in
+        courier = self.create_and_login_courier()
+        courier2 = courier.company.couriers.create(
+            user=User.objects.create(username='courier2', first_name='Corin', last_name='Courier'),
+            phone_number='+358505436657')
+
+        # And given an available package for delivery
+        sender = self.create_sender()
+        package = self.create_package(sender)
+
+        # When requesting to reserve the package for another courier in the coordinator's company
+        url = reverse('available_package-reserve', kwargs={'pk': package.id})
+        response = self.client.put(url, {'courier': courier2.id})
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And the package is linked to the courier:
+        package.refresh_from_db()
+        self.assertEqual(package.courier_id, courier2.id)
 
     def test_pick_up_package(self):
         # Given that a courier user is signed in

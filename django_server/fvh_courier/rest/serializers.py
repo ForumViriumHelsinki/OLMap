@@ -25,16 +25,46 @@ class AddressSerializer(serializers.ModelSerializer):
         exclude = ['id', 'created_at', 'modified_at']
 
 
+class UserRoleSerializer(serializers.ModelSerializer):
+    first_name = serializers.ReadOnlyField(source='user.first_name')
+    last_name = serializers.ReadOnlyField(source='user.last_name')
+    username = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        fields = ['id', 'user_id', 'first_name', 'last_name', 'username', 'phone_number']
+
+
+class SenderSerializer(UserRoleSerializer):
+    class Meta(UserRoleSerializer.Meta):
+        model = models.Sender
+
+
+class CourierSerializer(UserRoleSerializer):
+    class Meta(UserRoleSerializer.Meta):
+        model = models.Courier
+
+
+class CourierCompanySerializer(serializers.ModelSerializer):
+    couriers = CourierSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.CourierCompany
+        fields = ['name', 'coordinator_id', 'couriers']
+
+
 class UserSerializer(serializers.ModelSerializer):
     phone_number = serializers.SerializerMethodField()
     is_courier = serializers.SerializerMethodField()
     is_reviewer = serializers.SerializerMethodField()
     is_sender = serializers.SerializerMethodField()
 
+    courier = CourierSerializer(read_only=True)
+    courier_company = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ['id', 'first_name', 'last_name', 'username',
-                  'phone_number', 'is_courier', 'is_reviewer', 'is_sender']
+                  'phone_number', 'is_courier', 'is_reviewer', 'is_sender', 'courier', 'courier_company']
 
     def get_phone_number(self, user):
         if self.get_is_courier(user):
@@ -63,24 +93,12 @@ class UserSerializer(serializers.ModelSerializer):
         except (ObjectDoesNotExist, AttributeError):
             return False
 
-
-class UserRoleSerializer(serializers.ModelSerializer):
-    first_name = serializers.ReadOnlyField(source='user.first_name')
-    last_name = serializers.ReadOnlyField(source='user.last_name')
-    username = serializers.ReadOnlyField(source='user.username')
-
-    class Meta:
-        fields = ['id', 'first_name', 'last_name', 'username', 'phone_number']
-
-
-class SenderSerializer(UserRoleSerializer):
-    class Meta(UserRoleSerializer.Meta):
-        model = models.Sender
-
-
-class CourierSerializer(UserRoleSerializer):
-    class Meta(UserRoleSerializer.Meta):
-        model = models.Courier
+    def get_courier_company(self, user):
+        try:
+            company = models.CourierCompany.objects.prefetch_related('couriers__user').get(couriers__user=user)
+        except models.CourierCompany.DoesNotExist:
+            return None
+        return CourierCompanySerializer(company).data
 
 
 class PackageSerializer(serializers.ModelSerializer):

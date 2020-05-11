@@ -29,7 +29,7 @@ class RestAPITests(FVHAPITestCase):
 
     def test_get_current_user_when_signed_in(self):
         # Given that a courier user is signed in
-        self.create_and_login_courier()
+        courier = self.create_and_login_courier()
 
         # When requesting the current user over ReST
         url = reverse('rest_user_details')
@@ -37,7 +37,21 @@ class RestAPITests(FVHAPITestCase):
 
         # Then an OK response is received:
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assert_dict_contains(response.data, {'first_name': 'Coranne', 'last_name': 'Courier', 'is_courier': True})
+        self.assert_dict_contains(response.data, {
+            'first_name': 'Coranne',
+            'last_name': 'Courier',
+            'username': 'courier',
+            'phone_number': '+358505436657',
+            'courier': {'id': courier.id},
+            'courier_company': {
+                'name': 'Couriers r us',
+                'coordinator_id': courier.id,
+                'couriers': [{
+                    'id': courier.id, 'user_id': courier.user_id, 'first_name': 'Coranne', 'last_name': 'Courier',
+                    'username': 'courier', 'phone_number': '+358505436657'
+                }]
+            }
+        })
 
     def test_save_user_location(self):
         # Given that a courier user is signed in

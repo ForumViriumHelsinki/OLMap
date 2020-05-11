@@ -3,7 +3,7 @@ import Card, {CardP} from "util_components/Card";
 import MapWidget from "components/MapWidget";
 import PackageDistances from "components/PackageDistances";
 import ConfirmButton from "util_components/ConfirmButton";
-import {Package} from "components/types";
+import {AppContext, Package, User} from "components/types";
 import {LocationTuple} from "util_components/types";
 import TimeInterval from "util_components/TimeInterval";
 import {sessionRequest} from "sessionRequest";
@@ -11,6 +11,7 @@ import {reservePackageUrl} from "urls";
 import CopyTsvWidget from "util_components/CopyTsvWidget";
 import {packageAsTsv} from "components/package_cards/packageUtils";
 import Contacts from "util_components/Contacts";
+import Select from "util_components/Select";
 
 type AvailablePackageProps = {
     package: Package,
@@ -18,7 +19,16 @@ type AvailablePackageProps = {
     onPackageUpdate: (item: Package) => any
 }
 
-export default class AvailablePackage extends React.Component<AvailablePackageProps> {
+type State = {
+  selectedCourierId?: number,
+  error?: boolean
+}
+
+export default class AvailablePackage extends React.Component<AvailablePackageProps, State> {
+  static contextType = AppContext;
+
+  state: State = {};
+
   render() {
     const {
       earliest_pickup_time, latest_pickup_time,
@@ -26,6 +36,10 @@ export default class AvailablePackage extends React.Component<AvailablePackagePr
       pickup_at, deliver_to, name, recipient, recipient_phone,
       weight, width, height, depth, id} = this.props.package;
 
+    const {user} = this.context;
+    const {selectedCourierId} = this.state;
+    const isCoordinator =
+      user.courier && user.courier_company && (user.courier.id == user.courier_company.coordinator_id);
     const {currentLocation} = this.props;
     const [lon, lat] = currentLocation || [];
 
@@ -45,6 +59,13 @@ export default class AvailablePackage extends React.Component<AvailablePackagePr
           <TimeInterval label="Delivery" from={earliest_delivery_time} to={latest_delivery_time}/>
         </CardP>
         <Contacts phone={recipient_phone} title="Recipient" name={recipient}/>
+        {isCoordinator && <CardP>
+          <strong>Choose courier:</strong><br/>
+          <Select
+            options={user.courier_company.couriers.map((courier: User) => ({label: courier.username, value: courier.id}))}
+            default={selectedCourierId || user.courier.id}
+            onSelect={(selectedCourierId) => this.setState({selectedCourierId})}/>
+        </CardP>}
         <ConfirmButton confirm="Reserve for delivery?" onClick={this.reservePackage}>Reserve</ConfirmButton>
       </Card>
     );
@@ -52,7 +73,8 @@ export default class AvailablePackage extends React.Component<AvailablePackagePr
 
   reservePackage = () => {
     const {id} = this.props.package;
-    sessionRequest(reservePackageUrl(id), {method: 'PUT'})
+    const {selectedCourierId} = this.state;
+    sessionRequest(reservePackageUrl(id), {method: 'PUT', data: {courier: selectedCourierId}})
     .then((response) => {
       if (response.status == 200) response.json().then(this.props.onPackageUpdate);
       else this.setState({error: true});
