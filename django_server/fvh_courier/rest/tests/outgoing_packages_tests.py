@@ -1,5 +1,6 @@
 import datetime
 
+from django.core import mail
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
@@ -239,3 +240,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
 
         # And the primary courier is informed by SMS
         models.PackageSMS.objects.get(message_type=models.PackageSMS.types_by_name['courier_notification'])
+
+        # And also by email
+        self.assertEqual(mail.outbox[0].subject, 'OLMap package available')
+        self.assertEqual(mail.outbox[0].to, ['coranne@couriersrus.com'])

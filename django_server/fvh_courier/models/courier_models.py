@@ -17,10 +17,10 @@ class CourierCompany(TimestampedModel):
     def notify_new_package(cls, package):
         from fvh_courier.models import PackageSMS
         try:
-            number = package.courier_company.coordinator.phone_number
+            coordinator = package.courier_company.coordinator
         except AttributeError:
             return
-        PackageSMS.send_message(package, 'courier_notification', number)
+        PackageSMS.send_message(package, 'courier_notification', coordinator.phone_number, email=coordinator.user.email)
 
     @classmethod
     def packages_for_user(cls, user):

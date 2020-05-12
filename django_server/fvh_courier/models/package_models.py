@@ -3,6 +3,7 @@ import re
 import uuid as uuid
 
 from django.conf import settings
+from django.core.mail import send_mail
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
@@ -89,20 +90,25 @@ class Package(TimestampedModel):
 class PackageSMS(TimestampedModel):
     message_types = [{
         'name': 'reservation',
+        'subject': 'OLMap package reserved',
         'template': 'Your package to {recipient} was reserved by {courier}. See delivery progress: {url}'
     }, {
         'name': 'pickup',
+        'subject': 'OLMap package picked up',
         'template': 'Your package from {sender} was picked up for delivery. See delivery progress: {url}'
     }, {
         'name': 'delivery',
+        'subject': 'OLMap package delivered',
         'template': 'Your package to {recipient} has been delivered.'
     }, {
         'name': 'courier_notification',
+        'subject': 'OLMap package available',
         'template': 'New package delivery request from {sender}: {url}'
     }]
 
     types_by_name = dict((t['name'], i) for i, t in enumerate(message_types))
     templates_by_name = dict((t['name'], t['template']) for t in message_types)
+    subjects_by_name = dict((t['name'], t['subject']) for t in message_types)
 
     message_type = models.PositiveSmallIntegerField(choices=((i, t['name']) for i, t in enumerate(message_types)))
     recipient_number = models.CharField(max_length=32)
@@ -122,7 +128,7 @@ class PackageSMS(TimestampedModel):
             url='{}#/package/{}'.format(referer or settings.FRONTEND_ROOT, package.uuid))
 
     @classmethod
-    def send_message(cls, package, message_type, to_number, referer=None):
+    def send_message(cls, package, message_type, to_number, referer=None, email=None):
         message = cls(
             package=package,
             message_type=cls.types_by_name[message_type],
@@ -141,6 +147,10 @@ class PackageSMS(TimestampedModel):
 
             elif settings.SMS_PLATFORM == 'GatewayAPI':
                 gateway.send(OutgoingMessage(to_number, message.content))
+
+        if email:
+            from_email = settings.EMAIL_HOST_USER or 'olmap@olmap.org'
+            send_mail(cls.subjects_by_name[message_type], message.content, from_email, [email])
 
         message.save()
 

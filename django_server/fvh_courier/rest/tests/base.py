@@ -23,7 +23,8 @@ class FVHAPITestCase(APITestCase):
     def create_courier(self):
         courier = models.Courier.objects.create(
             company=models.CourierCompany.objects.create(name='Couriers r us'),
-            user=User.objects.create(username='courier', first_name='Coranne', last_name='Courier'),
+            user=User.objects.create(
+                username='courier', first_name='Coranne', last_name='Courier', email='coranne@couriersrus.com'),
             phone_number='+358505436657')
         courier.company.coordinator = courier
         courier.company.save()
