@@ -3,11 +3,11 @@ import React from 'react';
 import MyPositionMap from 'util_components/MyPositionMap';
 // @ts-ignore
 import {Button, Spinner} from "reactstrap";
-import Icon from "util_components/Icon";
+import Icon from "util_components/bootstrap/Icon";
 import Component from "util_components/Component";
 import {LocationTuple} from "util_components/types";
-import Modal from "util_components/Modal";
-import ErrorAlert from "util_components/ErrorAlert";
+import Modal from "util_components/bootstrap/Modal";
+import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, osmImageNoteUrl} from "urls";

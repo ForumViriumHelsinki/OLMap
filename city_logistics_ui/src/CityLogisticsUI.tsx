@@ -11,6 +11,7 @@ import SenderUI from "components/SenderUI";
 import LivePackage from "components/LivePackage";
 import {AppContext, User} from "components/types";
 import OLMapUI from "components/OLMapUI";
+import ResetPasswordScreen from "components/ResetPasswordScreen";
 
 type UIState = {
   user?: User,
@@ -50,10 +51,18 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
     const {user, dataFetched} = this.state;
     const Package = () => <LivePackage uuid={useParams().packageUUID}/>;
 
+    const ResetPassword = () => {
+      const params = useParams();
+      return <ResetPasswordScreen uid={params.uid} token={params.token}/>;
+    };
+
     return <Router>
       <Switch>
         <Route path='/package/:packageUUID'>
           <Package/>
+        </Route>
+        <Route path='/resetPassword/:uid/:token'>
+          <ResetPassword/>
         </Route>
         <Route exact path=''>
           {dataFetched ?

@@ -2,6 +2,8 @@ import {packageAction} from "components/types";
 
 export const loginUrl = '/rest-auth/login/';
 export const registerUrl = '/rest-auth/registration/';
+export const passwordResetUrl = '/rest-auth/password/reset/';
+export const changePasswordUrl = '/rest-auth/password/reset/confirm/';
 
 export const availablePackagesUrl = "/rest/available_packages/";
 export const reservePackageUrl = (id: number) => `/rest/available_packages/${id}/reserve/`;

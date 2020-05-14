@@ -3,7 +3,7 @@ import React from 'react';
 // @ts-ignore
 import OverpassFrontend from 'overpass-frontend';
 import {LocationTuple} from "util_components/types";
-import CenteredSpinner from "util_components/CenteredSpinner";
+import CenteredSpinner from "util_components/bootstrap/CenteredSpinner";
 import {getBoundsOfDistance} from "geolib";
 import {GeolibGeoJSONPoint} from "geolib/es/types";
 // @ts-ignore

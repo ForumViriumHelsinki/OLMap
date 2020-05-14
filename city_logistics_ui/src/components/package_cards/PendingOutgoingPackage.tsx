@@ -1,5 +1,5 @@
 import React from 'react';
-import Card, {CardP} from "util_components/Card";
+import Card, {CardP} from "util_components/bootstrap/Card";
 import MapWidget from "components/MapWidget";
 import Contacts from "util_components/Contacts";
 import {formatTimestamp} from "utils";

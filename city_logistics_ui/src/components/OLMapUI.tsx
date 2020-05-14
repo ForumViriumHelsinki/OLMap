@@ -1,8 +1,8 @@
 import React from 'react';
 import OSMImageNotesEditor from "components/osm_image_notes/OSMImageNotesEditor";
-import NavBar from "util_components/NavBar";
+import NavBar from "util_components/bootstrap/NavBar";
 import {AppContext} from "components/types";
-import Confirm from "util_components/Confirm";
+import Confirm from "util_components/bootstrap/Confirm";
 
 type func = () => any;
 

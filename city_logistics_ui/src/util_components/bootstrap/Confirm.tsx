@@ -3,7 +3,7 @@ import React from "react";
 // @ts-ignore
 import {Input} from 'reactstrap';
 
-import Modal, {ModalActions} from "util_components/Modal";
+import Modal, {ModalActions} from "util_components/bootstrap/Modal";
 
 type ConfirmProps = {
   title: string,

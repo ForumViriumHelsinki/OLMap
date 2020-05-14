@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal from "util_components/Modal";
+import Modal from "util_components/bootstrap/Modal";
 // @ts-ignore
 import * as L from 'leaflet';
 import settings from 'settings.json';

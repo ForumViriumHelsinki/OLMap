@@ -2,7 +2,7 @@ import React from 'react';
 import PendingOutgoingPackage from "components/package_cards/PendingOutgoingPackage";
 import DeliveredOutgoingPackage from "components/package_cards/DeliveredOutgoingPackage";
 import {pendingOutgoingPackagesUrl, deliveredOutgoingPackagesUrl} from "urls";
-import NavPills from "util_components/NavPills";
+import NavPills from "util_components/bootstrap/NavPills";
 import NewPackage from "components/NewPackage";
 import LiveList from "util_components/LiveList";
 

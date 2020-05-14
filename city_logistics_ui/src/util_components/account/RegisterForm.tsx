@@ -4,7 +4,7 @@ import Form from "react-jsonschema-form";
 // @ts-ignore
 import {Button} from 'reactstrap';
 import sessionRequest, {login} from "sessionRequest";
-import ErrorAlert from "util_components/ErrorAlert";
+import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 type RegisterFormProps = {
   url: string,

@@ -1,5 +1,5 @@
 import React from "react";
-import CenteredSpinner from "util_components/CenteredSpinner";
+import CenteredSpinner from "util_components/bootstrap/CenteredSpinner";
 
 export default class LoadScreen extends React.Component {
   render() {

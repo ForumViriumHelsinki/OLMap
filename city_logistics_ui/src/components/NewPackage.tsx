@@ -4,10 +4,10 @@ import React from 'react';
 import Form from "react-jsonschema-form";
 import places, { ReconfigurableOptions, Suggestion } from "places.js";
 import sessionRequest from "sessionRequest";
-import CenteredSpinner from "util_components/CenteredSpinner";
+import CenteredSpinner from "util_components/bootstrap/CenteredSpinner";
 
 import settings from "settings.json";
-import ErrorAlert from "util_components/ErrorAlert";
+import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 import moment from "moment";
 import Component from "util_components/Component";
 import {newPackageSchemaUrl, pendingOutgoingPackagesUrl} from "urls";

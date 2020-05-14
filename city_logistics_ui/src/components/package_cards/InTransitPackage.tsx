@@ -1,10 +1,10 @@
 import React from 'react';
-import Card, {CardP} from "util_components/Card";
+import Card, {CardP} from "util_components/bootstrap/Card";
 import MapWidget from "components/MapWidget";
 import Contacts from "util_components/Contacts";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
-import ConfirmButton from "util_components/ConfirmButton";
+import ConfirmButton from "util_components/bootstrap/ConfirmButton";
 import {AppContext, Package, packageAction} from "components/types";
 import {LocationTuple} from "util_components/types";
 import TimeInterval from "util_components/TimeInterval";

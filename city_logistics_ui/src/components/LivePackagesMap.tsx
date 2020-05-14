@@ -11,7 +11,7 @@ import Map from "util_components/Map";
 import GlyphIcon from "util_components/GlyphIcon";
 
 import {availablePackagesUrl, myPackagesUrl} from "urls";
-import Modal from "util_components/Modal";
+import Modal from "util_components/bootstrap/Modal";
 import InTransitPackage from "components/package_cards/InTransitPackage";
 import AvailablePackage from "components/package_cards/AvailablePackage";
 

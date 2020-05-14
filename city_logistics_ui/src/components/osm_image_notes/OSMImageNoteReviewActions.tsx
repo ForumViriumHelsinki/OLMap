@@ -1,10 +1,10 @@
 import React from 'react';
 import {OSMImageNote} from "components/types";
-import Icon from "util_components/Icon";
+import Icon from "util_components/bootstrap/Icon";
 
 // @ts-ignore
 import {Button, ButtonGroup} from "reactstrap";
-import Confirm from "util_components/Confirm";
+import Confirm from "util_components/bootstrap/Confirm";
 import Component from "util_components/Component";
 import sessionRequest from "sessionRequest";
 import {acceptOSMImageNoteUrl, rejectOSMImageNoteUrl} from "urls";

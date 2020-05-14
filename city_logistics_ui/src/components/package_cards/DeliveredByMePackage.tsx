@@ -1,11 +1,11 @@
 import React from 'react';
-import Card, {CardP} from "util_components/Card";
+import Card, {CardP} from "util_components/bootstrap/Card";
 import MapWidget from "components/MapWidget";
 import {formatTimestamp} from "utils";
 import PackageDistances from "components/PackageDistances";
 import {AppContext, Package} from "components/types";
 import {markerIcons as icons} from "settings.json"
-import Icon from "util_components/Icon";
+import Icon from "util_components/bootstrap/Icon";
 import CopyTsvWidget from "util_components/CopyTsvWidget";
 import {packageAsTsv} from "components/package_cards/packageUtils";
 import Contacts from "util_components/Contacts";

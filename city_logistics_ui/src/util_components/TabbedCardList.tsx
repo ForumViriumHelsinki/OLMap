@@ -1,5 +1,5 @@
 import React from 'react';
-import NavPills from "./NavPills";
+import NavPills from "util_components/bootstrap/NavPills";
 
 type TabbedCardListProps = {
   items: any[],

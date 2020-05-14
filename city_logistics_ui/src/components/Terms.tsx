@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal from "util_components/Modal";
+import Modal from "util_components/bootstrap/Modal";
 
 type TermsProps = {}
 

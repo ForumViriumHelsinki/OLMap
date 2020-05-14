@@ -8,8 +8,8 @@ import _ from 'lodash';
 import sessionRequest from "sessionRequest";
 import {osmFeaturePropertiesUrl, osmImageNotesUrl, osmImageNoteUrl} from "urls";
 import {AppContext, OSMFeatureProps, OSMImageNote} from "components/types";
-import Modal from "util_components/Modal";
-import ErrorAlert from "util_components/ErrorAlert";
+import Modal from "util_components/bootstrap/Modal";
+import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 import 'components/osm_image_notes/OSMImageNotes.css';
 
@@ -18,7 +18,7 @@ import {LocationTuple} from "util_components/types";
 import Component from "util_components/Component";
 import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
 import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
-import Icon from "util_components/Icon";
+import Icon from "util_components/bootstrap/Icon";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 import ZoomableImage from "util_components/ZoomableImage";
 import OSMImageNoteVotes from "components/osm_image_notes/OSMImageNoteVotes";

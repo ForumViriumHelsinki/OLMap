@@ -1,5 +1,5 @@
 import React from "react";
-import Confirm from "util_components/Confirm";
+import Confirm from "util_components/bootstrap/Confirm";
 
 type ButtonProps = {
   onClick: () => any,

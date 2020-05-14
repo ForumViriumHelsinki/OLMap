@@ -1,5 +1,5 @@
 import React from "react";
-import Icon from "util_components/Icon";
+import Icon from "util_components/bootstrap/Icon";
 
 type NavBarProps = { icon: string, iconText: string, header: string, onIconClick: () => any };
 

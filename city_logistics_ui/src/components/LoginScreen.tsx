@@ -1,8 +1,7 @@
 import React from 'react';
-import {loginUrl, registerUrl} from "urls";
-import LoginForm from "util_components/LoginForm";
-import RegisterForm from "util_components/RegisterForm";
-import Modal from "util_components/Modal";
+import {loginUrl, registerUrl, passwordResetUrl} from "urls";
+import LoginForm from "util_components/account/LoginForm";
+import RegisterForm from "util_components/account/RegisterForm";
 import Terms from "components/Terms";
 
 type func = () => any;
@@ -50,7 +49,7 @@ export default class LoginScreen extends React.Component<LoginScreenProps, Login
           </p>
         </div>
         {mode == 'login' ?
-          <LoginForm loginUrl={loginUrl} onLogin={onLogin}/>
+          <LoginForm loginUrl={loginUrl} onLogin={onLogin} passwordResetUrl={passwordResetUrl}/>
         : <RegisterForm url={registerUrl} loginUrl={loginUrl} onLogin={onLogin}/>
         }
         <Terms/>

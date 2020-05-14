@@ -12,7 +12,7 @@ import DeliveredByMePackage from "components/package_cards/DeliveredByMePackage"
 import InTransitPackage from "components/package_cards/InTransitPackage";
 import {LocationTuple} from "util_components/types";
 import {Package} from "components/types";
-import NavPills from "util_components/NavPills";
+import NavPills from "util_components/bootstrap/NavPills";
 import LiveList from "util_components/LiveList";
 import AvailablePackage from "components/package_cards/AvailablePackage";
 import LivePackagesMap from "components/LivePackagesMap";

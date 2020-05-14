@@ -1,12 +1,12 @@
 import React from 'react';
 
-import Modal from "util_components/Modal";
+import Modal from "util_components/bootstrap/Modal";
 import {OSMFeature} from "util_components/osm/types";
 import OSMFeatureList from "util_components/osm/OSMFeatureList";
 import {LocationTuple} from "util_components/types";
 import sessionRequest from "sessionRequest";
 import {osmEntranceUrl} from "urls";
-import ErrorAlert from "util_components/ErrorAlert";
+import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 type AssociateEntranceProps = {
   entrance: OSMFeature,

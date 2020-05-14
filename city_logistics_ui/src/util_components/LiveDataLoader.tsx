@@ -1,6 +1,6 @@
 import React from 'react';
 import sessionRequest from "sessionRequest";
-import ErrorAlert from "util_components/ErrorAlert";
+import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 type LiveDataLoaderProps = {
   url: string,

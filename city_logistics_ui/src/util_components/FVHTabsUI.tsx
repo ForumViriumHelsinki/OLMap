@@ -1,7 +1,7 @@
 import React from 'react';
-import Confirm from "util_components/Confirm";
-import Icon from "util_components/Icon";
-import NavBar from "util_components/NavBar";
+import Confirm from "util_components/bootstrap/Confirm";
+import Icon from "util_components/bootstrap/Icon";
+import NavBar from "util_components/bootstrap/NavBar";
 import {User} from "components/types";
 
 type NavItemProps = {icon: string, text: string, active?: boolean, onClick: () => any}

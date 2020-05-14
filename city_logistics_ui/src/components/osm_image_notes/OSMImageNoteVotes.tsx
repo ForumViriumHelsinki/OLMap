@@ -2,7 +2,7 @@ import React from 'react';
 // @ts-ignore
 import {Button, ButtonGroup} from 'reactstrap';
 import {AppContext, OSMImageNote} from "components/types";
-import Icon from "util_components/Icon";
+import Icon from "util_components/bootstrap/Icon";
 import sessionRequest from "sessionRequest";
 import {downvoteOSMImageNoteUrl, upvoteOSMImageNoteUrl} from "urls";
 

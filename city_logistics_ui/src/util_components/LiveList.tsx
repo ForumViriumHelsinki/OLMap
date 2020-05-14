@@ -1,6 +1,6 @@
 import React from 'react';
 import LiveDataLoader from "util_components/LiveDataLoader";
-import CenteredSpinner from "util_components/CenteredSpinner";
+import CenteredSpinner from "util_components/bootstrap/CenteredSpinner";
 
 type LiveListProps = {
   url: string,

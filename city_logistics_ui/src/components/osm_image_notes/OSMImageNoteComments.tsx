@@ -4,8 +4,8 @@ import {Button} from 'reactstrap';
 import {OSMImageNote} from "components/types";
 import {formatTimestamp} from "utils";
 import sessionRequest from "sessionRequest";
-import {osmImageNoteCommentsUrl, osmImageNoteUrl} from "urls";
-import ErrorAlert from "util_components/ErrorAlert";
+import {osmImageNoteCommentsUrl} from "urls";
+import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 type OSMImageNoteCommentsProps = {
   osmImageNote: OSMImageNote,

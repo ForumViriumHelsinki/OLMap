@@ -1,10 +1,10 @@
 import React from 'react';
-import Card, {CardP} from "util_components/Card";
+import Card, {CardP} from "util_components/bootstrap/Card";
 import MapWidget from "components/MapWidget";
 import Contacts from "util_components/Contacts";
 import {formatTimestamp} from "utils";
 import {Package, User} from "components/types";
-import Icon from "util_components/Icon";
+import Icon from "util_components/bootstrap/Icon";
 import {markerIcons as icons} from "settings.json";
 
 export default class DeliveredOutgoingPackage extends React.Component<{package: Package}> {

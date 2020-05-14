@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal, {ModalBody} from "util_components/Modal";
+import Modal, {ModalBody} from "util_components/bootstrap/Modal";
 import settings from "settings.json";
 import {LocationTuple} from './types';
 

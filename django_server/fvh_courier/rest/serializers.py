@@ -1,8 +1,11 @@
 from collections import OrderedDict
 
+from django.conf import settings
+from django.contrib.auth.forms import PasswordResetForm as BasePasswordResetForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import DecimalField
+from rest_auth.serializers import PasswordResetSerializer as BasePasswordResetSerializer
 from rest_framework import serializers
 
 import fvh_courier.models.base
@@ -267,3 +270,14 @@ class OSMEntranceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OSMFeature
         fields = ['id', 'associated_features']
+
+
+class PasswordResetForm(BasePasswordResetForm):
+    def save(self, **kwargs):
+        kwargs = dict(kwargs, domain_override='app.olmap.org', use_https=True,
+                      from_email=settings.EMAIL_HOST_USER or 'olmap@olmap.org')
+        return super().save(**kwargs)
+
+
+class PasswordResetSerializer(BasePasswordResetSerializer):
+    password_reset_form_class = PasswordResetForm
