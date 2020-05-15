@@ -17,7 +17,9 @@ export default class LivePackage extends React.Component<{uuid: string}> {
     const {pkg} = this.state;
 
     return <>
-      <NavBar icon="work" iconText="" header="Package"/>
+      <NavBar icon="work" iconText="">
+        <h5 className="mt-1">Package</h5>
+      </NavBar>
       <div className="container mt-2">
         <LiveDataLoader url={uuidPackageUrl(uuid)} onLoad={(pkg) => this.setState({pkg})}/>
         {pkg ? <PendingOutgoingPackage package={pkg}/> : <CenteredSpinner/>}

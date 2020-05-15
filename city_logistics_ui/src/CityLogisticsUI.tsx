@@ -6,12 +6,13 @@ import sessionRequest, {logout} from "sessionRequest";
 
 import LoginScreen from 'components/LoginScreen';
 import LoadScreen from "components/LoadScreen";
-import CourierUI from "components/CourierUI";
-import SenderUI from "components/SenderUI";
 import LivePackage from "components/LivePackage";
 import {AppContext, User} from "components/types";
-import OLMapUI from "components/OLMapUI";
 import ResetPasswordScreen from "components/ResetPasswordScreen";
+import FVHTabsUI from "util_components/FVHTabsUI";
+import OutgoingPackageLists from "components/package_lists/OutgoingPackageLists";
+import OSMImageNotesEditor from "components/osm_image_notes/OSMImageNotesEditor";
+import ReservedPackageLists from "components/package_lists/ReservedPackageLists";
 
 type UIState = {
   user?: User,
@@ -22,12 +23,29 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
   state: UIState = {
     user: undefined,
     dataFetched: false
-  }
+  };
 
-  constructor(props: any) {
-    super(props);
-    this.logout = this.logout.bind(this);
-  }
+  tabs = {
+    senderPackages: {
+      header: 'Packages',
+      ChildComponent: OutgoingPackageLists,
+      icon: 'dynamic_feed',
+      menuText: 'Packages'
+    },
+    courierPackages: {
+      header: 'Packages',
+      ChildComponent: ReservedPackageLists,
+      icon: 'directions_bike',
+      menuText: 'Packages'
+    },
+    notes: {
+      header: 'Notes',
+      ChildComponent: OSMImageNotesEditor,
+      icon: 'my_location',
+      menuText: 'Notes',
+      fullWidth: true
+    }
+  };
 
   componentDidMount() {
     this.refreshUser();
@@ -40,12 +58,12 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
     })
   }
 
-  logout() {
+  logout = () => {
     sessionRequest('/rest-auth/logout/', {method: 'POST'}).then(response => {
       logout();
       this.setState({user: undefined});
     });
-  }
+  };
 
   render() {
     const {user, dataFetched} = this.state;
@@ -55,6 +73,13 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
       const params = useParams();
       return <ResetPasswordScreen uid={params.uid} token={params.token}/>;
     };
+
+    // @ts-ignore
+    const tabs: any[] = user && (
+      user.is_courier ? [this.tabs.courierPackages]
+      : user.is_sender ? [this.tabs.senderPackages]
+      : []
+    ).concat([this.tabs.notes]);
 
     return <Router>
       <Switch>
@@ -67,11 +92,9 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
         <Route exact path=''>
           {dataFetched ?
             user ?
-              <AppContext.Provider value={{user}}>{
-                user.is_courier ? <CourierUI user={user} onLogout={this.logout}/>
-                : user.is_sender ? <SenderUI user={user} onLogout={this.logout}/>
-                : <OLMapUI onLogout={this.logout}/>
-              }</AppContext.Provider>
+              <AppContext.Provider value={{user}}>
+                <FVHTabsUI user={user} activeTab={tabs[0].header} tabs={tabs} onLogout={this.logout}/>
+              </AppContext.Provider>
             : <LoginScreen onLogin={() => this.refreshUser()}/>
           : <LoadScreen/>}
         </Route>
