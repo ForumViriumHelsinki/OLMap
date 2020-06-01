@@ -1,21 +1,16 @@
-import datetime
-import re
 import uuid as uuid
 
 from django.conf import settings
 from django.core.mail import send_mail
 from django.db import models
 from django.db.models import Q
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from smsframework import Gateway, OutgoingMessage
 from smsframework_gatewayapi import GatewayAPIProvider
 from twilio.rest import Client
 
-from holvi_orders.signals import order_received
 from .base import Address, TimestampedModel
 from .courier_models import CourierCompany, Courier, Sender
-
 
 if settings.SMS_PLATFORM == 'GatewayAPI':
     gateway = Gateway()
@@ -174,77 +169,3 @@ class PackageSMS(TimestampedModel):
     def get_twilio_client(cls):
         if settings.TWILIO['ACCOUNT_SID'] != 'configure in local settings':
             return Client(settings.TWILIO['ACCOUNT_SID'], settings.TWILIO['AUTH_TOKEN'])
-
-
-class HolviPackage(models.Model):
-    package = models.OneToOneField(Package, on_delete=models.CASCADE)
-    order = models.OneToOneField('holvi_orders.HolviOrder', on_delete=models.CASCADE)
-
-    ignore_products = ["Shipping fee"]
-    delivery_products = ['Kotiinkuljetus', 'Home delivery', 'ILMAINEN KOTIINKULJETUS']
-    instruction_regex = re.compile('Delivery instructions|Ohjeet kuljettajalle', re.IGNORECASE)
-
-    minute_limits = {
-        'pickup': [20, 40],
-        'delivery': [20, 60]
-    }
-
-    @classmethod
-    def create_package_for_order(cls, order):
-        if cls.order_needs_delivery(order):
-            return cls(order=order).create_package()
-
-    @classmethod
-    def order_needs_delivery(cls, order):
-        for p in order.purchases.all():
-            if p.product_name in cls.delivery_products:
-                return True
-        return False
-
-    def create_package(self):
-        delivery_instructions = ''
-        details = ''
-        purchases = [p for p in self.order.purchases.all() if p.product_name not in self.ignore_products]
-
-        for p in purchases:
-            details += p.product_name
-            for a in p.answers.all():
-                if a.answer:
-                    details += f'\n  {a.label}:\n  {a.answer}'
-                    if re.search(self.instruction_regex, a.label):
-                        delivery_instructions += a.answer
-            details += '\n'
-
-        meals = len(purchases) - 1  # Home delivery is one product, hence - 1
-        sender_user = self.order.sender()
-        sender = sender_user.sender
-        self.package = Package.objects.create(
-            name=f'{meals} meal{meals > 1 and "s" or ""} to {self.order.recipient_str()}'[:64],
-            details=details,
-            delivery_instructions=delivery_instructions,
-            pickup_at=sender.address,
-            deliver_to=Address.objects.get_or_create(
-                street_address=self.order.street,
-                city=self.order.city,
-                postal_code=self.order.postcode,
-                country=self.order.country
-            )[0].with_latlng(),
-            sender=sender,
-            courier_company=sender.courier_company,
-            recipient=self.order.recipient_str(),
-            recipient_phone=self.order.phone,
-            earliest_pickup_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['pickup'][0]),
-            latest_pickup_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['pickup'][1]),
-
-            earliest_delivery_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['delivery'][0]),
-            latest_delivery_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['delivery'][1]))
-        self.save()
-        CourierCompany.notify_new_package(self.package)
-        return self.package
-
-
-def on_order_received(sender, order=None, **kwargs):
-    HolviPackage.create_package_for_order(order)
-
-
-order_received.connect(on_order_received)

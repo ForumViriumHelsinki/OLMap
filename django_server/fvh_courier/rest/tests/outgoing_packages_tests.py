@@ -185,6 +185,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
         courier = self.create_courier()
         sender = self.create_sender(courier_company=courier.company)
         webshop = sender.user.holvi_webshops.create()
+        models.RequiredHolviProduct.objects.create(holvi_shop=webshop, name='Kotiinkuljetus')
 
         # When POSTing the payload to the holvi order endpoint
         url = reverse('holvi_order', kwargs={'token': webshop.token})
@@ -207,6 +208,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
         courier = self.create_courier()
         sender = self.create_sender(courier_company=courier.company)
         webshop = sender.user.holvi_webshops.create()
+        models.RequiredHolviProduct.objects.create(holvi_shop=webshop, name='Kotiinkuljetus')
 
         # When POSTing the payload to the holvi order endpoint
         url = reverse('holvi_order', kwargs={'token': webshop.token})

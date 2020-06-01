@@ -4,7 +4,6 @@ from django.utils.safestring import mark_safe
 from holvi_orders import models
 
 
-@admin.register(models.HolviWebshop)
 class HolviWebshopAdmin(admin.ModelAdmin):
     pass
 
