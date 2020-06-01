@@ -4,9 +4,12 @@ import re
 from django.db import models
 from django.utils import timezone
 
-from fvh_courier.models import Package, Address, CourierCompany
 from holvi_orders.models import HolviWebshop
 from holvi_orders.signals import order_received
+
+from .package_models import Package, PackageSMS
+from .base import Address
+from .courier_models import CourierCompany
 
 
 class IgnoredHolviProduct(models.Model):
@@ -108,6 +111,7 @@ class HolviPackage(models.Model):
             latest_delivery_time=timezone.now() + datetime.timedelta(minutes=self.minute_limits['delivery'][1]))
         self.save()
         CourierCompany.notify_new_package(self.package)
+        PackageSMS.notify_sender_of_order(self.package)
         return self.package
 
 

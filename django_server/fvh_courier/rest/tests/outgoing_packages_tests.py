@@ -246,3 +246,7 @@ class OutgoingPackagesTests(FVHAPITestCase):
         # And also by email
         self.assertEqual(mail.outbox[0].subject, 'OLMap package available')
         self.assertEqual(mail.outbox[0].to, ['coranne@couriersrus.com'])
+
+        # And the sender is informed by SMS
+        models.PackageSMS.objects.get(message_type=models.PackageSMS.types_by_name['new_package'])
+

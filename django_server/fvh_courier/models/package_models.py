@@ -99,6 +99,10 @@ class PackageSMS(TimestampedModel):
         'name': 'courier_notification',
         'subject': 'OLMap package available',
         'template': 'New package delivery request from {sender}: {url}'
+    }, {
+        'name': 'new_package',
+        'subject': 'New delivery order',
+        'template': 'New order from {recipient}: {url}'
     }]
 
     types_by_name = dict((t['name'], i) for i, t in enumerate(message_types))
@@ -152,6 +156,10 @@ class PackageSMS(TimestampedModel):
     @classmethod
     def message_sender(cls, package, message_type, referer):
         cls.send_message(package, message_type, package.sender.phone_number, referer)
+
+    @classmethod
+    def notify_sender_of_order(cls, package, referer=None):
+        cls.message_sender(package, 'new_package', referer)
 
     @classmethod
     def notify_sender_of_reservation(cls, package, referer):
