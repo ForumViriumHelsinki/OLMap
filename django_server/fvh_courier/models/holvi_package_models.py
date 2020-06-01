@@ -39,8 +39,6 @@ class RequiredHolviProduct(models.Model):
 class HolviPackage(models.Model):
     package = models.OneToOneField(Package, on_delete=models.CASCADE)
     order = models.OneToOneField('holvi_orders.HolviOrder', on_delete=models.CASCADE)
-
-    delivery_products = ['Kotiinkuljetus', 'Home delivery', 'ILMAINEN KOTIINKULJETUS']
     instruction_regex = re.compile('Delivery instructions|Ohjeet kuljettajalle', re.IGNORECASE)
 
     minute_limits = {
