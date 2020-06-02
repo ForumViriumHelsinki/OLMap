@@ -206,4 +206,10 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
                     'type': {
                         'type': 'string', 'maxLength': 32, 'minLength': 1, 'title': 'Type',
                         'description': 'See https://wiki.openstreetmap.org/wiki/Key:amenity'}}),
-                'required': ['type']}})
+                'required': ['type']},
+
+            'InfoBoard': {
+                'type': 'object',
+                'properties': {'type': {'type': 'string', 'enum': ['', 'map', 'board'], 'title': 'Type'}}}
+        })
+

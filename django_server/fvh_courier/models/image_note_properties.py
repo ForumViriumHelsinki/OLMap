@@ -33,6 +33,17 @@ class ImageNoteProperties(models.Model):
         return {}
 
 
+class InfoBoard(ImageNoteProperties):
+    types = ['map', 'board']
+    type = choices_field(types, default='board')
+
+    def as_osm_tags(self):
+        return {
+            'tourism': 'information',
+            'information': self.type or 'board'
+        }
+
+
 class BaseAddress(ImageNoteProperties):
     street = models.CharField(max_length=64, blank=True)
     housenumber = models.CharField(max_length=8, blank=True, null=True, help_text='E.g. 3-5')
@@ -177,7 +188,7 @@ class Amenity(Company):
             **filter_dict({'delivery:covid19': self.delivery_covid19, 'takeaway:covid19': self.takeaway_covid19}))
 
 
-image_note_property_types = [Entrance, Steps, Gate, Barrier, Office, Shop, Amenity]
+image_note_property_types = [Entrance, Steps, Gate, Barrier, Office, Shop, Amenity, InfoBoard]
 
 
 def manager_name(prop_type):
