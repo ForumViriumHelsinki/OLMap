@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+from sentry_sdk import capture_exception
 from smsframework import Gateway, OutgoingMessage
 from smsframework_gatewayapi import GatewayAPIProvider
 from twilio.rest import Client
@@ -134,22 +135,29 @@ class PackageSMS(TimestampedModel):
             recipient_number=to_number,
             content=cls.render_message(message_type, package, referer))
 
-        if not settings.TEST:
-            if settings.SMS_PLATFORM == 'Twilio':
-                client = cls.get_twilio_client()
-                if client:
-                    twilio_msg = client.messages.create(
-                        body=message.content,
-                        to=to_number,
-                        from_=settings.TWILIO['SENDER_NR'])
-                    message.twilio_sid = twilio_msg.sid
+        try:
+            if not settings.TEST:
+                if settings.SMS_PLATFORM == 'Twilio':
+                    client = cls.get_twilio_client()
+                    if client:
+                        twilio_msg = client.messages.create(
+                            body=message.content,
+                            to=to_number,
+                            from_=settings.TWILIO['SENDER_NR'])
+                        message.twilio_sid = twilio_msg.sid
 
-            elif settings.SMS_PLATFORM == 'GatewayAPI':
-                gateway.send(OutgoingMessage(to_number, message.content))
+                elif settings.SMS_PLATFORM == 'GatewayAPI':
+                    gateway.send(OutgoingMessage(to_number, message.content))
 
-        if email:
-            from_email = settings.EMAIL_HOST_USER or 'olmap@olmap.org'
-            send_mail(cls.subjects_by_name[message_type], message.content, from_email, [email])
+            if email:
+                from_email = settings.EMAIL_HOST_USER or 'olmap@olmap.org'
+                send_mail(cls.subjects_by_name[message_type], message.content, from_email, [email])
+
+        except Exception as e:
+            if settings.DEBUG:
+                print(e)
+            else:
+                capture_exception(e)
 
         message.save()
 
@@ -167,7 +175,8 @@ class PackageSMS(TimestampedModel):
 
     @classmethod
     def notify_recipient_of_pickup(cls, package, referer):
-        cls.send_message(package, 'pickup', package.recipient_phone, referer)
+        if package.recipient_phone:
+            cls.send_message(package, 'pickup', package.recipient_phone, referer)
 
     @classmethod
     def notify_sender_of_delivery(cls, package, referer):
