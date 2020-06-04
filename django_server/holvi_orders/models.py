@@ -44,4 +44,4 @@ class HolviPurchase(models.Model):
 class HolviPurchaseAnswer(models.Model):
     purchase = models.ForeignKey(HolviPurchase, related_name='answers', on_delete=models.CASCADE)
     label = models.CharField(max_length=128)
-    answer = models.CharField(max_length=256)
+    answer = models.CharField(max_length=256, blank=True)
