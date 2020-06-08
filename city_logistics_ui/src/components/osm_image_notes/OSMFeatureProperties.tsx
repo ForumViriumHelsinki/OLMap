@@ -127,7 +127,7 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
     // @ts-ignore
     const featureList = osmImageNote[fieldName];
     // @ts-ignore
-    featureList.splice(featureList.indexOf(feature, 1));
+    featureList.splice(featureList.indexOf(feature), 1);
     // @ts-ignore
     Promise.resolve(onSubmit({[fieldName]: featureList}))
       .then(() => {if (feature == this.state.editingFeature) this.setState({editingFeature: undefined})});

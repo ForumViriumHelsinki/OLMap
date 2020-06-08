@@ -16,6 +16,7 @@ import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
 import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
 import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
+import {OSMFeature} from "util_components/osm/types";
 
 
 type OSMImageNotesEditorState = OSMImageNote & {
@@ -28,10 +29,11 @@ type OSMImageNotesEditorState = OSMImageNote & {
   osmFeatureProperties?: OSMFeatureProps,
   tags: string[],
   osmProperties: any,
-  myNotesOnly: boolean
+  myNotesOnly: boolean,
+  nearbyFeatures: OSMFeature[]
 }
 
-const initialState: OSMImageNotesEditorState = {
+const initialState: () => OSMImageNotesEditorState = () => ({
   status: 'initial',
   lat: undefined,
   lon: undefined,
@@ -44,13 +46,14 @@ const initialState: OSMImageNotesEditorState = {
   imagesUploading: [],
   tags: [],
   osmProperties: {},
-  myNotesOnly: false
-};
+  myNotesOnly: false,
+  nearbyFeatures: []
+});
 
-const {imagesUploading, ...resetState} = initialState;
+const {imagesUploading, ...resetState} = initialState();
 
 export default class OSMImageNotesEditor extends Component<{}> {
-  state: OSMImageNotesEditorState = initialState;
+  state: OSMImageNotesEditorState = initialState();
 
   static bindMethods = [
     'onImageClick', 'onImageCaptured', 'onCommentClick',
@@ -66,7 +69,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
   render() {
     const {
       status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags,
-      osmProperties, myNotesOnly
+      osmProperties, myNotesOnly, osm_features, nearbyFeatures
     } = this.state;
 
     const location = [lon, lat] as LocationTuple;
@@ -116,6 +119,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
             <Modal title="Choose related places (optional)" onClose={this.onCancel}>
               <OSMFeaturesSelection
                 location={location}
+                onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
                 onSelect={osm_features => this.setState({osm_features, status: 'commenting'})}/>
             </Modal>,
           commenting:
@@ -134,8 +138,9 @@ export default class OSMImageNotesEditor extends Component<{}> {
                   <div className="ml-2 mr-2">
                     {tags.filter(tag => osmFeatureProperties[tag]).map((tag) =>
                       <OSMFeatureProperties key={tag} schema={osmFeatureProperties[tag]} osmFeatureName={tag}
-                                            osmImageNote={osmProperties}
-                                            onSubmit={(data) => this.addOSMProperties(data)} />
+                                            osmImageNote={{osm_features, ...osmProperties}}
+                                            onSubmit={(data) => this.addOSMProperties(data)}
+                                            nearbyFeatures={nearbyFeatures}/>
                     )}
                   </div>
                 </>
