@@ -48,8 +48,8 @@ class HolviOrderTests(APITestCase):
             'language': 'en',
             'phone': '+35888445544',
             'paid': True,
-            'create_time': '2020-03-27T12:57:45.442000Z',
-            'paid_time': '2020-03-27T12:59:04.582000Z',
+            'create_time': '2020-03-27T14:57:45.442000+02:00',
+            'paid_time': '2020-03-27T14:59:04.582000+02:00',
             'shop': webshop.id})
 
         # And when subsequently POSTing the same payload again
