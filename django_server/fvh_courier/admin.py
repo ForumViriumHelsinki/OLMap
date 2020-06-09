@@ -1,6 +1,10 @@
+import datetime
+
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from django.db.models import Count, Q
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.conf import settings
 from fvh_courier import models
@@ -66,6 +70,19 @@ class CourierInline(admin.TabularInline):
 @admin.register(User)
 class UserWithRolesAdmin(UserAdmin):
     inlines = UserAdmin.inlines + [SenderInline, CourierInline]
+    list_display = UserAdmin.list_display + ('notes', 'notes_12h')
+
+    def get_queryset(self, request):
+        _12_hours_ago = timezone.now() - datetime.timedelta(hours=12)
+        return super().get_queryset(request)\
+            .annotate(notes=Count('created_notes'))\
+            .annotate(notes_12h=Count('created_notes', filter=Q(created_notes__created_at__gt=_12_hours_ago)))
+
+    def notes(self, user):
+        return user.notes
+
+    def notes_12h(self, user):
+        return user.notes_12h
 
 
 @admin.register(models.CourierCompany)
