@@ -30,6 +30,8 @@ class OSMImageNote(BaseLocation, TimestampedModel):
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name='created_notes')
     modified_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name='modified_notes')
+    processed_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='processed_notes')
     reviewed_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name='reviewed_notes')
 
@@ -78,6 +80,9 @@ class OSMImageNote(BaseLocation, TimestampedModel):
 
     def is_reviewed(self):
         return bool(self.reviewed_by_id)
+
+    def is_processed(self):
+        return bool(self.processed_by_id)
 
 
 class ImageNoteTag(base.Model):

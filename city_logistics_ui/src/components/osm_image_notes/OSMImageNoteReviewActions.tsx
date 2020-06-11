@@ -5,9 +5,8 @@ import Icon from "util_components/bootstrap/Icon";
 // @ts-ignore
 import {Button, ButtonGroup} from "reactstrap";
 import Confirm from "util_components/bootstrap/Confirm";
-import Component from "util_components/Component";
 import sessionRequest from "sessionRequest";
-import {acceptOSMImageNoteUrl, rejectOSMImageNoteUrl} from "urls";
+import {acceptOSMImageNoteUrl, rejectOSMImageNoteUrl, processedOSMImageNoteUrl} from "urls";
 
 type ReviewActionsProps = {
   imageNote: OSMImageNote,
@@ -16,22 +15,22 @@ type ReviewActionsProps = {
 
 type ReviewActionsState = {
   confirmAccept: boolean,
-  confirmReject: boolean
+  confirmReject: boolean,
+  confirmProcessed: boolean
 }
 
 const initialState: ReviewActionsState = {
   confirmAccept: false,
-  confirmReject: false
+  confirmReject: false,
+  confirmProcessed: false
 };
 
-export default class OSMImageNoteReviewActions extends Component<ReviewActionsProps, ReviewActionsState> {
-  static bindMethods = ['onAccept', 'onReject'];
-
+export default class OSMImageNoteReviewActions extends React.Component<ReviewActionsProps, ReviewActionsState> {
   state = initialState;
 
   render() {
     const {imageNote} = this.props;
-    const {confirmAccept, confirmReject} = this.state;
+    const {confirmAccept, confirmReject, confirmProcessed} = this.state;
 
     const osm_edit_url =
       `https://www.openstreetmap.org/edit#map=20/${imageNote.lat}/${imageNote.lon}`;
@@ -43,20 +42,36 @@ export default class OSMImageNoteReviewActions extends Component<ReviewActionsPr
           <Icon icon="search"/> OSM
         </Button>{' '}
 
-        <Button outline color="success" className="btn-compact" size="sm"
-                onClick={() => this.setState({confirmAccept: true})}>
-          <Icon icon="done"/> Accept
-        </Button>{' '}
+        {imageNote.is_processed ?
+          <Button outline color="success" className="btn-compact" size="sm"
+                  onClick={() => this.setState({confirmAccept: true})}>
+            <Icon icon="done"/> Accept
+          </Button>
+        :
+          <Button outline color="success" className="btn-compact" size="sm"
+                  onClick={() => this.setState({confirmProcessed: true})}>
+            <Icon icon="map"/> Added to OSM
+          </Button>
+        }
+        {' '}
+
         {confirmAccept &&
           <Confirm title="Mark this image note as reviewed & accepted?"
                    onClose={() => this.setState({confirmAccept: false})}
                    onConfirm={this.onAccept}/>
         }
 
+        {confirmProcessed &&
+          <Confirm title="Mark this image note as added to OSM?"
+                   onClose={() => this.setState({confirmProcessed: false})}
+                   onConfirm={this.onProcessed}/>
+        }
+
         <Button outline color="danger" className="btn-compact modal-header-action" size="sm"
                 onClick={() => this.setState({confirmReject: true})}>
           <Icon icon="delete"/> Reject
         </Button>
+
         {confirmReject &&
           <Confirm title="Mark this image note as rejected, hiding it from view on the map?"
                    onClose={() => this.setState({confirmReject: false})}
@@ -66,7 +81,7 @@ export default class OSMImageNoteReviewActions extends Component<ReviewActionsPr
       </ButtonGroup>;
   }
 
-  private onReviewed(url: string, data?: any) {
+  onReviewed = (url: string, data?: any) => {
     const {imageNote, onReviewed} = this.props;
     sessionRequest(url, {method: 'PUT', data})
     .then((response) => {
@@ -75,13 +90,17 @@ export default class OSMImageNoteReviewActions extends Component<ReviewActionsPr
         onReviewed();
       }
     })
-  }
+  };
 
-  private onAccept() {
+  onProcessed = () => {
+    this.onReviewed(processedOSMImageNoteUrl(this.props.imageNote.id as number));
+  };
+
+  onAccept = () => {
     this.onReviewed(acceptOSMImageNoteUrl(this.props.imageNote.id as number));
-  }
+  };
 
-  private onReject(hidden_reason?: string) {
+  onReject = (hidden_reason?: string) => {
     this.onReviewed(rejectOSMImageNoteUrl(this.props.imageNote.id as number), {hidden_reason});
-  }
+  };
 }

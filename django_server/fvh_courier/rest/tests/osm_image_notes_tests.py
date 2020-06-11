@@ -144,7 +144,18 @@ class OSMImageNotesTests(FVHAPITestCase):
         # And given a successfully created OSM image note
         note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188')
 
-        # When requesting to mark the OSM image note as reviewed over ReST
+        # When requesting to mark the OSM image note as processed over ReST
+        url = reverse('osmimagenote-mark-processed', kwargs={'pk': note.id})
+        response = self.client.put(url)
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And the note is updated in db:
+        note = models.OSMImageNote.objects.get()
+        self.assertEqual(note.processed_by_id, user.id)
+
+        # And when requesting to mark the OSM image note as reviewed over ReST
         url = reverse('osmimagenote-mark-reviewed', kwargs={'pk': note.id})
         response = self.client.put(url)
 
@@ -299,6 +310,7 @@ class OSMImageNotesTests(FVHAPITestCase):
                     'comment': 'Nice view',
                     'lat': '60.16134702',
                     'lon': '24.94459394',
+                    'is_processed': False,
                     'is_reviewed': False
                 }
             }]

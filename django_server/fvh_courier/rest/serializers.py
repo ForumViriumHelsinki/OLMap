@@ -183,7 +183,7 @@ class OSMImageNoteCommentSerializer(serializers.ModelSerializer):
 class BaseOSMImageNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OSMImageNote
-        fields = ['id', 'comment', 'image', 'lat', 'lon', 'is_reviewed', 'created_by']
+        fields = ['id', 'comment', 'image', 'lat', 'lon', 'is_reviewed', 'is_processed', 'created_by']
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
@@ -215,7 +215,7 @@ class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
 class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImageNoteSerializerMeta):
     class Meta:
         model = models.OSMImageNote
-        fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed', 'tags',
+        fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed', 'is_processed', 'tags',
                    'created_by', 'upvotes', 'downvotes', 'comments'] +
                   [manager_name(prop_type) for prop_type in models.image_note_property_types])
 

@@ -27,6 +27,7 @@ import AssociateEntranceModal from "components/osm_image_notes/AssociateEntrance
 import {OSMFeature} from "util_components/osm/types";
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
+const processedDotIcon = L.divIcon({className: "dotIcon processedDotIcon", iconSize: [24, 24]});
 const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
 const problemDotIcon = L.divIcon({className: "dotIcon problemDotIcon", iconSize: [24, 24]});
 
@@ -221,11 +222,11 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
 
     osmImageNotes.forEach((osmImageNote) => {
       const id = String(osmImageNote.id);
-      const icon = (osmImageNote.tags || []).includes('Problem')
-        ? problemDotIcon
-        : (user.is_reviewer && !osmImageNote.is_reviewed)
-          ? dotIcon
-          : successDotIcon;
+      const icon =
+        (osmImageNote.tags || []).includes('Problem') ? problemDotIcon
+        : osmImageNote.is_reviewed ? successDotIcon
+        : osmImageNote.is_processed ? processedDotIcon
+        : dotIcon;
       if (this.dotMarkers[id]) return this.dotMarkers[id].setIcon(icon);
       const marker = L.marker({lon: osmImageNote.lon, lat: osmImageNote.lat}, {icon: icon})
       marker.on('click', () =>

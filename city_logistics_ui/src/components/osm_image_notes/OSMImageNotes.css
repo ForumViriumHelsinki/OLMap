@@ -24,6 +24,14 @@ div.successDotIcon::before {
     border-color: #28a745;
 }
 
+div.processedDotIcon {
+    background: rgba(0, 133, 255, 0.1);
+}
+
+div.processedDotIcon::before {
+    border-color: #007bff;
+}
+
 div.problemDotIcon {
     background: rgba(255, 0, 0, 0.1);
 }

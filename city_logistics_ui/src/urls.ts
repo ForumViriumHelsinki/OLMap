@@ -21,8 +21,11 @@ export const uuidPackageUrl = (uuid: string) => `/rest/packages/${uuid}/`;
 
 export const osmImageNotesUrl = "/rest/osm_image_notes/";
 export const osmImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/`;
+
+export const processedOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/mark_processed/`;
 export const acceptOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/mark_reviewed/`;
 export const rejectOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/hide_note/`;
+
 export const upvoteOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/upvote/`;
 export const downvoteOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/downvote/`;
 export const osmImageNoteCommentsUrl = `/rest/osm_image_note_comments/`;

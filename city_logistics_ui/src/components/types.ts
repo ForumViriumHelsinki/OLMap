@@ -58,6 +58,7 @@ export type OSMImageNote = {
     lon?: number,
     comment?: string,
     osm_features: number[],
+    is_processed?: boolean,
     is_reviewed?: boolean,
     tags?: string[],
     created_by?: number,
