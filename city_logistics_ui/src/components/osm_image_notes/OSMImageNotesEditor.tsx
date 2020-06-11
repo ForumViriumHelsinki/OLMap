@@ -107,6 +107,9 @@ export default class OSMImageNotesEditor extends Component<{}> {
                       onClick={() => this.setState({myNotesOnly: !myNotesOnly})}>
                 <Icon icon="account_circle"/>
               </Button>{' '}
+              <Button {...this.childProps.toolButton} tag="a" href="/editing-process.html" target="_blank">
+                <Icon icon="help"/>
+              </Button>{' '}
             </>,
           locating:
             <div className="mt-4 text-right">
