@@ -55,6 +55,12 @@ class CourierCompanySerializer(serializers.ModelSerializer):
         fields = ['name', 'coordinator_id', 'couriers']
 
 
+class BaseUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'username']
+
+
 class UserSerializer(serializers.ModelSerializer):
     phone_number = serializers.SerializerMethodField()
     is_courier = serializers.SerializerMethodField()
@@ -213,10 +219,12 @@ class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
 
 
 class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImageNoteSerializerMeta):
+    created_by = BaseUserSerializer(read_only=True)
+
     class Meta:
         model = models.OSMImageNote
         fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed', 'is_processed', 'tags',
-                   'created_by', 'upvotes', 'downvotes', 'comments'] +
+                   'created_by', 'created_at', 'upvotes', 'downvotes', 'comments'] +
                   [manager_name(prop_type) for prop_type in models.image_note_property_types])
 
     def create(self, validated_data):

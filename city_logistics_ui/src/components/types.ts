@@ -61,7 +61,11 @@ export type OSMImageNote = {
     is_processed?: boolean,
     is_reviewed?: boolean,
     tags?: string[],
-    created_by?: number,
+    created_at?: string,
+    created_by?: number | {
+        id: number,
+        username: string
+    },
     upvotes?: userId[],
     downvotes?: userId[],
     comments?: OSMImageNoteComment[]

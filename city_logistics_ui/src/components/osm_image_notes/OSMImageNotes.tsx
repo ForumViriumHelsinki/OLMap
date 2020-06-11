@@ -25,6 +25,7 @@ import OSMImageNoteVotes from "components/osm_image_notes/OSMImageNoteVotes";
 import OSMImageNoteComments from "components/osm_image_notes/OSMImageNoteComments";
 import AssociateEntranceModal from "components/osm_image_notes/AssociateEntranceModal";
 import {OSMFeature} from "util_components/osm/types";
+import {formatTimestamp} from "utils";
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
 const processedDotIcon = L.divIcon({className: "dotIcon processedDotIcon", iconSize: [24, 24]});
@@ -101,9 +102,14 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
         ? nearbyFeatures.filter(f => selectedNote.osm_features.includes(f.id))
         : nearbyFeatures;
 
-    return <Modal title={selectedNote.comment || 'No comment.'}
-             className={selectedNote.image ? 'modal-xl' : 'modal-dialog-centered'}
-             onClose={() => this.setState(initialState)}>
+    // @ts-ignore
+    const credit = `${selectedNote.created_by.username} on ${formatTimestamp(selectedNote.created_at)}`;
+    const title = selectedNote.comment
+      ? <>{selectedNote.comment}<br/>by {credit}</>
+      : `Note by ${credit}`;
+    const modalCls = selectedNote.image ? 'modal-xl' : 'modal-dialog-centered';
+
+    return <Modal title={title} className={modalCls} onClose={() => this.setState(initialState)}>
         {user.is_reviewer &&
           <OSMImageNoteReviewActions imageNote={selectedNote} onReviewed={this.refresh}/>
         }
