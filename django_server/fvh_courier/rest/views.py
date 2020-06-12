@@ -170,6 +170,8 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     @decorators.permission_classes([IsReviewer])
     def mark_reviewed(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
+        if not osm_image_note.processed_by:
+            osm_image_note.processed_by = request.user
         osm_image_note.reviewed_by = request.user
         osm_image_note.save()
         return Response('OK')

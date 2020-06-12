@@ -42,12 +42,13 @@ export default class OSMImageNoteReviewActions extends React.Component<ReviewAct
           <Icon icon="search"/> OSM
         </Button>{' '}
 
-        {imageNote.is_processed ?
+        {!imageNote.is_processed &&
           <Button outline color="success" className="btn-compact" size="sm"
                   onClick={() => this.setState({confirmAccept: true})}>
             <Icon icon="done"/> Accept
           </Button>
-        :
+        }
+        {!imageNote.is_reviewed &&
           <Button outline color="success" className="btn-compact" size="sm"
                   onClick={() => this.setState({confirmProcessed: true})}>
             <Icon icon="map"/> Added to OSM
