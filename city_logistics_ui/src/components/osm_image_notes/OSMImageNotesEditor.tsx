@@ -1,4 +1,6 @@
 import React from 'react';
+// @ts-ignore
+import _ from 'lodash';
 
 import MyPositionMap from 'util_components/MyPositionMap';
 // @ts-ignore
@@ -6,7 +8,7 @@ import {Button, Spinner} from "reactstrap";
 import Icon from "util_components/bootstrap/Icon";
 import Component from "util_components/Component";
 import {LocationTuple} from "util_components/types";
-import Modal from "util_components/bootstrap/Modal";
+import Modal, {ModalBody} from "util_components/bootstrap/Modal";
 import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 import sessionRequest from "sessionRequest";
@@ -16,7 +18,9 @@ import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
 import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
 import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
-import {OSMFeature} from "util_components/osm/types";
+import {changeset, OSMFeature} from "util_components/osm/types";
+import OSMChangesetSelection from "util_components/osm/OSMChangesetSelection";
+import OSMChangesetMapLayer from "util_components/osm/OSMChangesetMapLayer";
 
 
 type OSMImageNotesEditorState = OSMImageNote & {
@@ -30,7 +34,9 @@ type OSMImageNotesEditorState = OSMImageNote & {
   tags: string[],
   osmProperties: any,
   myNotesOnly: boolean,
-  nearbyFeatures: OSMFeature[]
+  nearbyFeatures: OSMFeature[],
+  selectChangeset: boolean,
+  selectedChangeset?: changeset
 }
 
 const initialState: () => OSMImageNotesEditorState = () => ({
@@ -47,7 +53,8 @@ const initialState: () => OSMImageNotesEditorState = () => ({
   tags: [],
   osmProperties: {},
   myNotesOnly: false,
-  nearbyFeatures: []
+  nearbyFeatures: [],
+  selectChangeset: false
 });
 
 const {imagesUploading, ...resetState} = initialState();
@@ -61,6 +68,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
   ];
 
   imageNotesRef = React.createRef<OSMImageNotes>();
+  changesetLayerRef = React.createRef<OSMChangesetMapLayer>();
 
   childProps = {
     toolButton: {outline: true, color: "primary", size: "sm", className: 'bg-white'}
@@ -69,7 +77,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
   render() {
     const {
       status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags,
-      osmProperties, myNotesOnly, osm_features, nearbyFeatures
+      osmProperties, myNotesOnly, osm_features, nearbyFeatures, selectChangeset, selectedChangeset
     } = this.state;
 
     const location = [lon, lat] as LocationTuple;
@@ -79,11 +87,24 @@ export default class OSMImageNotesEditor extends Component<{}> {
         <input name="image" id="image" className="d-none" type="file"
                accept="image/*" capture="environment"
                onChange={this.onImageCaptured}/>
+
+        {selectChangeset &&
+          <Modal title="Select OSM changeset" onClose={() => this.setState({selectChangeset: false})}>
+            <ModalBody>
+              <OSMChangesetSelection changeset={selectedChangeset}
+                                     onCancel={() => this.setState({selectChangeset: false})}
+                                     onSelect={this.selectChangeset} />
+            </ModalBody>
+          </Modal>
+        }
+        <OSMChangesetMapLayer ref={this.changesetLayerRef} />
+
         {imageError &&
           <Modal title="Image error" onClose={() => this.setState({imageError: false})}>
             There was an error uploading the image. Try again maybe?
           </Modal>
         }
+
         {{
           initial:
             <>
@@ -109,6 +130,9 @@ export default class OSMImageNotesEditor extends Component<{}> {
               </Button>{' '}
               <Button {...this.childProps.toolButton} tag="a" href="/editing-process.html" target="_blank">
                 <Icon icon="help"/>
+              </Button>{' '}
+              <Button {...this.childProps.toolButton} onClick={() => this.setState({selectChangeset: true})}>
+                <Icon icon="compare_arrows"/>
               </Button>{' '}
             </>,
           locating:
@@ -167,12 +191,17 @@ export default class OSMImageNotesEditor extends Component<{}> {
       </div>
       <MyPositionMap requestLocation={status == 'locating'}
                      onLocationSelected={this.onLocationSelected}
-                     extraLayers={osmImageNotesLayer && [osmImageNotesLayer]}/>
+                     extraLayers={_.filter([osmImageNotesLayer, this.getChangesetMapLayer()])}/>
       <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
                      onOSMFeaturePropertiesLoaded={(osmFeatureProperties) =>
                        this.setState({osmFeatureProperties})}
                      ref={this.imageNotesRef} myNotesOnly={myNotesOnly}/>
     </div>;
+  }
+
+  private getChangesetMapLayer() {
+    const {selectedChangeset} = this.state;
+    return this.changesetLayerRef.current && this.changesetLayerRef.current.getMapLayer(selectedChangeset);
   }
 
   private addOSMProperties(data: any) {
@@ -238,4 +267,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
   private reloadNotes() {
     this.imageNotesRef.current && this.imageNotesRef.current.loadImageNotes();
   }
+
+  selectChangeset = (selectedChangeset: any) =>
+    this.setState({selectedChangeset, selectChangeset: false})
 }

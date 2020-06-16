@@ -82,3 +82,10 @@ export const osmFeatureTypes: OSMFeatureType[] = [
     label: (tags) => `barrier: ${tags.barrier}`
   }
 ];
+
+export type changeset = {
+  id: string,
+  created: OSMFeature[],
+  modified: OSMFeature[],
+  deleted: OSMFeature[]
+}

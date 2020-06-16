@@ -11,3 +11,7 @@ export function formatDate(timestamp) {
 export function formatTime(timestamp) {
   return moment(timestamp).format("H:mm");
 }
+
+export function capitalize(str) {
+  return str && (str[0].toUpperCase() + str.slice(1));
+}

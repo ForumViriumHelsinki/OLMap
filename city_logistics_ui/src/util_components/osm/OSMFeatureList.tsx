@@ -11,6 +11,7 @@ import PillsSelection from "util_components/PillsSelection";
 import Toggle from "util_components/Toggle";
 import {OSMFeature, osmFeatureTypes} from "util_components/osm/types";
 import OSMFeatureMapPopup from "util_components/osm/OSMFeatureMapPopup";
+import {osmFeatureLabel} from "util_components/osm/utils";
 
 type sortOption = 'relevance' | 'distance' | 'name';
 const sortOptions: sortOption[] = ['distance', 'relevance', 'name'];
@@ -117,16 +118,10 @@ export default class OSMFeatureList extends React.Component<OSMFeatureListProps,
 
   private label(osmFeature: OSMFeature) {
     const {location} = this.props;
-    const {tags} = osmFeature;
-    let label = '';
-
-    osmFeatureTypes.forEach((osmFeatureType) => {
-      if (!label && tags[osmFeatureType.requiredTag]) label = osmFeatureType.label(tags);
-    });
-
+    let label = osmFeatureLabel(osmFeature);
     if (osmFeature.type == 'node')
       label += ` (${getDistance(osmFeature, location as GeolibInputCoordinates)}m)`
-    return label && (label[0].toUpperCase() + label.slice(1)).replace('_', ' ');
+    return label;
   }
 
   private toggleSelectedFeature(osmFeature: OSMFeature) {

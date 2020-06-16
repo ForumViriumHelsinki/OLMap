@@ -16,6 +16,13 @@ div.dotIcon::before {
     bottom: 8px;
 }
 
+div.smDot::before {
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+}
+
 div.successDotIcon {
     background: rgba(24, 167, 69, 0.1);
 }

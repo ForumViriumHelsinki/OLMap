@@ -48,7 +48,10 @@ export default class Map extends React.Component<MapProps> {
     this.initMapState()
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps?: Readonly<MapProps>) {
+    if (prevProps && prevProps.extraLayers) prevProps.extraLayers.forEach(layer => {
+      if (!this.props.extraLayers?.includes(layer)) layer.remove();
+    });
     this.refreshMap();
   }
 
