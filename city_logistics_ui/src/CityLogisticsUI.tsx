@@ -1,6 +1,6 @@
 import React from 'react';
 // @ts-ignore
-import {HashRouter as Router, Route, Switch, useParams} from "react-router-dom";
+import {HashRouter as Router, Route, Switch, useParams, Redirect} from "react-router-dom";
 
 import sessionRequest, {logout} from "sessionRequest";
 
@@ -81,25 +81,28 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
       : []
     ).concat([this.tabs.notes]);
 
-    return <Router>
-      <Switch>
-        <Route path='/package/:packageUUID'>
-          <Package/>
-        </Route>
-        <Route path='/resetPassword/:uid/:token'>
-          <ResetPassword/>
-        </Route>
-        <Route exact path=''>
-          {dataFetched ?
-            user ?
-              <AppContext.Provider value={{user}}>
-                <FVHTabsUI user={user} activeTab={tabs[0].header} tabs={tabs} onLogout={this.logout}/>
-              </AppContext.Provider>
-            : <LoginScreen onLogin={() => this.refreshUser()}/>
-          : <LoadScreen/>}
-        </Route>
-      </Switch>
-    </Router>
+    return <AppContext.Provider value={{user}}>
+      <Router>
+        <Switch>
+          <Route path='/login/'>
+            {user ? <Redirect to="" /> : <LoginScreen onLogin={() => this.refreshUser()}/>}
+          </Route>
+          <Route path='/package/:packageUUID'>
+            <Package/>
+          </Route>
+          <Route path='/resetPassword/:uid/:token'>
+            <ResetPassword/>
+          </Route>
+          <Route exact path=''>
+            {dataFetched
+              ? user
+                ? <FVHTabsUI user={user} tabs={tabs} onLogout={this.logout}/>
+                : <Redirect to="/login/" />
+              : <LoadScreen/>}
+          </Route>
+        </Switch>
+      </Router>
+    </AppContext.Provider>;
   }
 }
 

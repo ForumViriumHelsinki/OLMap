@@ -56,7 +56,7 @@ export default class RouteMapModal extends React.Component<MapProps, State> {
 
     return <Modal title={`${origin.street_address} to ${destination.street_address}`} onClose={onClose}>
       {showNotes &&
-        <OSMImageNotes onMapLayerLoaded={imageNotesLayer => this.setState({imageNotesLayer})} />
+        <OSMImageNotes onMapLayerLoaded={(imageNotesLayer: any) => this.setState({imageNotesLayer})} />
       }
       <div style={{height: '70vh', position: 'relative'}}>
         <div className="position-absolute map-tools p-3">

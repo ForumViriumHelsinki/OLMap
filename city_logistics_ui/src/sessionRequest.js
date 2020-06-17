@@ -1,11 +1,11 @@
 import settings from './settings';
 
 export function login(token) {
-  sessionStorage.setItem('token', token);
+  localStorage.setItem('olmap-token', token);
 }
 
 export function logout() {
-  sessionStorage.clear();
+  localStorage.clear();
 }
 
 export function sessionRequest(url, options={}) {
@@ -14,7 +14,7 @@ export function sessionRequest(url, options={}) {
     options.headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(options.data);
   }
-  const token = sessionStorage.getItem('token');
+  const token = localStorage.getItem('olmap-token');
   if (token) {
     options.headers.Authorization = "Token " + token;
   }

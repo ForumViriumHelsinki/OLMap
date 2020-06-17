@@ -67,7 +67,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
     'onLocationSelected', 'onCancel', 'onSubmit', 'reloadNotes'
   ];
 
-  imageNotesRef = React.createRef<OSMImageNotes>();
+  imageNotesRef = React.createRef();
   changesetLayerRef = React.createRef<OSMChangesetMapLayer>();
 
   childProps = {
@@ -193,7 +193,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
                      onLocationSelected={this.onLocationSelected}
                      extraLayers={_.filter([osmImageNotesLayer, this.getChangesetMapLayer()])}/>
       <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
-                     onOSMFeaturePropertiesLoaded={(osmFeatureProperties) =>
+                     onOSMFeaturePropertiesLoaded={(osmFeatureProperties: OSMFeatureProps) =>
                        this.setState({osmFeatureProperties})}
                      ref={this.imageNotesRef} myNotesOnly={myNotesOnly}/>
     </div>;
@@ -265,6 +265,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
   }
 
   private reloadNotes() {
+    // @ts-ignore
     this.imageNotesRef.current && this.imageNotesRef.current.loadImageNotes();
   }
 

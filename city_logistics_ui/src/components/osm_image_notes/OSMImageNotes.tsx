@@ -1,4 +1,6 @@
 import React from 'react';
+// @ts-ignore
+import {HashRouter as Router, Route, Switch, withRouter} from "react-router-dom";
 
 // @ts-ignore
 import * as L from 'leaflet';
@@ -6,26 +8,12 @@ import * as L from 'leaflet';
 import _ from 'lodash';
 
 import sessionRequest from "sessionRequest";
-import {osmFeaturePropertiesUrl, osmImageNotesUrl, osmImageNoteUrl} from "urls";
+import {osmFeaturePropertiesUrl, osmImageNotesUrl} from "urls";
 import {AppContext, OSMFeatureProps, OSMImageNote} from "components/types";
-import Modal from "util_components/bootstrap/Modal";
-import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 import 'components/osm_image_notes/OSMImageNotes.css';
 
-import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
-import {LocationTuple} from "util_components/types";
-import Component from "util_components/Component";
-import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
-import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
-import Icon from "util_components/bootstrap/Icon";
-import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
-import ZoomableImage from "util_components/ZoomableImage";
-import OSMImageNoteVotes from "components/osm_image_notes/OSMImageNoteVotes";
-import OSMImageNoteComments from "components/osm_image_notes/OSMImageNoteComments";
-import AssociateEntranceModal from "components/osm_image_notes/AssociateEntranceModal";
-import {OSMFeature} from "util_components/osm/types";
-import {formatTimestamp} from "utils";
+import OSMImageNoteModal from "components/osm_image_notes/OSMImageNoteModal";
 
 const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
 const processedDotIcon = L.divIcon({className: "dotIcon processedDotIcon", iconSize: [24, 24]});
@@ -35,34 +23,28 @@ const problemDotIcon = L.divIcon({className: "dotIcon problemDotIcon", iconSize:
 type OSMImageNotesProps = {
   onMapLayerLoaded: (mapLayer: any) => any
   onOSMFeaturePropertiesLoaded?: (osmFeatureProperties: OSMFeatureProps) => any,
-  myNotesOnly: boolean
+  myNotesOnly: boolean,
+  history: any,
+  location: Location,
+  match: any
 }
 
 type OSMImageNotesState = {
-  selectedNote?: OSMImageNote,
-  readOnly: boolean,
+  osmImageNotes?: OSMImageNote[],
   error: boolean
-  osmFeatureProperties?: OSMFeatureProps,
-  nearbyFeatures: OSMFeature[],
-  linkingEntrance?: OSMFeature
+  osmFeatureProperties?: OSMFeatureProps
 }
 
 const initialState: OSMImageNotesState = {
-  readOnly: true,
-  error: false,
-  selectedNote: undefined,
-  nearbyFeatures: []
+  error: false
 };
 
-export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImageNotesState> {
+class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesState> {
   static contextType = AppContext;
   static defaultProps = {
     myNotesOnly: false
   };
 
-  static bindMethods = ['onFeaturesSelected', 'refresh'];
-
-  private osmImageNotes: OSMImageNote[] = [];
   private mapLayer?: any;
   private dotMarkers: {[id: string]: any} = {};
 
@@ -81,150 +63,46 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
     sessionRequest(osmImageNotesUrl).then((response: any) => {
       if (response.status < 300)
         response.json().then((osmImageNotes: OSMImageNote[]) => {
-          this.osmImageNotes = osmImageNotes;
+          this.setState({osmImageNotes});
           this.props.onMapLayerLoaded(this.getMapLayer())
         });
     })
   }
 
   render() {
-    const {selectedNote, readOnly, error, osmFeatureProperties, nearbyFeatures, linkingEntrance} = this.state;
+    const {osmImageNotes, error, osmFeatureProperties} = this.state;
+    const {history} = this.props;
     const {user} = this.context;
-    if (!selectedNote) return '';
 
-    const location = [selectedNote.lon, selectedNote.lat] as LocationTuple;
+    if (!osmImageNotes || !osmFeatureProperties) return '';
 
-    const tags = selectedNote.tags || [];
-
-    const editable = user.is_reviewer && readOnly;
-    const relatedFeatures =
-      selectedNote.osm_features
-        ? nearbyFeatures.filter(f => selectedNote.osm_features.includes(f.id))
-        : nearbyFeatures;
-
-    // @ts-ignore
-    const credit = `${selectedNote.created_by.username} on ${formatTimestamp(selectedNote.created_at)}`;
-    const title = selectedNote.comment
-      ? <>{selectedNote.comment}<br/>by {credit}</>
-      : `Note by ${credit}`;
-    const modalCls = selectedNote.image ? 'modal-xl' : 'modal-dialog-centered';
-
-    return <Modal title={title} className={modalCls} onClose={() => this.setState(initialState)}>
-        {user.is_reviewer &&
-          <OSMImageNoteReviewActions imageNote={selectedNote} onReviewed={this.refresh}/>
-        }
-        <OSMImageNoteVotes osmImageNote={selectedNote} onUpdate={this.noteUpdated}/>
-        <ErrorAlert status={error} message="Saving features failed. Try again perhaps?"/>
-        {selectedNote.image && <ZoomableImage src={selectedNote.image} className="noteImage"/>}
-        <>
-          <p className="m-2 ml-3"><strong>Tags:</strong></p>
-          <p className="m-2 ml-3">
-             <OSMImageNoteTags {...{tags, osmFeatureProperties}} readOnly={!user.is_reviewer}
-                               onChange={tags => this.updateSelectedNote({tags})}/>
-          </p>
-        </>
-        <div onClick={() => editable && this.setState({readOnly: false})}
-             className={editable ? "clickable": ''}>
-          <div className="list-group-item">
-            <strong>Related places:</strong>
-            {editable && <div className="float-right"><Icon icon={'edit'}/></div>}
-            {!readOnly &&
-              <div className="float-right">
-                <button className="btn btn-light btn-sm btn-compact"
-                        onClick={() => this.setState({readOnly: true})}>
-                  Close <Icon icon={'close'}/>
-                </button>
-              </div>
-            }
-          </div>
-          <OSMFeaturesSelection
-            location={location} onChange={this.onFeaturesSelected} readOnly={readOnly}
-            maxHeight={null}
-            preselectedFeatureIds={selectedNote.osm_features}
-            onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
-            featureActions={
-              (feature: OSMFeature) =>
-                feature.tags.entrance && selectedNote.osm_features && selectedNote.osm_features.includes(feature.id) &&
-                  <button className="btn btn-light btn-compact float-right"
-                          onClick={(e) => this.linkEntrance(e, feature)}>
-                    <Icon icon="link"/>
-                  </button>
-            }/>
-        </div>
-        {user.is_reviewer && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
-          <div key={osmFeatureName} className="mr-2 ml-3">
-              <OSMFeatureProperties
-                schema={osmFeatureProperties[osmFeatureName]}
-                osmImageNote={selectedNote}
-                osmFeatureName={osmFeatureName}
-                nearbyFeatures={nearbyFeatures}
-                onSubmit={(data) => this.updateSelectedNote(data)}/>
-          </div>
+    return <Router>
+      <Switch>
+        {osmImageNotes.map(note =>
+          <Route key={note.id} path={`/Notes/${note.id}/`}>
+            <OSMImageNoteModal osmFeatureProperties={osmFeatureProperties} note={note}
+                               onClose={() => history.push('/Notes/')}/>
+          </Route>
         )}
-        <div className="m-2 ml-3">
-          <p>
-            <strong>Comments ({(selectedNote.comments || []).length}) </strong>
-            <button className="btn btn-light btn-sm btn-compact float-right" onClick={this.refreshNote}>
-              <Icon icon={'refresh'}/>
-            </button>
-          </p>
-          <OSMImageNoteComments osmImageNote={selectedNote} refreshNote={this.refreshNote}/>
-        </div>
-
-        {linkingEntrance && <AssociateEntranceModal
-          entrance={linkingEntrance}
-          nearbyFeatures={relatedFeatures}
-          onClose={() => this.setState({linkingEntrance: undefined})}/>}
-    </Modal>
+      </Switch>
+    </Router>;
   }
 
-  private refresh() {
+  refresh = () => {
     this.setState(initialState);
     this.loadImageNotes();
-  }
-
-  onFeaturesSelected(featureIds: number[]) {
-    this.updateSelectedNote({osm_features: featureIds});
-  }
-
-  updateSelectedNote(data: any, nextState?: any) {
-    const {selectedNote} = this.state;
-    if (!selectedNote) return;
-    const url = osmImageNoteUrl(selectedNote.id as number);
-
-    sessionRequest(url, {method: 'PATCH', data})
-    .then((response) => {
-      if (response.status < 300) response.json().then((note: OSMImageNote) => {
-        this.noteUpdated(note, nextState);
-      });
-      else this.setState({error: true});
-    })
-  }
-
-  noteUpdated = (note: OSMImageNote, nextState?: any) => {
-    const {selectedNote} = this.state;
-    Object.assign(selectedNote, note);
-    this.setState({error: false, selectedNote, ...(nextState || {})});
-  };
-
-  fetchNote(id: number) {
-    return sessionRequest(osmImageNoteUrl(id)).then(response => response.json())
-  }
-
-  refreshNote = () => {
-    const {selectedNote} = this.state;
-    if (selectedNote)
-      this.fetchNote(selectedNote.id as number).then((newNote: OSMImageNote) => this.noteUpdated(newNote))
   };
 
   private getMapLayer() {
     const {user} = this.context;
-    const {myNotesOnly} = this.props;
+    const {myNotesOnly, history} = this.props;
 
     if (!this.mapLayer) this.mapLayer = L.layerGroup();
+    if (!this.state.osmImageNotes) return this.mapLayer;
+
     const osmImageNotes =
-      myNotesOnly ? this.osmImageNotes.filter(n => n.created_by == user.id)
-      : this.osmImageNotes;
+      myNotesOnly ? this.state.osmImageNotes.filter(n => n.created_by == user.id)
+      : this.state.osmImageNotes;
 
     osmImageNotes.forEach((osmImageNote) => {
       const id = String(osmImageNote.id);
@@ -234,11 +112,8 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
         : osmImageNote.is_processed ? processedDotIcon
         : dotIcon;
       if (this.dotMarkers[id]) return this.dotMarkers[id].setIcon(icon);
-      const marker = L.marker({lon: osmImageNote.lon, lat: osmImageNote.lat}, {icon: icon})
-      marker.on('click', () =>
-        this.fetchNote(osmImageNote.id as number)
-        .then(selectedNote => this.setState({selectedNote, readOnly: true}))
-      );
+      const marker = L.marker({lon: osmImageNote.lon, lat: osmImageNote.lat}, {icon: icon});
+      marker.on('click', () => history.push(`/Notes/${id}/`));
       marker.addTo(this.mapLayer);
       this.dotMarkers[id] = marker;
     });
@@ -261,17 +136,6 @@ export default class OSMImageNotes extends Component<OSMImageNotesProps, OSMImag
         })
     })
   }
-
-  private getRelevantProperties() {
-    const {selectedNote, osmFeatureProperties} = this.state;
-    if (!selectedNote) return [];
-    const tags = selectedNote.tags || [];
-    const allTags = Object.keys(osmFeatureProperties || {});
-    return allTags.filter(tag => tags.includes(tag));
-  }
-
-  linkEntrance(e: React.MouseEvent, entrance: OSMFeature) {
-    e.stopPropagation();
-    this.setState({linkingEntrance: entrance})
-  }
 }
+
+export default withRouter(OSMImageNotes);
