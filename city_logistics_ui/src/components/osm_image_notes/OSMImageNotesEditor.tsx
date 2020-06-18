@@ -195,7 +195,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
       <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
                      onOSMFeaturePropertiesLoaded={(osmFeatureProperties: OSMFeatureProps) =>
                        this.setState({osmFeatureProperties})}
-                     ref={this.imageNotesRef} myNotesOnly={myNotesOnly}/>
+                     wrappedComponentRef={this.imageNotesRef} myNotesOnly={myNotesOnly}/>
     </div>;
   }
 
