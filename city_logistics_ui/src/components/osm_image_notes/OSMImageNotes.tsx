@@ -72,7 +72,6 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
   render() {
     const {osmImageNotes, error, osmFeatureProperties} = this.state;
     const {history} = this.props;
-    const {user} = this.context;
 
     if (!osmImageNotes || !osmFeatureProperties) return '';
 
@@ -81,7 +80,7 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
         {osmImageNotes.map(note =>
           <Route key={note.id} path={`/Notes/${note.id}/`}>
             <OSMImageNoteModal osmFeatureProperties={osmFeatureProperties} note={note}
-                               onClose={() => history.push('/Notes/')}/>
+                               onClose={() => {this.loadImageNotes(); history.push('/Notes/')}}/>
           </Route>
         )}
       </Switch>
@@ -131,7 +130,7 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
     sessionRequest(osmFeaturePropertiesUrl).then((response) => {
       if (response.status < 300)
         response.json().then((osmFeatureProperties) => {
-          this.setState({osmFeatureProperties})
+          this.setState({osmFeatureProperties});
           onOSMFeaturePropertiesLoaded && onOSMFeaturePropertiesLoaded(osmFeatureProperties)
         })
     })
