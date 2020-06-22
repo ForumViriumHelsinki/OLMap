@@ -24,7 +24,8 @@ import {formatTimestamp} from "utils";
 type OSMImageNoteModalProps = {
   osmFeatureProperties: OSMFeatureProps,
   note: OSMImageNote,
-  onClose: () => any
+  onClose: () => any,
+  showOnMap?: () => any
 }
 
 type OSMImageNoteModalState = {
@@ -54,7 +55,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
   }
 
   render() {
-    const {osmFeatureProperties, onClose} = this.props;
+    const {osmFeatureProperties, onClose, showOnMap} = this.props;
     const {note, readOnly, error, nearbyFeatures, linkingEntrance} = this.state;
     const {user} = this.context;
 
@@ -72,9 +73,21 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
 
     // @ts-ignore
     const credit = `${note.created_by.username} on ${formatTimestamp(note.created_at)}`;
-    const title = note.comment
-      ? <>{note.comment}<br/>by {credit}</>
-      : `Note by ${credit}`;
+
+    const title = <>
+      {showOnMap && <span className="clickable text-primary" onClick={showOnMap}><Icon icon="place"/></span>}
+      {' '}
+      <span className="clickable text-primary ml-1"
+              onClick={this.copyPermalink}>
+        <Icon icon="link"/>
+      </span>
+      {' '}
+      <textarea id="permalink" value={window.location.href} style={{width: 0, height: 0, opacity: 0}}/>
+      {note.comment
+        ? <>{note.comment}<br/>by {credit}</>
+        : `Note by ${credit}`}
+    </>;
+
     const modalCls = note.image ? 'modal-xl' : 'modal-dialog-centered';
 
     return <Modal title={title} className={modalCls} onClose={onClose}>
@@ -145,6 +158,11 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
           onClose={() => this.setState({linkingEntrance: undefined})}/>}
     </Modal>
   }
+
+  copyPermalink = () => {
+    (document.getElementById('permalink') as HTMLInputElement).select();
+    document.execCommand('copy');
+  };
 
   onFeaturesSelected = (featureIds: number[]) => {
     this.updateSelectedNote({osm_features: featureIds});

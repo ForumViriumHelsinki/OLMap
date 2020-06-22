@@ -26,7 +26,8 @@ type OSMImageNotesProps = {
   myNotesOnly: boolean,
   history: any,
   location: Location,
-  match: any
+  match: any,
+  showLocation: (location: any) => any
 }
 
 type OSMImageNotesState = {
@@ -71,7 +72,7 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
 
   render() {
     const {osmImageNotes, error, osmFeatureProperties} = this.state;
-    const {history} = this.props;
+    const {history, showLocation} = this.props;
 
     if (!osmImageNotes || !osmFeatureProperties) return '';
 
@@ -80,7 +81,8 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
         {osmImageNotes.map(note =>
           <Route key={note.id} path={`/Notes/${note.id}/`}>
             <OSMImageNoteModal osmFeatureProperties={osmFeatureProperties} note={note}
-                               onClose={() => {this.loadImageNotes(); history.push('/Notes/')}}/>
+                               onClose={() => {this.loadImageNotes(); history.push('/Notes/')}}
+                               showOnMap={() => {showLocation(note); history.push('/Notes/')}}/>
           </Route>
         )}
       </Switch>

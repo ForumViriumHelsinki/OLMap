@@ -113,4 +113,9 @@ export default class MyPositionMap extends React.Component<MapProps, {currentPos
     const marker = this.markers.selectedPosition;
     if (marker) marker.setLatLng(this.leafletMap.getCenter())
   }
+
+  showLocation(location: any) {
+    if (!this.leafletMap) return;
+    this.leafletMap.setView(location, 20);
+  }
 }

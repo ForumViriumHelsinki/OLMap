@@ -69,6 +69,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
 
   imageNotesRef = React.createRef();
   changesetLayerRef = React.createRef<OSMChangesetMapLayer>();
+  mapRef = React.createRef<MyPositionMap>();
 
   childProps = {
     toolButton: {outline: true, color: "primary", size: "sm", className: 'bg-white'}
@@ -190,14 +191,21 @@ export default class OSMImageNotesEditor extends Component<{}> {
         }[status]}
       </div>
       <MyPositionMap requestLocation={status == 'locating'}
+                     ref={this.mapRef}
                      onLocationSelected={this.onLocationSelected}
                      extraLayers={_.filter([osmImageNotesLayer, this.getChangesetMapLayer()])}/>
       <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
                      onOSMFeaturePropertiesLoaded={(osmFeatureProperties: OSMFeatureProps) =>
                        this.setState({osmFeatureProperties})}
-                     wrappedComponentRef={this.imageNotesRef} myNotesOnly={myNotesOnly}/>
+                     wrappedComponentRef={this.imageNotesRef} myNotesOnly={myNotesOnly}
+                     showLocation={this.showLocation}/>
     </div>;
   }
+
+  showLocation = (location: any) => {
+    if (!this.mapRef.current) return;
+    this.mapRef.current.showLocation(location);
+  };
 
   private getChangesetMapLayer() {
     const {selectedChangeset} = this.state;
