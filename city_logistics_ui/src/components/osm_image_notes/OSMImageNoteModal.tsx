@@ -25,7 +25,8 @@ type OSMImageNoteModalProps = {
   osmFeatureProperties: OSMFeatureProps,
   note: OSMImageNote,
   onClose: () => any,
-  showOnMap?: () => any
+  showOnMap?: () => any,
+  requestLocation?: (initial: any) => Promise<any>
 }
 
 type OSMImageNoteModalState = {
@@ -33,13 +34,15 @@ type OSMImageNoteModalState = {
   readOnly: boolean,
   error: boolean
   nearbyFeatures: OSMFeature[],
-  linkingEntrance?: OSMFeature
+  linkingEntrance?: OSMFeature,
+  repositioning: boolean
 }
 
 const initialState: OSMImageNoteModalState = {
   readOnly: true,
   error: false,
-  nearbyFeatures: []
+  nearbyFeatures: [],
+  repositioning: false
 };
 
 export default class OSMImageNoteModal extends React.Component<OSMImageNoteModalProps, OSMImageNoteModalState> {
@@ -55,11 +58,11 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
   }
 
   render() {
-    const {osmFeatureProperties, onClose, showOnMap} = this.props;
-    const {note, readOnly, error, nearbyFeatures, linkingEntrance} = this.state;
+    const {osmFeatureProperties, onClose, showOnMap, requestLocation} = this.props;
+    const {note, readOnly, error, nearbyFeatures, linkingEntrance, repositioning} = this.state;
     const {user} = this.context;
 
-    if (!note) return null;
+    if (repositioning || !note) return null;
 
     const location = [note.lon, note.lat] as LocationTuple;
 
@@ -81,6 +84,11 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
               onClick={this.copyPermalink}>
         <Icon icon="link"/>
       </span>
+      {' '}
+      {requestLocation &&
+        <span className="clickable text-primary ml-1" onClick={this.adjustPosition}>
+          <Icon icon="open_with"/>
+        </span>}
       {' '}
       <textarea id="permalink" value={window.location.href} style={{width: 0, height: 0, opacity: 0}}/>
       {note.comment
@@ -201,4 +209,14 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
     e.stopPropagation();
     this.setState({linkingEntrance: entrance})
   }
+
+  adjustPosition = () => {
+    const {requestLocation, note} = this.props;
+    if (!requestLocation) return;
+    this.setState({repositioning: true});
+    requestLocation(note).then((location: any) => {
+      this.updateSelectedNote(location);
+      this.setState({repositioning: false});
+    }).catch(() => this.setState({repositioning: false}))
+  };
 }

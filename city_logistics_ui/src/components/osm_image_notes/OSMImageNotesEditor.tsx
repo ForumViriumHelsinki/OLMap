@@ -36,7 +36,9 @@ type OSMImageNotesEditorState = OSMImageNote & {
   myNotesOnly: boolean,
   nearbyFeatures: OSMFeature[],
   selectChangeset: boolean,
-  selectedChangeset?: changeset
+  selectedChangeset?: changeset,
+  onLocationSelected?: (location: any) => any,
+  onLocationCancelled?: () => any
 }
 
 const initialState: () => OSMImageNotesEditorState = () => ({
@@ -198,13 +200,21 @@ export default class OSMImageNotesEditor extends Component<{}> {
                      onOSMFeaturePropertiesLoaded={(osmFeatureProperties: OSMFeatureProps) =>
                        this.setState({osmFeatureProperties})}
                      wrappedComponentRef={this.imageNotesRef} myNotesOnly={myNotesOnly}
-                     showLocation={this.showLocation}/>
+                     showLocation={this.showLocation} requestLocation={this.requestLocation}/>
     </div>;
   }
 
   showLocation = (location: any) => {
     if (!this.mapRef.current) return;
     this.mapRef.current.showLocation(location);
+  };
+
+  requestLocation = (initial: any) => {
+    if (!this.mapRef.current) return;
+    this.mapRef.current.showLocation(initial);
+    this.setState({status: 'locating'});
+    return new Promise(
+      (resolve, reject) => this.setState({onLocationSelected: resolve, onLocationCancelled: reject}));
   };
 
   private getChangesetMapLayer() {
@@ -234,10 +244,20 @@ export default class OSMImageNotesEditor extends Component<{}> {
   }
 
   private onLocationSelected(location: LocationTuple) {
-    this.setState({status: "relating", lon: location[0], lat: location[1]});
+    const {onLocationSelected} = this.state;
+    if (onLocationSelected) {
+      this.setState({onLocationSelected: undefined, onLocationCancelled: undefined, status: 'initial'});
+      onLocationSelected({lon: location[0], lat: location[1]});
+    }
+    else this.setState({status: "relating", lon: location[0], lat: location[1]});
   }
 
   private onCancel() {
+    const {onLocationCancelled} = this.state;
+    if (onLocationCancelled) {
+      onLocationCancelled();
+      this.setState({onLocationSelected: undefined, onLocationCancelled: undefined, status: 'initial'});
+    }
     this.setState(resetState);
   }
 

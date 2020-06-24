@@ -29,7 +29,8 @@ type OSMImageNotesProps = {
   history: any,
   location: Location,
   match: any,
-  showLocation: (location: any) => any
+  showLocation: (location: any) => any,
+  requestLocation?: (initial: any) => Promise<any>
 }
 
 type OSMImageNotesState = {
@@ -74,7 +75,7 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
 
   render() {
     const {osmImageNotes, error, osmFeatureProperties} = this.state;
-    const {history, showLocation} = this.props;
+    const {history, showLocation, requestLocation} = this.props;
 
     if (!osmImageNotes || !osmFeatureProperties) return '';
 
@@ -84,7 +85,8 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
           <Route key={note.id} path={`/Notes/${note.id}/`}>
             <OSMImageNoteModal osmFeatureProperties={osmFeatureProperties} note={note}
                                onClose={() => {this.loadImageNotes(); history.push('/Notes/')}}
-                               showOnMap={() => {showLocation(note); history.push('/Notes/')}}/>
+                               showOnMap={() => {showLocation(note); history.push('/Notes/')}}
+                               requestLocation={requestLocation}/>
           </Route>
         )}
       </Switch>
@@ -122,8 +124,9 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
         fillColor: markerColors[category],
         fillOpacity: 1
       };
-      if (this.dotMarkers[id]) return this.dotMarkers[id].setStyle(style);
-      const marker = L.circleMarker({lon: osmImageNote.lon, lat: osmImageNote.lat}, style);
+      const latLng = {lon: osmImageNote.lon, lat: osmImageNote.lat};
+      if (this.dotMarkers[id]) return this.dotMarkers[id].setStyle(style).setLatLng(latLng);
+      const marker = L.circleMarker(latLng, style);
       marker.on('click', () => history.push(`/Notes/${id}/`));
       marker.addTo(this.mapLayer);
       this.dotMarkers[id] = marker;
