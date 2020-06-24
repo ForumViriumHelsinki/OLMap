@@ -1,4 +1,5 @@
 import React from 'react';
+import {getBounds} from 'geolib';
 // @ts-ignore
 import * as L from 'leaflet';
 import settings from 'settings.json';
@@ -115,7 +116,13 @@ export default class MyPositionMap extends React.Component<MapProps, {currentPos
   }
 
   showLocation(location: any) {
-    if (!this.leafletMap) return;
-    this.leafletMap.setView(location, 20);
+    if (this.leafletMap) this.leafletMap.setView(location, 20);
+  }
+
+  showPoints(points: any[]) {
+    if (this.leafletMap) {
+      const bounds = getBounds(points);
+      this.leafletMap.fitBounds([[bounds.minLat, bounds.minLng], [bounds.maxLat, bounds.maxLng]]);
+    }
   }
 }

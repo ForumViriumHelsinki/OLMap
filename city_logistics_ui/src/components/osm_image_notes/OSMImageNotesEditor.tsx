@@ -277,6 +277,9 @@ export default class OSMImageNotesEditor extends Component<{}> {
     this.imageNotesRef.current && this.imageNotesRef.current.loadImageNotes();
   }
 
-  selectChangeset = (selectedChangeset: any) =>
-    this.setState({selectedChangeset, selectChangeset: false})
+  selectChangeset = (selectedChangeset: any) => {
+    this.setState({selectedChangeset, selectChangeset: false});
+    if (this.mapRef.current) this.mapRef.current.showPoints(
+      _.flatten([selectedChangeset.created, selectedChangeset.modified, selectedChangeset.deleted]))
+  }
 }
