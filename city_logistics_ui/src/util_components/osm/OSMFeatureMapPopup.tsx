@@ -9,8 +9,6 @@ import {getCenter, getDistance} from "geolib";
 import {OSMFeature} from "util_components/osm/types";
 import GlyphIcon from 'util_components/GlyphIcon';
 
-const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
-
 type OSMFeatureMapPopupProps = {
   osmFeature: OSMFeature,
   location: any // location in some form recognized by geolib
@@ -65,7 +63,15 @@ export default class OSMFeatureMapPopup extends React.Component<OSMFeatureMapPop
   private getMapLayer() {
     const {location, osmFeature} = this.props;
     const mapLayer = L.layerGroup();
-    L.marker({lon: location[0], lat: location[1]}, {icon: successDotIcon}).addTo(mapLayer);
+    const style = {
+      radius: 2,
+      color: '#28a745',
+      opacity: 0.05,
+      weight: 20,
+      fillColor: '#28a745',
+      fillOpacity: 1
+    };
+    L.circleMarker({lon: location[0], lat: location[1]}, style).addTo(mapLayer);
     L.marker(osmFeature, {icon: new GlyphIcon({glyph: 'star'})}).addTo(mapLayer);
     return mapLayer;
   }

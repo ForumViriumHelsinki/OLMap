@@ -6,10 +6,10 @@ import Modal, {ModalBody} from "util_components/bootstrap/Modal";
 import {osmFeatureLabel} from "util_components/osm/utils";
 import {capitalize} from "utils";
 
-const icons = {
-  created: L.divIcon({className: "dotIcon smDot successDotIcon", iconSize: [8, 8]}),
-  modified: L.divIcon({className: "dotIcon smDot processedDotIcon", iconSize: [8, 8]}),
-  deleted: L.divIcon({className: "dotIcon smDot problemDotIcon", iconSize: [8, 8]}),
+const markerColors = {
+  deleted: '#ff0000',
+  created: '#28a745',
+  modified: '#007bff',
 };
 
 type OSMChangesetMapLayerProps = {}
@@ -44,8 +44,16 @@ export default class OSMChangesetMapLayer extends React.Component<OSMChangesetMa
     ['created', 'modified', 'deleted'].forEach((status) => {
       // @ts-ignore
       changeset[status].forEach((node: OSMFeature) => {
-        // @ts-ignore
-        const marker = L.marker({lon: node.lon, lat: node.lat}, {icon: icons[status]});
+        const style = {
+          radius: 3,
+          // @ts-ignore
+          color: markerColors[status],
+          opacity: 1,
+          weight: 2,
+          fillColor: '#ffffff',
+          fillOpacity: 1
+        };
+        const marker = L.circleMarker({lon: node.lon, lat: node.lat}, style);
         marker.on('click', () => this.setState({selectedNode: node}));
         marker.addTo(mapLayer);
       });

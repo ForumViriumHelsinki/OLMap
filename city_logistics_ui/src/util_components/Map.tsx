@@ -61,7 +61,8 @@ export default class Map extends React.Component<MapProps> {
     if (!this.leafletMap) {
       this.leafletMap = L.map(this.getMapElId(), {
         attributionControl: showAttribution,
-        zoomControl: zoomControl
+        zoomControl: zoomControl,
+        preferCanvas: true
       });
       this.leafletMap.setView(latLng, zoom);
       const attribution = 'Data &copy; <a href="https://www.openstreetmap.org/">OSM</a> contribs, ' +

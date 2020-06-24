@@ -15,10 +15,12 @@ import 'components/osm_image_notes/OSMImageNotes.css';
 
 import OSMImageNoteModal from "components/osm_image_notes/OSMImageNoteModal";
 
-const dotIcon = L.divIcon({className: "dotIcon", iconSize: [24, 24]});
-const processedDotIcon = L.divIcon({className: "dotIcon processedDotIcon", iconSize: [24, 24]});
-const successDotIcon = L.divIcon({className: "dotIcon successDotIcon", iconSize: [24, 24]});
-const problemDotIcon = L.divIcon({className: "dotIcon problemDotIcon", iconSize: [24, 24]});
+const markerColors = {
+  problem: '#ff0000',
+  reviewed: '#28a745',
+  processed: '#007bff',
+  new: '#ff5000'
+};
 
 type OSMImageNotesProps = {
   onMapLayerLoaded: (mapLayer: any) => any
@@ -107,13 +109,21 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
 
     osmImageNotes.forEach((osmImageNote) => {
       const id = String(osmImageNote.id);
-      const icon =
-        (osmImageNote.tags || []).includes('Problem') ? problemDotIcon
-        : osmImageNote.is_reviewed ? successDotIcon
-        : osmImageNote.is_processed ? processedDotIcon
-        : dotIcon;
-      if (this.dotMarkers[id]) return this.dotMarkers[id].setIcon(icon);
-      const marker = L.marker({lon: osmImageNote.lon, lat: osmImageNote.lat}, {icon: icon});
+      const category =
+        (osmImageNote.tags || []).includes('Problem') ? 'problem'
+        : osmImageNote.is_reviewed ? 'reviewed'
+        : osmImageNote.is_processed ? 'processed'
+        : 'new';
+      const style = {
+        radius: 2,
+        color: markerColors[category],
+        opacity: 0.05,
+        weight: 20,
+        fillColor: markerColors[category],
+        fillOpacity: 1
+      };
+      if (this.dotMarkers[id]) return this.dotMarkers[id].setStyle(style);
+      const marker = L.circleMarker({lon: osmImageNote.lon, lat: osmImageNote.lat}, style);
       marker.on('click', () => history.push(`/Notes/${id}/`));
       marker.addTo(this.mapLayer);
       this.dotMarkers[id] = marker;
