@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
-from .base import TimestampedModel, Address, BaseLocation
+from .base import TimestampedModel, Address
 
 
 class CourierCompany(TimestampedModel):
@@ -53,8 +53,10 @@ class UserRole(TimestampedModel):
             return super().__str__()
 
 
-class Courier(UserRole, BaseLocation):
+class Courier(UserRole):
     company = models.ForeignKey(CourierCompany, related_name='couriers', on_delete=models.CASCADE)
+    lat = models.DecimalField(max_digits=11, decimal_places=8, null=True)
+    lon = models.DecimalField(max_digits=11, decimal_places=8, null=True)
 
 
 class Sender(UserRole):

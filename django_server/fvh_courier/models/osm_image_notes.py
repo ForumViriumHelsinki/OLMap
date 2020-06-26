@@ -6,7 +6,7 @@ from django.core.files import File
 from django.db import models
 
 from . import base
-from .base import BaseLocation, TimestampedModel
+from .base import TimestampedModel
 
 
 class OSMFeature(base.Model):
@@ -21,7 +21,9 @@ def upload_osm_images_to(instance, filename):
     return f'osm_image_notes/{instance.id}/{filename}'
 
 
-class OSMImageNote(BaseLocation, TimestampedModel):
+class OSMImageNote(TimestampedModel):
+    lat = models.DecimalField(max_digits=11, decimal_places=8)
+    lon = models.DecimalField(max_digits=11, decimal_places=8)
     image = models.ImageField(null=True, blank=True, upload_to=upload_osm_images_to)
     comment = models.TextField(blank=True)
     osm_features = models.ManyToManyField(OSMFeature, blank=True, related_name='image_notes')

@@ -21,16 +21,6 @@ class TimestampedModel(Model):
         abstract = True
 
 
-class BaseLocation(Model):
-    lat = models.DecimalField(max_digits=11, decimal_places=8, null=True)
-    lon = models.DecimalField(max_digits=11, decimal_places=8, null=True)
-
-    # coordinate = PointField()
-
-    class Meta:
-        abstract = True
-
-
 class BaseAddress(TimestampedModel):
     street_address = models.CharField(verbose_name=_('street address'), max_length=128)
     postal_code = models.CharField(verbose_name=_('postal code'), max_length=16)
