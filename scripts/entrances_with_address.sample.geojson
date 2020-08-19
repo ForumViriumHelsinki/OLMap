@@ -1,0 +1,995 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-ide",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2020-08-19T07:40:03Z",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/60130088",
+        "addr:city": "Helsinki",
+        "addr:country": "FI",
+        "addr:housenumber": "2",
+        "addr:street": "Alvar Aallon kuja",
+        "entrance": "main"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9372963,
+          60.1726827
+        ]
+      },
+      "id": "node/60130088"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/163977935",
+        "access": "private",
+        "addr:housenumber": "2",
+        "addr:street": "Hermannin rantatie",
+        "addr:unit": "A",
+        "description": "With keycode",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9774056,
+          60.1883318
+        ]
+      },
+      "id": "node/163977935"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/163977939",
+        "access": "private",
+        "addr:housenumber": "2",
+        "addr:street": "Hermannin rantatie",
+        "addr:unit": "A",
+        "description": "With buzzer",
+        "entrance": "main",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9772245,
+          60.1882436
+        ]
+      },
+      "id": "node/163977939"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/179621440",
+        "access": "yes",
+        "addr:housenumber": "19",
+        "addr:street": "Pohjoisesplanadi",
+        "entrance": "main",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9509249,
+          60.1679676
+        ]
+      },
+      "id": "node/179621440"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/179626536",
+        "access": "yes",
+        "addr:housenumber": "24",
+        "addr:street": "Aleksanterinkatu",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9521743,
+          60.1689855
+        ]
+      },
+      "id": "node/179626536"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/179626542",
+        "access": "private",
+        "addr:housenumber": "20",
+        "addr:street": "Aleksanterinkatu",
+        "description": "With keycode",
+        "entrance": "secondary",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9532703,
+          60.1688866
+        ]
+      },
+      "id": "node/179626542"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/179627651",
+        "access": "yes",
+        "addr:housenumber": "9",
+        "addr:street": "Pohjoisesplanadi",
+        "entrance": "main",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9537255,
+          60.168044
+        ]
+      },
+      "id": "node/179627651"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/228411959",
+        "access": "private",
+        "addr:housenumber": "29",
+        "addr:street": "Annankatu",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9358421,
+          60.1680181
+        ]
+      },
+      "id": "node/228411959"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/228556451",
+        "access": "private",
+        "addr:housenumber": "9",
+        "addr:street": "Kalevankatu",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9379244,
+          60.1675341
+        ]
+      },
+      "id": "node/228556451"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/241029221",
+        "addr:housenumber": "21",
+        "addr:street": "Kasarmikatu",
+        "addr:unit": "A",
+        "description": "With buzzer",
+        "entrance": "secondary",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9479356,
+          60.1656699
+        ]
+      },
+      "id": "node/241029221"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/241059768",
+        "access": "yes",
+        "addr:housenumber": "14",
+        "addr:street": "Unioninkatu",
+        "description": "With buzzer",
+        "entrance": "main",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9512554,
+          60.1649046
+        ]
+      },
+      "id": "node/241059768"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/241259181",
+        "addr:housenumber": "12",
+        "addr:street": "Unioninkatu",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9512826,
+          60.1647532
+        ]
+      },
+      "id": "node/241259181"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/241259376",
+        "access": "private",
+        "addr:housenumber": "6",
+        "addr:street": "Unioninkatu",
+        "addr:unit": "A",
+        "description": "With keycode",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.951077,
+          60.1639959
+        ]
+      },
+      "id": "node/241259376"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/241259377",
+        "access": "private",
+        "addr:housenumber": "6",
+        "addr:street": "Unioninkatu",
+        "addr:unit": "B",
+        "entrance": "staircase",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9508845,
+          60.1639915
+        ]
+      },
+      "id": "node/241259377"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/241576676",
+        "access": "private",
+        "addr:housenumber": "35",
+        "addr:street": "Korkeavuorenkatu",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9462409,
+          60.1651821
+        ]
+      },
+      "id": "node/241576676"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/241577428",
+        "access": "private",
+        "addr:housenumber": "37",
+        "addr:street": "Korkeavuorenkatu",
+        "entrance": "service",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9465874,
+          60.1655197
+        ]
+      },
+      "id": "node/241577428"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/241582113",
+        "access": "private",
+        "addr:housenumber": "29",
+        "addr:street": "Korkeavuorenkatu",
+        "addr:unit": "F",
+        "entrance": "staircase",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9464337,
+          60.164587
+        ]
+      },
+      "id": "node/241582113"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/241584725",
+        "access": "yes",
+        "addr:housenumber": "21",
+        "addr:street": "Korkeavuorenkatu",
+        "entrance": "secondary",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9464,
+          60.162756
+        ]
+      },
+      "id": "node/241584725"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/241595372",
+        "access": "yes",
+        "addr:housenumber": "2",
+        "addr:street": "Vuorimiehenpuistikko",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9487247,
+          60.1589013
+        ]
+      },
+      "id": "node/241595372"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/246387187",
+        "access": "yes",
+        "addr:housenumber": "35",
+        "addr:street": "Lönnrotinkatu",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9303041,
+          60.1635865
+        ]
+      },
+      "id": "node/246387187"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/246387201",
+        "access": "private",
+        "addr:housenumber": "36",
+        "addr:street": "Albertinkatu",
+        "entrance": "service",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.932509,
+          60.1645401
+        ]
+      },
+      "id": "node/246387201"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/246433324",
+        "addr:city": "Helsinki",
+        "addr:housenumber": "50",
+        "addr:postcode": "00120",
+        "addr:street": "Bulevardi",
+        "addr:unit": "B",
+        "entrance": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9316657,
+          60.1610451
+        ]
+      },
+      "id": "node/246433324"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/246633387",
+        "access": "yes",
+        "addr:housenumber": "45",
+        "addr:street": "Fredrikinkatu",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9347115,
+          60.1660979
+        ]
+      },
+      "id": "node/246633387"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/247140110",
+        "access": "private",
+        "addr:housenumber": "17",
+        "addr:street": "Uudenmaankatu",
+        "description": "With buzzer",
+        "entrance": "service"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9396701,
+          60.1645234
+        ]
+      },
+      "id": "node/247140110"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/247321381",
+        "access": "private",
+        "addr:housenumber": "44",
+        "addr:street": "Uudenmaankatu",
+        "addr:unit": "B",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9354883,
+          60.1623795
+        ]
+      },
+      "id": "node/247321381"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/247321382",
+        "access": "private",
+        "addr:housenumber": "44",
+        "addr:street": "Uudenmaankatu",
+        "addr:unit": "D",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9351992,
+          60.162279
+        ]
+      },
+      "id": "node/247321382"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/247321393",
+        "access": "yes",
+        "addr:housenumber": "20",
+        "addr:street": "Fredrikinkatu",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9392855,
+          60.162573
+        ]
+      },
+      "id": "node/247321393"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/247321685",
+        "access": "yes",
+        "addr:housenumber": "23",
+        "addr:street": "Fredrikinkatu",
+        "entrance": "main",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9404992,
+          60.1619562
+        ]
+      },
+      "id": "node/247321685"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/247321734",
+        "access": "private",
+        "addr:housenumber": "5",
+        "addr:street": "Annankatu",
+        "entrance": "main",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9419999,
+          60.1633529
+        ]
+      },
+      "id": "node/247321734"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/247321777",
+        "access": "yes",
+        "addr:housenumber": "10",
+        "addr:street": "Pieni Roobertinkatu",
+        "entrance": "main",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9459758,
+          60.1641203
+        ]
+      },
+      "id": "node/247321777"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/247321778",
+        "access": "yes",
+        "addr:housenumber": "1a",
+        "addr:street": "Ratakatu",
+        "addr:unit": "A",
+        "entrance": "main",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9460132,
+          60.1638335
+        ]
+      },
+      "id": "node/247321778"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/254074653",
+        "access": "private",
+        "addr:housenumber": "4",
+        "addr:street": "Merikasarminkatu",
+        "addr:unit": "C",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9720467,
+          60.1665423
+        ]
+      },
+      "id": "node/254074653"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/254074675",
+        "access": "private",
+        "addr:housenumber": "4",
+        "addr:street": "Amiraalinkatu",
+        "addr:unit": "D",
+        "description": "With keycode",
+        "entrance": "secondary",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9732954,
+          60.1665226
+        ]
+      },
+      "id": "node/254074675"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/254081674",
+        "access": "private",
+        "addr:housenumber": "3",
+        "addr:street": "Amiraalinkatu",
+        "addr:unit": "C",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9736423,
+          60.1669621
+        ]
+      },
+      "id": "node/254081674"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/254081692",
+        "access": "private",
+        "addr:housenumber": "4",
+        "addr:street": "Matruusinkatu",
+        "addr:unit": "A",
+        "description": "With keycode",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9746673,
+          60.1669651
+        ]
+      },
+      "id": "node/254081692"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/254093246",
+        "access": "private",
+        "addr:housenumber": "1",
+        "addr:street": "Merisotilaantori",
+        "addr:unit": "D",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9750791,
+          60.1681556
+        ]
+      },
+      "id": "node/254093246"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/254093270",
+        "access": "private",
+        "addr:housenumber": "3",
+        "addr:street": "Merisotilaantori",
+        "addr:unit": "B",
+        "description": "With buzzer",
+        "entrance": "staircase",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9756456,
+          60.1681629
+        ]
+      },
+      "id": "node/254093270"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/254093376",
+        "access": "private",
+        "addr:housenumber": "3",
+        "addr:street": "Merisotilaankatu",
+        "addr:unit": "C",
+        "entrance": "secondary",
+        "wheelchair": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9763555,
+          60.1677845
+        ]
+      },
+      "id": "node/254093376"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/256257160",
+        "access": "yes",
+        "addr:housenumber": "23",
+        "addr:street": "Yrjönkatu",
+        "entrance": "secondary",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9387355,
+          60.1681399
+        ]
+      },
+      "id": "node/256257160"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/266123355",
+        "addr:city": "Helsinki",
+        "addr:country": "FI",
+        "addr:housenumber": "14",
+        "addr:street": "Ratapihantie",
+        "amenity": "parking",
+        "entrance": "yes",
+        "fee": "yes",
+        "operator": "Messukeskus",
+        "parking": "multi-storey"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9352934,
+          60.2047278
+        ]
+      },
+      "id": "node/266123355"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/266225622",
+        "addr:city": "Helsinki",
+        "addr:housenumber": "2",
+        "addr:postcode": "00500",
+        "addr:street": "Kinaporinkatu",
+        "addr:unit": "E",
+        "entrance": "staircase"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9605564,
+          60.1883645
+        ]
+      },
+      "id": "node/266225622"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/266961684",
+        "access": "private",
+        "addr:housenumber": "4",
+        "addr:street": "Ratamestarinkatu",
+        "description": "With keycode",
+        "entrance": "staircase",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9396948,
+          60.1984323
+        ]
+      },
+      "id": "node/266961684"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/282859601",
+        "addr:housenumber": "9 c",
+        "addr:street": "Porintie",
+        "entrance": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.8675924,
+          60.2048151
+        ]
+      },
+      "id": "node/282859601"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/283281653",
+        "access": "private",
+        "addr:housenumber": "7",
+        "addr:street": "Palkkatilankatu",
+        "addr:unit": "H",
+        "description": "With keycode",
+        "entrance": "staircase"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.924664,
+          60.1961135
+        ]
+      },
+      "id": "node/283281653"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/296044102",
+        "access": "permissive",
+        "addr:city": "Helsinki",
+        "addr:housenumber": "1",
+        "addr:postcode": "00100",
+        "addr:street": "Simonkatu",
+        "entrance": "yes",
+        "name": "Metro Rautatientori D",
+        "railway": "subway_entrance",
+        "ref": "D",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9377283,
+          60.1697628
+        ]
+      },
+      "id": "node/296044102"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/301361061",
+        "access": "yes",
+        "addr:housenumber": "30",
+        "addr:street": "Annankatu",
+        "description": "With keycode",
+        "entrance": "secondary",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9343401,
+          60.1678283
+        ]
+      },
+      "id": "node/301361061"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/301740117",
+        "access": "private",
+        "addr:housenumber": "7",
+        "addr:street": "Resiinakuja",
+        "addr:unit": "A",
+        "description": "With keycode",
+        "entrance": "staircase",
+        "wheelchair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9411457,
+          60.1981207
+        ]
+      },
+      "id": "node/301740117"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/302639203",
+        "addr:housenumber": "7",
+        "addr:street": "Arkadiankatu",
+        "entrance": "main"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9301691,
+          60.1715387
+        ]
+      },
+      "id": "node/302639203"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/303240464",
+        "access": "private",
+        "addr:housenumber": "14",
+        "addr:street": "Radiokatu",
+        "addr:unit": "G",
+        "description": "With keycode",
+        "entrance": "staircase"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9210138,
+          60.2019893
+        ]
+      },
+      "id": "node/303240464"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/303240620",
+        "access": "private",
+        "addr:housenumber": "1",
+        "addr:street": "Rahakamarinkatu",
+        "addr:unit": "C",
+        "description": "With keycode",
+        "entrance": "staircase"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          24.9210629,
+          60.2010056
+        ]
+      },
+      "id": "node/303240620"
+    }
+  ]
+}
