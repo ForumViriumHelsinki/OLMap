@@ -28,7 +28,7 @@ geocoder = ">=1.38"
 smsframework_gatewayapi = "*"
 elastic-apm = ">=5.5"
 geopy = "*"
-pyproj = "==1.9.6"
+pyproj = ">=2.6.1"
 
 [requires]
 python_version = "3.7"
