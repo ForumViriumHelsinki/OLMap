@@ -289,3 +289,19 @@ class PasswordResetForm(BasePasswordResetForm):
 
 class PasswordResetSerializer(BasePasswordResetSerializer):
     password_reset_form_class = PasswordResetForm
+
+
+class AddressAsOSMNodeSerializer(serializers.ModelSerializer):
+    type = serializers.ReadOnlyField(default='node')
+    tags = serializers.SerializerMethodField()
+
+    class Meta:
+        model = models.Address
+        fields = ['type', 'id', 'lat', 'lon', 'tags']
+
+    def get_tags(self, address):
+        return {
+            'addr:street': address.street,
+            'addr:housenumber': address.housenumber,
+            'addr:unit': address.unit
+        }

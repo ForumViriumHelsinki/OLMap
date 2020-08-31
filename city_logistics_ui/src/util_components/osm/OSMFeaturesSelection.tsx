@@ -33,6 +33,7 @@ type OSMFSProps = {
   maxHeight: any,
   onFeaturesLoaded: (features: OSMFeature[]) => any
   featureActions?: (feature: OSMFeature) => any
+  extraFeatures: OSMFeature[]
 }
 
 export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OSMFSState> {
@@ -43,12 +44,13 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
     preselectedFeatureIds: [],
     readOnly: false,
     maxHeight: 'calc(100vh - 248px)',
-    onFeaturesLoaded: () => null
+    onFeaturesLoaded: () => null,
+    extraFeatures: []
   };
 
   render() {
     const {selectedFeatureIds, featuresLoading, nearbyOSMFeatures} = this.state;
-    const {onSelect, readOnly, maxHeight, featureActions, location} = this.props;
+    const {onSelect, readOnly, maxHeight, featureActions, location, extraFeatures} = this.props;
 
     return <>
       <div style={maxHeight ? {maxHeight, overflowY: 'auto'} : {}}>
@@ -56,7 +58,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
           <ListGroup><ListGroupItem><CenteredSpinner/></ListGroupItem></ListGroup>
         :
           <OSMFeatureList {...{featureActions, location, readOnly, selectedFeatureIds}}
-                          onChange={this.onChange} OSMFeatures={nearbyOSMFeatures} />
+                          onChange={this.onChange} OSMFeatures={nearbyOSMFeatures.concat(extraFeatures)} />
         }
       </div>
 

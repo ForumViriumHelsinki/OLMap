@@ -1,4 +1,5 @@
 import {packageAction} from "components/types";
+import {LocationTuple} from "util_components/types";
 
 export const loginUrl = '/rest-auth/login/';
 export const registerUrl = '/rest-auth/registration/';
@@ -33,3 +34,6 @@ export const osmImageNoteCommentsUrl = `/rest/osm_image_note_comments/`;
 export const osmFeaturePropertiesUrl = "/rest/osm_image_notes/property_schemas/";
 
 export const osmEntranceUrl = (id: number) => `/rest/osm_entrances/${id}/`;
+
+export const nearbyAddressesUrl = (location: LocationTuple) =>
+  `/rest/addresses_at/${location[0]}/${location[1]}/`;

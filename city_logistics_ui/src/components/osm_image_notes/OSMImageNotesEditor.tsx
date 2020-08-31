@@ -21,6 +21,7 @@ import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 import {changeset, OSMFeature} from "util_components/osm/types";
 import OSMChangesetSelection from "util_components/osm/OSMChangesetSelection";
 import OSMChangesetMapLayer from "util_components/osm/OSMChangesetMapLayer";
+import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
 
 
 type OSMImageNotesEditorState = OSMImageNote & {
@@ -35,6 +36,7 @@ type OSMImageNotesEditorState = OSMImageNote & {
   osmProperties: any,
   myNotesOnly: boolean,
   nearbyFeatures: OSMFeature[],
+  nearbyAddresses: OSMFeature[],
   selectChangeset: boolean,
   selectedChangeset?: changeset,
   onLocationSelected?: (location: any) => any,
@@ -56,6 +58,7 @@ const initialState: () => OSMImageNotesEditorState = () => ({
   osmProperties: {},
   myNotesOnly: false,
   nearbyFeatures: [],
+  nearbyAddresses: [],
   selectChangeset: false
 });
 
@@ -80,7 +83,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
   render() {
     const {
       status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags,
-      osmProperties, myNotesOnly, osm_features, nearbyFeatures, selectChangeset, selectedChangeset
+      osmProperties, myNotesOnly, osm_features, nearbyFeatures, selectChangeset, selectedChangeset, nearbyAddresses
     } = this.state;
 
     const location = [lon, lat] as LocationTuple;
@@ -147,8 +150,12 @@ export default class OSMImageNotesEditor extends Component<{}> {
             </div>,
           relating:
             <Modal title="Choose related places (optional)" onClose={this.onCancel}>
+              <NearbyAddressesAsOSMLoader
+                location={location}
+                onLoad={nearbyAddresses => this.setState({nearbyAddresses})} />
               <OSMFeaturesSelection
                 location={location}
+                extraFeatures={nearbyAddresses}
                 onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
                 onSelect={osm_features => this.setState({osm_features, status: 'commenting'})}/>
             </Modal>,
@@ -170,7 +177,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
                       <OSMFeatureProperties key={tag} schema={osmFeatureProperties[tag]} osmFeatureName={tag}
                                             osmImageNote={{osm_features, ...osmProperties}}
                                             onSubmit={(data) => this.addOSMProperties(data)}
-                                            nearbyFeatures={nearbyFeatures}/>
+                                            nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}/>
                     )}
                   </div>
                 </>

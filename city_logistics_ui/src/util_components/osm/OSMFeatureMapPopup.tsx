@@ -51,7 +51,7 @@ export default class OSMFeatureMapPopup extends React.Component<OSMFeatureMapPop
                 this.setState({open: false})
              }}>
           <Map latLng={latLng(getCenter([osmFeature, location]))}
-               zoom={20 - getDistance(osmFeature, location) / 8}
+               zoom={18 - getDistance(osmFeature, location) / 40}
                zoomControl={false}
                extraLayers={[this.getMapLayer()]}
                showAttribution={false}/>

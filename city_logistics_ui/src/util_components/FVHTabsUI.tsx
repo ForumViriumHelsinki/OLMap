@@ -61,7 +61,7 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, State> {
                       </h5>
 
                       {menuOpen &&
-                        <div className="dropdown-menu show w-100 mt-3">
+                        <div className="dropdown-menu show w-100 mt-3" onClick={() => this.setState({menuOpen: !menuOpen})}>
                           {tabs.map(({icon, menuText, header}) =>
                             <Link key={header} to={`/${header}/`} className="dropdown-item pt-2 pb-2">
                               <h5><Icon icon={icon} className="text-primary mr-2"/> {menuText}</h5>

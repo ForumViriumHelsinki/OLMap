@@ -9,12 +9,6 @@ import {Button} from "reactstrap";
 import {OSMFeature} from "util_components/osm/types";
 import ConfirmButton from "util_components/bootstrap/ConfirmButton";
 
-const valueFromOSMTags: {[tag: string]: (f: OSMFeature) => any} = {
-  'street': (f: OSMFeature) => f.tags['addr:street'] || (f.tags.highway && f.tags.name),
-  'housenumber': (f: OSMFeature) => f.tags['addr:housenumber'],
-  'unit': (f: OSMFeature) => f.tags['addr:unit']
-};
-
 type PKFeature = {[field: string]: any}
 
 type OSMFeaturePropertiesProps = {
@@ -140,15 +134,16 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
     const pkFeatures = (osmImageNote[listFieldName] || []) as PKFeature[];
     const selectedFeatureIds = osmImageNote.osm_features || [];
     const selectedFeatures = nearbyFeatures.filter((f) => selectedFeatureIds.includes(f.id));
-    const allFeatures = selectedFeatures.concat(nearbyFeatures);
 
     const newPKFeature: {[k: string]: any} = {};
-    Object.keys(schema.properties).forEach(fieldName => {
-      const valueFunction = valueFromOSMTags[fieldName];
-      if (!valueFunction) return;
-      const f = allFeatures.find(f => valueFunction(f))
-      if (f) newPKFeature[fieldName] = valueFunction(f);
-    });
+
+    if (schema.properties.street && schema.properties.housenumber) {
+      const f = selectedFeatures.find(f => f.tags['addr:housenumber'] && f.tags['addr:street']);
+      if (f) {
+        newPKFeature.street = f.tags['addr:street'];
+        newPKFeature.housenumber = f.tags['addr:housenumber'];
+      }
+    }
 
     pkFeatures.push(newPKFeature);
     // @ts-ignore
