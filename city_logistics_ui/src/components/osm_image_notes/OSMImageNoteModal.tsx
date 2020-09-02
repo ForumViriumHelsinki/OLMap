@@ -20,6 +20,7 @@ import OSMImageNoteComments from "components/osm_image_notes/OSMImageNoteComment
 import AssociateEntranceModal from "components/osm_image_notes/AssociateEntranceModal";
 import {OSMFeature} from "util_components/osm/types";
 import {formatTimestamp} from "utils";
+import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
 
 type OSMImageNoteModalProps = {
   osmFeatureProperties: OSMFeatureProps,
@@ -34,6 +35,7 @@ type OSMImageNoteModalState = {
   readOnly: boolean,
   error: boolean
   nearbyFeatures: OSMFeature[],
+  nearbyAddresses: OSMFeature[],
   linkingEntrance?: OSMFeature,
   repositioning: boolean
 }
@@ -42,6 +44,7 @@ const initialState: OSMImageNoteModalState = {
   readOnly: true,
   error: false,
   nearbyFeatures: [],
+  nearbyAddresses: [],
   repositioning: false
 };
 
@@ -59,7 +62,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
 
   render() {
     const {osmFeatureProperties, onClose, showOnMap, requestLocation} = this.props;
-    const {note, readOnly, error, nearbyFeatures, linkingEntrance, repositioning} = this.state;
+    const {note, readOnly, error, nearbyFeatures, nearbyAddresses, linkingEntrance, repositioning} = this.state;
     const {user} = this.context;
 
     if (repositioning || !note) return null;
@@ -126,8 +129,13 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
               </div>
             }
           </div>
+          <NearbyAddressesAsOSMLoader
+            location={location}
+            onLoad={nearbyAddresses => this.setState({nearbyAddresses})} />
           <OSMFeaturesSelection
-            location={location} onChange={this.onFeaturesSelected} readOnly={readOnly}
+            location={location}
+            extraFeatures={nearbyAddresses}
+            onChange={this.onFeaturesSelected} readOnly={readOnly}
             maxHeight={null}
             preselectedFeatureIds={note.osm_features}
             onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
@@ -146,7 +154,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
                 schema={osmFeatureProperties[osmFeatureName]}
                 osmImageNote={note}
                 osmFeatureName={osmFeatureName}
-                nearbyFeatures={nearbyFeatures}
+                nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}
                 onSubmit={(data) => this.updateSelectedNote(data)}/>
           </div>
         )}
