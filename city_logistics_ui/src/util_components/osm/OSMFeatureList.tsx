@@ -22,7 +22,7 @@ const filterOptions: filterOption[] = ['entrance', 'place', 'address', 'street',
 const filters: {[key: string]: (f: OSMFeature) => boolean | null} = {
   'entrance': (f) => Boolean(f.tags.entrance),
   'place': (f) => Boolean(f.tags.name && (f.type != 'way')),
-  'address': (f) => Boolean(f.tags['addr:housenumber'] && !f.tags.name),
+  'address': (f) => Boolean(f.tags['addr:housenumber'] && !f.tags.name && !f.tags.entrance),
   'street': (f) => Boolean(f.type == "way"),
   'barrier': (f) => Boolean(f.tags.barrier)
 };
