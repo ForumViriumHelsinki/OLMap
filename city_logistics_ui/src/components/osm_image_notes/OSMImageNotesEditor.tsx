@@ -94,6 +94,7 @@ export default class OSMImageNotesEditor extends Component<{}> {
     const location = [lon, lat] as LocationTuple;
     const {user} = this.context;
 
+    const nonStatusFilters = _.omit(filters, ['is_processed', 'is_reviewed']);
     return <div className="flex-grow-1">
       <div className="position-absolute map-tools p-3">
         <input name="image" id="image" className="d-none" type="file"
@@ -146,15 +147,27 @@ export default class OSMImageNotesEditor extends Component<{}> {
                   </DropdownItem>
                   <DropdownItem divider/>
                   <DropdownItem className={(filters.is_processed === false) ? 'text-primary' : ''}
-                                onClick={() => this.toggleFilter({is_processed: false, is_reviewed: false})}>
+                                onClick={() => this.setState({
+                                  filters:
+                                    (filters.is_processed === false) ? nonStatusFilters
+                                    : _.assign({}, filters, {is_processed: false, is_reviewed: false})
+                                })}>
                     New
                   </DropdownItem>
                   <DropdownItem className={(filters.is_processed) ? 'text-primary' : ''}
-                                onClick={() => this.toggleFilter({is_processed: true, is_reviewed: undefined})}>
+                                onClick={() => this.setState({
+                                  filters:
+                                    (filters.is_processed) ? nonStatusFilters
+                                    : _.assign({}, filters, {is_processed: true, is_reviewed: false})
+                                })}>
                     In OSM
                   </DropdownItem>
                   <DropdownItem className={(filters.is_reviewed) ? 'text-primary' : ''}
-                                onClick={() => this.toggleFilter({is_reviewed: true, is_processed: undefined})}>
+                                onClick={() => this.setState({
+                                  filters:
+                                    (filters.is_reviewed) ? nonStatusFilters
+                                    : _.assign({}, nonStatusFilters, {is_reviewed: true})
+                                })}>
                     Reviewed
                   </DropdownItem>
                   <DropdownItem divider/>
