@@ -29,7 +29,7 @@ export default class OSMChangesetMapLayer extends React.Component<OSMChangesetMa
     return <Modal onClose={() => this.setState({selectedNode: undefined})}
                   title={osmFeatureLabel(selectedNode) || 'OSM node'}>
       <ModalBody>
-        {Object.entries(selectedNode.tags).map(([k, v]) =>
+        {([['id', selectedNode.id]]).concat(Object.entries(selectedNode.tags)).map(([k, v]) =>
           <div key={k}>
             <span className="d-inline-block mr-2" style={{minWidth: 100}}><strong>{capitalize(k)}:</strong></span>{v}
           </div>
