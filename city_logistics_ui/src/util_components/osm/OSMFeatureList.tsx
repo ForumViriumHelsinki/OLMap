@@ -71,16 +71,15 @@ export default class OSMFeatureList extends React.Component<OSMFeatureListProps,
         <>
           {OSMFeatures.length > 5 &&
             <ListGroupItem className="pt-1 pt-sm-2">
-              <span className="d-inline-block mr-1">
+              <span className="d-inline-block mt-2 mt-sm-0">
+                Filter:{' '}
+                <PillsSelection options={filterOptions} selected={selectedFilters} color="secondary"
+                                onClick={this.toggleFilter}/>
+              </span>
+              <span className="d-inline-block ml-1">
                 <Toggle off='Sort' on='Sort by: '>
                   <PillsSelection options={sortOptions} selected={[sortBy]} color="secondary"
                                   onClick={this.sortBy}/>
-                </Toggle>
-              </span>
-              <span className="d-inline-block mt-2 mt-sm-0">
-                <Toggle off='Filter' on='Filter: '>
-                  <PillsSelection options={filterOptions} selected={selectedFilters} color="secondary"
-                                  onClick={this.toggleFilter}/>
                 </Toggle>
               </span>
             </ListGroupItem>
