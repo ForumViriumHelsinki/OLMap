@@ -134,7 +134,7 @@ class MyLocationView(RetrieveUpdateDestroyAPIView):
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OSMImageNoteWithPropsSerializer
-    queryset = models.OSMImageNote.objects.filter(visible=True)
+    queryset = models.OSMImageNote.objects.filter(visible=True).prefetch_related('tags')
 
     # Use simple serializer for list to improve performance:
     serializer_classes = {

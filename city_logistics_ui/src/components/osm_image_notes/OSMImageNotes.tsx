@@ -9,7 +9,7 @@ import _ from 'lodash';
 
 import sessionRequest from "sessionRequest";
 import {osmFeaturePropertiesUrl, osmImageNotesUrl} from "urls";
-import {AppContext, OSMFeatureProps, OSMImageNote} from "components/types";
+import {OSMFeatureProps, OSMImageNote} from "components/types";
 
 import 'components/osm_image_notes/OSMImageNotes.css';
 
@@ -25,7 +25,7 @@ const markerColors = {
 type OSMImageNotesProps = {
   onMapLayerLoaded: (mapLayer: any) => any
   onOSMFeaturePropertiesLoaded?: (osmFeatureProperties: OSMFeatureProps) => any,
-  myNotesOnly: boolean,
+  filters: any,
   history: any,
   location: Location,
   match: any,
@@ -44,9 +44,8 @@ const initialState: OSMImageNotesState = {
 };
 
 class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesState> {
-  static contextType = AppContext;
   static defaultProps = {
-    myNotesOnly: false
+    filters: {}
   };
 
   private mapLayer?: any;
@@ -60,7 +59,7 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
   }
 
   componentDidUpdate(prevProps: OSMImageNotesProps) {
-    if (prevProps.myNotesOnly != this.props.myNotesOnly) this.getMapLayer();
+    if (prevProps.filters != this.props.filters) this.getMapLayer();
   }
 
   loadImageNotes() {
@@ -99,17 +98,28 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
   };
 
   private getMapLayer() {
-    const {user} = this.context;
-    const {myNotesOnly, history} = this.props;
+    const {filters, history} = this.props;
 
     if (!this.mapLayer) this.mapLayer = L.layerGroup();
     if (!this.state.osmImageNotes) return this.mapLayer;
 
+    const filterEntries = Object.entries(filters || {});
     const osmImageNotes =
-      myNotesOnly ? this.state.osmImageNotes.filter(n => n.created_by == user.id)
+      filters ?
+        this.state.osmImageNotes.filter(note => {
+          for (const [key, value] of filterEntries) {
+            if (value instanceof Array) for (const item of value) {
+              // @ts-ignore
+              if (!(note[key] || []).includes(item)) return false;
+            }
+            // @ts-ignore
+            else if (note[key] != value) return false;
+          }
+          return true;
+        })
       : this.state.osmImageNotes;
 
-    osmImageNotes.forEach((osmImageNote) => {
+    osmImageNotes.forEach((osmImageNote: OSMImageNote) => {
       const id = String(osmImageNote.id);
       const category =
         (osmImageNote.tags || []).includes('Problem') ? 'problem'

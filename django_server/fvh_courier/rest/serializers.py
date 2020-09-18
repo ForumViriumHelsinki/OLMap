@@ -187,9 +187,12 @@ class OSMImageNoteCommentSerializer(serializers.ModelSerializer):
 
 
 class BaseOSMImageNoteSerializer(serializers.ModelSerializer):
+    tags = CreateableSlugRelatedField(
+        many=True, required=False, slug_field='tag', queryset=models.ImageNoteTag.objects.all())
+
     class Meta:
         model = models.OSMImageNote
-        fields = ['id', 'comment', 'image', 'lat', 'lon', 'is_reviewed', 'is_processed', 'created_by']
+        fields = ['id', 'comment', 'image', 'lat', 'lon', 'is_reviewed', 'is_processed', 'created_by', 'tags']
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
@@ -197,8 +200,6 @@ class BaseOSMImageNoteSerializer(serializers.ModelSerializer):
 
 
 class OSMImageNoteSerializer(BaseOSMImageNoteSerializer):
-    tags = CreateableSlugRelatedField(
-        many=True, required=False, slug_field='tag', queryset=models.ImageNoteTag.objects.all())
     upvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
     downvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
     comments = OSMImageNoteCommentSerializer(many=True, read_only=True)

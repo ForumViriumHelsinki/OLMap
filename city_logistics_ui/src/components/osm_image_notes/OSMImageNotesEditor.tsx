@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import MyPositionMap from 'util_components/MyPositionMap';
 // @ts-ignore
-import {Button, Spinner} from "reactstrap";
+import {Button, Spinner, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem} from "reactstrap";
 import Icon from "util_components/bootstrap/Icon";
 import Component from "util_components/Component";
 import {LocationTuple} from "util_components/types";
@@ -13,7 +13,7 @@ import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
-import {OSMFeatureProps, OSMImageNote} from "components/types";
+import {OSMFeatureProps, OSMImageNote, AppContext} from "components/types";
 import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
 import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
 import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
@@ -34,7 +34,8 @@ type OSMImageNotesEditorState = OSMImageNote & {
   osmFeatureProperties?: OSMFeatureProps,
   tags: string[],
   osmProperties: any,
-  myNotesOnly: boolean,
+  filters: any,
+  filtersOpen: boolean,
   nearbyFeatures: OSMFeature[],
   nearbyAddresses: OSMFeature[],
   selectChangeset: boolean,
@@ -56,7 +57,8 @@ const initialState: () => OSMImageNotesEditorState = () => ({
   imagesUploading: [],
   tags: [],
   osmProperties: {},
-  myNotesOnly: false,
+  filters: {},
+  filtersOpen: false,
   nearbyFeatures: [],
   nearbyAddresses: [],
   selectChangeset: false
@@ -66,6 +68,8 @@ const {imagesUploading, ...resetState} = initialState();
 
 export default class OSMImageNotesEditor extends Component<{}> {
   state: OSMImageNotesEditorState = initialState();
+
+  static contextType = AppContext;
 
   static bindMethods = [
     'onImageClick', 'onImageCaptured', 'onCommentClick',
@@ -83,10 +87,12 @@ export default class OSMImageNotesEditor extends Component<{}> {
   render() {
     const {
       status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags,
-      osmProperties, myNotesOnly, osm_features, nearbyFeatures, selectChangeset, selectedChangeset, nearbyAddresses
+      osmProperties, filters, osm_features, nearbyFeatures, selectChangeset, selectedChangeset, nearbyAddresses,
+      filtersOpen
     } = this.state;
 
     const location = [lon, lat] as LocationTuple;
+    const {user} = this.context;
 
     return <div className="flex-grow-1">
       <div className="position-absolute map-tools p-3">
@@ -128,12 +134,39 @@ export default class OSMImageNotesEditor extends Component<{}> {
               <Button {...this.childProps.toolButton} onClick={this.reloadNotes}>
                 <Icon icon="refresh"/>
               </Button>{' '}
-              <Button {...this.childProps.toolButton}
-                      className={myNotesOnly ? '' : 'bg-white'}
-                      outline={!myNotesOnly}
-                      onClick={() => this.setState({myNotesOnly: !myNotesOnly})}>
-                <Icon icon="account_circle"/>
-              </Button>{' '}
+              <ButtonDropdown isOpen={filtersOpen} toggle={() => this.setState({filtersOpen: !filtersOpen})}>
+                <DropdownToggle {...this.childProps.toolButton}>
+                  <Icon icon="filter_alt"/>
+                </DropdownToggle>
+                <DropdownMenu>
+                  <DropdownItem header>Filter</DropdownItem>
+                  <DropdownItem className={(filters.created_by) ? 'text-primary' : ''}
+                                onClick={() => this.toggleFilter({created_by: user.id})}>
+                    My notes
+                  </DropdownItem>
+                  <DropdownItem divider/>
+                  <DropdownItem className={(filters.is_processed === false) ? 'text-primary' : ''}
+                                onClick={() => this.toggleFilter({is_processed: false, is_reviewed: false})}>
+                    New
+                  </DropdownItem>
+                  <DropdownItem className={(filters.is_processed) ? 'text-primary' : ''}
+                                onClick={() => this.toggleFilter({is_processed: true, is_reviewed: undefined})}>
+                    In OSM
+                  </DropdownItem>
+                  <DropdownItem className={(filters.is_reviewed) ? 'text-primary' : ''}
+                                onClick={() => this.toggleFilter({is_reviewed: true, is_processed: undefined})}>
+                    Reviewed
+                  </DropdownItem>
+                  <DropdownItem divider/>
+                  {osmFeatureProperties && Object.keys(osmFeatureProperties).map((tag) =>
+                    <DropdownItem className={(filters.tags && filters.tags.includes(tag)) ? 'text-primary' : ''}
+                                  onClick={() => this.toggleFilter({tags: tag})}>
+                      {tag}
+                    </DropdownItem>
+                  )}
+                </DropdownMenu>
+              </ButtonDropdown>
+              {' '}
               <Button {...this.childProps.toolButton} tag="a" href="/editing-process.html" target="_blank">
                 <Icon icon="help"/>
               </Button>{' '}
@@ -206,9 +239,26 @@ export default class OSMImageNotesEditor extends Component<{}> {
       <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
                      onOSMFeaturePropertiesLoaded={(osmFeatureProperties: OSMFeatureProps) =>
                        this.setState({osmFeatureProperties})}
-                     wrappedComponentRef={this.imageNotesRef} myNotesOnly={myNotesOnly}
+                     wrappedComponentRef={this.imageNotesRef} filters={filters}
                      showLocation={this.showLocation} requestLocation={this.requestLocation}/>
     </div>;
+  }
+
+  private toggleFilter(filter: any) {
+    const filters = Object.assign({}, this.state.filters);
+
+    Object.entries(filter).forEach(([key, value]) => {
+      if (key == 'tags') {
+        if (filters.tags && filters.tags.includes(value)) {
+          filters.tags = _.without(filters.tags, value);
+          if (!filters.tags.length) delete filters.tags;
+        }
+        else filters.tags = (filters.tags || []).concat([value]);
+      }
+      else if ((filters[key] == value) || (value === undefined)) delete filters[key];
+      else filters[key] = value;
+    });
+    this.setState({filters});
   }
 
   showLocation = (location: any) => {
