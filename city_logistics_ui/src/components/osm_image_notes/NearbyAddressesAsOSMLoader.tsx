@@ -1,4 +1,6 @@
 import React from 'react';
+// @ts-ignore
+import _ from 'lodash';
 import {LocationTuple} from "util_components/types";
 import {OSMFeature} from "util_components/osm/types";
 import sessionRequest from "sessionRequest";
@@ -28,6 +30,6 @@ export default class NearbyAddressesAsOSMLoader extends React.Component<NearbyAd
     const {location, onLoad} = this.props;
     return sessionRequest(nearbyAddressesUrl(location))
       .then(response => response.json())
-      .then(addresses => onLoad(addresses))
+      .then(addresses => onLoad(addresses.map((a: any) => _.merge(a, {tags: {source: 'OLMap'}}))))
   };
 }

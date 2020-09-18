@@ -63,9 +63,9 @@ export const osmFeatureTypes: OSMFeatureType[] = [
     name: 'address',
     requiredTag: 'addr:housenumber',
     label: (tags) => {
-      const {name} = tags;
+      const {name, source} = tags;
       const address = osmAddressString(tags);
-      return `${name ? `${name}: ` : ''}${address}`;
+      return `${name ? `${name}: ` : ''}${address} (${source ? 'official' : 'OSM'})`;
     }
   },
   {
