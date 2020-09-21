@@ -5,14 +5,18 @@ from fvh_courier.models import Address
 
 class ModelTests(TestCase):
     def test_building_address(self):
-        # Given an address including building number & entrance details
-        a = Address(street_address='Kulosaarentie 22B 3, 3rd floor')
+        addresses = [['Kulosaarentie 22B 3, 3rd floor', 'Kulosaarentie 22'],
+                     ['Lääkärinkatu 8  L rappu', 'Lääkärinkatu 8']]
 
-        # When requesting the building address:
-        b = a.building_address()
+        for [full_address, building_address] in addresses:
+            # Given an address including building number & entrance details
+            a = Address(street_address=full_address)
 
-        # Then the entrance details are stripped:
-        self.assertEqual(b, 'Kulosaarentie 22')
+            # When requesting the building address:
+            b = a.building_address()
+
+            # Then the entrance details are stripped:
+            self.assertEqual(b, building_address)
 
     def test_sync_street_address(self):
         # Given an address including building number & entrance details

@@ -250,3 +250,43 @@ class OutgoingPackagesTests(FVHAPITestCase):
         # And the sender is informed by SMS
         models.PackageSMS.objects.get(message_type=models.PackageSMS.types_by_name['new_package'])
 
+    def test_outgoing_package_from_holvi_order_with_faulty_address(self):
+        # Given a valid Holvi webhook payload, including an order for home delivery to a misspelled address
+        # that will not be recognized by the geocoder:
+        data = dict(holvi_delivery_order_webhook_payload, street="Porthaniliininkatu 13")
+
+        # And a token identifying a sender account with a primary courier attached
+        courier = self.create_courier()
+        sender = self.create_sender(courier_company=courier.company)
+        webshop = sender.user.holvi_webshops.create()
+        models.RequiredHolviProduct.objects.create(holvi_shop=webshop, name='Kotiinkuljetus')
+
+        # When POSTing the payload to the holvi order endpoint
+        url = reverse('holvi_order', kwargs={'token': webshop.token})
+        response = self.client.post(url, data, format='json')
+
+        # Then an OK response is received
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # And a new outgoing package is created
+        self.client.force_login(sender.user)
+        url = reverse('pending_outgoing_package-list')
+        response = self.client.get(url)
+
+        self.assert_dict_contains(response.json()[0], {
+            'pickup_at': {
+                'street_address': 'Paradisäppelvägen 123',
+                'postal_code': '00123',
+                'city': 'Ankeborg',
+                'country': 'Ankerige'},
+            'deliver_to': {
+                'street_address': 'Porthaniliininkatu 13',
+                'postal_code': '00530',
+                'city': 'Helsinki',
+                'country': 'FI'},
+            'sender': {
+                'first_name': 'Cedrik',
+                'last_name': 'Sender'},
+            'recipient': 'Mark Smith',
+            'recipient_phone': '+35888445544',
+            'delivery_instructions': 'Watch your steps'})

@@ -99,7 +99,7 @@ class HolviPackage(models.Model):
                 city=self.order.city,
                 postal_code=self.order.postcode,
                 country=self.order.country
-            )[0].with_latlng(),
+            )[0].with_latlng(default=sender.address),
             sender=sender,
             courier_company=sender.courier_company,
             recipient=self.order.recipient_str(),

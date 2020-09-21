@@ -56,7 +56,7 @@ class BaseAddress(TimestampedModel):
         elif self.street and self.housenumber:
             self.street_address = f'{self.street} {self.housenumber} {self.unit or ""}'.strip()
 
-    def with_latlng(self):
+    def with_latlng(self, default=None):
         if self.lat and self.lon:
             return self
         official = Address.objects.filter(
@@ -65,7 +65,11 @@ class BaseAddress(TimestampedModel):
         if official:
             [self.lat, self.lon] = [official.lat, official.lon]
         else:
-            [self.lat, self.lon] = geocoder.osm(f'{self.building_address()}, {self.city}').latlng
+            latlng = geocoder.osm(f'{self.building_address()}, {self.city}').latlng
+            if latlng:
+                [self.lat, self.lon] = latlng
+            elif default:
+                [self.lat, self.lon] = [default.lat, default.lon]
         self.save()
         return self
 
