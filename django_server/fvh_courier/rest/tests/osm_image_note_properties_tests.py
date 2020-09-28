@@ -210,6 +210,17 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
 
             'InfoBoard': {
                 'type': 'object',
-                'properties': {'type': {'type': 'string', 'enum': ['', 'map', 'board'], 'title': 'Type'}}}
+                'properties': {'type': {'type': 'string', 'enum': ['', 'map', 'board'], 'title': 'Type'}}
+
+            },
+
+            'TrafficSign': {
+                'type': 'object',
+                'properties': {
+                    'type': {
+                        'type': 'string',
+                        'enum': ['', 'Max height', 'Max weight', 'No stopping', 'No parking', 'Loading zone', 'Parking'],
+                        'title': 'Type'},
+                    'text': {'type': 'string', 'maxLength': 128, 'title': 'Text'}}}
         })
 

@@ -188,7 +188,29 @@ class Amenity(Company):
             **filter_dict({'delivery:covid19': self.delivery_covid19, 'takeaway:covid19': self.takeaway_covid19}))
 
 
-image_note_property_types = [Entrance, Steps, Gate, Barrier, Office, Shop, Amenity, InfoBoard]
+class TrafficSign(ImageNoteProperties):
+    osm_url = 'https://wiki.openstreetmap.org/wiki/Key:traffic_sign'
+    types = {'Max height': 'FI:342',
+             'Max weight': 'FI:344',
+             'No stopping': 'FI:371',
+             'No parking': 'FI:372',
+             'Loading zone': 'FI:C43',
+             'Parking': 'FI:521'}
+    type = choices_field(types.keys())
+    text_in_signs = ['Max height', 'Max weight']
+    text_sign='FI:871'
+    text = models.CharField(max_length=128, blank=True)
+
+    def as_osm_tags(self):
+        code = self.types[self.type]
+        if self.type in self.text_in_signs:
+            return {'traffic_sign': f'{code}[{self.text}]'}
+        return filter_dict({
+            'traffic_sign': f'{code}',
+            'traffic_sign:2': f'{self.text_sign}[{self.text}]' if self.text else None})
+
+
+image_note_property_types = [Entrance, Steps, Gate, Barrier, Office, Shop, Amenity, InfoBoard, TrafficSign]
 
 
 def manager_name(prop_type):

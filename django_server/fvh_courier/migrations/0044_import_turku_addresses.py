@@ -2,6 +2,7 @@
 import csv
 import re, requests
 
+from django.conf import settings
 from django.db import migrations
 from pyproj import Transformer
 
@@ -13,6 +14,8 @@ def sync_street_address(self):
 
 
 def forwards(apps, schema_editor):
+    if settings.TEST:
+        return
     Address = apps.get_model('fvh_courier', 'Address')
 
     print('Loading address data...')

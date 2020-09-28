@@ -3,6 +3,7 @@ import re, requests
 
 from django.db import migrations
 from pyproj import Transformer
+from django.conf import settings
 
 transformer = Transformer.from_crs('epsg:3879', 'epsg:4326')
 
@@ -12,6 +13,8 @@ def sync_street_address(self):
 
 
 def forwards(apps, schema_editor):
+    if settings.TEST:
+        return
     Address = apps.get_model('fvh_courier', 'Address')
 
     response = requests.get('https://kartta.hel.fi/ws/geoserver/avoindata/wfs?version=1.1.0&request=GetFeature&typeName=avoindata:Osoiteluettelo_piste_rekisteritiedot&outputformat=json')
