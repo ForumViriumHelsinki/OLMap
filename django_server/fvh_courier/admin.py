@@ -59,6 +59,7 @@ admin.site.unregister(User)
 
 class SenderInline(admin.TabularInline):
     model = models.Sender
+    raw_id_fields = ['address']
     extra = 0
 
 
