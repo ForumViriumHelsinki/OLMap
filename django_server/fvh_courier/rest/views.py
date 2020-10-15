@@ -144,6 +144,12 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, self.serializer_class)
 
+    def get_permissions(self):
+        if self.action in ['retrieve', 'list', 'property_schemas']:
+            return [permissions.AllowAny()]
+        else:
+            return super().get_permissions()
+
     def create(self, request, *args, **kwargs):
         self.ensure_features(request)
         return super().create(request, *args, **kwargs)

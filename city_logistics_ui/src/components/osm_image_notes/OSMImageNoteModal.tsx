@@ -64,6 +64,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
     const {osmFeatureProperties, onClose, showOnMap, requestLocation} = this.props;
     const {note, readOnly, error, nearbyFeatures, nearbyAddresses, linkingEntrance, repositioning} = this.state;
     const {user} = this.context;
+    const reviewer = user && user.is_reviewer;
 
     if (repositioning || !note) return null;
 
@@ -71,7 +72,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
 
     const tags = note.tags || [];
 
-    const editable = user.is_reviewer && readOnly;
+    const editable = reviewer && readOnly;
     const relatedFeatures =
       note.osm_features
         ? nearbyFeatures.filter(f => note.osm_features.includes(f.id))
@@ -88,7 +89,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
         <Icon icon="link"/>
       </span>
       {' '}
-      {requestLocation &&
+      {requestLocation && user &&
         <span className="clickable text-primary ml-1" onClick={this.adjustPosition}>
           <Icon icon="open_with"/>
         </span>}
@@ -102,7 +103,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
     const modalCls = note.image ? 'modal-xl' : 'modal-dialog-centered';
 
     return <Modal title={title} className={modalCls} onClose={onClose}>
-        {user.is_reviewer &&
+        {reviewer &&
           <OSMImageNoteReviewActions imageNote={note} onReviewed={onClose}/>
         }
         <OSMImageNoteVotes osmImageNote={note} onUpdate={this.fetchNote}/>
@@ -111,7 +112,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
         <>
           <p className="m-2 ml-3"><strong>Tags:</strong></p>
           <p className="m-2 ml-3">
-             <OSMImageNoteTags {...{tags, osmFeatureProperties}} readOnly={!user.is_reviewer}
+             <OSMImageNoteTags {...{tags, osmFeatureProperties}} readOnly={!reviewer}
                                onChange={tags => this.updateSelectedNote({tags})}/>
           </p>
         </>
@@ -148,7 +149,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
                   </button>
             }/>
         </div>
-        {user.is_reviewer && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
+        {reviewer && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
           <div key={osmFeatureName} className="mr-2 ml-3">
               <OSMFeatureProperties
                 schema={osmFeatureProperties[osmFeatureName]}

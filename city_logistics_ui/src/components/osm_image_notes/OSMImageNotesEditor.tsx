@@ -126,12 +126,14 @@ export default class OSMImageNotesEditor extends Component<{}> {
                   <Icon icon="cloud_upload"/> {imagesUploading.length} <Spinner size="sm"/>
                 </Button>
               }
-              <Button {...this.childProps.toolButton} onClick={this.onImageClick}>
-                <Icon icon="camera_alt"/>
-              </Button>{' '}
-              <Button {...this.childProps.toolButton} onClick={this.onCommentClick}>
-                <Icon icon="comment"/>
-              </Button>{' '}
+              {user && <>
+                <Button {...this.childProps.toolButton} onClick={this.onImageClick}>
+                  <Icon icon="camera_alt"/>
+                </Button>{' '}
+                <Button {...this.childProps.toolButton} onClick={this.onCommentClick}>
+                  <Icon icon="comment"/>
+                </Button>{' '}
+              </>}
               <Button {...this.childProps.toolButton} onClick={this.reloadNotes}>
                 <Icon icon="refresh"/>
               </Button>{' '}

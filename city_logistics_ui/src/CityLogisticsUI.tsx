@@ -1,6 +1,6 @@
 import React from 'react';
 // @ts-ignore
-import {HashRouter as Router, Route, Switch, useParams, Redirect} from "react-router-dom";
+import {HashRouter as Router, Route, Switch, useParams, Redirect, useHistory} from "react-router-dom";
 
 import sessionRequest, {logout} from "sessionRequest";
 
@@ -75,11 +75,14 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
     };
 
     // @ts-ignore
-    const tabs: any[] = user && (
-      user.is_courier ? [this.tabs.courierPackages]
-      : user.is_sender ? [this.tabs.senderPackages]
-      : []
-    ).concat([this.tabs.notes]);
+    const tabs: any[] = [this.tabs.notes];
+    if (user && user.is_courier) tabs.unshift(this.tabs.courierPackages);
+    if (user && user.is_sender) tabs.unshift(this.tabs.senderPackages);
+
+    const TabsUI = () => {
+      const history = useHistory();
+      return <FVHTabsUI user={user} tabs={tabs} onLogout={this.logout} onLogin={() => history.push('/login/')}/>
+    };
 
     return <AppContext.Provider value={{user}}>
       <Router>
@@ -94,11 +97,7 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
             <ResetPassword/>
           </Route>
           <Route exact path=''>
-            {dataFetched
-              ? user
-                ? <FVHTabsUI user={user} tabs={tabs} onLogout={this.logout}/>
-                : <Redirect to="/login/" />
-              : <LoadScreen/>}
+            <TabsUI/>
           </Route>
         </Switch>
       </Router>

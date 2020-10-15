@@ -8,7 +8,7 @@ import NavBar from "util_components/bootstrap/NavBar";
 import {User} from "components/types";
 
 type FVHTabsUIProps = {
-  user: User,
+  user?: User,
   tabs: {
     ChildComponent: any,
     header: string,
@@ -17,7 +17,8 @@ type FVHTabsUIProps = {
     menuText: string,
     fullWidth?: boolean
   }[],
-  onLogout: () => any
+  onLogout: () => any,
+  onLogin: () => any
 }
 
 type State = { showLogout: boolean, menuOpen: boolean };
@@ -51,9 +52,9 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, State> {
           <Switch>
             {tabs.map(({header, ChildComponent, childProps, fullWidth}) =>
               <Route key={header} path={`/${header}/`}>
-                <NavBar onIconClick={() => this.setState({showLogout: true})}
-                        icon={user.is_courier ? "directions_bike" : "account_circle"}
-                        iconText={user.username}>
+                <NavBar onIconClick={this.onNavIconClick}
+                        icon={user ? (user.is_courier ? "directions_bike" : "account_circle") : "login"}
+                        iconText={user ? user.username : 'Sign in'}>
                   {(tabs.length < 2) ? <h5 className="m-2">{header}</h5> :
                     <div className="dropdown show">
                       <h5 className="mt-1 clickable" onClick={() => this.setState({menuOpen: !menuOpen})}>
@@ -91,5 +92,10 @@ export default class FVHTabsUI extends React.Component<FVHTabsUIProps, State> {
         }
       </div>
     );
+  }
+
+  onNavIconClick = () => {
+    if (this.props.user) this.setState({showLogout: true});
+    else this.props.onLogin()
   }
 }
