@@ -40,7 +40,7 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
   render() {
     const {schema, osmFeatureName, osmImageNote} = this.props;
     const {user} = this.context;
-    const editable = user.is_reviewer || !osmImageNote.id;
+    const editable = (user && user.is_reviewer) || !osmImageNote.id;
     const {editingFeature} = this.state;
     // @ts-ignore
     const pkFeatures = (osmImageNote[(this.getFeatureListFieldName())] || []) as PKFeature[];

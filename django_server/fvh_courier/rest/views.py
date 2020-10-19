@@ -132,7 +132,7 @@ class MyLocationView(RetrieveUpdateDestroyAPIView):
 
 
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     serializer_class = OSMImageNoteWithPropsSerializer
     queryset = models.OSMImageNote.objects.filter(visible=True).prefetch_related('tags')
 
@@ -143,12 +143,6 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, self.serializer_class)
-
-    def get_permissions(self):
-        if self.action in ['retrieve', 'list', 'property_schemas']:
-            return [permissions.AllowAny()]
-        else:
-            return super().get_permissions()
 
     def create(self, request, *args, **kwargs):
         self.ensure_features(request)
@@ -165,8 +159,9 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         osm_image_note = serializer.save()
-        osm_image_note.created_by = self.request.user
-        osm_image_note.modified_by = self.request.user
+        if not self.request.user.is_anonymous:
+            osm_image_note.created_by = self.request.user
+            osm_image_note.modified_by = self.request.user
         osm_image_note.save()
 
     def perform_update(self, serializer):

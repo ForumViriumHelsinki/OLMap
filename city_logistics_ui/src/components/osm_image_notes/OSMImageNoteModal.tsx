@@ -79,7 +79,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
         : nearbyFeatures;
 
     // @ts-ignore
-    const credit = `${note.created_by.username} on ${formatTimestamp(note.created_at)}`;
+    const credit = `${note.created_by ? note.created_by.username: 'Anonymous'} on ${formatTimestamp(note.created_at)}`;
 
     const title = <>
       {showOnMap && <span className="clickable text-primary" onClick={showOnMap}><Icon icon="place"/></span>}
