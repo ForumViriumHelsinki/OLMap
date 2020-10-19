@@ -31,7 +31,7 @@ export default class OSMImageNoteComments extends React.Component<OSMImageNoteCo
     return <>
       {comments.map(comment =>
         <div key={comment.id} className="mb-2 mt-2">
-          <strong>{comment.user} {formatTimestamp(comment.created_at)}:</strong><br/>
+          <strong>{comment.user || 'Anonymous'} {formatTimestamp(comment.created_at)}:</strong><br/>
           {comment.comment}
         </div>
       )}

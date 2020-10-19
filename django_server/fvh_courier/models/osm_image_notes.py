@@ -106,7 +106,7 @@ class ImageNoteDownvote(base.Model):
 
 
 class OSMImageNoteComment(base.Model):
-    user = models.ForeignKey(User, related_name='image_note_comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='image_note_comments', on_delete=models.CASCADE, null=True)
     image_note = models.ForeignKey(OSMImageNote, related_name='comments', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     comment = models.TextField()

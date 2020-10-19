@@ -226,13 +226,17 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
 
 class OSMImageNoteCommentsViewSet(viewsets.ModelViewSet):
     queryset = models.OSMImageNoteComment.objects.all().select_related('user')
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     serializer_class = OSMImageNoteCommentSerializer
 
     def get_queryset(self):
+        if self.request.user.is_anonymous:
+            return self.queryset.none()
         return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
+        if self.request.user.is_anonymous:
+            return serializer.save()
         return serializer.save(user=self.request.user)
 
 
