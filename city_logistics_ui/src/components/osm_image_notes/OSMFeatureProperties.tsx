@@ -8,6 +8,7 @@ import {AppContext, JSONSchema, OSMImageNote} from "components/types";
 import {Button} from "reactstrap";
 import {OSMFeature} from "util_components/osm/types";
 import ConfirmButton from "util_components/bootstrap/ConfirmButton";
+import {userCanEditNote} from "components/osm_image_notes/utils";
 
 type PKFeature = {[field: string]: any}
 
@@ -40,7 +41,7 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
   render() {
     const {schema, osmFeatureName, osmImageNote} = this.props;
     const {user} = this.context;
-    const editable = (user && user.is_reviewer) || !osmImageNote.id;
+    const editable = userCanEditNote(user, osmImageNote);
     const {editingFeature} = this.state;
     // @ts-ignore
     const pkFeatures = (osmImageNote[(this.getFeatureListFieldName())] || []) as PKFeature[];

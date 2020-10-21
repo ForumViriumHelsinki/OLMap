@@ -20,6 +20,7 @@ import OSMImageNoteComments from "components/osm_image_notes/OSMImageNoteComment
 import AssociateEntranceModal from "components/osm_image_notes/AssociateEntranceModal";
 import {OSMFeature} from "util_components/osm/types";
 import {formatTimestamp} from "utils";
+import {userCanEditNote} from "./utils";
 import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
 
 type OSMImageNoteModalProps = {
@@ -32,7 +33,7 @@ type OSMImageNoteModalProps = {
 
 type OSMImageNoteModalState = {
   note?: OSMImageNote,
-  readOnly: boolean,
+  editingRelatedPlaces: boolean,
   error: boolean
   nearbyFeatures: OSMFeature[],
   nearbyAddresses: OSMFeature[],
@@ -41,7 +42,7 @@ type OSMImageNoteModalState = {
 }
 
 const initialState: OSMImageNoteModalState = {
-  readOnly: true,
+  editingRelatedPlaces: false,
   error: false,
   nearbyFeatures: [],
   nearbyAddresses: [],
@@ -62,17 +63,18 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
 
   render() {
     const {osmFeatureProperties, onClose, showOnMap, requestLocation} = this.props;
-    const {note, readOnly, error, nearbyFeatures, nearbyAddresses, linkingEntrance, repositioning} = this.state;
+    const {note, editingRelatedPlaces, error, nearbyFeatures, nearbyAddresses, linkingEntrance, repositioning} = this.state;
     const {user} = this.context;
-    const reviewer = user && user.is_reviewer;
 
     if (repositioning || !note) return null;
+
+    const canEdit = userCanEditNote(user, note);
 
     const location = [note.lon, note.lat] as LocationTuple;
 
     const tags = note.tags || [];
 
-    const editable = reviewer && readOnly;
+    const canEditRelatedPlaces = canEdit && !editingRelatedPlaces;
     const relatedFeatures =
       note.osm_features
         ? nearbyFeatures.filter(f => note.osm_features.includes(f.id))
@@ -89,7 +91,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
         <Icon icon="link"/>
       </span>
       {' '}
-      {requestLocation && user &&
+      {requestLocation && canEdit &&
         <span className="clickable text-primary ml-1" onClick={this.adjustPosition}>
           <Icon icon="open_with"/>
         </span>}
@@ -103,7 +105,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
     const modalCls = note.image ? 'modal-xl' : 'modal-dialog-centered';
 
     return <Modal title={title} className={modalCls} onClose={onClose}>
-        {reviewer &&
+        {canEdit &&
           <OSMImageNoteReviewActions imageNote={note} onReviewed={onClose}/>
         }
         <OSMImageNoteVotes osmImageNote={note} onUpdate={this.fetchNote}/>
@@ -112,19 +114,19 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
         <>
           <p className="m-2 ml-3"><strong>Tags:</strong></p>
           <p className="m-2 ml-3">
-             <OSMImageNoteTags {...{tags, osmFeatureProperties}} readOnly={!reviewer}
+             <OSMImageNoteTags {...{tags, osmFeatureProperties}} readOnly={!canEdit}
                                onChange={tags => this.updateSelectedNote({tags})}/>
           </p>
         </>
-        <div onClick={() => editable && this.setState({readOnly: false})}
-             className={editable ? "clickable": ''}>
+        <div onClick={() => canEditRelatedPlaces && this.setState({editingRelatedPlaces: true})}
+             className={canEditRelatedPlaces ? "clickable": ''}>
           <div className="list-group-item">
             <strong>Related places:</strong>
-            {editable && <div className="float-right"><Icon icon={'edit'}/></div>}
-            {!readOnly &&
+            {canEditRelatedPlaces && <div className="float-right"><Icon icon={'edit'}/></div>}
+            {editingRelatedPlaces &&
               <div className="float-right">
                 <button className="btn btn-light btn-sm btn-compact"
-                        onClick={() => this.setState({readOnly: true})}>
+                        onClick={() => this.setState({editingRelatedPlaces: false})}>
                   Close <Icon icon={'close'}/>
                 </button>
               </div>
@@ -136,7 +138,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
           <OSMFeaturesSelection
             location={location}
             extraFeatures={nearbyAddresses}
-            onChange={this.onFeaturesSelected} readOnly={readOnly}
+            onChange={this.onFeaturesSelected} readOnly={!editingRelatedPlaces}
             maxHeight={null}
             preselectedFeatureIds={note.osm_features}
             onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
@@ -149,7 +151,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
                   </button>
             }/>
         </div>
-        {reviewer && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
+        {canEdit && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
           <div key={osmFeatureName} className="mr-2 ml-3">
               <OSMFeatureProperties
                 schema={osmFeatureProperties[osmFeatureName]}

@@ -13,7 +13,7 @@ from .serializers import (
     PackageSerializer, OutgoingPackageSerializer, LocationSerializer,
     OSMImageNoteWithPropsSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer,
     OSMFeatureSerializer, BaseOSMImageNoteSerializer, AddressAsOSMNodeSerializer)
-from .permissions import IsCourier, IsReviewer
+from .permissions import IsCourier, IsReviewer, IsReviewerOrCreator
 
 
 class PackagesViewSetMixin:
@@ -141,6 +141,16 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         'list': BaseOSMImageNoteSerializer
     }
 
+    def get_permissions(self):
+        if self.action in ['update', 'partial_update', 'hide_note', 'mark_processed']:
+            return [IsReviewerOrCreator()]
+        elif self.action in ['upvote', 'downvote']:
+            return [permissions.IsAuthenticated()]
+        elif self.action == ['mark_reviewed']:
+            return [IsReviewer()]
+        else:
+            return super().get_permissions()
+
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, self.serializer_class)
 
@@ -148,7 +158,6 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         self.ensure_features(request)
         return super().create(request, *args, **kwargs)
 
-    @decorators.permission_classes([IsReviewer])
     def update(self, request, *args, **kwargs):
         self.ensure_features(request)
         return super().update(request, *args, **kwargs)
@@ -166,11 +175,11 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         osm_image_note = serializer.save()
-        osm_image_note.modified_by = self.request.user
+        if not self.request.user.is_anonymous:
+            osm_image_note.modified_by = self.request.user
         osm_image_note.save()
 
     @action(methods=['PUT'], detail=True)
-    @decorators.permission_classes([IsReviewer])
     def mark_reviewed(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
         if not osm_image_note.processed_by:
@@ -180,7 +189,6 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response('OK')
 
     @action(methods=['PUT'], detail=True)
-    @decorators.permission_classes([IsReviewer])
     def mark_processed(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
         osm_image_note.processed_by = request.user
@@ -188,7 +196,6 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response('OK')
 
     @action(methods=['PUT'], detail=True)
-    @decorators.permission_classes([IsReviewer])
     def hide_note(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
         osm_image_note.reviewed_by = request.user

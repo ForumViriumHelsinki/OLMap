@@ -1,5 +1,5 @@
 import React from 'react';
-import {OSMImageNote} from "components/types";
+import {AppContext, OSMImageNote} from "components/types";
 import Icon from "util_components/bootstrap/Icon";
 
 // @ts-ignore
@@ -26,11 +26,13 @@ const initialState: ReviewActionsState = {
 };
 
 export default class OSMImageNoteReviewActions extends React.Component<ReviewActionsProps, ReviewActionsState> {
+  static contextType = AppContext;
   state = initialState;
 
   render() {
     const {imageNote} = this.props;
     const {confirmAccept, confirmReject, confirmProcessed} = this.state;
+    const {user} = this.context;
 
     const osm_edit_url =
       `https://www.openstreetmap.org/edit#map=20/${imageNote.lat}/${imageNote.lon}`;
@@ -49,7 +51,7 @@ export default class OSMImageNoteReviewActions extends React.Component<ReviewAct
           </Button>
         }
 
-        {!imageNote.is_reviewed &&
+        {!imageNote.is_reviewed && user && user.is_reviewer &&
           <Button outline color="success" className="btn-compact" size="sm"
                   onClick={() => this.setState({confirmAccept: true})}>
             <Icon icon="done"/> Accept

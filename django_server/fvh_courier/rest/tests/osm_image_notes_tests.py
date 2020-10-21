@@ -59,6 +59,46 @@ class OSMImageNotesTests(FVHAPITestCase):
         note = models.OSMImageNote.objects.get()
         self.assertEqual(note.image.name, f'osm_image_notes/{note.id}/image.png')
 
+    def test_save_anonymous_osm_image_note(self):
+        # Given that no user is signed in
+        # When requesting to save an OSM image note over ReST
+        url = reverse('osmimagenote-list')
+        fields = {
+            'lat': '60.16134701761975',
+            'lon': '24.944593941327188',
+            'comment': 'Nice view',
+            'osm_features': [3330783778, 3336789583, 3330783754],
+            'tags': ['Entrance', 'Steps']
+        }
+        response = self.client.post(url, data=fields, format='json')
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        # And a note is created in db:
+        note = models.OSMImageNote.objects.get()
+
+        # And it registers no user as the creator of the note:
+        self.assertEqual(note.created_by_id, None)
+        self.assertEqual(note.modified_by_id, None)
+
+        # And it creates any passed tags:
+        self.assertSetEqual(set(note.tags.values_list('tag', flat=True)), set(fields['tags']))
+
+        # And when subsequently requesting to attach an image to the note
+        with open(os.path.join(os.path.dirname(__file__), 'test_image.png'), 'rb') as file:
+            file_content = file.read()
+        uploaded_file = SimpleUploadedFile("image.png", file_content, content_type="image/png")
+        url = reverse('osmimagenote-detail', kwargs={'pk': note.id})
+        response = self.client.patch(url, data={'image': uploaded_file}, format='multipart')
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        # And a note is updated in db:
+        note = models.OSMImageNote.objects.get()
+        self.assertEqual(note.image.name, f'osm_image_notes/{note.id}/image.png')
+
     def test_save_osm_image_note_with_no_features(self):
         # Given that a user is signed in
         courier = self.create_and_login_courier()
@@ -84,7 +124,8 @@ class OSMImageNotesTests(FVHAPITestCase):
         courier = self.create_and_login_courier()
 
         # And given a successfully created OSM image note
-        note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188')
+        note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188',
+                                                  created_by=courier.user)
 
         # When requesting to update an OSM image note over ReST, giving a list of features to which to link
         url = reverse('osmimagenote-detail', kwargs={'pk': note.id})
@@ -107,12 +148,30 @@ class OSMImageNotesTests(FVHAPITestCase):
         # And the image note is included in the response:
         self.assertEqual(response.json()['image_notes'][0]['id'], note.id)
 
+    def test_update_osm_image_note_features_anonymously(self):
+        # Given that no user is signed in
+        # And given a successfully created OSM image note
+        note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188',
+                                                  created_by=self.create_courier().user)
+
+        # When requesting to update an OSM image note over ReST, giving a list of features to which to link
+        url = reverse('osmimagenote-detail', kwargs={'pk': note.id})
+        response = self.client.patch(url, data={'osm_features': [37812542837, 12735437812]}, format='json')
+
+        # Then a 401 response is received:
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+        # And the note is not updated in db:
+        note = models.OSMImageNote.objects.get()
+        self.assertEqual(note.osm_features.count(), 0)
+
     def test_update_osm_image_note_tags(self):
         # Given that a user is signed in
         courier = self.create_and_login_courier()
 
         # And given a successfully created OSM image note
-        note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188')
+        note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188',
+                                                  created_by=courier.user)
 
         # When requesting to update an OSM image note over ReST, giving a list of tags to add
         url = reverse('osmimagenote-detail', kwargs={'pk': note.id})

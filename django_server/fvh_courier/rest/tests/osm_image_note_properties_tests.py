@@ -73,7 +73,8 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
         courier = self.create_and_login_courier()
 
         # And given a successfully created OSM image note with some saved properties
-        note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188')
+        note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188',
+                                                  created_by=courier.user)
         note.entrance_set.create(**{
             'street': 'Unioninkatu',
             'housenumber': '24',
