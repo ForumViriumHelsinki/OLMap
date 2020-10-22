@@ -12,7 +12,8 @@ from fvh_courier import models
 from .serializers import (
     PackageSerializer, OutgoingPackageSerializer, LocationSerializer,
     OSMImageNoteWithPropsSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer,
-    OSMFeatureSerializer, BaseOSMImageNoteSerializer, AddressAsOSMNodeSerializer)
+    OSMFeatureSerializer, BaseOSMImageNoteSerializer, AddressAsOSMNodeSerializer,
+    DictOSMImageNoteSerializer)
 from .permissions import IsCourier, IsReviewer, IsReviewerOrCreator
 
 
@@ -134,12 +135,18 @@ class MyLocationView(RetrieveUpdateDestroyAPIView):
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
     serializer_class = OSMImageNoteWithPropsSerializer
-    queryset = models.OSMImageNote.objects.filter(visible=True).prefetch_related('tags')
+    queryset = models.OSMImageNote.objects.filter(visible=True)
 
     # Use simple serializer for list to improve performance:
     serializer_classes = {
-        'list': BaseOSMImageNoteSerializer
+        'list': DictOSMImageNoteSerializer
     }
+
+    def get_queryset(self):
+        if self.action == 'list':
+            # Fetch list as dicts rather than object instances for a bit more speed:
+            return super().get_queryset().values()
+        return super().get_queryset()
 
     def get_permissions(self):
         if self.action in ['update', 'partial_update', 'hide_note', 'mark_processed']:

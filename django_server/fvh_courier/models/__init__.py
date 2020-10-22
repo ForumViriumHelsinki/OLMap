@@ -1,5 +1,5 @@
 from .osm_image_notes import (
-    OSMFeature, OSMImageNote, ImageNoteTag, upload_osm_images_to,
+    OSMFeature, OSMImageNote, upload_osm_images_to,
     ImageNoteUpvote, ImageNoteDownvote, OSMImageNoteComment)
 from .courier_models import CourierCompany, Courier, Sender
 from .package_models import Package, PackageSMS

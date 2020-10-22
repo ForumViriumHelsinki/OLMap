@@ -43,7 +43,7 @@ class OSMImageNotesTests(FVHAPITestCase):
         self.assertEqual(note.modified_by_id, courier.user_id)
 
         # And it creates any passed tags:
-        self.assertSetEqual(set(note.tags.values_list('tag', flat=True)), set(fields['tags']))
+        self.assertSetEqual(set(note.tags), set(fields['tags']))
 
         # And when subsequently requesting to attach an image to the note
         with open(os.path.join(os.path.dirname(__file__), 'test_image.png'), 'rb') as file:
@@ -83,7 +83,7 @@ class OSMImageNotesTests(FVHAPITestCase):
         self.assertEqual(note.modified_by_id, None)
 
         # And it creates any passed tags:
-        self.assertSetEqual(set(note.tags.values_list('tag', flat=True)), set(fields['tags']))
+        self.assertSetEqual(set(note.tags), set(fields['tags']))
 
         # And when subsequently requesting to attach an image to the note
         with open(os.path.join(os.path.dirname(__file__), 'test_image.png'), 'rb') as file:
@@ -183,7 +183,7 @@ class OSMImageNotesTests(FVHAPITestCase):
 
         # And the passed tags are created:
         note = models.OSMImageNote.objects.get()
-        self.assertSetEqual(set(note.tags.values_list('tag', flat=True)), set(fields['tags']))
+        self.assertSetEqual(set(note.tags), set(fields['tags']))
 
         # And when subsequently requesting to update the note, giving another list of tags
         fields = {'tags': ['Entrance']}
@@ -194,7 +194,7 @@ class OSMImageNotesTests(FVHAPITestCase):
 
         # And the tags have been changed:
         note = models.OSMImageNote.objects.get()
-        self.assertSetEqual(set(note.tags.values_list('tag', flat=True)), set(fields['tags']))
+        self.assertSetEqual(set(note.tags), set(fields['tags']))
 
     def test_review_features(self):
         # Given that a reviewer user is signed in

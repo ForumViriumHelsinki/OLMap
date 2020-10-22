@@ -2,6 +2,7 @@ from io import BytesIO
 
 from PIL import Image as Img, UnidentifiedImageError, ExifTags
 from django.contrib.auth.models import User
+from django.contrib.postgres.fields import ArrayField
 from django.core.files import File
 from django.db import models
 
@@ -26,6 +27,7 @@ class OSMImageNote(TimestampedModel):
     lon = models.DecimalField(max_digits=11, decimal_places=8)
     image = models.ImageField(null=True, blank=True, upload_to=upload_osm_images_to)
     comment = models.TextField(blank=True)
+    tags = ArrayField(base_field=models.CharField(max_length=64), default=list)
     osm_features = models.ManyToManyField(OSMFeature, blank=True, related_name='image_notes')
 
     created_by = models.ForeignKey(
@@ -85,14 +87,6 @@ class OSMImageNote(TimestampedModel):
 
     def is_processed(self):
         return bool(self.processed_by_id)
-
-
-class ImageNoteTag(base.Model):
-    tag = models.CharField(max_length=64)
-    image_note = models.ForeignKey(OSMImageNote, related_name='tags', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return self.tag or super().__str__()
 
 
 class ImageNoteUpvote(base.Model):

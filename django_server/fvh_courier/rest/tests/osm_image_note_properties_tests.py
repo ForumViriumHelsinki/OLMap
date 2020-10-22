@@ -36,7 +36,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
         note = models.OSMImageNote.objects.get()
 
         # And it creates any passed tags:
-        self.assertSetEqual(set(note.tags.values_list('tag', flat=True)), set(fields['tags']))
+        self.assertSetEqual(set(note.tags), set(fields['tags']))
 
         # And it creates the passed properties:
         self.assertEqual(note.entrance_set.count(), 1)

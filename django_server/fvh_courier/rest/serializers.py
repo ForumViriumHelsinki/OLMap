@@ -170,14 +170,6 @@ class ImageNotePropertiesSerializer(serializers.ModelSerializer):
         return PropSerializer
 
 
-class CreateableSlugRelatedField(serializers.SlugRelatedField):
-    def to_internal_value(self, data):
-        try:
-            return self.get_queryset().model(**{self.slug_field: data})
-        except (TypeError, ValueError):
-            self.fail('invalid')
-
-
 class OSMImageNoteCommentSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(slug_field='username', read_only=True)
 
@@ -187,9 +179,6 @@ class OSMImageNoteCommentSerializer(serializers.ModelSerializer):
 
 
 class BaseOSMImageNoteSerializer(serializers.ModelSerializer):
-    tags = CreateableSlugRelatedField(
-        many=True, required=False, slug_field='tag', queryset=models.ImageNoteTag.objects.all())
-
     class Meta:
         model = models.OSMImageNote
         fields = ['id', 'comment', 'image', 'lat', 'lon', 'is_reviewed', 'is_processed', 'created_by', 'tags']
@@ -197,6 +186,12 @@ class BaseOSMImageNoteSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         result = super().to_representation(instance)
         return OrderedDict([(key, result[key]) for key in result if result[key] not in [None, []]])
+
+
+class DictOSMImageNoteSerializer(BaseOSMImageNoteSerializer):
+    is_reviewed = serializers.BooleanField(read_only=True, source='reviewed_by_id')
+    is_processed = serializers.BooleanField(read_only=True, source='processed_by_id')
+    created_by = serializers.IntegerField(read_only=True, source='created_by_id')
 
 
 class OSMImageNoteSerializer(BaseOSMImageNoteSerializer):
@@ -229,11 +224,9 @@ class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImage
                   [manager_name(prop_type) for prop_type in models.image_note_property_types])
 
     def create(self, validated_data):
-        tags = validated_data.pop('tags', None)
         relateds = self.extract_related_properties(validated_data)
         instance = super().create(validated_data)
         self.save_related_properties(instance, relateds, new=True)
-        self.save_tags(instance, tags)
         return instance
 
     def save_related_properties(self, instance, relateds, new=False):
@@ -252,17 +245,8 @@ class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImage
                 relateds[field] = validated_data.pop(field, [])
         return relateds
 
-    def save_tags(self, instance, tags):
-        if not tags:
-            return
-        instance.tags.all().delete()
-        for tag in tags:
-            tag.image_note = instance
-            tag.save()
-
     def update(self, instance, validated_data):
         relateds = self.extract_related_properties(validated_data)
-        self.save_tags(instance, validated_data.get('tags', None))
         self.save_related_properties(instance, relateds)
         return super().update(instance, validated_data)
 
