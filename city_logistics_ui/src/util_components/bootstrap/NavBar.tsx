@@ -1,13 +1,9 @@
 import React from "react";
 import Icon from "util_components/bootstrap/Icon";
 
-type NavBarProps = { icon: string, iconText: string, onIconClick: () => any };
+type NavBarProps = { icon: string, iconText: string, onIconClick?: () => any };
 
 export default class NavBar extends React.Component<NavBarProps> {
-  static defaultProps = {
-    onIconClick: () => null
-  };
-
   render() {
     const {icon, iconText, onIconClick, children} = this.props;
 
