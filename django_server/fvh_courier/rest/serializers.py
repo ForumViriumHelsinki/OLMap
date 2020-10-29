@@ -193,6 +193,14 @@ class DictOSMImageNoteSerializer(BaseOSMImageNoteSerializer):
     is_processed = serializers.BooleanField(read_only=True, source='processed_by_id')
     created_by = serializers.IntegerField(read_only=True, source='created_by_id')
 
+    false_default_fields = ['is_reviewed', 'is_processed']
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        for field in self.false_default_fields:
+            result.setdefault(field, False)
+        return result
+
 
 class OSMImageNoteSerializer(BaseOSMImageNoteSerializer):
     upvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
