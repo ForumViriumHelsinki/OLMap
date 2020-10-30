@@ -84,7 +84,7 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
       return <FVHTabsUI user={user} tabs={tabs} onLogout={this.logout} onLogin={() => history.push('/login/')}/>
     };
 
-    return <AppContext.Provider value={{user}}>
+    return dataFetched ? <AppContext.Provider value={{user}}>
       <Router>
         <Switch>
           <Route path='/login/'>
@@ -101,7 +101,7 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
           </Route>
         </Switch>
       </Router>
-    </AppContext.Provider>;
+    </AppContext.Provider> : <LoadScreen/>;
   }
 }
 
