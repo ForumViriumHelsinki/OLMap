@@ -19,7 +19,8 @@ class PackageSMSInline(admin.TabularInline):
 @admin.register(models.Package)
 class PackageAdmin(admin.ModelAdmin):
     list_display = ['created_at', 'delivered_time', 'pickup_at', 'deliver_to', 'sender', 'recipient', 'courier']
-    list_select_related = ['sender__user', 'courier__user']
+    list_select_related = ['sender__user', 'courier__user', 'pickup_at', 'deliver_to']
+    raw_id_fields = ['pickup_at', 'deliver_to']
     search_fields = [
         'pickup_at__street_address', 'deliver_to__street_address',
         'sender__user__username', 'sender__user__first_name', 'sender__user__last_name',
