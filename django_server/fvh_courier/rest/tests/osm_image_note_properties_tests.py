@@ -155,7 +155,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
                 'properties': dict(address_fields, **lockable_fields, **{
                     'type': {
                         'type': 'string',
-                        'enum': ['', 'main', 'secondary', 'service', 'staircase'],
+                        'enum': ['', 'main', 'secondary', 'service', 'staircase', 'garage'],
                         'title': 'Type'},
                     'wheelchair': {'type': ['boolean', 'null'], 'title': 'Wheelchair'},
                     'loadingdock': {'type': 'boolean', 'title': 'Loadingdock'},
