@@ -1,6 +1,8 @@
 import datetime
 import re
 
+from django.conf import settings
+from django.core.mail import send_mail, mail_admins
 from django.db import models
 from django.utils import timezone
 
@@ -112,6 +114,7 @@ class HolviPackage(models.Model):
         self.save()
         CourierCompany.notify_new_package(self.package)
         PackageSMS.notify_sender_of_order(self.package)
+        mail_admins('New package for delivery', f'{Package.objects.count()} total packages.')
         return self.package
 
 
