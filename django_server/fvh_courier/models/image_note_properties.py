@@ -85,7 +85,7 @@ class Lockable(models.Model):
 class Entrance(Lockable, BaseAddress):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Key:entrance'
 
-    types = ['main', 'secondary', 'service', 'staircase']
+    types = ['main', 'secondary', 'service', 'staircase', 'garage']
     type = choices_field(types)
     wheelchair = models.BooleanField(blank=True, null=True)
     loadingdock = models.BooleanField(default=False)
