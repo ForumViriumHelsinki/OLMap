@@ -74,17 +74,26 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
 
   refreshNote(note: OSMImageNote) {
     return sessionRequest(osmImageNoteUrl(note.id as number))
-      .then(response => response.json())
-      .then(note => {
+      .then(response => {
         if (!this.state.osmImageNotes) return;
-        // Align created_by with how it is serialized in the note list response:
-        if (note.created_by && typeof note.created_by !== "number") note.created_by = note.created_by.id;
         const osmImageNotes = this.state.osmImageNotes.slice();
         const index = osmImageNotes.findIndex(note2 => note2.id == note.id);
-        osmImageNotes.splice(index, 1, note);
-        this.setState({osmImageNotes});
-        this.props.onMapLayerLoaded(this.getMapLayer());
-      });
+
+        if (response.status == 404) { // The note has been rejected
+          osmImageNotes.splice(index, 1);
+          this.setState({osmImageNotes});
+          this.props.onMapLayerLoaded(this.getMapLayer());
+        }
+
+        else if (response.status == 200)
+          response.json().then(note => {
+            // Align created_by with how it is serialized in the note list response:
+            if (note.created_by && typeof note.created_by !== "number") note.created_by = note.created_by.id;
+            osmImageNotes.splice(index, 1, note);
+            this.setState({osmImageNotes});
+            this.props.onMapLayerLoaded(this.getMapLayer());
+          });
+      })
   }
 
   addNote(note: OSMImageNote) {
