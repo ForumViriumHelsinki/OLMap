@@ -8,7 +8,7 @@ import * as L from 'leaflet';
 import _ from 'lodash';
 
 import sessionRequest from "sessionRequest";
-import {osmFeaturePropertiesUrl, osmImageNotesUrl} from "urls";
+import {osmFeaturePropertiesUrl, osmImageNotesUrl, osmImageNoteUrl} from "urls";
 import {OSMFeatureProps, OSMImageNote} from "components/types";
 
 import 'components/osm_image_notes/OSMImageNotes.css';
@@ -67,9 +67,24 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
       if (response.status < 300)
         response.json().then((osmImageNotes: OSMImageNote[]) => {
           this.setState({osmImageNotes});
-          this.props.onMapLayerLoaded(this.getMapLayer())
+          this.props.onMapLayerLoaded(this.getMapLayer());
         });
     })
+  }
+
+  refreshNote(note: OSMImageNote) {
+    return sessionRequest(osmImageNoteUrl(note.id as number))
+      .then(response => response.json())
+      .then(note => {
+        if (!this.state.osmImageNotes) return;
+        // Align created_by with how it is serialized in the note list response:
+        if (note.created_by.id) note.created_by = note.created_by.id;
+        const osmImageNotes = this.state.osmImageNotes.slice();
+        const index = osmImageNotes.findIndex(note2 => note2.id == note.id);
+        osmImageNotes.splice(index, 1, note);
+        this.setState({osmImageNotes});
+        this.props.onMapLayerLoaded(this.getMapLayer());
+      });
   }
 
   render() {
@@ -83,7 +98,7 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
         {osmImageNotes.map(note =>
           <Route key={note.id} path={`/Notes/${note.id}/`}>
             <OSMImageNoteModal osmFeatureProperties={osmFeatureProperties} note={note}
-                               onClose={() => {this.loadImageNotes(); history.push('/Notes/')}}
+                               onClose={() => {this.refreshNote(note); history.push('/Notes/')}}
                                showOnMap={() => {showLocation(note); history.push('/Notes/')}}
                                requestLocation={requestLocation}/>
           </Route>
@@ -91,11 +106,6 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
       </Switch>
     </Router>;
   }
-
-  refresh = () => {
-    this.setState(initialState);
-    this.loadImageNotes();
-  };
 
   private getMapLayer() {
     const {filters, history} = this.props;
