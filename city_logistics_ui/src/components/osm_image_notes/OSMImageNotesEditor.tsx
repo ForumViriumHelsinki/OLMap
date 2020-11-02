@@ -340,24 +340,29 @@ export default class OSMImageNotesEditor extends Component<{}> {
     sessionRequest(osmImageNotesUrl, {method: 'POST', data: fields})
     .then((response: any) => {
       if ((response.status >= 300)) return this.setState({error: true, submitting: false});
+      response.json().then((data: OSMImageNote) => {
+        this.setState({...resetState, status: "thanks"});
 
-      this.setState({...resetState, status: "thanks"});
+        if (!image) {
+          if (this.imageNotesRef.current) // @ts-ignore
+            this.imageNotesRef.current.addNote(data);
+          return;
+        }
 
-      if (!image) return this.reloadNotes();
-
-      else response.json().then((data: OSMImageNote) => {
         let formData = new FormData();
         formData.append('image', image);
-        this.setState({imagesUploading: imagesUploading.concat([data])})
+        this.setState({imagesUploading: imagesUploading.concat([data])});
         sessionRequest(osmImageNoteUrl(data.id as number), {method: 'PATCH', body: formData})
-          .then((response: any) => {
-            const uploading = this.state.imagesUploading.slice();
-            uploading.splice(uploading.indexOf(data, 1))
-            this.setState({imagesUploading: uploading});
+        .then((response: any) => {
+          const uploading = this.state.imagesUploading.slice();
+          uploading.splice(uploading.indexOf(data, 1));
+          this.setState({imagesUploading: uploading});
 
-            if ((response.status >= 300)) this.setState({imageError: true});
-            else this.reloadNotes();
-          });
+          if ((response.status >= 300)) this.setState({imageError: true});
+          else if (this.imageNotesRef.current) { // @ts-ignore
+            this.imageNotesRef.current.addNote(data);
+          }
+        });
       });
     });
   }
