@@ -16,3 +16,9 @@ __pycache__
 /tunnel_db.sh
 /update_qa_server.sh
 /update_prod_server.sh
+/scripts/all_entrances.json
+/scripts/common_entrances.json
+/scripts/osoitehaavi-hki.gpkg
+/scripts/hki_osoiteluettelo_cleaned.json
+/scripts/hki_osoiteluettelo.json
+/scripts/entrances_with_distance.json
