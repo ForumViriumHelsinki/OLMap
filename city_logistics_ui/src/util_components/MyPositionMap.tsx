@@ -38,7 +38,7 @@ export default class MyPositionMap extends React.Component<MapProps, {currentPos
 
   render() {
     const {requestLocation, extraLayers} = this.props;
-    const {userMovedMap, currentPosition} = this.state;
+    const {currentPosition} = this.state;
     const latlng = this.getInitialPosition();
 
     return <div className="position-relative">
