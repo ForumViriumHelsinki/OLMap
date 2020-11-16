@@ -172,7 +172,8 @@ export default class OSMImageNotesEditor extends Component<{}> {
                   </DropdownItem>
                   <DropdownItem divider/>
                   {osmFeatureProperties && Object.keys(osmFeatureProperties).map((tag) =>
-                    <DropdownItem className={(filters.tags && filters.tags.includes(tag)) ? 'text-primary' : ''}
+                    <DropdownItem key={tag}
+                                  className={(filters.tags && filters.tags.includes(tag)) ? 'text-primary' : ''}
                                   onClick={() => this.toggleFilter({tags: tag})}>
                       {tag}
                     </DropdownItem>

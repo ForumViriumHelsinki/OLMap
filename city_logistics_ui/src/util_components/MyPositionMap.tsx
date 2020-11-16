@@ -49,9 +49,9 @@ export default class MyPositionMap extends React.Component<MapProps, {currentPos
             </Button>
         </div>
       }
-      {userMovedMap &&
+      {currentPosition &&
         <div className="position-absolute" style={{zIndex: 401, right: 12, bottom: 36}}>
-            <Button color="primary" size="sm" onClick={() => this.setState({userMovedMap: false})}>
+            <Button color="primary" size="sm" onClick={this.gotoMyLocation}>
               <i className="material-icons">my_location</i>
             </Button>
         </div>
@@ -134,6 +134,14 @@ export default class MyPositionMap extends React.Component<MapProps, {currentPos
   showLocation(location: any) {
     if (this.leafletMap) this.leafletMap.setView(location, 20);
   }
+
+  gotoMyLocation = () => {
+    const {currentPosition} = this.state;
+    if (!currentPosition) return;
+    // @ts-ignore
+    const currentLatLng =  [currentPosition.lat, currentPosition.lon];
+    this.leafletMap.setView(currentLatLng, 18);
+  };
 
   showPoints(points: any[]) {
     if (this.leafletMap) {
