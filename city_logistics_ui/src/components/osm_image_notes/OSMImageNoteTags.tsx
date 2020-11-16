@@ -15,7 +15,7 @@ const defaultTags = ['Problem'];
 export default class OSMImageNoteTags extends React.Component<OSMImageNoteTagsProps> {
   render() {
     const {osmFeatureProperties, tags, readOnly} = this.props;
-    const tagOptions = defaultTags.concat(osmFeatureProperties ? Object.keys(osmFeatureProperties) : []);
+    const tagOptions = osmFeatureProperties ? defaultTags.concat(Object.keys(osmFeatureProperties)) : tags;
     return readOnly ?
       (tags.length > 0) ? <PillsSelection options={tags} selected={tags}/>
       : 'No tags selected.'
