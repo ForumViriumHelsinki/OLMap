@@ -28,7 +28,8 @@ type OSMImageNoteModalProps = {
   note: OSMImageNote,
   onClose: () => any,
   showOnMap?: () => any,
-  requestLocation?: (initial: any) => Promise<any>
+  requestLocation?: (initial: any) => Promise<any>,
+  fullScreen?: boolean
 }
 
 type OSMImageNoteModalState = {
@@ -62,7 +63,21 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
   }
 
   render() {
-    const {osmFeatureProperties, onClose, showOnMap, requestLocation} = this.props;
+    const {onClose, fullScreen} = this.props;
+    const {note, repositioning} = this.state;
+
+    if (repositioning || !note) return null;
+
+    const modalCls = note.image ? 'modal-xl' : 'modal-dialog-centered';
+    return fullScreen ? <><h6 className="pt-2">{this.renderTitle()}</h6>{this.renderContent()}</>
+    : <Modal title={this.renderTitle()} className={modalCls} onClose={onClose}>
+        {this.renderContent()}
+      </Modal>
+    ;
+  }
+
+  renderContent() {
+    const {osmFeatureProperties, onClose} = this.props;
     const {note, editingRelatedPlaces, error, nearbyFeatures, nearbyAddresses, linkingEntrance, repositioning} = this.state;
     const {user} = this.context;
 
@@ -80,10 +95,93 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
         ? nearbyFeatures.filter(f => note.osm_features.includes(f.id))
         : nearbyFeatures;
 
+    return <>
+      {canEdit &&
+        <OSMImageNoteReviewActions imageNote={note} onReviewed={onClose}/>
+      }
+      <OSMImageNoteVotes osmImageNote={note} onUpdate={this.fetchNote}/>
+      <ErrorAlert status={error} message="Saving features failed. Try again perhaps?"/>
+      {note.image && <ZoomableImage src={note.image} className="noteImage"/>}
+      <>
+        <p className="m-2 ml-3"><strong>Tags:</strong></p>
+        <p className="m-2 ml-3">
+           <OSMImageNoteTags {...{tags, osmFeatureProperties}} readOnly={!canEdit}
+                             onChange={tags => this.updateSelectedNote({tags})}/>
+        </p>
+      </>
+      <div onClick={() => canEditRelatedPlaces && this.setState({editingRelatedPlaces: true})}
+           className={canEditRelatedPlaces ? "clickable": ''}>
+        <div className="list-group-item">
+          <strong>Related places:</strong>
+          {canEditRelatedPlaces && <div className="float-right"><Icon icon={'edit'}/></div>}
+          {editingRelatedPlaces &&
+            <div className="float-right">
+              <button className="btn btn-light btn-sm btn-compact"
+                      onClick={() => this.setState({editingRelatedPlaces: false})}>
+                Close <Icon icon={'close'}/>
+              </button>
+            </div>
+          }
+        </div>
+        <NearbyAddressesAsOSMLoader
+          location={location}
+          onLoad={nearbyAddresses => this.setState({nearbyAddresses})} />
+        <OSMFeaturesSelection
+          location={location}
+          extraFeatures={nearbyAddresses}
+          onChange={this.onFeaturesSelected} readOnly={!editingRelatedPlaces}
+          maxHeight={null}
+          preselectedFeatureIds={note.osm_features}
+          onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
+          featureActions={
+            (feature: OSMFeature) =>
+              feature.tags.entrance && note.osm_features && note.osm_features.includes(feature.id) &&
+                <button className="btn btn-light btn-compact float-right"
+                        onClick={(e) => this.linkEntrance(e, feature)}>
+                  <Icon icon="link"/>
+                </button>
+          }/>
+      </div>
+      {canEdit && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
+        <div key={osmFeatureName} className="mr-2 ml-3">
+            <OSMFeatureProperties
+              schema={osmFeatureProperties[osmFeatureName]}
+              osmImageNote={note}
+              osmFeatureName={osmFeatureName}
+              nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}
+              onSubmit={(data) => this.updateSelectedNote(data)}/>
+        </div>
+      )}
+      <div className="m-2 ml-3">
+        <p>
+          <strong>Comments ({(note.comments || []).length}) </strong>
+          <button className="btn btn-light btn-sm btn-compact float-right" onClick={this.fetchNote}>
+            <Icon icon={'refresh'}/>
+          </button>
+        </p>
+        <OSMImageNoteComments osmImageNote={note} refreshNote={this.fetchNote}/>
+      </div>
+
+      {linkingEntrance && <AssociateEntranceModal
+        entrance={linkingEntrance}
+        nearbyFeatures={relatedFeatures}
+        onClose={() => this.setState({linkingEntrance: undefined})}/>}
+    </>;
+  }
+
+  renderTitle() {
+    const {showOnMap, requestLocation} = this.props;
+    const {note, repositioning} = this.state;
+    const {user} = this.context;
+
+    if (repositioning || !note) return null;
+
+    const canEdit = userCanEditNote(user, note);
+
     // @ts-ignore
     const credit = `${note.created_by ? note.created_by.username: 'Anonymous'} on ${formatTimestamp(note.created_at)}`;
 
-    const title = <>
+    return <>
       {showOnMap && <span className="clickable text-primary" onClick={showOnMap}><Icon icon="place"/></span>}
       {' '}
       <span className="clickable text-primary ml-1"
@@ -101,81 +199,6 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
         ? <>{note.comment}<br/>by {credit}</>
         : `Note by ${credit}`}
     </>;
-
-    const modalCls = note.image ? 'modal-xl' : 'modal-dialog-centered';
-
-    return <Modal title={title} className={modalCls} onClose={onClose}>
-        {canEdit &&
-          <OSMImageNoteReviewActions imageNote={note} onReviewed={onClose}/>
-        }
-        <OSMImageNoteVotes osmImageNote={note} onUpdate={this.fetchNote}/>
-        <ErrorAlert status={error} message="Saving features failed. Try again perhaps?"/>
-        {note.image && <ZoomableImage src={note.image} className="noteImage"/>}
-        <>
-          <p className="m-2 ml-3"><strong>Tags:</strong></p>
-          <p className="m-2 ml-3">
-             <OSMImageNoteTags {...{tags, osmFeatureProperties}} readOnly={!canEdit}
-                               onChange={tags => this.updateSelectedNote({tags})}/>
-          </p>
-        </>
-        <div onClick={() => canEditRelatedPlaces && this.setState({editingRelatedPlaces: true})}
-             className={canEditRelatedPlaces ? "clickable": ''}>
-          <div className="list-group-item">
-            <strong>Related places:</strong>
-            {canEditRelatedPlaces && <div className="float-right"><Icon icon={'edit'}/></div>}
-            {editingRelatedPlaces &&
-              <div className="float-right">
-                <button className="btn btn-light btn-sm btn-compact"
-                        onClick={() => this.setState({editingRelatedPlaces: false})}>
-                  Close <Icon icon={'close'}/>
-                </button>
-              </div>
-            }
-          </div>
-          <NearbyAddressesAsOSMLoader
-            location={location}
-            onLoad={nearbyAddresses => this.setState({nearbyAddresses})} />
-          <OSMFeaturesSelection
-            location={location}
-            extraFeatures={nearbyAddresses}
-            onChange={this.onFeaturesSelected} readOnly={!editingRelatedPlaces}
-            maxHeight={null}
-            preselectedFeatureIds={note.osm_features}
-            onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
-            featureActions={
-              (feature: OSMFeature) =>
-                feature.tags.entrance && note.osm_features && note.osm_features.includes(feature.id) &&
-                  <button className="btn btn-light btn-compact float-right"
-                          onClick={(e) => this.linkEntrance(e, feature)}>
-                    <Icon icon="link"/>
-                  </button>
-            }/>
-        </div>
-        {canEdit && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
-          <div key={osmFeatureName} className="mr-2 ml-3">
-              <OSMFeatureProperties
-                schema={osmFeatureProperties[osmFeatureName]}
-                osmImageNote={note}
-                osmFeatureName={osmFeatureName}
-                nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}
-                onSubmit={(data) => this.updateSelectedNote(data)}/>
-          </div>
-        )}
-        <div className="m-2 ml-3">
-          <p>
-            <strong>Comments ({(note.comments || []).length}) </strong>
-            <button className="btn btn-light btn-sm btn-compact float-right" onClick={this.fetchNote}>
-              <Icon icon={'refresh'}/>
-            </button>
-          </p>
-          <OSMImageNoteComments osmImageNote={note} refreshNote={this.fetchNote}/>
-        </div>
-
-        {linkingEntrance && <AssociateEntranceModal
-          entrance={linkingEntrance}
-          nearbyFeatures={relatedFeatures}
-          onClose={() => this.setState({linkingEntrance: undefined})}/>}
-    </Modal>
   }
 
   copyPermalink = () => {

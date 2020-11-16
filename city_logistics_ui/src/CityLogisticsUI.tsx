@@ -13,6 +13,7 @@ import FVHTabsUI from "util_components/FVHTabsUI";
 import OutgoingPackageLists from "components/package_lists/OutgoingPackageLists";
 import OSMImageNotesEditor from "components/osm_image_notes/OSMImageNotesEditor";
 import ReservedPackageLists from "components/package_lists/ReservedPackageLists";
+import OSMImageNoteModal from "components/osm_image_notes/OSMImageNoteModal";
 
 type UIState = {
   user?: User,
@@ -67,7 +68,10 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
 
   render() {
     const {user, dataFetched} = this.state;
+
     const Package = () => <LivePackage uuid={useParams().packageUUID}/>;
+    // @ts-ignore
+    const ImageNote = () => <OSMImageNoteModal note={{id: useParams().noteId}} fullScreen />;
 
     const ResetPassword = () => {
       const params = useParams();
@@ -95,6 +99,9 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
           </Route>
           <Route path='/resetPassword/:uid/:token'>
             <ResetPassword/>
+          </Route>
+          <Route path='/note/:noteId'>
+            <ImageNote/>
           </Route>
           <Route exact path=''>
             <TabsUI/>
