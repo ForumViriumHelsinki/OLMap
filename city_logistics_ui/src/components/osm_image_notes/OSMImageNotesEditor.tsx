@@ -6,7 +6,6 @@ import MyPositionMap from 'util_components/MyPositionMap';
 // @ts-ignore
 import {Button, Spinner, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem} from "reactstrap";
 import Icon from "util_components/bootstrap/Icon";
-import Component from "util_components/Component";
 import {LocationTuple} from "util_components/types";
 import Modal, {ModalBody} from "util_components/bootstrap/Modal";
 import ErrorAlert from "util_components/bootstrap/ErrorAlert";
@@ -66,15 +65,10 @@ const initialState: () => OSMImageNotesEditorState = () => ({
 
 const {imagesUploading, ...resetState} = initialState();
 
-export default class OSMImageNotesEditor extends Component<{}> {
+export default class OSMImageNotesEditor extends React.Component<{}> {
   state: OSMImageNotesEditorState = initialState();
 
   static contextType = AppContext;
-
-  static bindMethods = [
-    'onImageClick', 'onImageCaptured', 'onCommentClick',
-    'onLocationSelected', 'onCancel', 'onSubmit', 'reloadNotes'
-  ];
 
   imageNotesRef = React.createRef();
   changesetLayerRef = React.createRef<OSMChangesetMapLayer>();
@@ -297,42 +291,42 @@ export default class OSMImageNotesEditor extends Component<{}> {
     this.setState({osmProperties: {...this.state.osmProperties, ...data}});
   }
 
-  private onImageClick() {
+  onImageClick = () => {
     this.imageEl().click();
-  }
+  };
 
-  private onCommentClick() {
+  onCommentClick = () => {
     this.setState({status: 'locating'});
-  }
+  };
 
   private imageEl() {
     return document.getElementById('image') as HTMLInputElement;
   }
 
-  private onImageCaptured() {
+  onImageCaptured = () => {
     const files = this.imageEl().files as FileList;
     this.setState({status: "locating", image: files[0]})
-  }
+  };
 
-  private onLocationSelected(location: LocationTuple) {
+  onLocationSelected = (location: LocationTuple) => {
     const {onLocationSelected} = this.state;
     if (onLocationSelected) {
       this.setState({onLocationSelected: undefined, onLocationCancelled: undefined, status: 'initial'});
       onLocationSelected({lon: location[0], lat: location[1]});
     }
     else this.setState({status: "relating", lon: location[0], lat: location[1]});
-  }
+  };
 
-  private onCancel() {
+  onCancel = () => {
     const {onLocationCancelled} = this.state;
     if (onLocationCancelled) {
       onLocationCancelled();
       this.setState({onLocationSelected: undefined, onLocationCancelled: undefined, status: 'initial'});
     }
     this.setState(resetState);
-  }
+  };
 
-  private onSubmit() {
+  onSubmit = () => {
     const {comment, lon, lat, osm_features, image, imagesUploading, tags, osmProperties} = this.state;
     const fields = {comment, lat, lon, osm_features, tags, ...osmProperties};
 
@@ -366,12 +360,12 @@ export default class OSMImageNotesEditor extends Component<{}> {
         });
       });
     });
-  }
+  };
 
-  private reloadNotes() {
+  reloadNotes = () => {
     // @ts-ignore
     this.imageNotesRef.current && this.imageNotesRef.current.loadImageNotes();
-  }
+  };
 
   selectChangeset = (selectedChangeset: any) => {
     this.setState({selectedChangeset, selectChangeset: false});

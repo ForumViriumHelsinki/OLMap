@@ -1,55 +1,36 @@
 import React from 'react';
 // @ts-ignore
-import {HashRouter as Router, Route, Switch, useParams, Redirect, useHistory} from "react-router-dom";
+import {HashRouter as Router, Route, Switch, useParams, Redirect} from "react-router-dom";
 
 import sessionRequest, {logout} from "sessionRequest";
 
 import LoginScreen from 'components/LoginScreen';
 import LoadScreen from "components/LoadScreen";
-import LivePackage from "components/LivePackage";
 import {AppContext, User} from "components/types";
 import ResetPasswordScreen from "components/ResetPasswordScreen";
-import FVHTabsUI from "util_components/FVHTabsUI";
-import OutgoingPackageLists from "components/package_lists/OutgoingPackageLists";
-import OSMImageNotesEditor from "components/osm_image_notes/OSMImageNotesEditor";
-import ReservedPackageLists from "components/package_lists/ReservedPackageLists";
 import OSMImageNoteModal from "components/osm_image_notes/OSMImageNoteModal";
+import NavBar from "util_components/bootstrap/NavBar";
+import Confirm from "util_components/bootstrap/Confirm";
+import OSMImageNotesEditor from "components/osm_image_notes/OSMImageNotesEditor";
 
 type UIState = {
   user?: User,
-  dataFetched: boolean
+  dataFetched: boolean,
+  showLogout: boolean,
+  menuOpen: boolean
 }
 
-class CityLogisticsUI extends React.Component<{}, UIState> {
+class OLMapUI extends React.Component<{}, UIState> {
   state: UIState = {
     user: undefined,
-    dataFetched: false
-  };
-
-  tabs = {
-    senderPackages: {
-      header: 'Packages',
-      ChildComponent: OutgoingPackageLists,
-      icon: 'dynamic_feed',
-      menuText: 'Packages'
-    },
-    courierPackages: {
-      header: 'Packages',
-      ChildComponent: ReservedPackageLists,
-      icon: 'directions_bike',
-      menuText: 'Packages'
-    },
-    notes: {
-      header: 'Notes',
-      ChildComponent: OSMImageNotesEditor,
-      icon: 'my_location',
-      menuText: 'Notes',
-      fullWidth: true
-    }
+    dataFetched: false,
+    showLogout: false,
+    menuOpen: false
   };
 
   componentDidMount() {
     this.refreshUser();
+    window.addEventListener('resize', this.onResize)
   }
 
   refreshUser() {
@@ -66,10 +47,16 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
     });
   };
 
-  render() {
-    const {user, dataFetched} = this.state;
+  // @ts-ignore
+  onResize = () => document.getElementById('OLMapUI').style.height = window.innerHeight;
 
-    const Package = () => <LivePackage uuid={useParams().packageUUID}/>;
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.onResize)
+  }
+
+  render() {
+    const {user, dataFetched, showLogout} = this.state;
+
     // @ts-ignore
     const ImageNote = () => <OSMImageNoteModal note={{id: useParams().noteId}} fullScreen />;
 
@@ -78,24 +65,11 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
       return <ResetPasswordScreen uid={params.uid} token={params.token}/>;
     };
 
-    // @ts-ignore
-    const tabs: any[] = [this.tabs.notes];
-    if (user && user.is_courier) tabs.unshift(this.tabs.courierPackages);
-    if (user && user.is_sender) tabs.unshift(this.tabs.senderPackages);
-
-    const TabsUI = () => {
-      const history = useHistory();
-      return <FVHTabsUI user={user} tabs={tabs} onLogout={this.logout} onLogin={() => history.push('/login/')}/>
-    };
-
     return dataFetched ? <AppContext.Provider value={{user}}>
       <Router>
         <Switch>
           <Route path='/login/'>
             {user ? <Redirect to="" /> : <LoginScreen onLogin={() => this.refreshUser()}/>}
-          </Route>
-          <Route path='/package/:packageUUID'>
-            <Package/>
           </Route>
           <Route path='/resetPassword/:uid/:token'>
             <ResetPassword/>
@@ -104,12 +78,31 @@ class CityLogisticsUI extends React.Component<{}, UIState> {
             <ImageNote/>
           </Route>
           <Route exact path=''>
-            <TabsUI/>
+            <div style={{height: window.innerHeight}} className="flex-column d-flex" id="OLMapUI">
+              <NavBar onIconClick={this.onNavIconClick}
+                      icon={user ? "account_circle" : "login"}
+                      iconText={user ? user.username : 'Sign in'}>
+                <h5 className="m-2">OLMap</h5>
+              </NavBar>
+              <div className="flex-grow-1  flex-shrink-1 overflow-auto">
+                <OSMImageNotesEditor/>
+              </div>
+            </div>
           </Route>
         </Switch>
       </Router>
+      {showLogout &&
+        <Confirm title="Log out?"
+                 onClose={() => this.setState({showLogout: false})}
+                 onConfirm={this.logout}/>
+      }
     </AppContext.Provider> : <LoadScreen/>;
+  }
+
+  onNavIconClick = () => {
+    if (this.state.user) this.setState({showLogout: true});
+    else window.location.hash = '#/login/'
   }
 }
 
-export default CityLogisticsUI;
+export default OLMapUI;
