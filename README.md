@@ -23,7 +23,7 @@ python manage.py runserver
 <Create a courier user, e.g. "courier" which belongs to "courier" group>
 ```
 
-In city_logistics_ui:
+In react_ui:
 
 ```
 npm install yarn

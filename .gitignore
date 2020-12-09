@@ -1,12 +1,12 @@
 /.idea/
 /django_server/db.sqlite3
-/city_logistics_ui/static/build/
-/city_logistics_ui/public/build/
-/city_logistics_ui/node_modules/
+/react_ui/static/build/
+/react_ui/public/build/
+/react_ui/node_modules/
 .DS_Store
 __pycache__
-/city_logistics_ui/yarn-error.log
-/city_logistics_ui/build/
+/react_ui/yarn-error.log
+/react_ui/build/
 /django_server/city_logistics/local_settings.py
 /Pipfile
 /Pipfile.lock

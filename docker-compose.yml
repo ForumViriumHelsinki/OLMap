@@ -23,13 +23,13 @@ services:
       - 5432:5432
 
   frontend:
-      build: ./city_logistics_ui
+      build: ./react_ui
       command: yarn start
       ports:
         - "3000:3000"
       volumes:
-        - ./city_logistics_ui:/app/frontend
-        - node-modules:/app/city_logistics_ui/node_modules
+        - ./react_ui:/app/frontend
+        - node-modules:/app/react_ui/node_modules
 
 volumes:
   postgres_data:
