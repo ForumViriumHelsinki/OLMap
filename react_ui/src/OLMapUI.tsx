@@ -65,7 +65,7 @@ class OLMapUI extends React.Component<{}, UIState> {
       return <ResetPasswordScreen uid={params.uid} token={params.token}/>;
     };
 
-    const MainUI = (props: {selectedNoteId?: number, newNote?: 'text' | 'photo', osmFeatures?: number[]}) =>
+    const MainUI = (props: {selectedNoteId?: number, newNote?: boolean, osmFeatures?: number[]}) =>
       <div style={{height: window.innerHeight}} className="flex-column d-flex" id="OLMapUI">
         <NavBar onIconClick={this.onNavIconClick}
                 icon={user ? "account_circle" : "login"}
@@ -89,9 +89,9 @@ class OLMapUI extends React.Component<{}, UIState> {
           <Route path='/note/:noteId'>
             <ImageNote/>
           </Route>
-          <Route path='/Notes/new/:osmId(\d+)?/:photo(photo)?' render={(props: any) => {
-            const {photo, osmId} = props.match.params;
-            return <MainUI newNote={photo || 'text'} osmFeatures={osmId && [Number(osmId)]}/>
+          <Route path='/Notes/new/:osmId(\d+)?/' render={(props: any) => {
+            const {osmId} = props.match.params;
+            return <MainUI newNote osmFeatures={osmId && [Number(osmId)]}/>
           }} />
           <Route path='(/Notes)?/:noteId(\d+)?' render={(props: any) =>
             <MainUI selectedNoteId={props.match.params.noteId && Number(props.match.params.noteId)}/>

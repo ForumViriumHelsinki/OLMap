@@ -25,7 +25,7 @@ import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddress
 
 type OSMImageNotesEditorProps = {
   selectedNoteId?: number,
-  newNote?: 'text' | 'photo',
+  newNote?: boolean,
   osmFeatures?: number[]
 }
 
@@ -260,18 +260,21 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
                      selectedNoteId={this.props.selectedNoteId} />
       {requestPhoto &&
         <Modal onClose={() => this.setState({requestPhoto: false})} title={<>
-            Add a new picture on the map:{' '}
-            <Button {...this.childProps.toolButton} onClick={this.onImageClick}>
+            <p>Add a new picture or textual note on the map:</p>
+            <Button {...this.childProps.toolButton} onClick={this.onImageClick} className="mr-2">
               <Icon icon="camera_alt"/> Open camera
-            </Button>
+            </Button>{' '}
+            <Button {...this.childProps.toolButton}
+                    onClick={() => this.setState({requestPhoto: false, status: 'locating'})}>
+              <Icon icon="comment"/> Add text
+            </Button>{' '}
           </>} />}
     </div>;
   }
 
   componentDidMount() {
     const {newNote} = this.props;
-    if (newNote == 'text') this.setState({status: 'locating'})
-    if (newNote == 'photo') this.setState({requestPhoto: true});
+    if (newNote) this.setState({requestPhoto: true});
   }
 
   private toggleFilter(filter: any) {
@@ -315,6 +318,7 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
 
   onImageClick = () => {
     this.imageEl().click();
+    this.setState({requestPhoto: false});
   };
 
   onCommentClick = () => {
