@@ -30,7 +30,8 @@ type OSMImageNotesProps = {
   location: Location,
   match: any,
   showLocation: (location: any) => any,
-  requestLocation?: (initial: any) => Promise<any>
+  requestLocation?: (initial: any) => Promise<any>,
+  selectedNoteId?: number
 }
 
 type OSMImageNotesState = {
@@ -108,22 +109,15 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
 
   render() {
     const {osmImageNotes, error, osmFeatureProperties} = this.state;
-    const {history, showLocation, requestLocation} = this.props;
+    const {history, showLocation, requestLocation, selectedNoteId} = this.props;
 
-    if (!osmImageNotes || !osmFeatureProperties) return '';
+    if (!osmImageNotes || !osmFeatureProperties || !selectedNoteId) return '';
 
-    return <Router>
-      <Switch>
-        {osmImageNotes.map(note =>
-          <Route key={note.id} path={`/Notes/${note.id}/`}>
-            <OSMImageNoteModal osmFeatureProperties={osmFeatureProperties} note={note}
+    const note = _.find(osmImageNotes, {id: selectedNoteId}) || {id: selectedNoteId} as OSMImageNote;
+    return <OSMImageNoteModal osmFeatureProperties={osmFeatureProperties} note={note}
                                onClose={() => {this.refreshNote(note); history.push('/Notes/')}}
                                showOnMap={() => {showLocation(note); history.push('/Notes/')}}
                                requestLocation={requestLocation}/>
-          </Route>
-        )}
-      </Switch>
-    </Router>;
   }
 
   private getMapLayer() {

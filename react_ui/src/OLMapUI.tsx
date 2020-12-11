@@ -65,6 +65,18 @@ class OLMapUI extends React.Component<{}, UIState> {
       return <ResetPasswordScreen uid={params.uid} token={params.token}/>;
     };
 
+    const MainUI = (props: {selectedNoteId?: number, newNote?: 'text' | 'photo', osmFeatures?: number[]}) =>
+      <div style={{height: window.innerHeight}} className="flex-column d-flex" id="OLMapUI">
+        <NavBar onIconClick={this.onNavIconClick}
+                icon={user ? "account_circle" : "login"}
+                iconText={user ? user.username : 'Sign in'}>
+          <h5 className="m-2">OLMap</h5>
+        </NavBar>
+        <div className="flex-grow-1 flex-shrink-1 overflow-auto">
+          <OSMImageNotesEditor {...props}/>
+        </div>
+      </div>;
+
     return dataFetched ? <AppContext.Provider value={{user}}>
       <Router>
         <Switch>
@@ -77,18 +89,13 @@ class OLMapUI extends React.Component<{}, UIState> {
           <Route path='/note/:noteId'>
             <ImageNote/>
           </Route>
-          <Route exact path=''>
-            <div style={{height: window.innerHeight}} className="flex-column d-flex" id="OLMapUI">
-              <NavBar onIconClick={this.onNavIconClick}
-                      icon={user ? "account_circle" : "login"}
-                      iconText={user ? user.username : 'Sign in'}>
-                <h5 className="m-2">OLMap</h5>
-              </NavBar>
-              <div className="flex-grow-1  flex-shrink-1 overflow-auto">
-                <OSMImageNotesEditor/>
-              </div>
-            </div>
-          </Route>
+          <Route path='/Notes/new/:osmId(\d+)?/:photo(photo)?' render={(props: any) => {
+            const {photo, osmId} = props.match.params;
+            return <MainUI newNote={photo || 'text'} osmFeatures={osmId && [Number(osmId)]}/>
+          }} />
+          <Route path='(/Notes)?/:noteId(\d+)?' render={(props: any) =>
+            <MainUI selectedNoteId={props.match.params.noteId && Number(props.match.params.noteId)}/>
+          } />
         </Switch>
       </Router>
       {showLogout &&

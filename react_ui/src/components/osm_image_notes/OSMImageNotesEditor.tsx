@@ -23,6 +23,12 @@ import OSMChangesetMapLayer from "util_components/osm/OSMChangesetMapLayer";
 import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
 
 
+type OSMImageNotesEditorProps = {
+  selectedNoteId?: number,
+  newNote?: 'text' | 'photo',
+  osmFeatures?: number[]
+}
+
 type OSMImageNotesEditorState = OSMImageNote & {
   status: 'initial' | 'locating' | 'relating' | 'commenting' | 'thanks',
   submitting: boolean,
@@ -40,7 +46,8 @@ type OSMImageNotesEditorState = OSMImageNote & {
   selectChangeset: boolean,
   selectedChangeset?: changeset,
   onLocationSelected?: (location: any) => any,
-  onLocationCancelled?: () => any
+  onLocationCancelled?: () => any,
+  requestPhoto?: boolean
 }
 
 const initialState: () => OSMImageNotesEditorState = () => ({
@@ -65,7 +72,7 @@ const initialState: () => OSMImageNotesEditorState = () => ({
 
 const {imagesUploading, ...resetState} = initialState();
 
-export default class OSMImageNotesEditor extends React.Component<{}> {
+export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEditorProps, OSMImageNotesEditorState> {
   state: OSMImageNotesEditorState = initialState();
 
   static contextType = AppContext;
@@ -82,7 +89,7 @@ export default class OSMImageNotesEditor extends React.Component<{}> {
     const {
       status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags,
       osmProperties, filters, osm_features, nearbyFeatures, selectChangeset, selectedChangeset, nearbyAddresses,
-      filtersOpen
+      filtersOpen, requestPhoto
     } = this.state;
 
     const location = [lon, lat] as LocationTuple;
@@ -197,6 +204,7 @@ export default class OSMImageNotesEditor extends React.Component<{}> {
               <OSMFeaturesSelection
                 location={location}
                 extraFeatures={nearbyAddresses}
+                preselectedFeatureIds={this.props.osmFeatures}
                 onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
                 onSelect={osm_features => this.setState({osm_features, status: 'commenting'})}/>
             </Modal>,
@@ -248,8 +256,22 @@ export default class OSMImageNotesEditor extends React.Component<{}> {
                      onOSMFeaturePropertiesLoaded={(osmFeatureProperties: OSMFeatureProps) =>
                        this.setState({osmFeatureProperties})}
                      wrappedComponentRef={this.imageNotesRef} filters={filters}
-                     showLocation={this.showLocation} requestLocation={this.requestLocation}/>
+                     showLocation={this.showLocation} requestLocation={this.requestLocation}
+                     selectedNoteId={this.props.selectedNoteId} />
+      {requestPhoto &&
+        <Modal onClose={() => this.setState({requestPhoto: false})} title={<>
+            Add a new picture on the map:{' '}
+            <Button {...this.childProps.toolButton} onClick={this.onImageClick}>
+              <Icon icon="camera_alt"/> Open camera
+            </Button>
+          </>} />}
     </div>;
+  }
+
+  componentDidMount() {
+    const {newNote} = this.props;
+    if (newNote == 'text') this.setState({status: 'locating'})
+    if (newNote == 'photo') this.setState({requestPhoto: true});
   }
 
   private toggleFilter(filter: any) {

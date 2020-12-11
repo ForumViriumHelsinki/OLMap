@@ -24,7 +24,7 @@ import {userCanEditNote} from "./utils";
 import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
 
 type OSMImageNoteModalProps = {
-  osmFeatureProperties: OSMFeatureProps,
+  osmFeatureProperties?: OSMFeatureProps,
   note: OSMImageNote,
   onClose: () => any,
   showOnMap?: () => any,
@@ -59,7 +59,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
   }
 
   componentDidUpdate(prevProps: Readonly<OSMImageNoteModalProps>) {
-    if (prevProps && (prevProps.note != this.props.note)) this.fetchNote();
+    if (prevProps && (prevProps.note.id != this.props.note.id)) this.fetchNote();
   }
 
   render() {
@@ -104,10 +104,10 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
       {note.image && <ZoomableImage src={note.image} className="noteImage"/>}
       <>
         <p className="m-2 ml-3"><strong>Tags:</strong></p>
-        <p className="m-2 ml-3">
+        <div className="m-2 ml-3">
            <OSMImageNoteTags {...{tags, osmFeatureProperties}} readOnly={!canEdit}
                              onChange={tags => this.updateSelectedNote({tags})}/>
-        </p>
+        </div>
       </>
       <div onClick={() => canEditRelatedPlaces && this.setState({editingRelatedPlaces: true})}
            className={canEditRelatedPlaces ? "clickable": ''}>
@@ -194,7 +194,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
           <Icon icon="open_with"/>
         </span>}
       {' '}
-      <textarea id="permalink" value={window.location.href} style={{width: 0, height: 0, opacity: 0}}/>
+      <textarea id="permalink" value={window.location.href} style={{width: 0, height: 0, opacity: 0}} readOnly/>
       {note.comment
         ? <>{note.comment}<br/>by {credit}</>
         : `Note by ${credit}`}
