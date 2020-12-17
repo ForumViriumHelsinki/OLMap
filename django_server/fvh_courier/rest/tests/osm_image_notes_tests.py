@@ -19,7 +19,7 @@ class OSMImageNotesTests(FVHAPITestCase):
 
     def test_save_osm_image_note(self):
         # Given that a user is signed in
-        courier = self.create_and_login_courier()
+        user = self.create_and_login_user()
 
         # When requesting to save an OSM image note over ReST
         url = reverse('osmimagenote-list')
@@ -39,8 +39,8 @@ class OSMImageNotesTests(FVHAPITestCase):
         note = models.OSMImageNote.objects.get()
 
         # And it registers the user as the creator of the note:
-        self.assertEqual(note.created_by_id, courier.user_id)
-        self.assertEqual(note.modified_by_id, courier.user_id)
+        self.assertEqual(note.created_by_id, user.id)
+        self.assertEqual(note.modified_by_id, user.id)
 
         # And it creates any passed tags:
         self.assertSetEqual(set(note.tags), set(fields['tags']))
@@ -101,7 +101,7 @@ class OSMImageNotesTests(FVHAPITestCase):
 
     def test_save_osm_image_note_with_no_features(self):
         # Given that a user is signed in
-        courier = self.create_and_login_courier()
+        user = self.create_and_login_user()
 
         # When requesting to save an OSM image note over ReST, giving an empty list of features to which to link
         url = reverse('osmimagenote-list')
@@ -121,11 +121,11 @@ class OSMImageNotesTests(FVHAPITestCase):
 
     def test_update_osm_image_note_features(self):
         # Given that a user is signed in
-        courier = self.create_and_login_courier()
+        user = self.create_and_login_user()
 
         # And given a successfully created OSM image note
         note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188',
-                                                  created_by=courier.user)
+                                                  created_by=user)
 
         # When requesting to update an OSM image note over ReST, giving a list of features to which to link
         url = reverse('osmimagenote-detail', kwargs={'pk': note.id})
@@ -152,7 +152,7 @@ class OSMImageNotesTests(FVHAPITestCase):
         # Given that no user is signed in
         # And given a successfully created OSM image note
         note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188',
-                                                  created_by=self.create_courier().user)
+                                                  created_by=self.create_user())
 
         # When requesting to update an OSM image note over ReST, giving a list of features to which to link
         url = reverse('osmimagenote-detail', kwargs={'pk': note.id})
@@ -167,11 +167,11 @@ class OSMImageNotesTests(FVHAPITestCase):
 
     def test_update_osm_image_note_tags(self):
         # Given that a user is signed in
-        courier = self.create_and_login_courier()
+        user = self.create_and_login_user()
 
         # And given a successfully created OSM image note
         note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188',
-                                                  created_by=courier.user)
+                                                  created_by=user)
 
         # When requesting to update an OSM image note over ReST, giving a list of tags to add
         url = reverse('osmimagenote-detail', kwargs={'pk': note.id})
@@ -252,7 +252,7 @@ class OSMImageNotesTests(FVHAPITestCase):
 
     def test_vote_on_osm_image_note(self):
         # Given that a user is signed in
-        courier = self.create_and_login_courier()
+        user = self.create_and_login_user()
 
         # And given a successfully created OSM image note
         note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188')
@@ -266,8 +266,8 @@ class OSMImageNotesTests(FVHAPITestCase):
 
         # And the upvote is created:
         note = models.OSMImageNote.objects.get()
-        self.assertSetEqual(set(response.json()['upvotes']), set([courier.user_id]))
-        self.assertSetEqual(set(note.upvotes.values_list('user_id', flat=True)), set([courier.user_id]))
+        self.assertSetEqual(set(response.json()['upvotes']), set([user.id]))
+        self.assertSetEqual(set(note.upvotes.values_list('user_id', flat=True)), set([user.id]))
 
         # And when subsequently requesting to downvote the note
         url = reverse('osmimagenote-downvote', kwargs={'pk': note.id})
@@ -279,12 +279,12 @@ class OSMImageNotesTests(FVHAPITestCase):
         # And the votes have been changed:
         note = models.OSMImageNote.objects.get()
         self.assertSetEqual(set(note.upvotes.values_list('user_id', flat=True)), set())
-        self.assertSetEqual(set(response.json()['downvotes']), set([courier.user_id]))
-        self.assertSetEqual(set(note.downvotes.values_list('user_id', flat=True)), set([courier.user_id]))
+        self.assertSetEqual(set(response.json()['downvotes']), set([user.id]))
+        self.assertSetEqual(set(note.downvotes.values_list('user_id', flat=True)), set([user.id]))
 
     def test_comment_on_osm_image_note(self):
         # Given that a user is signed in
-        courier = self.create_and_login_courier()
+        user = self.create_and_login_user()
 
         # And given a successfully created OSM image note
         note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188')
@@ -318,7 +318,7 @@ class OSMImageNotesTests(FVHAPITestCase):
 
     def test_associate_entrance(self):
         # Given that a user is signed in
-        courier = self.create_and_login_courier()
+        user = self.create_and_login_user()
 
         # When requesting to associate an entrance with businesses over ReST, giving OSM ids for the entrance &
         # businesses:

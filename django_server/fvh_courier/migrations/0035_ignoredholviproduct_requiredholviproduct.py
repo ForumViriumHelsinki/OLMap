@@ -7,7 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('holvi_orders', '0002_auto_20200331_1347'),
         ('fvh_courier', '0034_delete_userlocation'),
     ]
 
@@ -17,7 +16,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=128)),
-                ('holvi_shop', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='required_product', to='holvi_orders.HolviWebshop')),
             ],
         ),
         migrations.CreateModel(
@@ -25,7 +23,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=128)),
-                ('holvi_shop', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='ignored_products', to='holvi_orders.HolviWebshop')),
             ],
         ),
     ]

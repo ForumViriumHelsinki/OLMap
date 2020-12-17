@@ -8,7 +8,7 @@ from fvh_courier import models
 class OSMImageNotePropertiesTests(FVHAPITestCase):
     def test_save_osm_image_note_with_property(self):
         # Given that a user is signed in
-        courier = self.create_and_login_courier()
+        user = self.create_and_login_user()
 
         # When requesting to save an OSM image note over ReST, supplying tags and properties
         url = reverse('osmimagenote-list')
@@ -50,7 +50,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
 
     def test_save_osm_image_note_with_empty_property_list(self):
         # Given that a user is signed in
-        courier = self.create_and_login_courier()
+        user = self.create_and_login_user()
 
         # When requesting to save an OSM image note over ReST, supplying an empty list of properties
         url = reverse('osmimagenote-list')
@@ -70,11 +70,11 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
 
     def test_update_osm_image_note_properties(self):
         # Given that a user is signed in
-        courier = self.create_and_login_courier()
+        user = self.create_and_login_user()
 
         # And given a successfully created OSM image note with some saved properties
         note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188',
-                                                  created_by=courier.user)
+                                                  created_by=user)
         note.entrance_set.create(**{
             'street': 'Unioninkatu',
             'housenumber': '24',
@@ -103,7 +103,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
 
     def test_osm_image_note_property_schemas(self):
         # Given that a user is signed in
-        self.create_and_login_courier()
+        self.create_and_login_user()
 
         # When requesting the image note property type schemas
         url = reverse('osmimagenote-property-schemas')

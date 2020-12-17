@@ -1,8 +1,8 @@
 [run]
 omit =
-    city_logistics/asgi.py
-    city_logistics/wsgi.py
-    city_logistics/settings.py
+    olmap_config/asgi.py
+    olmap_config/wsgi.py
+    olmap_config/settings.py
     # 3rd party library added to repo for convenience:
     drf_jsonschema/*
     */migrations/*

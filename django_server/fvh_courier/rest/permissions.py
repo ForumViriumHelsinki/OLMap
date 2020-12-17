@@ -1,14 +1,9 @@
 from datetime import timedelta
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.utils.timezone import now
 from rest_framework import permissions
 
 REVIEWER_GROUP = 'Reviewer'
-
-# Deprecated in favor of UserRole subclasses:
-COURIER_GROUP = 'Courier'
-SENDER_GROUP = 'Sender'
 
 
 class UserBelongsToGroup(permissions.IsAuthenticated):
@@ -17,14 +12,6 @@ class UserBelongsToGroup(permissions.IsAuthenticated):
     def has_permission(self, request, view):
         return (super(UserBelongsToGroup, self).has_permission(request, view) and
                 request.user.groups.filter(name=self.group_name).exists())
-
-
-class IsCourier(permissions.IsAuthenticated):
-    def has_permission(self, request, view):
-        try:
-            return bool(request.user.courier.id)
-        except (ObjectDoesNotExist, AttributeError):
-            return False
 
 
 class IsReviewer(UserBelongsToGroup):

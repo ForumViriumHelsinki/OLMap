@@ -1,5 +1,5 @@
 """
-ASGI config for city_logistics project.
+ASGI config for OLMap project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'city_logistics.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'olmap_config.settings')
 
 application = get_asgi_application()

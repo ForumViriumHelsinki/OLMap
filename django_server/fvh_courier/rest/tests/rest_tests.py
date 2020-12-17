@@ -28,8 +28,8 @@ class RestAPITests(FVHAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_get_current_user_when_signed_in(self):
-        # Given that a courier user is signed in
-        courier = self.create_and_login_courier()
+        # Given that a user is signed in
+        user = self.create_and_login_user()
 
         # When requesting the current user over ReST
         url = reverse('rest_user_details')
@@ -40,33 +40,5 @@ class RestAPITests(FVHAPITestCase):
         self.assert_dict_contains(response.data, {
             'first_name': 'Coranne',
             'last_name': 'Courier',
-            'username': 'courier',
-            'phone_number': '+358505436657',
-            'courier': {'id': courier.id},
-            'courier_company': {
-                'name': 'Couriers r us',
-                'coordinator_id': courier.id,
-                'couriers': [{
-                    'id': courier.id, 'user_id': courier.user_id, 'first_name': 'Coranne', 'last_name': 'Courier',
-                    'username': 'courier', 'phone_number': '+358505436657'
-                }]
-            }
+            'username': 'courier'
         })
-
-    def test_save_user_location(self):
-        # Given that a courier user is signed in
-        courier = self.create_and_login_courier()
-
-        # When requesting to save the current user location over ReST
-        url = reverse('user_location')
-        location = {'lat': '60.161687', 'lon': '24.944368'}
-        response = self.client.put(url, data=location)
-
-        # Then an OK response is received:
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        # And the user location is saved:
-        courier.refresh_from_db()
-        self.assertEqual(courier.lat, Decimal(location['lat']))
-        self.assertEqual(courier.lon, Decimal(location['lon']))
-        self.assertEqual(courier.user.username, 'courier')

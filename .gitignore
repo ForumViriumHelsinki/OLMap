@@ -7,7 +7,7 @@
 __pycache__
 /react_ui/yarn-error.log
 /react_ui/build/
-/django_server/city_logistics/local_settings.py
+/django_server/olmap_config/local_settings.py
 /Pipfile
 /Pipfile.lock
 /django_server/staticfiles/

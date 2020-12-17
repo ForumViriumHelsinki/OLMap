@@ -2,49 +2,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import migrations
 
-from fvh_courier.rest.permissions import COURIER_GROUP, SENDER_GROUP
-
-
-def forwards(apps, schema_editor):
-    User = apps.get_model('auth', 'User')
-    CourierCompany = apps.get_model('fvh_courier', 'CourierCompany')
-    Sender = apps.get_model('fvh_courier', 'Sender')
-    PrimaryCourier = apps.get_model('fvh_courier', 'PrimaryCourier')
-    Package = apps.get_model('fvh_courier', 'Package')
-
-    courier_company = CourierCompany.objects.create(name='Default company')
-    for user in User.objects.filter(groups__name=COURIER_GROUP):
-        phone = user.phone_numbers.first()
-        number = phone.number if phone else ''
-        courier_company.couriers.create(user=user, phone_number=number)
-
-    for user in User.objects.filter(groups__name=SENDER_GROUP):
-        Sender.objects.create(
-            user=user, courier_company=courier_company, phone_number=user.phone_numbers.first().number,
-            address=user.address)
-
-    for primary in PrimaryCourier.objects.all():
-        primary.courier.courier.company.coordinator = primary.courier.courier
-        primary.courier.courier.company.save()
-        try:
-            primary.sender.sender.courier_company = primary.courier.courier.company
-            primary.sender.sender.save()
-        except ObjectDoesNotExist:
-            pass
-
-    for package in Package.objects.all():
-        try:
-            package.sender_2 = package.sender.sender
-        except ObjectDoesNotExist:
-            pass
-        if package.courier:
-            try:
-                package.courier_2 = package.courier.courier
-                package.courier_company = package.courier_2.company
-            except ObjectDoesNotExist:
-                pass
-        package.save()
-
 
 class Migration(migrations.Migration):
 
@@ -53,5 +10,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(forwards)
     ]

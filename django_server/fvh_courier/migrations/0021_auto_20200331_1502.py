@@ -8,7 +8,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('holvi_orders', '0002_auto_20200331_1347'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('fvh_courier', '0020_auto_20200327_0955'),
     ]
@@ -43,7 +42,6 @@ class Migration(migrations.Migration):
             name='HolviPackage',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('order', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='holvi_orders.HolviOrder')),
                 ('package', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='fvh_courier.Package')),
             ],
         ),
