@@ -6,8 +6,8 @@ from django.urls import reverse
 from rest_framework import status
 
 from .base import FVHAPITestCase
-from fvh_courier import models
-from fvh_courier.rest.permissions import REVIEWER_GROUP
+from olmap import models
+from olmap.rest.permissions import REVIEWER_GROUP
 
 
 class OSMImageNotesTests(FVHAPITestCase):

@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 
 from .base import FVHAPITestCase
-from fvh_courier import models
+from olmap import models
 
 
 class OSMImageNotePropertiesTests(FVHAPITestCase):

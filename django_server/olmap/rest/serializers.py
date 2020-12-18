@@ -7,8 +7,8 @@ from django.db.models import DecimalField
 from rest_auth.serializers import PasswordResetSerializer as BasePasswordResetSerializer
 from rest_framework import serializers
 
-from fvh_courier import models
-from fvh_courier.models.image_note_properties import manager_name
+from olmap import models
+from olmap.models.image_note_properties import manager_name
 from .permissions import REVIEWER_GROUP
 
 

@@ -37,7 +37,7 @@ ALLOWED_HOSTS = ['citylogistiikka.fvh.io', '127.0.0.1', 'localhost']
 # Application definition
 
 INSTALLED_APPS = [
-    'fvh_courier',
+    'olmap',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
@@ -147,8 +147,8 @@ REST_FRAMEWORK = {
 }
 
 REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'fvh_courier.rest.serializers.UserSerializer',
-    'PASSWORD_RESET_SERIALIZER': 'fvh_courier.rest.serializers.PasswordResetSerializer'
+    'USER_DETAILS_SERIALIZER': 'olmap.rest.serializers.UserSerializer',
+    'PASSWORD_RESET_SERIALIZER': 'olmap.rest.serializers.PasswordResetSerializer'
 }
 
 LOG_DB_QUERIES = False

@@ -6,7 +6,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
 from drf_jsonschema import to_jsonschema
-from fvh_courier import models
+from olmap import models
 from .permissions import IsReviewer, IsReviewerOrCreator
 from .serializers import (
     OSMImageNoteWithPropsSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer,

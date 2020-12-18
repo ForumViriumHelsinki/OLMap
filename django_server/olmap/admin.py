@@ -7,7 +7,7 @@ from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.conf import settings
-from fvh_courier import models
+from olmap import models
 
 
 @admin.register(models.Address)

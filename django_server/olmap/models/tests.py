@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from fvh_courier.models import Address
+from olmap.models import Address
 
 
 class ModelTests(TestCase):

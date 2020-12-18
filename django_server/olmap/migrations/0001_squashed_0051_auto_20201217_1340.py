@@ -3,8 +3,8 @@ from django.conf import settings
 import django.contrib.postgres.fields
 from django.db import migrations, models
 import django.db.models.deletion
-import fvh_courier.models.osm_image_notes
-from fvh_courier.rest.permissions import REVIEWER_GROUP
+import olmap.models.osm_image_notes
+from olmap.rest.permissions import REVIEWER_GROUP
 import re, requests
 import csv
 
@@ -17,7 +17,7 @@ def import_turku_addresses(apps, schema_editor):
         return
 
     transformer = Transformer.from_crs('epsg:3067', 'epsg:4326')
-    Address = apps.get_model('fvh_courier', 'Address')
+    Address = apps.get_model('olmap', 'Address')
 
     print('Loading address data...')
     response = requests.get('https://www.avoindata.fi/data/dataset/cf9208dc-63a9-44a2-9312-bbd2c3952596/resource/986fbcd8-589f-460c-81a3-5efb8ab4b880/download/02_osoitteet_2020-08-14.opt')
@@ -56,7 +56,7 @@ def import_helsinki_addresses(apps, schema_editor):
         return
 
     transformer = Transformer.from_crs('epsg:3879', 'epsg:4326')
-    Address = apps.get_model('fvh_courier', 'Address')
+    Address = apps.get_model('olmap', 'Address')
 
     response = requests.get('https://kartta.hel.fi/ws/geoserver/avoindata/wfs?version=1.1.0&request=GetFeature&typeName=avoindata:Osoiteluettelo_piste_rekisteritiedot&outputformat=json')
     addresses = response.json()
@@ -107,7 +107,7 @@ def sync_addresses(apps, schema_editor):
         elif self.street and self.housenumber:
             self.street_address = f'{self.street} {self.housenumber} {self.unit or ""}'.strip()
 
-    Address = apps.get_model('fvh_courier', 'Address')
+    Address = apps.get_model('olmap', 'Address')
     for address in Address.objects.all():
         sync_street_address(address)
         address.save()
@@ -115,7 +115,7 @@ def sync_addresses(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('fvh_courier', '0001_initial'), ('fvh_courier', '0002_add_user_groups'), ('fvh_courier', '0003_userlocation'), ('fvh_courier', '0004_auto_20191216_1331'), ('fvh_courier', '0005_package_uuid'), ('fvh_courier', '0006_packagesms'), ('fvh_courier', '0007_osmfeature_osmimagenote'), ('fvh_courier', '0008_auto_20200124_1211'), ('fvh_courier', '0009_auto_20200124_1228'), ('fvh_courier', '0010_auto_20200205_0723'), ('fvh_courier', '0011_add_reviewer_group'), ('fvh_courier', '0012_auto_20200218_1512'), ('fvh_courier', '0013_auto_20200220_1039'), ('fvh_courier', '0014_auto_20200220_1427'), ('fvh_courier', '0015_add_sender_group'), ('fvh_courier', '0016_auto_20200309_1014'), ('fvh_courier', '0017_imagenotedownvote_imagenoteupvote'), ('fvh_courier', '0018_osmimagenotecomment'), ('fvh_courier', '0019_osmfeature_associated_entrances'), ('fvh_courier', '0020_auto_20200327_0955'), ('fvh_courier', '0021_auto_20200331_1502'), ('fvh_courier', '0022_auto_20200331_1517'), ('fvh_courier', '0023_auto_20200401_0956'), ('fvh_courier', '0024_package_delivery_instructions'), ('fvh_courier', '0025_auto_20200402_1257'), ('fvh_courier', '0026_auto_20200403_0832'), ('fvh_courier', '0027_auto_20200406_0902'), ('fvh_courier', '0028_auto_20200427_0613'), ('fvh_courier', '0029_auto_20200506_1325'), ('fvh_courier', '0030_populate_courier_models'), ('fvh_courier', '0031_auto_20200507_0751'), ('fvh_courier', '0032_auto_20200507_0754'), ('fvh_courier', '0033_auto_20200508_0729'), ('fvh_courier', '0034_delete_userlocation'), ('fvh_courier', '0035_ignoredholviproduct_requiredholviproduct'), ('fvh_courier', '0036_auto_20200601_1323'), ('fvh_courier', '0037_infoboard'), ('fvh_courier', '0038_osmimagenote_processed_by'), ('fvh_courier', '0039_auto_20200626_1613'), ('fvh_courier', '0040_auto_20200827_1217'), ('fvh_courier', '0041_sync_addresses'), ('fvh_courier', '0042_address_official'), ('fvh_courier', '0043_import_helsinki_addresses'), ('fvh_courier', '0044_import_turku_addresses'), ('fvh_courier', '0045_trafficsign'), ('fvh_courier', '0046_auto_20201019_1122'), ('fvh_courier', '0047_auto_20201022_1342'), ('fvh_courier', '0048_transfer_tags'), ('fvh_courier', '0049_delete_imagenotetag'), ('fvh_courier', '0050_auto_20201030_1542'), ('fvh_courier', '0051_auto_20201217_1340')]
+    replaces = [('olmap', '0001_initial'), ('olmap', '0002_add_user_groups'), ('olmap', '0003_userlocation'), ('olmap', '0004_auto_20191216_1331'), ('olmap', '0005_package_uuid'), ('olmap', '0006_packagesms'), ('olmap', '0007_osmfeature_osmimagenote'), ('olmap', '0008_auto_20200124_1211'), ('olmap', '0009_auto_20200124_1228'), ('olmap', '0010_auto_20200205_0723'), ('olmap', '0011_add_reviewer_group'), ('olmap', '0012_auto_20200218_1512'), ('olmap', '0013_auto_20200220_1039'), ('olmap', '0014_auto_20200220_1427'), ('olmap', '0015_add_sender_group'), ('olmap', '0016_auto_20200309_1014'), ('olmap', '0017_imagenotedownvote_imagenoteupvote'), ('olmap', '0018_osmimagenotecomment'), ('olmap', '0019_osmfeature_associated_entrances'), ('olmap', '0020_auto_20200327_0955'), ('olmap', '0021_auto_20200331_1502'), ('olmap', '0022_auto_20200331_1517'), ('olmap', '0023_auto_20200401_0956'), ('olmap', '0024_package_delivery_instructions'), ('olmap', '0025_auto_20200402_1257'), ('olmap', '0026_auto_20200403_0832'), ('olmap', '0027_auto_20200406_0902'), ('olmap', '0028_auto_20200427_0613'), ('olmap', '0029_auto_20200506_1325'), ('olmap', '0030_populate_courier_models'), ('olmap', '0031_auto_20200507_0751'), ('olmap', '0032_auto_20200507_0754'), ('olmap', '0033_auto_20200508_0729'), ('olmap', '0034_delete_userlocation'), ('olmap', '0035_ignoredholviproduct_requiredholviproduct'), ('olmap', '0036_auto_20200601_1323'), ('olmap', '0037_infoboard'), ('olmap', '0038_osmimagenote_processed_by'), ('olmap', '0039_auto_20200626_1613'), ('olmap', '0040_auto_20200827_1217'), ('olmap', '0041_sync_addresses'), ('olmap', '0042_address_official'), ('olmap', '0043_import_helsinki_addresses'), ('olmap', '0044_import_turku_addresses'), ('olmap', '0045_trafficsign'), ('olmap', '0046_auto_20201019_1122'), ('olmap', '0047_auto_20201022_1342'), ('olmap', '0048_transfer_tags'), ('olmap', '0049_delete_imagenotetag'), ('olmap', '0050_auto_20201030_1542'), ('olmap', '0051_auto_20201217_1340')]
 
     initial = True
 
@@ -156,9 +156,9 @@ class Migration(migrations.Migration):
                 ('modified_at', models.DateTimeField(auto_now=True)),
                 ('lat', models.DecimalField(decimal_places=8, max_digits=11)),
                 ('lon', models.DecimalField(decimal_places=8, max_digits=11)),
-                ('image', models.ImageField(blank=True, null=True, upload_to=fvh_courier.models.osm_image_notes.upload_osm_images_to)),
+                ('image', models.ImageField(blank=True, null=True, upload_to=olmap.models.osm_image_notes.upload_osm_images_to)),
                 ('comment', models.TextField(blank=True)),
-                ('osm_features', models.ManyToManyField(blank=True, to='fvh_courier.OSMFeature')),
+                ('osm_features', models.ManyToManyField(blank=True, to='olmap.OSMFeature')),
                 ('created_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='created_notes', to=settings.AUTH_USER_MODEL)),
                 ('hidden_reason', models.TextField(blank=True, help_text='If reviewer decides to hide the note, document reason here.')),
                 ('modified_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='modified_notes', to=settings.AUTH_USER_MODEL)),
@@ -181,7 +181,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('type', models.CharField(blank=True, choices=[['fence', 'fence'], ['wall', 'wall'], ['block', 'block'], ['bollard', 'bollard']], max_length=32)),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='olmap.osmimagenote')),
             ],
             options={
                 'abstract': False,
@@ -196,7 +196,7 @@ class Migration(migrations.Migration):
                 ('ramp', models.BooleanField(blank=True, null=True)),
                 ('width', models.DecimalField(blank=True, decimal_places=2, help_text='In meters', max_digits=4, null=True)),
                 ('incline', models.CharField(blank=True, choices=[['up', 'up'], ['down', 'down']], help_text='From street level', max_length=32)),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='olmap.osmimagenote')),
             ],
             options={
                 'abstract': False,
@@ -219,7 +219,7 @@ class Migration(migrations.Migration):
                 ('type', models.CharField(blank=True, choices=[['main', 'main'], ['secondary', 'secondary'], ['service', 'service'], ['staircase', 'staircase']], max_length=32)),
                 ('wheelchair', models.BooleanField(blank=True, null=True)),
                 ('loadingdock', models.BooleanField(default=False)),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='olmap.osmimagenote')),
             ],
             options={
                 'abstract': False,
@@ -237,7 +237,7 @@ class Migration(migrations.Migration):
                 ('phone', models.CharField(blank=True, max_length=32)),
                 ('opening_hours', models.CharField(blank=True, max_length=64)),
                 ('lift_gate', models.BooleanField(default=False)),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='olmap.osmimagenote')),
             ],
             options={
                 'abstract': False,
@@ -247,7 +247,7 @@ class Migration(migrations.Migration):
             name='ImageNoteUpvote',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='upvotes', to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='upvotes', to='olmap.osmimagenote')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='image_note_upvotes', to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -255,7 +255,7 @@ class Migration(migrations.Migration):
             name='ImageNoteDownvote',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='downvotes', to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='downvotes', to='olmap.osmimagenote')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='image_note_downvotes', to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -265,7 +265,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True, db_index=True)),
                 ('comment', models.TextField()),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='olmap.osmimagenote')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='image_note_comments', to=settings.AUTH_USER_MODEL)),
             ],
             options={
@@ -275,12 +275,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='osmfeature',
             name='associated_entrances',
-            field=models.ManyToManyField(blank=True, related_name='associated_features', to='fvh_courier.OSMFeature'),
+            field=models.ManyToManyField(blank=True, related_name='associated_features', to='olmap.OSMFeature'),
         ),
         migrations.AlterField(
             model_name='osmimagenote',
             name='osm_features',
-            field=models.ManyToManyField(blank=True, related_name='image_notes', to='fvh_courier.OSMFeature'),
+            field=models.ManyToManyField(blank=True, related_name='image_notes', to='olmap.OSMFeature'),
         ),
         migrations.AlterField(
             model_name='address',
@@ -304,7 +304,7 @@ class Migration(migrations.Migration):
                 ('opening_hours', models.CharField(blank=True, max_length=64)),
                 ('level', models.CharField(blank=True, help_text='Floor(s), e.g. 1-3', max_length=8)),
                 ('type', models.CharField(help_text='See https://wiki.openstreetmap.org/wiki/Key:amenity', max_length=32)),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='olmap.osmimagenote')),
                 ('delivery_covid19', models.CharField(blank=True, max_length=64)),
                 ('opening_hours_covid19', models.CharField(blank=True, max_length=64)),
                 ('takeaway_covid19', models.CharField(blank=True, max_length=64)),
@@ -325,7 +325,7 @@ class Migration(migrations.Migration):
                 ('opening_hours', models.CharField(blank=True, max_length=64)),
                 ('level', models.CharField(blank=True, help_text='Floor(s), e.g. 1-3', max_length=8)),
                 ('type', models.CharField(blank=True, choices=[['association', 'association'], ['company', 'company'], ['diplomatic', 'diplomatic'], ['educational_institution', 'educational_institution'], ['government', 'government']], max_length=32)),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='olmap.osmimagenote')),
                 ('opening_hours_covid19', models.CharField(blank=True, max_length=64)),
             ],
             options={
@@ -344,7 +344,7 @@ class Migration(migrations.Migration):
                 ('opening_hours', models.CharField(blank=True, max_length=64)),
                 ('level', models.CharField(blank=True, help_text='Floor(s), e.g. 1-3', max_length=8)),
                 ('type', models.CharField(blank=True, help_text='See https://wiki.openstreetmap.org/wiki/Key:shop', max_length=32)),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='olmap.osmimagenote')),
                 ('opening_hours_covid19', models.CharField(blank=True, max_length=64)),
             ],
             options={
@@ -366,7 +366,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('type', models.CharField(blank=True, choices=[['map', 'map'], ['board', 'board']], default='board', max_length=32)),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='olmap.osmimagenote')),
             ],
             options={
                 'abstract': False,
@@ -424,7 +424,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('type', models.CharField(blank=True, choices=[['Max height', 'Max height'], ['Max weight', 'Max weight'], ['No stopping', 'No stopping'], ['No parking', 'No parking'], ['Loading zone', 'Loading zone'], ['Parking', 'Parking']], max_length=32)),
                 ('text', models.CharField(blank=True, max_length=128)),
-                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='fvh_courier.osmimagenote')),
+                ('image_note', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='olmap.osmimagenote')),
             ],
             options={
                 'abstract': False,
