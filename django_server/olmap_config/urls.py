@@ -23,8 +23,8 @@ from olmap import rest
 
 
 schema_view = get_schema_view(
-    title="FVH City Logistics API",
-    description="API for interacting with packages in the FVH City Logistics application",
+    title="Open Logistics Map API",
+    description="API for interacting with packages in the Open Logistics Map application",
     version="1.0.0", public=True)
 
 

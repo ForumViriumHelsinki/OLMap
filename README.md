@@ -1,12 +1,13 @@
-# CityLogistics
-Proof of concept app for last mile city logistics
+# Open Logistics Map - OLMap
+App for collecting and discussing geospatial features important for last mile city logistics
+(entrances, steps, gates, barriers etc.) and modeling them for inclusion in OpenStreetMap.
 
 ## Installation
 
 **Prerequisites**: 
 * Python 3.7 with pip
 * Node.js 13.3 with ./node_modules/.bin in the PATH
-* Postgres with a db available as configured in django_server/city_logistics/settings.py
+* Postgres with a db available as configured in django_server/olmap_config/settings.py
 
 In project root:
 
@@ -20,7 +21,6 @@ python manage.py createsuperuser
 <Configure user to your satisfaction>
 python manage.py runserver
 <Verify that you can login at 127.0.0.1:8000/admin/ >
-<Create a courier user, e.g. "courier" which belongs to "courier" group>
 ```
 
 In react_ui:
