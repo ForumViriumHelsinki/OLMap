@@ -14,9 +14,14 @@ export function sessionRequest(url, options={}) {
     options.headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(options.data);
   }
-  const token = localStorage.getItem('olmap-token');
-  if (token) {
-    options.headers.Authorization = "Token " + token;
+  try {
+    const token = localStorage.getItem('olmap-token');
+    if (token) {
+      options.headers.Authorization = "Token " + token;
+    }
+  }
+  catch (DOMException) {
+    console.log('Local storage not accessible, proceeding as anonymous user.')
   }
   return fetch(settings.serverRoot + url, options);
 }
