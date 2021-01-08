@@ -157,20 +157,21 @@ class OSMFeaturesViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class OSMImageNotesGeoJSON(ListAPIView):
-    serializer_class = BaseOSMImageNoteSerializer
-    queryset = models.OSMImageNote.objects.filter(visible=True)
+    serializer_class = DictOSMImageNoteSerializer
+    queryset = models.OSMImageNote.objects.filter(visible=True).values()
     permission_classes = [permissions.AllowAny]
 
     def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer()
         return Response({
             "type": "FeatureCollection",
             "features": [{
                 "type": "Feature",
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [note.lon, note.lat]
+                    "coordinates": [note['lon'], note['lat']]
                 },
-                "properties": self.get_serializer(note).data
+                "properties": serializer.to_representation(note)
             } for note in self.get_queryset()]
         })
 

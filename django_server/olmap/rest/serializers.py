@@ -77,6 +77,7 @@ class DictOSMImageNoteSerializer(BaseOSMImageNoteSerializer):
     is_reviewed = serializers.BooleanField(read_only=True, source='reviewed_by_id')
     is_processed = serializers.BooleanField(read_only=True, source='processed_by_id')
     created_by = serializers.IntegerField(read_only=True, source='created_by_id')
+    image = serializers.SerializerMethodField()
 
     false_default_fields = ['is_reviewed', 'is_processed']
 
@@ -85,6 +86,9 @@ class DictOSMImageNoteSerializer(BaseOSMImageNoteSerializer):
         for field in self.false_default_fields:
             result.setdefault(field, False)
         return result
+
+    def get_image(self, note):
+        return settings.MEDIA_URL + note['image'] if note.get('image', None) else None
 
 
 class OSMImageNoteSerializer(BaseOSMImageNoteSerializer):
