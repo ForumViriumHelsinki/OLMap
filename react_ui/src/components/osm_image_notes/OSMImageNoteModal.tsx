@@ -194,6 +194,9 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
           <Icon icon="open_with"/>
         </span>}
       {' '}
+      <a className="text-primary ml-1" target="google-maps" href={`https://maps.google.com/?layer=c&cbll=${note?.lat},${note.lon}`}>
+        <span style={{fontSize: 21, marginRight: -4}}>G</span><Icon icon="place"/>
+      </a>
       <textarea id="permalink" value={window.location.href} style={{width: 0, height: 0, opacity: 0}} readOnly/>
       {note.comment
         ? <>{note.comment}<br/>by {credit}</>
