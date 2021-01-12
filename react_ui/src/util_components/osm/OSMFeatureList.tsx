@@ -104,11 +104,10 @@ export default class OSMFeatureList extends React.Component<OSMFeatureListProps,
   };
 
   toggleFilter = (f: string) => {
-    const selectedFilters = this.state.selectedFilters.slice();
+    const {selectedFilters} = this.state;
     const filter = f as filterOption;
-    if (selectedFilters.includes(filter)) selectedFilters.splice(selectedFilters.indexOf(filter), 1);
-    else selectedFilters.push(filter);
-    this.setState({selectedFilters});
+    if (selectedFilters.includes(filter)) this.setState({selectedFilters: []});
+    else this.setState({selectedFilters: [filter]});
   };
 
   selectedFeatures() {
