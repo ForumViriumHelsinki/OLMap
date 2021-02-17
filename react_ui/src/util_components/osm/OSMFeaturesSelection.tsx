@@ -115,6 +115,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
 
     const query = osmFeatureTypes.map(({requiredTag}) => `node['${requiredTag}']`).join(';') + ';way[name]';
     const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter');
+    this.setState({nearbyOSMFeatures: []});
     overpassFrontend.BBoxQuery(query, overpassBounds, {},
       (err: any, response: any) => {
         if (err) console.error(err);
