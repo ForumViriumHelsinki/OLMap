@@ -1,4 +1,6 @@
 import React from 'react';
+// @ts-ignore
+import _ from 'lodash';
 
 // @ts-ignore
 import OverpassFrontend from 'overpass-frontend';
@@ -118,12 +120,12 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
     this.setState({nearbyOSMFeatures: []});
     overpassFrontend.BBoxQuery(query, overpassBounds, {},
       (err: any, response: any) => {
-        if (location != this.props.location) return;
+        if (!_.isEqual(location, this.props.location)) return;
         if (err) console.error(err);
         this.addNearbyFeature(response.data);
       },
       (err: any) => {
-        if (location != this.props.location) return;
+        if (!_.isEqual(location, this.props.location)) return;
         if (!this.state.nearbyOSMFeatures.length && onSelect) onSelect([]);
         else {
           this.setState({featuresLoading: false});
