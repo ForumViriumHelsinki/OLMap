@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import MyPositionMap from 'util_components/MyPositionMap';
 // @ts-ignore
-import {Button, Spinner, ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem} from "reactstrap";
+import {Button, Spinner} from "reactstrap";
 import Icon from "util_components/bootstrap/Icon";
 import {LocationTuple} from "util_components/types";
 import Modal, {ModalBody} from "util_components/bootstrap/Modal";
@@ -12,7 +12,7 @@ import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
-import {OSMFeatureProps, OSMImageNote, AppContext} from "components/types";
+import {OSMFeatureProps, OSMImageNote} from "components/types";
 import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
 import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
 import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
@@ -21,6 +21,8 @@ import {changeset, OSMFeature} from "util_components/osm/types";
 import OSMChangesetSelection from "util_components/osm/OSMChangesetSelection";
 import OSMChangesetMapLayer from "util_components/osm/OSMChangesetMapLayer";
 import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
+import OSMImageNoteFiltersButton from "components/osm_image_notes/OSMImageNoteFiltersButton";
+import NotificationsButton from "components/osm_image_notes/NotificationsButton";
 
 
 type OSMImageNotesEditorProps = {
@@ -40,7 +42,6 @@ type OSMImageNotesEditorState = OSMImageNote & {
   tags: string[],
   osmProperties: any,
   filters: any,
-  filtersOpen: boolean,
   nearbyFeatures: OSMFeature[],
   nearbyAddresses: OSMFeature[],
   selectChangeset: boolean,
@@ -64,7 +65,6 @@ const initialState: () => OSMImageNotesEditorState = () => ({
   tags: [],
   osmProperties: {},
   filters: {},
-  filtersOpen: false,
   nearbyFeatures: [],
   nearbyAddresses: [],
   selectChangeset: false
@@ -74,8 +74,6 @@ const {imagesUploading, ...resetState} = initialState();
 
 export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEditorProps, OSMImageNotesEditorState> {
   state: OSMImageNotesEditorState = initialState();
-
-  static contextType = AppContext;
 
   imageNotesRef = React.createRef();
   changesetLayerRef = React.createRef<OSMChangesetMapLayer>();
@@ -89,13 +87,11 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
     const {
       status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags,
       osmProperties, filters, osm_features, nearbyFeatures, selectChangeset, selectedChangeset, nearbyAddresses,
-      filtersOpen, requestPhoto
+      requestPhoto
     } = this.state;
 
     const location = [lon, lat] as LocationTuple;
-    const {user} = this.context;
 
-    const nonStatusFilters = _.omit(filters, ['is_processed', 'is_reviewed']);
     return <div className="flex-grow-1">
       <div className="position-absolute map-tools p-3">
         <input name="image" id="image" className="d-none" type="file"
@@ -136,51 +132,8 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
               <Button {...this.childProps.toolButton} onClick={this.reloadNotes}>
                 <Icon icon="refresh"/>
               </Button>{' '}
-              <ButtonDropdown isOpen={filtersOpen} toggle={() => this.setState({filtersOpen: !filtersOpen})}>
-                <DropdownToggle {...this.childProps.toolButton}>
-                  <Icon icon="filter_alt"/>
-                </DropdownToggle>
-                <DropdownMenu>
-                  <DropdownItem header>Filter</DropdownItem>
-                  <DropdownItem className={(filters.created_by) ? 'text-primary' : ''}
-                                onClick={() => this.toggleFilter({created_by: user.id})}>
-                    My notes
-                  </DropdownItem>
-                  <DropdownItem divider/>
-                  <DropdownItem className={(filters.is_processed === false) ? 'text-primary' : ''}
-                                onClick={() => this.setState({
-                                  filters:
-                                    (filters.is_processed === false) ? nonStatusFilters
-                                    : _.assign({}, filters, {is_processed: false, is_reviewed: false})
-                                })}>
-                    New
-                  </DropdownItem>
-                  <DropdownItem className={(filters.is_processed) ? 'text-primary' : ''}
-                                onClick={() => this.setState({
-                                  filters:
-                                    (filters.is_processed) ? nonStatusFilters
-                                    : _.assign({}, filters, {is_processed: true, is_reviewed: false})
-                                })}>
-                    In OSM
-                  </DropdownItem>
-                  <DropdownItem className={(filters.is_reviewed) ? 'text-primary' : ''}
-                                onClick={() => this.setState({
-                                  filters:
-                                    (filters.is_reviewed) ? nonStatusFilters
-                                    : _.assign({}, nonStatusFilters, {is_reviewed: true})
-                                })}>
-                    Reviewed
-                  </DropdownItem>
-                  <DropdownItem divider/>
-                  {osmFeatureProperties && Object.keys(osmFeatureProperties).map((tag) =>
-                    <DropdownItem key={tag}
-                                  className={(filters.tags && filters.tags.includes(tag)) ? 'text-primary' : ''}
-                                  onClick={() => this.toggleFilter({tags: tag})}>
-                      {tag}
-                    </DropdownItem>
-                  )}
-                </DropdownMenu>
-              </ButtonDropdown>
+              <OSMImageNoteFiltersButton onFiltersChanged={filters => this.setState({filters})}
+                                         osmFeatureProperties={osmFeatureProperties} />
               {' '}
               <Button {...this.childProps.toolButton} tag="a" href="/editing-process.html" target="_blank">
                 <Icon icon="help"/>
@@ -188,6 +141,7 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
               <Button {...this.childProps.toolButton} onClick={() => this.setState({selectChangeset: true})}>
                 <Icon icon="compare_arrows"/>
               </Button>{' '}
+              <NotificationsButton/>
             </>,
           locating:
             <div className="mt-4 text-right">
@@ -275,23 +229,6 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
   componentDidMount() {
     const {newNote} = this.props;
     if (newNote) this.setState({requestPhoto: true});
-  }
-
-  private toggleFilter(filter: any) {
-    const filters = Object.assign({}, this.state.filters);
-
-    Object.entries(filter).forEach(([key, value]) => {
-      if (key == 'tags') {
-        if (filters.tags && filters.tags.includes(value)) {
-          filters.tags = _.without(filters.tags, value);
-          if (!filters.tags.length) delete filters.tags;
-        }
-        else filters.tags = (filters.tags || []).concat([value]);
-      }
-      else if ((filters[key] == value) || (value === undefined)) delete filters[key];
-      else filters[key] = value;
-    });
-    this.setState({filters});
   }
 
   showLocation = (location: any) => {

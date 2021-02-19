@@ -65,6 +65,10 @@ $theme-colors: (
 
 
 // Misc style corrections for our use cases:
+body {
+  overflow: hidden;
+}
+
 a, button {
   background: none;
   border: none;
@@ -178,4 +182,10 @@ div.leaflet-top, div.leaflet-bottom {
   z-index: 500;
   right: 0;
   background: rgba(255, 255, 255, 0.4)
+}
+
+.text-ellipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }

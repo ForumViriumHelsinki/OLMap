@@ -88,6 +88,15 @@ class OSMImageNote(TimestampedModel):
     def is_processed(self):
         return bool(self.processed_by_id)
 
+    def interested_users(self):
+        from olmap.rest.permissions import REVIEWER_GROUP
+
+        return User.objects.filter(
+            models.Q(id__in=[self.created_by_id, self.modified_by_id, self.processed_by_id, self.reviewed_by_id]) |
+            models.Q(image_note_comments__image_note=self) |
+            models.Q(groups__name=REVIEWER_GROUP)
+        ).distinct()
+
 
 class ImageNoteUpvote(base.Model):
     user = models.ForeignKey(User, related_name='image_note_upvotes', on_delete=models.CASCADE)
@@ -110,3 +119,18 @@ class OSMImageNoteComment(base.Model):
 
     def __str__(self):
         return self.comment or super().__str__()
+
+    def notify_users(self):
+        """
+        Create OSMImageNoteCommentNotifications for users interested in this image note to notify them of the new
+        comment
+        """
+        for user in self.image_note.interested_users():
+            if user != self.user:
+                self.notifications.create(user=user)
+
+
+class OSMImageNoteCommentNotification(base.Model):
+    comment = models.ForeignKey(OSMImageNoteComment, related_name='notifications', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
+    seen = models.DateTimeField(null=True, blank=True, db_index=True)

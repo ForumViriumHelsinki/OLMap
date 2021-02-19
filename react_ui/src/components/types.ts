@@ -15,7 +15,8 @@ export type OSMImageNoteComment = {
     created_at: string,
     comment: string,
     user: string,
-    id: number
+    id: number,
+    image_note: number
 }
 
 export type OSMImageNote = {
@@ -37,6 +38,11 @@ export type OSMImageNote = {
     downvotes?: userId[],
     comments?: OSMImageNoteComment[]
 };
+
+export type Notification = {
+    id: number,
+    comment: OSMImageNoteComment
+}
 
 export type JSONSchema = any
 

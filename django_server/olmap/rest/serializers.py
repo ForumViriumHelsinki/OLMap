@@ -63,6 +63,14 @@ class OSMImageNoteCommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class OSMImageNoteCommentNotificationSerializer(serializers.ModelSerializer):
+    comment = OSMImageNoteCommentSerializer(read_only=True)
+
+    class Meta:
+        model = models.OSMImageNoteCommentNotification
+        fields = ['comment', 'id']
+
+
 class BaseOSMImageNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OSMImageNote

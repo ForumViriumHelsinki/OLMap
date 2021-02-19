@@ -1,5 +1,6 @@
 import math
 
+from django.utils import timezone
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView
@@ -11,7 +12,7 @@ from .permissions import IsReviewer, IsReviewerOrCreator
 from .serializers import (
     OSMImageNoteWithPropsSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer,
     OSMFeatureSerializer, BaseOSMImageNoteSerializer, AddressAsOSMNodeSerializer,
-    DictOSMImageNoteSerializer)
+    DictOSMImageNoteSerializer, OSMImageNoteCommentNotificationSerializer)
 
 
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
@@ -132,8 +133,33 @@ class OSMImageNoteCommentsViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         if self.request.user.is_anonymous:
-            return serializer.save()
-        return serializer.save(user=self.request.user)
+            comment = serializer.save()
+        else:
+            comment = serializer.save(user=self.request.user)
+        comment.notify_users()
+        return comment
+
+
+class OSMImageNoteCommentNotificationsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.OSMImageNoteCommentNotification.objects\
+        .filter(seen__isnull=True)\
+        .select_related('comment__user')\
+        .order_by('-id')
+    permission_classes = [permissions.AllowAny]
+    serializer_class = OSMImageNoteCommentNotificationSerializer
+
+    def get_queryset(self):
+        if self.request.user.is_anonymous:
+            return self.queryset.none()
+        return self.queryset.filter(user=self.request.user)
+
+    @action(methods=['PUT'], detail=True)
+    def mark_seen(self, request, *args, **kwargs):
+        notification = self.get_object()
+        if not notification.seen:
+            notification.seen = timezone.now()
+        notification.save()
+        return Response('OK')
 
 
 class OSMEntrancesViewSet(viewsets.ModelViewSet):

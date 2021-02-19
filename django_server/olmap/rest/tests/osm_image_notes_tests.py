@@ -287,7 +287,8 @@ class OSMImageNotesTests(FVHAPITestCase):
         user = self.create_and_login_user()
 
         # And given a successfully created OSM image note
-        note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188')
+        user2 = User.objects.create(username='other_user')
+        note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188', created_by=user2)
 
         # When requesting to comment the OSM image note over ReST
         url = reverse('osmimagenotecomment-list')
@@ -304,6 +305,9 @@ class OSMImageNotesTests(FVHAPITestCase):
         url = reverse('osmimagenote-detail', kwargs={'pk': note.id})
         response = self.client.get(url)
         self.assertEqual(response.json()['comments'][0]['comment'], 'nice!')
+
+        # And a notification of the comment is created for the note creator:
+        self.assertEqual(user2.notifications.count(), 1)
 
         # And when subsequently requesting to delete the note
         url = reverse('osmimagenotecomment-detail', kwargs={'pk': note.comments.first().id})
