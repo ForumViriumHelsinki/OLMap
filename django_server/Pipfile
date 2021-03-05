@@ -31,6 +31,7 @@ geopy = "*"
 pyproj = ">=2.6.1"
 overpy = "*"
 django-rename-app = "*"
+shapely = "*"
 
 [requires]
 python_version = "3.7"

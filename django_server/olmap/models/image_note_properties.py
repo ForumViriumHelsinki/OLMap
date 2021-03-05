@@ -1,6 +1,12 @@
+import overpy
+from geopy.distance import distance
+from shapely.geometry import Point
+from shapely.strtree import STRtree
+
 from django.db import models
 
 from .osm_image_notes import OSMImageNote
+from olmap.utils import intersection_matches
 
 
 def dimension_field():
@@ -96,6 +102,43 @@ class Entrance(Lockable, BaseAddress):
             'door': 'loadingdock' if self.loadingdock else None,
             'wheelchair': bool_to_osm(self.wheelchair)
         }))
+
+    @classmethod
+    def link_notes_to_osm_objects(cls):
+        api = overpy.Overpass()
+
+        query = """
+        [out:json][timeout:25];
+        node["entrance"](area:3600034914)->.entrances;
+        .entrances out;
+        """
+        print('Fetching Helsinki entrances from OSM...')
+        result = api.query(query)
+        print(f'{len(result.nodes)} entrances found.')
+
+        points = []
+        for entrance in result.nodes:
+            p = Point(entrance.lat, entrance.lon)
+            p.entrance = entrance
+            points.append(p)
+        tree = STRtree(points)
+
+        entrances = cls.objects.filter(image_note__processed_by__isnull=False)\
+            .prefetch_related('image_note__osm_features')
+        print(f'Checking {len(entrances)} OLMap entrances for unlinked matches...')
+        linked_count = 0
+        for entrance in entrances:
+            note_position = [entrance.image_note.lat, entrance.image_note.lon]
+            nearest_osm = tree.nearest(Point(*note_position)).entrance
+            dst = distance([nearest_osm.lat, nearest_osm.lon], note_position).meters
+            tags = entrance.as_osm_tags()
+            if (dst < 5 and intersection_matches(nearest_osm.tags, tags,
+                                                 'addr:unit', 'addr:housenumber', 'addr:street', 'entrance')):
+                added = entrance.image_note.link_osm_id(nearest_osm.id)
+                if added:
+                    linked_count += 1
+                    print(f'Linked OSM entrance {nearest_osm.id} to note {entrance.image_note_id}; distance {str(dst)[:4]}m.')
+        print(f'All done; {linked_count} new links created.')
 
 
 class Steps(ImageNoteProperties):

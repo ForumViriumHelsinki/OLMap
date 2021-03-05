@@ -97,6 +97,13 @@ class OSMImageNote(TimestampedModel):
             models.Q(groups__name=REVIEWER_GROUP)
         ).distinct()
 
+    def link_osm_id(self, osm_id):
+        if osm_id in [f.id for f in self.osm_features.all()]:
+            return
+        feature = OSMFeature.objects.get_or_create(id=osm_id)[0]
+        self.osm_features.add(feature)
+        return feature
+
 
 class ImageNoteUpvote(base.Model):
     user = models.ForeignKey(User, related_name='image_note_upvotes', on_delete=models.CASCADE)
