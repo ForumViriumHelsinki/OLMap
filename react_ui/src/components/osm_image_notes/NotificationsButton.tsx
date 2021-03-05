@@ -37,7 +37,7 @@ export default class NotificationsButton extends React.Component<NotificationsBu
         <Icon icon="inbox"/>
         {notifications.length}
       </DropdownToggle>
-      <DropdownMenu right>
+      <DropdownMenu>
         <div className="text-ellipsis" style={{maxWidth: '50vw', maxHeight: 'calc(100vh - 200px)', overflowY: 'auto'}}>
           {notifications.map(notification =>
             <a href={`#/Notes/${notification.comment.image_note}`}
