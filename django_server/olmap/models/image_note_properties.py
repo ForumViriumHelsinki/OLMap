@@ -1,5 +1,8 @@
+from time import sleep
+
 import overpy
 from geopy.distance import distance
+from overpy.exception import OverpassTooManyRequests
 from shapely.geometry import Point
 from shapely.strtree import STRtree
 
@@ -55,7 +58,11 @@ class ImageNoteProperties(models.Model):
         .nodes out;
         """
         print(f'Fetching Helsinki {cls.__name__}s from OSM...')
-        result = api.query(query)
+        try:
+            result = api.query(query)
+        except OverpassTooManyRequests:
+            sleep(30)
+            result = api.query(query)
         print(f'{len(result.nodes)} {cls.__name__}s found.')
 
         points = []
