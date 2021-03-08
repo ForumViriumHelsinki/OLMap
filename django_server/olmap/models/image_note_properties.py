@@ -32,11 +32,62 @@ def bool_to_osm(b):
 class ImageNoteProperties(models.Model):
     image_note = models.ForeignKey(OSMImageNote, on_delete=models.CASCADE)
 
+    # Override in subclasses to enable automatic linking of OSM nodes:
+    osm_node_query = None
+    required_osm_matching_tags = []
+    max_distance_to_osm_node = 5
+
     class Meta:
         abstract = True
 
     def as_osm_tags(self):
         return {}
+
+    @classmethod
+    def link_notes_to_osm_objects(cls):
+        if not (cls.osm_node_query and len(cls.required_osm_matching_tags)):
+            return
+        api = overpy.Overpass()
+
+        query = f"""
+        [out:json][timeout:25];
+        node[{cls.osm_node_query}](area:3600034914)->.nodes;
+        .nodes out;
+        """
+        print(f'Fetching Helsinki {cls.__name__}s from OSM...')
+        result = api.query(query)
+        print(f'{len(result.nodes)} {cls.__name__}s found.')
+
+        points = []
+        for node in result.nodes:
+            p = Point(node.lat, node.lon)
+            p.node = node
+            points.append(p)
+        tree = STRtree(points)
+
+        node_index = dict([(node.id, node) for node in result.nodes])
+
+        instances = cls.objects.filter(image_note__processed_by__isnull=False)\
+            .prefetch_related('image_note__osm_features')
+        print(f'Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...')
+        linked_count = 0
+        for instance in instances:
+            already_linked = False
+            for node in instance.image_note.osm_features.all():
+                if node_index.get(node.id, None):
+                    already_linked = True
+            if already_linked:
+                continue
+            note_position = [instance.image_note.lat, instance.image_note.lon]
+            nearest_osm = tree.nearest(Point(*note_position)).node
+            dst = distance([nearest_osm.lat, nearest_osm.lon], note_position).meters
+            tags = instance.as_osm_tags()
+            if (dst < cls.max_distance_to_osm_node and intersection_matches(nearest_osm.tags, tags, *cls.required_osm_matching_tags)):
+                added = instance.image_note.link_osm_id(nearest_osm.id)
+                if added:
+                    linked_count += 1
+                    print(f'Linked OSM {cls.__name__} {nearest_osm.id} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')
+        print(f'All done; {linked_count} new links created.')
 
 
 class InfoBoard(ImageNoteProperties):
@@ -96,49 +147,16 @@ class Entrance(Lockable, BaseAddress):
     wheelchair = models.BooleanField(blank=True, null=True)
     loadingdock = models.BooleanField(default=False)
 
+    # For automatic linking of OSM nodes to OLMap instances:
+    osm_node_query = 'entrance'
+    required_osm_matching_tags = ['addr:unit', 'addr:housenumber', 'addr:street', 'entrance']
+
     def as_osm_tags(self):
         return dict(super().as_osm_tags(), **filter_dict({
             'entrance': self.type or 'yes',
             'door': 'loadingdock' if self.loadingdock else None,
             'wheelchair': bool_to_osm(self.wheelchair)
         }))
-
-    @classmethod
-    def link_notes_to_osm_objects(cls):
-        api = overpy.Overpass()
-
-        query = """
-        [out:json][timeout:25];
-        node["entrance"](area:3600034914)->.entrances;
-        .entrances out;
-        """
-        print('Fetching Helsinki entrances from OSM...')
-        result = api.query(query)
-        print(f'{len(result.nodes)} entrances found.')
-
-        points = []
-        for entrance in result.nodes:
-            p = Point(entrance.lat, entrance.lon)
-            p.entrance = entrance
-            points.append(p)
-        tree = STRtree(points)
-
-        entrances = cls.objects.filter(image_note__processed_by__isnull=False)\
-            .prefetch_related('image_note__osm_features')
-        print(f'Checking {len(entrances)} OLMap entrances for unlinked matches...')
-        linked_count = 0
-        for entrance in entrances:
-            note_position = [entrance.image_note.lat, entrance.image_note.lon]
-            nearest_osm = tree.nearest(Point(*note_position)).entrance
-            dst = distance([nearest_osm.lat, nearest_osm.lon], note_position).meters
-            tags = entrance.as_osm_tags()
-            if (dst < 5 and intersection_matches(nearest_osm.tags, tags,
-                                                 'addr:unit', 'addr:housenumber', 'addr:street', 'entrance')):
-                added = entrance.image_note.link_osm_id(nearest_osm.id)
-                if added:
-                    linked_count += 1
-                    print(f'Linked OSM entrance {nearest_osm.id} to note {entrance.image_note_id}; distance {str(dst)[:4]}m.')
-        print(f'All done; {linked_count} new links created.')
 
 
 class Steps(ImageNoteProperties):
@@ -166,6 +184,10 @@ class Gate(Lockable, ImageNoteProperties):
 
     lift_gate = models.BooleanField(default=False)
 
+    # For automatic linking of OSM nodes to OLMap instances:
+    osm_node_query = 'barrier~"^(gate|lift_gate)$"'
+    required_osm_matching_tags = ['barrier']
+
     def as_osm_tags(self):
         return dict(super().as_osm_tags(), **filter_dict({
             'barrier': 'lift_gate' if self.lift_gate else 'gate'
@@ -191,6 +213,9 @@ class Company(BaseAddress):
     opening_hours_covid19 = models.CharField(blank=True, max_length=64)
     level = models.CharField(blank=True, max_length=8, help_text="Floor(s), e.g. 1-3")
 
+    # For automatic linking of OSM nodes to OLMap instances:
+    max_distance_to_osm_node = 20
+
     class Meta:
         abstract = True
 
@@ -206,6 +231,10 @@ class Office(Company):
     types = ['association', 'company', 'diplomatic', 'educational_institution', 'government']
     type = choices_field(types)
 
+    # For automatic linking of OSM nodes to OLMap instances:
+    osm_node_query = 'office'
+    required_osm_matching_tags = ['addr:unit', 'addr:housenumber', 'addr:street', 'office', 'name']
+
     def as_osm_tags(self):
         return dict(super().as_osm_tags(), office=self.type or 'yes')
 
@@ -213,6 +242,10 @@ class Office(Company):
 class Shop(Company):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Key:shop'
     type = models.CharField(blank=True, max_length=32, help_text=f'See {osm_url}')
+
+    # For automatic linking of OSM nodes to OLMap instances:
+    osm_node_query = 'shop'
+    required_osm_matching_tags = ['addr:unit', 'addr:housenumber', 'addr:street', 'name', 'shop']
 
     def as_osm_tags(self):
         return dict(super().as_osm_tags(), shop=self.type or 'yes')
@@ -223,6 +256,10 @@ class Amenity(Company):
     type = models.CharField(max_length=32, help_text=f'See {osm_url}')
     delivery_covid19 = models.CharField(blank=True, max_length=64)
     takeaway_covid19 = models.CharField(blank=True, max_length=64)
+
+    # For automatic linking of OSM nodes to OLMap instances:
+    osm_node_query = 'amenity'
+    required_osm_matching_tags = ['addr:unit', 'addr:housenumber', 'addr:street', 'name', 'amenity']
 
     def as_osm_tags(self):
         return dict(
@@ -262,3 +299,8 @@ def manager_name(prop_type):
 
 def prefetch_properties(image_note_qset):
     return image_note_qset.prefetch_related(*[manager_name(p) for p in image_note_property_types])
+
+
+def link_notes_to_osm_objects():
+    for cls in image_note_property_types:
+        cls.link_notes_to_osm_objects()
