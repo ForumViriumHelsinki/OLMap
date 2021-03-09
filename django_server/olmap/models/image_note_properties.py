@@ -8,6 +8,7 @@ from shapely.strtree import STRtree
 
 from django.db import models
 
+from . import Address
 from .osm_image_notes import OSMImageNote
 from olmap.utils import intersection_matches
 
@@ -30,6 +31,22 @@ def as_dict(obj, *keys):
 
 def bool_to_osm(b):
     return {True: 'yes', False: 'no', None: None}[b]
+
+
+class OSMFeatureIndex(object):
+    def __init__(self, osm_features):
+        if not len(osm_features):
+            self.index = {}
+        elif isinstance(osm_features[0], dict):
+            self.index = dict([(feature['id'], feature) for feature in osm_features])
+        else:
+            self.index = dict([(feature.id, feature) for feature in osm_features])
+
+    def is_linked(self, image_note):
+        for node in image_note.osm_features.all():
+            if self.index.get(node.id, None):
+                return True
+        return False
 
 
 class ImageNoteProperties(models.Model):
@@ -72,18 +89,14 @@ class ImageNoteProperties(models.Model):
             points.append(p)
         tree = STRtree(points)
 
-        node_index = dict([(node.id, node) for node in result.nodes])
+        node_index = OSMFeatureIndex(result.nodes)
 
         instances = cls.objects.filter(image_note__processed_by__isnull=False)\
             .prefetch_related('image_note__osm_features')
         print(f'Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...')
         linked_count = 0
         for instance in instances:
-            already_linked = False
-            for node in instance.image_note.osm_features.all():
-                if node_index.get(node.id, None):
-                    already_linked = True
-            if already_linked:
+            if node_index.is_linked(instance.image_note):
                 continue
             note_position = [instance.image_note.lat, instance.image_note.lon]
             nearest_osm = tree.nearest(Point(*note_position)).node
@@ -122,6 +135,29 @@ class BaseAddress(ImageNoteProperties):
             'addr:housenumber': self.housenumber,
             'addr:unit': self.unit
         }))
+
+    @classmethod
+    def link_notes_to_official_address(cls):
+        addresses = Address.objects.filter(official=True, city='Helsinki').values()
+        address_id_index = OSMFeatureIndex(addresses)
+        address_index = dict([(a['street_address'], a) for a in addresses])
+
+        instances = cls.objects.prefetch_related('image_note__osm_features')
+        print(f'Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...')
+        linked_count = 0
+        for instance in instances:
+            street_address = f'{instance.street} {instance.housenumber}'
+            address = address_index.get(street_address, None)
+            if (not address) or address_id_index.is_linked(instance.image_note):
+                continue
+            note_position = [instance.image_note.lat, instance.image_note.lon]
+            dst = distance(note_position, [address['lat'], address['lon']]).meters
+            if dst < 150:
+                added = instance.image_note.link_osm_id(address['id'])
+                if added:
+                    linked_count += 1
+                    print(f'Linked address {street_address} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')
+        print(f'All done; {linked_count} new links created.')
 
 
 class Lockable(models.Model):
@@ -298,6 +334,7 @@ class TrafficSign(ImageNoteProperties):
 
 
 image_note_property_types = [Entrance, Steps, Gate, Barrier, Office, Shop, Amenity, InfoBoard, TrafficSign]
+address_property_types = [Entrance, Office, Shop, Amenity]
 
 
 def manager_name(prop_type):
@@ -311,3 +348,8 @@ def prefetch_properties(image_note_qset):
 def link_notes_to_osm_objects():
     for cls in image_note_property_types:
         cls.link_notes_to_osm_objects()
+
+
+def link_notes_to_official_address():
+    for cls in address_property_types:
+        cls.link_notes_to_official_address()
