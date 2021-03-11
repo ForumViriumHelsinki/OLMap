@@ -13,6 +13,8 @@ import {Button, ListGroup, ListGroupItem} from "reactstrap";
 import OSMFeatureList from "util_components/osm/OSMFeatureList";
 import {OSMFeature, osmFeatureTypes} from "util_components/osm/types";
 
+import {overpassInterpreterPath} from 'settings.json';
+
 type OSMFSState = {
   nearbyOSMFeatures: OSMFeature[],
   featuresLoading: boolean,
@@ -116,7 +118,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
       minlon: bounds[0].longitude, maxlon: bounds[1].longitude};
 
     const query = osmFeatureTypes.map(({requiredTag}) => `node['${requiredTag}']`).join(';') + ';way[name]';
-    const overpassFrontend = new OverpassFrontend('//overpass-api.de/api/interpreter');
+    const overpassFrontend = new OverpassFrontend(overpassInterpreterPath);
     this.setState({nearbyOSMFeatures: []});
     overpassFrontend.BBoxQuery(query, overpassBounds, {},
       (err: any, response: any) => {

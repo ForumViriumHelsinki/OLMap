@@ -4,5 +4,6 @@
     "accessToken": "pk.eyJ1Ijoiam9oYW4tZnZoIiwiYSI6ImNrNDJtOGh5cDAxczIzb3FpdHg1Z3c5MGwifQ.bp9ubCm67HLIorEUb21K3A"
   },
   "useMockGeolocation": [24.944368, 60.161687],
-  "defaultLocation": [60.17012, 24.94290]
+  "defaultLocation": [60.17012, 24.94290],
+  "overpassInterpreterPath": "https://overpass.fvh.io/api/interpreter"
 }
