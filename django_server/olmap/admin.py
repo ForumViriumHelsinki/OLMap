@@ -91,5 +91,5 @@ class WorkplaceTypeAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('parents').annotate(image_notes=Count('workplace'))
 
-    def notes(self, wp_type):
+    def image_notes(self, wp_type):
         return wp_type.image_notes

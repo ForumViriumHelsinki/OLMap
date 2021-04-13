@@ -44,10 +44,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class WorkplaceTypeChoiceField(serializers.ChoiceField):
-    def __init__(self):
-        types = models.WorkplaceType.objects.values('id', 'label').order_by('label')
-        choices = [(t['id'], t['label']) for t in types]
-        super().__init__(choices=choices)
+    def __init__(self, **kwargs):
+        self.html_cutoff = kwargs.pop('html_cutoff', self.html_cutoff)
+        self.html_cutoff_text = kwargs.pop('html_cutoff_text', self.html_cutoff_text)
+        self.allow_blank = kwargs.pop('allow_blank', False)
+        self._choices = None
+
+        super(serializers.ChoiceField, self).__init__(**kwargs)
 
     def to_representation(self, value):
         if value in ('', None):
@@ -57,6 +60,13 @@ class WorkplaceTypeChoiceField(serializers.ChoiceField):
     def to_internal_value(self, data):
         if data:
             return models.WorkplaceType.objects.get(id=data)
+
+    @property
+    def choices(self):
+        if not self._choices:
+            types = models.WorkplaceType.objects.values('id', 'label').order_by('label')
+            self._set_choices([(t['id'], t['label']) for t in types])
+        return self._choices
 
 
 class WorkplaceSerializer(serializers.ModelSerializer):

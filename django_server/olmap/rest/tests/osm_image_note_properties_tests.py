@@ -123,13 +123,6 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
             'unit': {'type': 'string', 'maxLength': 8, 'title': 'Unit'}
         }
 
-        company_fields = dict(address_fields, **{
-            'name': {'type': 'string', 'maxLength': 64, 'title': 'Name'},
-            'phone': {'type': 'string', 'maxLength': 32, 'title': 'Phone'},
-            'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours'},
-            'opening_hours_covid19': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours covid19'},
-            'level': {'type': 'string', 'maxLength': 8, 'title': 'Level', 'description': 'Floor(s), e.g. 1-3'}})
-
         dimension_field = {
             'type': ['string', 'null'],
             'pattern': '^\\-?[0-9]*(\\.[0-9]{1,2})?$',
@@ -149,7 +142,10 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
             'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours'},
         }
 
-        self.assertDictEqual(response.json(), {
+        data = response.json()
+        workplace = data['Workplace']['properties']['type']
+
+        self.assertDictEqual(data, {
             'Entrance': {
                 'type': 'object',
                 'properties': dict(address_fields, **lockable_fields, **{
@@ -184,30 +180,17 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
                 'properties': {
                     'type': {'type': 'string', 'enum': ['', 'fence', 'wall', 'block', 'bollard'], 'title': 'Type'}}},
 
-            'Office': {
-                'type': 'object',
-                'properties': dict(company_fields, **{
-                    'type': {
-                        'type': 'string',
-                        'enum': ['', 'association', 'company', 'diplomatic', 'educational_institution', 'government'],
-                        'title': 'Type'}})},
 
-            'Shop': {
+            'Workplace': {
                 'type': 'object',
-                'properties': dict(company_fields, **{
-                    'type': {
-                        'type': 'string', 'maxLength': 32, 'title': 'Type',
-                        'description': 'See https://wiki.openstreetmap.org/wiki/Key:shop'}})},
-
-            'Amenity': {
-                'type': 'object',
-                'properties': dict(company_fields, **{
-                    'delivery_covid19': {'type': 'string', 'maxLength': 64, 'title': 'Delivery covid19'},
-                    'takeaway_covid19': {'type': 'string', 'maxLength': 64, 'title': 'Takeaway covid19'},
-                    'type': {
-                        'type': 'string', 'maxLength': 32, 'minLength': 1, 'title': 'Type',
-                        'description': 'See https://wiki.openstreetmap.org/wiki/Key:amenity'}}),
-                'required': ['type']},
+                'required': ['type'],
+                'properties': dict(address_fields, **{
+                    'name': {'type': 'string', 'maxLength': 64, 'title': 'Name'},
+                    'phone': {'type': 'string', 'maxLength': 32, 'title': 'Phone'},
+                    'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours'},
+                    'opening_hours_covid19': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours covid19'},
+                    'level': {'type': 'string', 'maxLength': 8, 'title': 'Level', 'description': 'Floor(s), e.g. 1-3'},
+                    'type': {'type': 'integer', 'enum': workplace['enum'], 'enumNames': workplace['enumNames'], 'title': 'Type'}})},
 
             'InfoBoard': {
                 'type': 'object',
