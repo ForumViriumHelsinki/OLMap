@@ -1,6 +1,7 @@
 from time import sleep
 
 import overpy
+from django.contrib.postgres.fields import ArrayField
 from geopy.distance import distance
 from overpy.exception import OverpassTooManyRequests
 from shapely.geometry import Point
@@ -9,6 +10,7 @@ from shapely.strtree import STRtree
 from django.db import models
 
 from . import Address
+from .base import Model
 from .osm_image_notes import OSMImageNote
 from olmap.utils import intersection_matches
 
@@ -311,6 +313,27 @@ class Amenity(Company):
             **filter_dict({'delivery:covid19': self.delivery_covid19, 'takeaway:covid19': self.takeaway_covid19}))
 
 
+class WorkplaceType(Model):
+    label = models.CharField(max_length=64)
+    parents = models.ManyToManyField('WorkplaceType', blank=True, related_name='children')
+    synonyms = ArrayField(base_field=models.CharField(max_length=64), default=list)
+    osm_tags = models.JSONField()
+
+    def __str__(self):
+        return self.label or super().__str__()
+
+
+class Workplace(Company):
+    type = models.ForeignKey(WorkplaceType, on_delete=models.CASCADE)
+
+    # For automatic linking of OSM nodes to OLMap instances:
+    osm_node_query = 'name'
+    required_osm_matching_tags = ['addr:unit', 'addr:housenumber', 'addr:street', 'office', 'amenity', 'shop', 'name']
+
+    def as_osm_tags(self):
+        return dict(super().as_osm_tags(), **self.type.osm_tags)
+
+
 class TrafficSign(ImageNoteProperties):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Key:traffic_sign'
     types = {'Max height': 'FI:342',
@@ -333,8 +356,8 @@ class TrafficSign(ImageNoteProperties):
             'traffic_sign:2': f'{self.text_sign}[{self.text}]' if self.text else None})
 
 
-image_note_property_types = [Entrance, Steps, Gate, Barrier, Office, Shop, Amenity, InfoBoard, TrafficSign]
-address_property_types = [Entrance, Office, Shop, Amenity]
+image_note_property_types = [Entrance, Steps, Gate, Barrier, Workplace, InfoBoard, TrafficSign]
+address_property_types = [Entrance, Workplace]
 
 
 def manager_name(prop_type):

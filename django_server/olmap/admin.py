@@ -77,3 +77,19 @@ class OSMImageNoteCommentAdmin(admin.ModelAdmin):
     search_fields = ['comment']
     list_filter = ['user']
     date_hierarchy = 'created_at'
+
+
+@admin.register(models.WorkplaceType)
+class WorkplaceTypeAdmin(admin.ModelAdmin):
+    list_display = ['label', '_parents', 'synonyms', 'image_notes']
+    search_fields = ['label', 'synonyms', 'parents__label', 'parents__parents__label']
+    filter_horizontal = ['parents']
+
+    def _parents(self, wp_type):
+        return ', '.join([p.label for p in wp_type.parents.all()])
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('parents').annotate(image_notes=Count('workplace'))
+
+    def notes(self, wp_type):
+        return wp_type.image_notes

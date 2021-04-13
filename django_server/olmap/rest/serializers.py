@@ -43,11 +43,39 @@ class UserSerializer(serializers.ModelSerializer):
         return self.user_in_group(user, REVIEWER_GROUP)
 
 
+class WorkplaceTypeChoiceField(serializers.ChoiceField):
+    def __init__(self):
+        types = models.WorkplaceType.objects.values('id', 'label').order_by('label')
+        choices = [(t['id'], t['label']) for t in types]
+        super().__init__(choices=choices)
+
+    def to_representation(self, value):
+        if value in ('', None):
+            return value
+        return value.id
+
+    def to_internal_value(self, data):
+        if data:
+            return models.WorkplaceType.objects.get(id=data)
+
+
+class WorkplaceSerializer(serializers.ModelSerializer):
+    as_osm_tags = serializers.ReadOnlyField()
+    type = WorkplaceTypeChoiceField()
+
+    class Meta:
+        model = models.Workplace
+        exclude = ['image_note']
+
+
 class ImageNotePropertiesSerializer(serializers.ModelSerializer):
     as_osm_tags = serializers.ReadOnlyField()
 
     @classmethod
     def get_subclass_for(cls, prop_type):
+        if prop_type == models.Workplace:
+            return WorkplaceSerializer
+
         class PropSerializer(cls):
             class Meta:
                 model = prop_type
