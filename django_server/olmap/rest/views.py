@@ -12,7 +12,7 @@ from .permissions import IsReviewer, IsReviewerOrCreator
 from .serializers import (
     OSMImageNoteWithPropsSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer,
     OSMFeatureSerializer, BaseOSMImageNoteSerializer, AddressAsOSMNodeSerializer,
-    DictOSMImageNoteSerializer, OSMImageNoteCommentNotificationSerializer)
+    DictOSMImageNoteSerializer, OSMImageNoteCommentNotificationSerializer, WorkplaceTypeSerializer)
 
 
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
@@ -180,6 +180,12 @@ class OSMFeaturesViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.OSMFeature.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = OSMFeatureSerializer
+
+
+class WorkplaceTypeViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = models.WorkplaceType.objects.all().prefetch_related('parents').order_by('label')
+    permission_classes = [permissions.AllowAny]
+    serializer_class = WorkplaceTypeSerializer
 
 
 class OSMImageNotesGeoJSON(ListAPIView):

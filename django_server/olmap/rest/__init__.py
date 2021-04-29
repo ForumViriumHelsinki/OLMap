@@ -4,7 +4,7 @@ from rest_framework import routers
 from .views import (
     NearbyAddressesView,
     OSMImageNotesViewSet, OSMImageNoteCommentsViewSet, OSMImageNotesGeoJSON,
-    OSMEntrancesViewSet, OSMFeaturesViewSet, OSMImageNoteCommentNotificationsViewSet)
+    OSMEntrancesViewSet, OSMFeaturesViewSet, OSMImageNoteCommentNotificationsViewSet, WorkplaceTypeViewSet)
 
 
 router = routers.DefaultRouter()
@@ -13,6 +13,7 @@ router.register('osm_image_note_comments', OSMImageNoteCommentsViewSet)
 router.register('osm_entrances', OSMEntrancesViewSet, basename='osmentrance')
 router.register('osm_features', OSMFeaturesViewSet)
 router.register('notifications', OSMImageNoteCommentNotificationsViewSet)
+router.register('workplace_types', WorkplaceTypeViewSet)
 
 urlpatterns = [
     path('addresses_at/<str:lon>/<str:lat>/', NearbyAddressesView.as_view(), name='nearby_addresses'),

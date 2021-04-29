@@ -208,6 +208,12 @@ class OSMEntranceSerializer(serializers.ModelSerializer):
         fields = ['id', 'associated_features']
 
 
+class WorkplaceTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.WorkplaceType
+        fields = '__all__'
+
+
 class PasswordResetForm(BasePasswordResetForm):
     def save(self, **kwargs):
         kwargs = dict(kwargs, domain_override='app.olmap.org', use_https=True,

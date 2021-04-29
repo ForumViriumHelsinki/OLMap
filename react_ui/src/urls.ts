@@ -24,3 +24,5 @@ export const osmEntranceUrl = (id: number) => `/rest/osm_entrances/${id}/`;
 
 export const nearbyAddressesUrl = (location: LocationTuple) =>
   `/rest/addresses_at/${location[0]}/${location[1]}/`;
+
+export const workplaceTypesUrl = "/rest/workplace_types/";

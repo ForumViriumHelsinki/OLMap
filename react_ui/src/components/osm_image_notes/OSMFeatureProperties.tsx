@@ -9,6 +9,7 @@ import {Button} from "reactstrap";
 import {OSMFeature} from "util_components/osm/types";
 import ConfirmButton from "util_components/bootstrap/ConfirmButton";
 import {userCanEditNote} from "components/osm_image_notes/utils";
+import WorkplaceTypeWidget from "components/osm_image_notes/WorkplaceTypeWidget";
 
 type PKFeature = {[field: string]: any}
 
@@ -26,6 +27,12 @@ type OSMFeaturePropertiesState = {
 
 const initialState: OSMFeaturePropertiesState = {
   editingFeature: undefined
+};
+
+type AnyObject = {[key: string]: any};
+
+const customWidgets: AnyObject = {
+  Workplace: {type: WorkplaceTypeWidget}
 };
 
 export default class OSMFeatureProperties extends React.Component<OSMFeaturePropertiesProps, OSMFeaturePropertiesState> {
@@ -174,16 +181,21 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
   };
 
   private getUISchema() {
-    const {schema} = this.props;
-    const uiSchema = Object.fromEntries(
-      Object.entries(schema.properties)
-        .filter(([field, spec]) =>
-          // @ts-ignore
-          String(spec.type) == String(["boolean", "null"]))
-        .map(([field, spec]) => {
-          // @ts-ignore
-          return [field, {"ui:widget": "radio"}]
-        }));
-    return uiSchema
+    const {schema, osmFeatureName} = this.props;
+    const radioFields = Object.entries(schema.properties)
+      .filter(([field, spec]) =>
+        // @ts-ignore
+        String(spec.type) == String(["boolean", "null"]))
+      .map(([field, spec]) => {
+        // @ts-ignore
+        return [field, {"ui:widget": "radio"}]
+      });
+    const customWidgetsForSchema = customWidgets[osmFeatureName] || {};
+    const customFields = Object.entries(schema.properties)
+      .filter(([field, spec]) => customWidgetsForSchema[field])
+      .map(([field, spec]) => {
+        return [field, {"ui:widget": customWidgetsForSchema[field]}]
+      });
+    return Object.fromEntries(radioFields.concat(customFields));
   }
 }
