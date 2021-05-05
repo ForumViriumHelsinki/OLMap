@@ -14,7 +14,10 @@ export const rejectOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id
 
 export const upvoteOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/upvote/`;
 export const downvoteOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/downvote/`;
+
 export const osmImageNoteCommentsUrl = `/rest/osm_image_note_comments/`;
+export const osmImageNoteCommentUrl = (id: number) => `/rest/osm_image_note_comments/${id}/`;
+
 export const notificationsUrl = `/rest/notifications/`;
 export const notificationSeenUrl = (id: number) => `/rest/notifications/${id}/mark_seen/`;
 

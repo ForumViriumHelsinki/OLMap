@@ -170,6 +170,14 @@ form.compact {
   }
 }
 
+.btn-discrete {
+  opacity: 0.2;
+}
+
+.btn-discrete:hover {
+  opacity: 1;
+}
+
 div.leaflet-top, div.leaflet-bottom {
   z-index: 400;
 }

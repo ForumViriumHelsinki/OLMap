@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from drf_jsonschema import to_jsonschema
 from olmap import models
-from .permissions import IsReviewer, IsReviewerOrCreator
+from .permissions import IsReviewer, IsReviewerOrCreator, user_is_reviewer
 from .serializers import (
     OSMImageNoteWithPropsSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer,
     OSMFeatureSerializer, BaseOSMImageNoteSerializer, AddressAsOSMNodeSerializer,
@@ -129,6 +129,8 @@ class OSMImageNoteCommentsViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.request.user.is_anonymous:
             return self.queryset.none()
+        if user_is_reviewer(self.request.user):
+            return self.queryset
         return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):

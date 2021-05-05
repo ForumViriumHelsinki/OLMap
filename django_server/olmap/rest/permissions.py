@@ -6,6 +6,10 @@ from rest_framework import permissions
 REVIEWER_GROUP = 'Reviewer'
 
 
+def user_is_reviewer(user):
+    return user.groups.filter(name=REVIEWER_GROUP).exists()
+
+
 class UserBelongsToGroup(permissions.IsAuthenticated):
     group_name = 'OVERRIDE IN SUBCLASSES!'
 
