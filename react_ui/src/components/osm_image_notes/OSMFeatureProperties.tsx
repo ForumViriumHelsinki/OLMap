@@ -102,7 +102,7 @@ export default class OSMFeatureProperties extends React.Component<OSMFeatureProp
           }
         </div>
       )}
-      {editable &&
+      {editable && !editingFeature &&
         <p className="mt-2">
           <Button size="sm" color="primary" outline className="btn-compact" onClick={this.newPKFeature}>
             New {osmFeatureName}

@@ -23,6 +23,7 @@ import OSMChangesetMapLayer from "util_components/osm/OSMChangesetMapLayer";
 import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
 import OSMImageNoteFiltersButton from "components/osm_image_notes/OSMImageNoteFiltersButton";
 import NotificationsButton from "components/osm_image_notes/NotificationsButton";
+import Confirm from "util_components/bootstrap/Confirm";
 
 
 type OSMImageNotesEditorProps = {
@@ -48,7 +49,8 @@ type OSMImageNotesEditorState = OSMImageNote & {
   selectedChangeset?: changeset,
   onLocationSelected?: (location: any) => any,
   onLocationCancelled?: () => any,
-  requestPhoto?: boolean
+  requestPhoto?: boolean,
+  confirmCancel?: boolean
 }
 
 const initialState: () => OSMImageNotesEditorState = () => ({
@@ -87,7 +89,7 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
     const {
       status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags,
       osmProperties, filters, osm_features, nearbyFeatures, selectChangeset, selectedChangeset, nearbyAddresses,
-      requestPhoto
+      requestPhoto, confirmCancel
     } = this.state;
 
     const location = [lon, lat] as LocationTuple;
@@ -222,7 +224,14 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
                     onClick={() => this.setState({requestPhoto: false, status: 'locating'})}>
               <Icon icon="comment"/> Add text
             </Button>{' '}
-          </>} />}
+          </>}
+        />
+      }
+      {confirmCancel &&
+        <Confirm title="Close without saving?"
+                 onConfirm={this.onConfirmCancel}
+                 onClose={() => this.setState({confirmCancel: false})}/>
+      }
     </div>;
   }
 
@@ -286,6 +295,11 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
       onLocationCancelled();
       this.setState({onLocationSelected: undefined, onLocationCancelled: undefined, status: 'initial'});
     }
+    if (this.state.status == 'commenting') this.setState({confirmCancel: true});
+    else this.setState(resetState);
+  };
+
+  onConfirmCancel = () => {
     this.setState(resetState);
   };
 
