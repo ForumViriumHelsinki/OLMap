@@ -22,3 +22,4 @@ __pycache__
 /scripts/hki_osoiteluettelo_cleaned.json
 /scripts/hki_osoiteluettelo.json
 /scripts/entrances_with_distance.json
+/scripts/temp/

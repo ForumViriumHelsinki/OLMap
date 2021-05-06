@@ -212,7 +212,7 @@ class OSMImageNotesGeoJSON(ListAPIView):
 
 class NearbyAddressesView(ListAPIView):
     serializer_class = AddressAsOSMNodeSerializer
-    queryset = models.Address.objects.filter(official=True)
+    queryset = models.Address.objects.all()
     permission_classes = [permissions.AllowAny]
 
     max_distance_meters = 100

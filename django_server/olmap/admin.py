@@ -12,8 +12,8 @@ from olmap import models
 
 @admin.register(models.Address)
 class AddressAdmin(admin.ModelAdmin):
-    list_display = ['street_address', 'lat', 'lon']
-    search_fields = ['street_address']
+    list_display = ['street', 'housenumber', 'lat', 'lon']
+    search_fields = ['street']
 
 
 admin.site.unregister(User)

@@ -140,7 +140,7 @@ class BaseAddress(ImageNoteProperties):
 
     @classmethod
     def link_notes_to_official_address(cls):
-        addresses = Address.objects.filter(official=True, city='Helsinki').values()
+        addresses = Address.objects.filter(city='Helsinki').values()
         address_id_index = OSMFeatureIndex(addresses)
         address_index = dict([(a['street_address'], a) for a in addresses])
 
