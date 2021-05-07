@@ -3,5 +3,5 @@ from .osm_image_notes import (
     ImageNoteUpvote, ImageNoteDownvote, OSMImageNoteComment, OSMImageNoteCommentNotification)
 from .base import Address
 from .image_note_properties import (
-    Entrance, Steps, Gate, Barrier, Office, Shop, Amenity, Workplace, WorkplaceType, image_note_property_types
+    Entrance, Steps, Gate, Barrier, Workplace, WorkplaceType, image_note_property_types
 )
