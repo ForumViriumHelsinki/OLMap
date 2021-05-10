@@ -7,8 +7,10 @@ def forwards(apps, schema_editor):
     Address = apps.get_model('olmap', 'Address')
     OSMFeature = apps.get_model('olmap', 'OSMFeature')
 
-    max_address_id = Address.objects.order_by('-id').first().id
-    address_features = OSMFeature.objects.filter(id__lte=max_address_id).prefetch_related('image_notes__addresses')
+    max_address = Address.objects.order_by('-id').first()
+    if not max_address:
+        return
+    address_features = OSMFeature.objects.filter(id__lte=max_address.id).prefetch_related('image_notes__addresses')
 
     for a in address_features:
         for n in a.image_notes.all():
