@@ -7,7 +7,7 @@ from django.core.files import File
 from django.db import models
 
 from . import base
-from .base import TimestampedModel
+from .base import TimestampedModel, Address
 
 
 class OSMFeature(base.Model):
@@ -29,6 +29,8 @@ class OSMImageNote(TimestampedModel):
     comment = models.TextField(blank=True)
     tags = ArrayField(base_field=models.CharField(max_length=64), default=list)
     osm_features = models.ManyToManyField(OSMFeature, blank=True, related_name='image_notes')
+
+    addresses = models.ManyToManyField(Address, blank=True, related_name='image_notes')
 
     created_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name='created_notes')

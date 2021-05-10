@@ -29,8 +29,8 @@ const initialState: OSMFSState = {
 
 type OSMFSProps = {
   location: LocationTuple,
-  onSelect?: (featureIds: number[]) => any,
-  onChange?: (featureIds: number[]) => any,
+  onSelect?: (featureIds: number[], extraFeatureIds?: number[]) => any,
+  onChange?: (featureIds: number[], extraFeatureIds?: number[]) => any,
   distance: number,
   preselectedFeatureIds: number[],
   readOnly: boolean,
@@ -68,17 +68,29 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
 
       {!readOnly && onSelect &&
         <Button block color="primary"
-                onClick={() => onSelect(selectedFeatureIds)} className="mt-2">
+                onClick={this.onSelect} className="mt-2">
           Done
         </Button>
       }
     </>;
   }
 
+  onSelect = () => {
+    const {onSelect, extraFeatures} = this.props;
+    const {selectedFeatureIds} = this.state;
+    const extraIndex = Object.fromEntries(extraFeatures.map(f => [f.id, f]));
+
+    if (onSelect) onSelect(selectedFeatureIds.filter(i => !extraIndex[i]),
+                           selectedFeatureIds.filter(i => extraIndex[i]));
+  };
+
   onChange = (selectedFeatureIds: number[]) => {
-    const {onChange} = this.props;
+    const {onChange, extraFeatures} = this.props;
+    const extraIndex = Object.fromEntries(extraFeatures.map(f => [f.id, f]));
+
     this.setState({selectedFeatureIds});
-    if (onChange) onChange(selectedFeatureIds);
+    if (onChange) onChange(selectedFeatureIds.filter(i => !extraIndex[i]),
+                           selectedFeatureIds.filter(i => extraIndex[i]));
   };
 
   componentDidUpdate(prevProps: OSMFSProps) {

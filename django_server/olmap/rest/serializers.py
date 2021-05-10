@@ -144,8 +144,8 @@ class OSMImageNoteSerializer(BaseOSMImageNoteSerializer):
 
     class Meta:
         model = models.OSMImageNote
-        fields = ['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed', 'tags',
-                  'created_by', 'upvotes', 'downvotes', 'comments']
+        fields = ['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'addresses',
+                  'is_reviewed', 'tags', 'created_by', 'upvotes', 'downvotes', 'comments']
 
 
 class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
@@ -162,8 +162,9 @@ class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImage
 
     class Meta:
         model = models.OSMImageNote
-        fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'is_reviewed', 'is_processed', 'tags',
-                   'created_by', 'created_at', 'upvotes', 'downvotes', 'comments'] +
+        fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'addresses',
+                   'is_reviewed', 'is_processed', 'tags', 'created_by', 'created_at',
+                   'upvotes', 'downvotes', 'comments'] +
                   [manager_name(prop_type) for prop_type in models.image_note_property_types])
 
     def create(self, validated_data):
@@ -236,6 +237,5 @@ class AddressAsOSMNodeSerializer(serializers.ModelSerializer):
     def get_tags(self, address):
         return {
             'addr:street': address.street,
-            'addr:housenumber': address.housenumber,
-            'addr:unit': address.unit
+            'addr:housenumber': address.housenumber
         }

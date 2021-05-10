@@ -35,20 +35,33 @@ def bool_to_osm(b):
     return {True: 'yes', False: 'no', None: None}[b]
 
 
-class OSMFeatureIndex(object):
-    def __init__(self, osm_features):
-        if not len(osm_features):
+class FeatureIndex(object):
+    def __init__(self, features):
+        if not len(features):
             self.index = {}
-        elif isinstance(osm_features[0], dict):
-            self.index = dict([(feature['id'], feature) for feature in osm_features])
-        else:
-            self.index = dict([(feature.id, feature) for feature in osm_features])
+        self.index = dict([(self.get_id(feature), feature) for feature in features])
 
     def is_linked(self, image_note):
-        for node in image_note.osm_features.all():
+        for node in self.note_features(image_note):
             if self.index.get(node.id, None):
                 return True
         return False
+
+
+class OSMFeatureIndex(FeatureIndex):
+    def get_id(self, feature):
+        return feature.id
+
+    def note_features(self, note):
+        return note.osm_features.all()
+
+
+class AddressIndex(FeatureIndex):
+    def get_id(self, feature):
+        return feature['id']
+
+    def note_features(self, note):
+        return note.addresses.all()
 
 
 class ImageNoteProperties(models.Model):
@@ -141,10 +154,10 @@ class BaseAddress(ImageNoteProperties):
     @classmethod
     def link_notes_to_official_address(cls):
         addresses = Address.objects.filter(city='Helsinki').values()
-        address_id_index = OSMFeatureIndex(addresses)
+        address_id_index = AddressIndex(addresses)
         address_index = dict([(f'{a["street"]} {a["housenumber"]}', a) for a in addresses])
 
-        instances = cls.objects.prefetch_related('image_note__osm_features')
+        instances = cls.objects.prefetch_related('image_note__addresses')
         print(f'Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...')
         linked_count = 0
         for instance in instances:
@@ -155,7 +168,7 @@ class BaseAddress(ImageNoteProperties):
             note_position = [instance.image_note.lat, instance.image_note.lon]
             dst = distance(note_position, [address['lat'], address['lon']]).meters
             if dst < 150:
-                added = instance.image_note.link_osm_id(address['id'])
+                added = instance.image_note.addresses.add(address['id'])
                 if added:
                     linked_count += 1
                     print(f'Linked address {street_address} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')

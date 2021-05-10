@@ -60,6 +60,7 @@ const initialState: () => OSMImageNotesEditorState = () => ({
   image: undefined,
   comment: '',
   osm_features: [],
+  addresses: [],
   error: false,
   imageError: false,
   submitting: false,
@@ -162,7 +163,8 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
                 extraFeatures={nearbyAddresses}
                 preselectedFeatureIds={this.props.osmFeatures}
                 onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
-                onSelect={osm_features => this.setState({osm_features, status: 'commenting'})}/>
+                onSelect={(osm_features, addresses) =>
+                            this.setState({osm_features, addresses: addresses || [], status: 'commenting'})}/>
             </Modal>,
           commenting:
             <Modal title="Add comment" onClose={this.onCancel}>
@@ -304,8 +306,8 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
   };
 
   onSubmit = () => {
-    const {comment, lon, lat, osm_features, image, imagesUploading, tags, osmProperties} = this.state;
-    const fields = {comment, lat, lon, osm_features, tags, ...osmProperties};
+    const {comment, lon, lat, osm_features, addresses, image, imagesUploading, tags, osmProperties} = this.state;
+    const fields = {comment, lat, lon, osm_features, addresses, tags, ...osmProperties};
 
     this.setState({submitting: true});
 
