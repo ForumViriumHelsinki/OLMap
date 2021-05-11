@@ -5,12 +5,12 @@ from .base import FVHAPITestCase
 from olmap import models
 
 
-class OSMImageNotePropertiesTests(FVHAPITestCase):
-    def test_save_osm_image_note_with_property(self):
+class OSMMapFeatureTests(FVHAPITestCase):
+    def test_save_osm_image_note_with_map_feature(self):
         # Given that a user is signed in
         user = self.create_and_login_user()
 
-        # When requesting to save an OSM image note over ReST, supplying tags and properties
+        # When requesting to save an OSM image note over ReST, supplying tags and map_features
         url = reverse('osmimagenote-list')
         fields = {
             'lat': '60.16134701761975',
@@ -38,7 +38,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
         # And it creates any passed tags:
         self.assertSetEqual(set(note.tags), set(fields['tags']))
 
-        # And it creates the passed properties:
+        # And it creates the passed map_features:
         self.assertEqual(note.entrance_set.count(), 1)
         self.assertDictEqual(response.json()['entrance_set'][0]['as_osm_tags'], {
             'addr:street': 'Unioninkatu',
@@ -48,11 +48,11 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
             'width': 0.9,
             'entrance': 'staircase'})
 
-    def test_save_osm_image_note_with_empty_property_list(self):
+    def test_save_osm_image_note_with_empty_map_feature_list(self):
         # Given that a user is signed in
         user = self.create_and_login_user()
 
-        # When requesting to save an OSM image note over ReST, supplying an empty list of properties
+        # When requesting to save an OSM image note over ReST, supplying an empty list of map_features
         url = reverse('osmimagenote-list')
         fields = {
             'lat': '60.16134701761975',
@@ -68,11 +68,11 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
         # And a note is created in db:
         note = models.OSMImageNote.objects.get()
 
-    def test_update_osm_image_note_properties(self):
+    def test_update_osm_image_note_map_features(self):
         # Given that a user is signed in
         user = self.create_and_login_user()
 
-        # And given a successfully created OSM image note with some saved properties
+        # And given a successfully created OSM image note with some saved map_features
         note = models.OSMImageNote.objects.create(lat='60.16134701761975', lon='24.944593941327188',
                                                   created_by=user)
         note.entrance_set.create(**{
@@ -83,7 +83,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
             'buzzer': True,
             'type': 'staircase'})
 
-        # When requesting to update an OSM image note over ReST, giving a list of properties
+        # When requesting to update an OSM image note over ReST, giving a list of map_features
         # conflicting with the existing ones
         url = reverse('osmimagenote-detail', kwargs={'pk': note.id})
         fields = {
@@ -97,16 +97,16 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
         # Then an OK response is received:
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        # And the properties have been changed:
+        # And the map_features have been changed:
         note = models.OSMImageNote.objects.get()
         self.assertSetEqual(set(note.entrance_set.values_list('street', flat=True)), set(['Bulevardi']))
 
-    def test_osm_image_note_property_schemas(self):
+    def test_osm_image_note_map_feature_schemas(self):
         # Given that a user is signed in
         self.create_and_login_user()
 
-        # When requesting the image note property type schemas
-        url = reverse('osmimagenote-property-schemas')
+        # When requesting the image note map_feature type schemas
+        url = reverse('osmimagenote-map-feature-schemas')
         response = self.client.get(url)
 
         # Then an OK response is received:
@@ -143,7 +143,7 @@ class OSMImageNotePropertiesTests(FVHAPITestCase):
         }
 
         data = response.json()
-        workplace = data['Workplace']['properties']['type']
+        workplace = data['Workplace']['map_features']['type']
 
         self.assertDictEqual(data, {
             'Entrance': {

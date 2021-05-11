@@ -8,7 +8,7 @@ from rest_auth.serializers import PasswordResetSerializer as BasePasswordResetSe
 from rest_framework import serializers
 
 from olmap import models
-from olmap.models.image_note_properties import manager_name
+from olmap.models.map_features import manager_name
 from .permissions import REVIEWER_GROUP
 
 
@@ -78,7 +78,7 @@ class WorkplaceSerializer(serializers.ModelSerializer):
         exclude = ['image_note']
 
 
-class ImageNotePropertiesSerializer(serializers.ModelSerializer):
+class MapFeatureSerializer(serializers.ModelSerializer):
     as_osm_tags = serializers.ReadOnlyField()
 
     @classmethod
@@ -150,9 +150,9 @@ class OSMImageNoteSerializer(BaseOSMImageNoteSerializer):
 
 class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
     def __new__(mcs, name, bases, attrs):
-        # Automatically add serializer fields for all image note property types:
-        for prop_type in models.image_note_property_types:
-            PropSerializer = ImageNotePropertiesSerializer.get_subclass_for(prop_type)
+        # Automatically add serializer fields for all image note map_feature types:
+        for prop_type in models.map_feature_types:
+            PropSerializer = MapFeatureSerializer.get_subclass_for(prop_type)
             attrs[manager_name(prop_type)] = PropSerializer(many=True, required=False)
         return super().__new__(mcs, name, bases, attrs)
 
@@ -165,15 +165,15 @@ class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImage
         fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'addresses',
                    'is_reviewed', 'is_processed', 'tags', 'created_by', 'created_at',
                    'upvotes', 'downvotes', 'comments'] +
-                  [manager_name(prop_type) for prop_type in models.image_note_property_types])
+                  [manager_name(prop_type) for prop_type in models.map_feature_types])
 
     def create(self, validated_data):
-        relateds = self.extract_related_properties(validated_data)
+        relateds = self.extract_related_map_features(validated_data)
         instance = super().create(validated_data)
-        self.save_related_properties(instance, relateds, new=True)
+        self.save_related_map_features(instance, relateds, new=True)
         return instance
 
-    def save_related_properties(self, instance, relateds, new=False):
+    def save_related_map_features(self, instance, relateds, new=False):
         for related_field, fields_list in relateds.items():
             related_manager = getattr(instance, related_field)
             if not new:
@@ -181,17 +181,17 @@ class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImage
             for fields in fields_list:
                 related_manager.create(**fields)
 
-    def extract_related_properties(self, validated_data):
+    def extract_related_map_features(self, validated_data):
         relateds = {}
-        for prop_type in models.image_note_property_types:
+        for prop_type in models.map_feature_types:
             field = manager_name(prop_type)
             if validated_data.get(field, None) is not None:
                 relateds[field] = validated_data.pop(field, [])
         return relateds
 
     def update(self, instance, validated_data):
-        relateds = self.extract_related_properties(validated_data)
-        self.save_related_properties(instance, relateds)
+        relateds = self.extract_related_map_features(validated_data)
+        self.save_related_map_features(instance, relateds)
         return super().update(instance, validated_data)
 
 

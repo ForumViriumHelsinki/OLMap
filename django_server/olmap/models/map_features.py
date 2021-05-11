@@ -64,7 +64,7 @@ class AddressIndex(FeatureIndex):
         return note.addresses.all()
 
 
-class ImageNoteProperties(models.Model):
+class MapFeature(models.Model):
     image_note = models.ForeignKey(OSMImageNote, on_delete=models.CASCADE)
 
     # Override in subclasses to enable automatic linking of OSM nodes:
@@ -125,7 +125,7 @@ class ImageNoteProperties(models.Model):
         print(f'All done; {linked_count} new links created.')
 
 
-class InfoBoard(ImageNoteProperties):
+class InfoBoard(MapFeature):
     types = ['map', 'board']
     type = choices_field(types, default='board')
 
@@ -136,7 +136,7 @@ class InfoBoard(ImageNoteProperties):
         }
 
 
-class BaseAddress(ImageNoteProperties):
+class BaseAddress(MapFeature):
     street = models.CharField(max_length=64, blank=True)
     housenumber = models.CharField(max_length=8, blank=True, null=True, help_text='E.g. 3-5')
     unit = models.CharField(max_length=8, blank=True)
@@ -217,7 +217,7 @@ class Entrance(Lockable, BaseAddress):
         }))
 
 
-class Steps(ImageNoteProperties):
+class Steps(MapFeature):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Tag:highway%3Dsteps'
 
     step_count = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -237,7 +237,7 @@ class Steps(ImageNoteProperties):
         )))
 
 
-class Gate(Lockable, ImageNoteProperties):
+class Gate(Lockable, MapFeature):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Tag:barrier%3Dgate'
 
     lift_gate = models.BooleanField(default=False)
@@ -252,7 +252,7 @@ class Gate(Lockable, ImageNoteProperties):
         }))
 
 
-class Barrier(ImageNoteProperties):
+class Barrier(MapFeature):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Key:barrier'
 
     types = ['fence', 'wall', 'block', 'bollard']
@@ -295,7 +295,7 @@ class Workplace(BaseAddress):
             **self.type.osm_tags)
 
 
-class TrafficSign(ImageNoteProperties):
+class TrafficSign(MapFeature):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Key:traffic_sign'
     types = {'Max height': 'FI:342',
              'Max weight': 'FI:344',
@@ -317,23 +317,19 @@ class TrafficSign(ImageNoteProperties):
             'traffic_sign:2': f'{self.text_sign}[{self.text}]' if self.text else None})
 
 
-image_note_property_types = [Entrance, Steps, Gate, Barrier, Workplace, InfoBoard, TrafficSign]
-address_property_types = [Entrance, Workplace]
+map_feature_types = [Entrance, Steps, Gate, Barrier, Workplace, InfoBoard, TrafficSign]
+address_feature_types = [Entrance, Workplace]
 
 
 def manager_name(prop_type):
     return prop_type.__name__.lower() + '_set'
 
 
-def prefetch_properties(image_note_qset):
-    return image_note_qset.prefetch_related(*[manager_name(p) for p in image_note_property_types])
-
-
 def link_notes_to_osm_objects():
-    for cls in image_note_property_types:
+    for cls in map_feature_types:
         cls.link_notes_to_osm_objects()
 
 
 def link_notes_to_official_address():
-    for cls in address_property_types:
+    for cls in address_feature_types:
         cls.link_notes_to_official_address()
