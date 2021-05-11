@@ -143,7 +143,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
         }
 
         data = response.json()
-        workplace = data['Workplace']['map_features']['type']
+        workplace = data['Workplace']['properties']['type']
 
         self.assertDictEqual(data, {
             'Entrance': {
