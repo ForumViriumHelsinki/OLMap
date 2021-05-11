@@ -1,10 +1,10 @@
 import React from 'react';
 import PillsSelection from "util_components/PillsSelection";
-import {OSMFeatureProps} from "components/types";
+import {MapFeatureTypes} from "components/types";
 import SearchModal from "util_components/SearchModal";
 
 type OSMImageNoteTagsProps = {
-  osmFeatureProperties?: OSMFeatureProps,
+  mapFeatureTypes?: MapFeatureTypes,
   tags: string[],
   onChange: (tags: string[]) => any,
   readOnly?: boolean
@@ -14,8 +14,8 @@ const defaultTags = ['Problem'];
 
 export default class OSMImageNoteTags extends React.Component<OSMImageNoteTagsProps> {
   render() {
-    const {osmFeatureProperties, tags, readOnly} = this.props;
-    const tagOptions = osmFeatureProperties ? defaultTags.concat(Object.keys(osmFeatureProperties)) : tags;
+    const {mapFeatureTypes, tags, readOnly} = this.props;
+    const tagOptions = mapFeatureTypes ? defaultTags.concat(Object.keys(mapFeatureTypes)) : tags;
     return readOnly ?
       (tags.length > 0) ? <PillsSelection options={tags} selected={tags}/>
       : 'No tags selected.'

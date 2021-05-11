@@ -47,7 +47,7 @@ export type Notification = {
 
 export type JSONSchema = any
 
-export type OSMFeatureProps = {
+export type MapFeatureTypes = {
   [featureType: string]: JSONSchema
 };
 

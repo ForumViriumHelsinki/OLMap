@@ -13,7 +13,7 @@ import WorkplaceTypeWidget from "components/osm_image_notes/WorkplaceTypeWidget"
 
 type PKFeature = {[field: string]: any}
 
-type OSMFeaturePropertiesProps = {
+type MapFeatureSetProps = {
   schema: JSONSchema,
   onSubmit: (data: any) => any,
   osmFeatureName: string,
@@ -21,11 +21,11 @@ type OSMFeaturePropertiesProps = {
   nearbyFeatures: OSMFeature[]
 }
 
-type OSMFeaturePropertiesState = {
+type MapFeatureSetState = {
   editingFeature?: PKFeature
 }
 
-const initialState: OSMFeaturePropertiesState = {
+const initialState: MapFeatureSetState = {
   editingFeature: undefined
 };
 
@@ -35,8 +35,8 @@ const customWidgets: AnyObject = {
   Workplace: {type: WorkplaceTypeWidget}
 };
 
-export default class OSMFeatureProperties extends React.Component<OSMFeaturePropertiesProps, OSMFeaturePropertiesState> {
-  state: OSMFeaturePropertiesState = initialState;
+export default class MapFeatureSet extends React.Component<MapFeatureSetProps, MapFeatureSetState> {
+  state: MapFeatureSetState = initialState;
 
   static contextType = AppContext;
 

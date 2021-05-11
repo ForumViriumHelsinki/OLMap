@@ -2,7 +2,7 @@ import React from 'react';
 
 import sessionRequest from "sessionRequest";
 import {osmImageNoteUrl} from "urls";
-import {AppContext, OSMFeatureProps, OSMImageNote} from "components/types";
+import {AppContext, MapFeatureTypes, OSMImageNote} from "components/types";
 import Modal from "util_components/bootstrap/Modal";
 import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
@@ -11,7 +11,7 @@ import 'components/osm_image_notes/OSMImageNotes.css';
 import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
 import {LocationTuple} from "util_components/types";
 import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
-import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
+import MapFeatureSet from "components/osm_image_notes/MapFeatureSet";
 import Icon from "util_components/bootstrap/Icon";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 import ZoomableImage from "util_components/ZoomableImage";
@@ -24,7 +24,7 @@ import {userCanEditNote} from "./utils";
 import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
 
 type OSMImageNoteModalProps = {
-  osmFeatureProperties?: OSMFeatureProps,
+  mapFeatureTypes?: MapFeatureTypes,
   note: OSMImageNote,
   onClose: () => any,
   showOnMap?: () => any,
@@ -77,7 +77,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
   }
 
   renderContent() {
-    const {osmFeatureProperties, onClose} = this.props;
+    const {mapFeatureTypes, onClose} = this.props;
     const {note, editingRelatedPlaces, error, nearbyFeatures, nearbyAddresses, linkingEntrance, repositioning} = this.state;
     const {user} = this.context;
 
@@ -105,7 +105,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
       <>
         <p className="m-2 ml-3"><strong>Tags:</strong></p>
         <div className="m-2 ml-3">
-           <OSMImageNoteTags {...{tags, osmFeatureProperties}} readOnly={!canEdit}
+           <OSMImageNoteTags {...{tags, mapFeatureTypes}} readOnly={!canEdit}
                              onChange={tags => this.updateSelectedNote({tags})}/>
         </div>
       </>
@@ -142,10 +142,10 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
                 </button>
           }/>
       </div>
-      {canEdit && osmFeatureProperties && this.getRelevantProperties().map((osmFeatureName) =>
+      {canEdit && mapFeatureTypes && this.getRelevantFeatureTypes().map((osmFeatureName) =>
         <div key={osmFeatureName} className="mr-2 ml-3">
-            <OSMFeatureProperties
-              schema={osmFeatureProperties[osmFeatureName]}
+            <MapFeatureSet
+              schema={mapFeatureTypes[osmFeatureName]}
               osmImageNote={note}
               osmFeatureName={osmFeatureName}
               nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}
@@ -233,12 +233,12 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
       .then(note => this.setState({note}))
   };
 
-  private getRelevantProperties() {
+  private getRelevantFeatureTypes() {
     const {note} = this.state;
-    const {osmFeatureProperties} = this.props;
+    const {mapFeatureTypes} = this.props;
     if (!note) return [];
     const tags = note.tags || [];
-    const allTags = Object.keys(osmFeatureProperties || {});
+    const allTags = Object.keys(mapFeatureTypes || {});
     return allTags.filter(tag => tags.includes(tag));
   }
 

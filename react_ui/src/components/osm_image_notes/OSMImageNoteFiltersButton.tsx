@@ -4,11 +4,11 @@ import _ from 'lodash';
 // @ts-ignore
 import {ButtonDropdown, DropdownItem, DropdownMenu, DropdownToggle} from "reactstrap";
 import Icon from "util_components/bootstrap/Icon";
-import {AppContext, OSMFeatureProps} from "components/types";
+import {AppContext, MapFeatureTypes} from "components/types";
 
 
 type OSMImageNoteFiltersButtonProps = {
-  osmFeatureProperties?: OSMFeatureProps,
+  mapFeatureTypes?: MapFeatureTypes,
   onFiltersChanged: (filters: any) => any
 }
 
@@ -32,7 +32,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
 
   render() {
     const {filters, filtersOpen} = this.state;
-    const {osmFeatureProperties} = this.props;
+    const {mapFeatureTypes} = this.props;
     const nonStatusFilters = _.omit(filters, ['is_processed', 'is_reviewed']);
     const {user} = this.context;
 
@@ -66,7 +66,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
           Reviewed
         </DropdownItem>
         <DropdownItem divider/>
-        {osmFeatureProperties && Object.keys(osmFeatureProperties).map((tag) =>
+        {mapFeatureTypes && Object.keys(mapFeatureTypes).map((tag) =>
           <DropdownItem key={tag}
                         className={(filters.tags && filters.tags.includes(tag)) ? 'text-primary' : ''}
                         onClick={() => this.toggleFilter({tags: tag})}>

@@ -12,10 +12,10 @@ import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
-import {OSMFeatureProps, OSMImageNote} from "components/types";
+import {MapFeatureTypes, OSMImageNote} from "components/types";
 import OSMImageNotes from "components/osm_image_notes/OSMImageNotes";
 import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
-import OSMFeatureProperties from "components/osm_image_notes/OSMFeatureProperties";
+import MapFeatureSet from "components/osm_image_notes/MapFeatureSet";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 import {changeset, OSMFeature} from "util_components/osm/types";
 import OSMChangesetSelection from "util_components/osm/OSMChangesetSelection";
@@ -39,9 +39,9 @@ type OSMImageNotesEditorState = OSMImageNote & {
   imageError: boolean,
   osmImageNotesLayer?: any,
   imagesUploading: OSMImageNote[],
-  osmFeatureProperties?: OSMFeatureProps,
+  mapFeatureTypes?: MapFeatureTypes,
   tags: string[],
-  osmProperties: any,
+  mapFeatureSets: any,
   filters: any,
   nearbyFeatures: OSMFeature[],
   nearbyAddresses: OSMFeature[],
@@ -66,7 +66,7 @@ const initialState: () => OSMImageNotesEditorState = () => ({
   submitting: false,
   imagesUploading: [],
   tags: [],
-  osmProperties: {},
+  mapFeatureSets: {},
   filters: {},
   nearbyFeatures: [],
   nearbyAddresses: [],
@@ -88,8 +88,8 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
 
   render() {
     const {
-      status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, osmFeatureProperties, tags,
-      osmProperties, filters, osm_features, nearbyFeatures, selectChangeset, selectedChangeset, nearbyAddresses,
+      status, lat, lon, submitting, error, osmImageNotesLayer, imageError, imagesUploading, mapFeatureTypes, tags,
+      mapFeatureSets, filters, osm_features, nearbyFeatures, selectChangeset, selectedChangeset, nearbyAddresses,
       requestPhoto, confirmCancel
     } = this.state;
 
@@ -136,7 +136,7 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
                 <Icon icon="refresh"/>
               </Button>{' '}
               <OSMImageNoteFiltersButton onFiltersChanged={filters => this.setState({filters})}
-                                         osmFeatureProperties={osmFeatureProperties} />
+                                         mapFeatureTypes={mapFeatureTypes} />
               {' '}
               <Button {...this.childProps.toolButton} tag="a" href="/editing-process.html" target="_blank">
                 <Icon icon="help"/>
@@ -173,17 +173,17 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
                         placeholder="Describe the problem / note (optional)"
                         onChange={(e) =>
                           this.setState({comment: e.target.value})} />
-              {osmFeatureProperties &&
+              {mapFeatureTypes &&
                 <>
                   <p className="m-2">Select tags:</p>
                   <p className="m-2">
-                    <OSMImageNoteTags {...{tags, osmFeatureProperties}} onChange={tags => this.setState({tags})}/>
+                    <OSMImageNoteTags {...{tags, mapFeatureTypes}} onChange={tags => this.setState({tags})}/>
                   </p>
                   <div className="ml-2 mr-2">
-                    {tags.filter(tag => osmFeatureProperties[tag]).map((tag) =>
-                      <OSMFeatureProperties key={tag} schema={osmFeatureProperties[tag]} osmFeatureName={tag}
-                                            osmImageNote={{osm_features, ...osmProperties}}
-                                            onSubmit={(data) => this.addOSMProperties(data)}
+                    {tags.filter(tag => mapFeatureTypes[tag]).map((tag) =>
+                      <MapFeatureSet key={tag} schema={mapFeatureTypes[tag]} osmFeatureName={tag}
+                                            osmImageNote={{osm_features, ...mapFeatureSets}}
+                                            onSubmit={(data) => this.addMapFeatureSets(data)}
                                             nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}/>
                     )}
                   </div>
@@ -211,8 +211,8 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
                      onLocationSelected={this.onLocationSelected}
                      extraLayers={_.filter([osmImageNotesLayer, this.getChangesetMapLayer()])}/>
       <OSMImageNotes onMapLayerLoaded={(osmImageNotesLayer: any) => this.setState({osmImageNotesLayer})}
-                     onOSMFeaturePropertiesLoaded={(osmFeatureProperties: OSMFeatureProps) =>
-                       this.setState({osmFeatureProperties})}
+                     onMapFeatureTypesLoaded={(mapFeatureTypes: MapFeatureTypes) =>
+                       this.setState({mapFeatureTypes})}
                      wrappedComponentRef={this.imageNotesRef} filters={filters}
                      showLocation={this.showLocation} requestLocation={this.requestLocation}
                      selectedNoteId={this.props.selectedNoteId} />
@@ -260,8 +260,8 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
     return this.changesetLayerRef.current && this.changesetLayerRef.current.getMapLayer(selectedChangeset);
   }
 
-  private addOSMProperties(data: any) {
-    this.setState({osmProperties: {...this.state.osmProperties, ...data}});
+  private addMapFeatureSets(data: any) {
+    this.setState({mapFeatureSets: {...this.state.mapFeatureSets, ...data}});
   }
 
   onImageClick = () => {
@@ -306,8 +306,8 @@ export default class OSMImageNotesEditor extends React.Component<OSMImageNotesEd
   };
 
   onSubmit = () => {
-    const {comment, lon, lat, osm_features, addresses, image, imagesUploading, tags, osmProperties} = this.state;
-    const fields = {comment, lat, lon, osm_features, addresses, tags, ...osmProperties};
+    const {comment, lon, lat, osm_features, addresses, image, imagesUploading, tags, mapFeatureSets} = this.state;
+    const fields = {comment, lat, lon, osm_features, addresses, tags, ...mapFeatureSets};
 
     this.setState({submitting: true});
 

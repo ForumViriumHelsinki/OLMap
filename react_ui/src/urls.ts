@@ -21,7 +21,7 @@ export const osmImageNoteCommentUrl = (id: number) => `/rest/osm_image_note_comm
 export const notificationsUrl = `/rest/notifications/`;
 export const notificationSeenUrl = (id: number) => `/rest/notifications/${id}/mark_seen/`;
 
-export const osmFeaturePropertiesUrl = "/rest/osm_image_notes/property_schemas/";
+export const mapFeatureTypesUrl = "/rest/osm_image_notes/map_feature_schemas/";
 
 export const osmEntranceUrl = (id: number) => `/rest/osm_entrances/${id}/`;
 

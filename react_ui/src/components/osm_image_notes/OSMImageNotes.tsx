@@ -8,8 +8,8 @@ import * as L from 'leaflet';
 import _ from 'lodash';
 
 import sessionRequest from "sessionRequest";
-import {osmFeaturePropertiesUrl, osmImageNotesUrl, osmImageNoteUrl} from "urls";
-import {OSMFeatureProps, OSMImageNote} from "components/types";
+import {mapFeatureTypesUrl, osmImageNotesUrl, osmImageNoteUrl} from "urls";
+import {MapFeatureTypes, OSMImageNote} from "components/types";
 
 import 'components/osm_image_notes/OSMImageNotes.css';
 
@@ -24,7 +24,7 @@ const markerColors = {
 
 type OSMImageNotesProps = {
   onMapLayerLoaded: (mapLayer: any) => any
-  onOSMFeaturePropertiesLoaded?: (osmFeatureProperties: OSMFeatureProps) => any,
+  onMapFeatureTypesLoaded?: (mapFeatureTypes: MapFeatureTypes) => any,
   filters: any,
   history: any,
   location: Location,
@@ -37,7 +37,7 @@ type OSMImageNotesProps = {
 type OSMImageNotesState = {
   osmImageNotes?: OSMImageNote[],
   error: boolean
-  osmFeatureProperties?: OSMFeatureProps
+  mapFeatureTypes?: MapFeatureTypes
 }
 
 const initialState: OSMImageNotesState = {
@@ -56,7 +56,7 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
 
   componentDidMount() {
     this.loadImageNotes();
-    this.loadOSMFeatureProperties();
+    this.loadMapFeatureTypes();
   }
 
   componentDidUpdate(prevProps: OSMImageNotesProps) {
@@ -108,13 +108,13 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
   }
 
   render() {
-    const {osmImageNotes, error, osmFeatureProperties} = this.state;
+    const {osmImageNotes, error, mapFeatureTypes} = this.state;
     const {history, showLocation, requestLocation, selectedNoteId} = this.props;
 
-    if (!osmImageNotes || !osmFeatureProperties || !selectedNoteId) return '';
+    if (!osmImageNotes || !mapFeatureTypes || !selectedNoteId) return '';
 
     const note = _.find(osmImageNotes, {id: selectedNoteId}) || {id: selectedNoteId} as OSMImageNote;
-    return <OSMImageNoteModal osmFeatureProperties={osmFeatureProperties} note={note}
+    return <OSMImageNoteModal mapFeatureTypes={mapFeatureTypes} note={note}
                                onClose={() => {this.refreshNote(note); history.push('/Notes/')}}
                                showOnMap={() => {showLocation(note); history.push('/Notes/')}}
                                requestLocation={requestLocation}/>
@@ -173,13 +173,13 @@ class OSMImageNotes extends React.Component<OSMImageNotesProps, OSMImageNotesSta
     return this.mapLayer;
   }
 
-  private loadOSMFeatureProperties() {
-    const {onOSMFeaturePropertiesLoaded} = this.props;
-    sessionRequest(osmFeaturePropertiesUrl).then((response) => {
+  private loadMapFeatureTypes() {
+    const {onMapFeatureTypesLoaded} = this.props;
+    sessionRequest(mapFeatureTypesUrl).then((response) => {
       if (response.status < 300)
-        response.json().then((osmFeatureProperties) => {
-          this.setState({osmFeatureProperties});
-          onOSMFeaturePropertiesLoaded && onOSMFeaturePropertiesLoaded(osmFeatureProperties)
+        response.json().then((mapFeatureTypes) => {
+          this.setState({mapFeatureTypes});
+          onMapFeatureTypesLoaded && onMapFeatureTypesLoaded(mapFeatureTypes)
         })
     })
   }
