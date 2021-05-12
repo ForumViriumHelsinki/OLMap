@@ -190,7 +190,17 @@ class OSMMapFeatureTests(FVHAPITestCase):
                     'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours'},
                     'opening_hours_covid19': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours covid19'},
                     'level': {'type': 'string', 'maxLength': 8, 'title': 'Level', 'description': 'Floor(s), e.g. 1-3'},
-                    'type': {'type': 'integer', 'enum': workplace['enum'], 'enumNames': workplace['enumNames'], 'title': 'Type'}})},
+                    'type': {'type': 'integer', 'enum': workplace['enum'], 'enumNames': workplace['enumNames'], 'title': 'Type'},
+                    "delivery_hours": {
+                        "type": "string",
+                        "maxLength": 64,
+                        "title": "Delivery hours"
+                    },
+                    "delivery_instructions": {
+                        "type": "string",
+                        "title": "Delivery instructions"
+                    }
+                })},
 
             'InfoBoard': {
                 'type': 'object',
@@ -205,6 +215,56 @@ class OSMMapFeatureTests(FVHAPITestCase):
                         'type': 'string',
                         'enum': ['', 'Max height', 'Max weight', 'No stopping', 'No parking', 'Loading zone', 'Parking'],
                         'title': 'Type'},
-                    'text': {'type': 'string', 'maxLength': 128, 'title': 'Text'}}}
+                    'text': {'type': 'string', 'maxLength': 128, 'title': 'Text'}}
+            },
+
+            "UnloadingPlace": {
+                "type": "object",
+                "properties": {
+                    "length": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^\\-?[0-9]*(\\.[0-9]{1,2})?$",
+                        "title": "Length",
+                        "description": "In meters"
+                    },
+                    "width": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^\\-?[0-9]*(\\.[0-9]{1,2})?$",
+                        "title": "Width",
+                        "description": "In meters"
+                    },
+                    "max_weight": {
+                        "type": [
+                            "string",
+                            "null"
+                        ],
+                        "pattern": "^\\-?[0-9]*(\\.[0-9]{1,2})?$",
+                        "title": "Max weight",
+                        "description": "In tons"
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Description"
+                    },
+                    "opening_hours": {
+                        "type": "string",
+                        "maxLength": 64,
+                        "title": "Opening hours"
+                    },
+                    "entrances": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "title": "Entrances"
+                    }
+                }
+            }
         })
 
