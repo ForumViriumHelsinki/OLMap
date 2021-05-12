@@ -11,7 +11,7 @@ from django.db import models
 
 from . import Address
 from .base import Model
-from .osm_image_notes import OSMImageNote
+from .osm_image_notes import OSMImageNote, OSMFeature
 from olmap.utils import intersection_matches
 
 
@@ -66,6 +66,7 @@ class AddressIndex(FeatureIndex):
 
 class MapFeature(models.Model):
     image_note = models.ForeignKey(OSMImageNote, on_delete=models.CASCADE)
+    osm_feature = models.ForeignKey(OSMFeature, blank=True, null=True, on_delete=models.SET_NULL)
 
     # Override in subclasses to enable automatic linking of OSM nodes:
     osm_node_query = None
@@ -104,25 +105,27 @@ class MapFeature(models.Model):
             points.append(p)
         tree = STRtree(points)
 
-        node_index = OSMFeatureIndex(result.nodes)
-
-        instances = cls.objects.filter(image_note__processed_by__isnull=False)\
-            .prefetch_related('image_note__osm_features')
+        instances = cls.objects.filter(osm_feature=None).prefetch_related('image_note__osm_features')
         print(f'Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...')
         linked_count = 0
         for instance in instances:
-            if node_index.is_linked(instance.image_note):
-                continue
             note_position = [instance.image_note.lat, instance.image_note.lon]
             nearest_osm = tree.nearest(Point(*note_position)).node
             dst = distance([nearest_osm.lat, nearest_osm.lon], note_position).meters
             tags = instance.as_osm_tags()
-            if (dst < cls.max_distance_to_osm_node and intersection_matches(nearest_osm.tags, tags, *cls.required_osm_matching_tags)):
-                added = instance.image_note.link_osm_id(nearest_osm.id)
-                if added:
-                    linked_count += 1
-                    print(f'Linked OSM {cls.__name__} {nearest_osm.id} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')
+            matches = intersection_matches(nearest_osm.tags, tags, *cls.required_osm_matching_tags)
+            if matches and dst < cls.max_distance_to_osm_node:
+                instance.link_osm_id(nearest_osm.id)
+                linked_count += 1
+                print(f'Linked OSM {cls.__name__} {nearest_osm.id} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')
         print(f'All done; {linked_count} new links created.')
+
+    def link_osm_id(self, osm_id):
+        feature = OSMFeature.objects.get_or_create(id=osm_id)[0]
+        self.osm_feature = feature
+        self.image_note.osm_features.add(feature)
+        self.save()
+        return feature
 
 
 class InfoBoard(MapFeature):
@@ -282,6 +285,9 @@ class Workplace(BaseAddress):
     opening_hours_covid19 = models.CharField(blank=True, max_length=64)
     level = models.CharField(blank=True, max_length=8, help_text="Floor(s), e.g. 1-3")
 
+    delivery_hours = models.CharField(blank=True, max_length=64)
+    delivery_instructions = models.TextField(blank=True)
+
     # For automatic linking of OSM nodes to OLMap instances:
     osm_node_query = 'name'
     required_osm_matching_tags = ['name']
@@ -293,6 +299,39 @@ class Workplace(BaseAddress):
             **filter_dict(as_dict(self, 'name', 'phone', 'opening_hours', 'level')),
             **filter_dict({'opening_hours:covid19': self.opening_hours_covid19}),
             **self.type.osm_tags)
+
+
+class DeliveryType(Model):
+    name = models.CharField(max_length=64)
+
+    def __str__(self):
+        return self.name or super().__str__()
+
+
+class WorkplaceEntrance(Model):
+    workplace = models.ForeignKey(Workplace, related_name='workplace_entrances', on_delete=models.CASCADE)
+    entrance = models.ForeignKey(Entrance, related_name='workplace_entrances', on_delete=models.CASCADE)
+    delivery_types = models.ManyToManyField(DeliveryType, blank=True)
+    delivery_hours = models.CharField(blank=True, max_length=64)
+    delivery_instructions = models.TextField(blank=True)
+
+
+class UnloadingPlace(MapFeature):
+    length = dimension_field()
+    width = dimension_field()
+    max_weight = models.DecimalField(max_digits=4, decimal_places=2, help_text='In tons', blank=True, null=True)
+    description = models.TextField(blank=True)
+    opening_hours = models.CharField(blank=True, max_length=64)
+    entrances = models.ManyToManyField(to=Entrance, related_name='unloading_places', blank=True)
+
+    def as_osm_tags(self):
+        return filter_dict({
+            'parking:condition': 'loading',
+            'length': self.length,
+            'width': self.width,
+            'max_weight': self.max_weight,
+            'opening_hours': self.opening_hours
+        })
 
 
 class TrafficSign(MapFeature):
@@ -317,7 +356,7 @@ class TrafficSign(MapFeature):
             'traffic_sign:2': f'{self.text_sign}[{self.text}]' if self.text else None})
 
 
-map_feature_types = [Entrance, Steps, Gate, Barrier, Workplace, InfoBoard, TrafficSign]
+map_feature_types = [Entrance, Steps, Gate, Barrier, Workplace, InfoBoard, TrafficSign, UnloadingPlace]
 address_feature_types = [Entrance, Workplace]
 
 
