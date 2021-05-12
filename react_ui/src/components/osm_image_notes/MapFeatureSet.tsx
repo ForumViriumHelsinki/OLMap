@@ -35,6 +35,10 @@ const customWidgets: AnyObject = {
   Workplace: {type: WorkplaceTypeWidget}
 };
 
+const omitFields: AnyObject = {
+  UnloadingPlace: ['entrances']
+};
+
 export default class MapFeatureSet extends React.Component<MapFeatureSetProps, MapFeatureSetState> {
   state: MapFeatureSetState = initialState;
 
@@ -52,6 +56,11 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
     const {editingFeature} = this.state;
     // @ts-ignore
     const pkFeatures = (osmImageNote[(this.getFeatureListFieldName())] || []) as PKFeature[];
+
+    const filteredSchema = {...schema};
+    filteredSchema.properties = omitFields[osmFeatureName] ? Object.fromEntries(
+      Object.entries(schema.properties).filter(([k, v]) => !omitFields[osmFeatureName].includes(k))
+    ) : schema.properties;
 
     return <>
       {pkFeatures.map((pkFeature, i) =>
@@ -79,7 +88,7 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
             }
           </p>
           {(pkFeature === editingFeature) ?
-            <Form schema={schema} uiSchema={this.getUISchema()} className="compact"
+            <Form schema={filteredSchema} uiSchema={this.getUISchema()} className="compact"
                   formData={pkFeature}
                   onSubmit={this.onSubmit}>
               <Button size="sm" color="primary" type="submit" className="btn-compact pl-4 pr-4 mr-2">Save</Button>
@@ -196,6 +205,12 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
       .map(([field, spec]) => {
         return [field, {"ui:widget": customWidgetsForSchema[field]}]
       });
-    return Object.fromEntries(radioFields.concat(customFields));
+    const textFields = Object.entries(schema.properties)
+        // @ts-ignore
+      .filter(([field, spec]) => spec.type == 'string' && !spec.maxLength)
+      .map(([field, spec]) => {
+        return [field, {"ui:widget": 'textarea'}]
+      });
+    return Object.fromEntries(radioFields.concat(customFields).concat(textFields));
   }
 }

@@ -69,17 +69,9 @@ class WorkplaceTypeChoiceField(serializers.ChoiceField):
         return self._choices
 
 
-class WorkplaceSerializer(serializers.ModelSerializer):
-    as_osm_tags = serializers.ReadOnlyField()
-    type = WorkplaceTypeChoiceField()
-
-    class Meta:
-        model = models.Workplace
-        exclude = ['image_note']
-
-
 class MapFeatureSerializer(serializers.ModelSerializer):
     as_osm_tags = serializers.ReadOnlyField()
+    osm_feature = serializers.PrimaryKeyRelatedField(read_only=True)
 
     @classmethod
     def get_subclass_for(cls, prop_type):
@@ -91,6 +83,14 @@ class MapFeatureSerializer(serializers.ModelSerializer):
                 model = prop_type
                 exclude = ['image_note']
         return PropSerializer
+
+
+class WorkplaceSerializer(MapFeatureSerializer):
+    type = WorkplaceTypeChoiceField()
+
+    class Meta:
+        model = models.Workplace
+        exclude = ['image_note']
 
 
 class OSMImageNoteCommentSerializer(serializers.ModelSerializer):
