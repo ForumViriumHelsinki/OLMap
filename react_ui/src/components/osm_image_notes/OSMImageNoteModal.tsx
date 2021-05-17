@@ -131,7 +131,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
           extraFeatures={nearbyAddresses}
           onChange={this.onFeaturesSelected} readOnly={!editingRelatedPlaces}
           maxHeight={null}
-          preselectedFeatureIds={note.osm_features.concat(note.addresses)}
+          preselectedFeatureIds={note.osm_features.concat(note.addresses).filter(f => f)}
           onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
           featureActions={
             (feature: OSMFeature) =>
