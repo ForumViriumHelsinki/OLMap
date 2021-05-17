@@ -207,7 +207,7 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
       });
     const textFields = Object.entries(schema.properties)
         // @ts-ignore
-      .filter(([field, spec]) => spec.type == 'string' && !spec.maxLength)
+      .filter(([field, spec]) => spec.type == 'string' && !spec.maxLength && !spec.enum)
       .map(([field, spec]) => {
         return [field, {"ui:widget": 'textarea'}]
       });
