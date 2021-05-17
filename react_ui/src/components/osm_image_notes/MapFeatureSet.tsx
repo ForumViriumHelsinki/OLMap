@@ -162,6 +162,13 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
       }
     }
 
+    if (schema.properties.name) {
+      const f = selectedFeatures.find(f => f.tags['name']);
+      if (f) {
+        newPKFeature.name = f.tags['name'];
+      }
+    }
+
     pkFeatures.push(newPKFeature);
     // @ts-ignore
     osmImageNote[listFieldName] = pkFeatures;
