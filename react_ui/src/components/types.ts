@@ -51,6 +51,8 @@ export type MapFeatureTypes = {
   [featureType: string]: JSONSchema
 };
 
+export type MapFeature = {[field: string]: any}
+
 export type AppContextType = {
     user?: User
 }

@@ -3,15 +3,15 @@ import React from 'react';
 // @ts-ignore
 import Form from "react-jsonschema-form";
 
-import {AppContext, JSONSchema, OSMImageNote} from "components/types";
+import {AppContext, JSONSchema, MapFeature, OSMImageNote} from "components/types";
 // @ts-ignore
 import {Button} from "reactstrap";
 import {OSMFeature} from "util_components/osm/types";
 import ConfirmButton from "util_components/bootstrap/ConfirmButton";
 import {userCanEditNote} from "components/osm_image_notes/utils";
-import WorkplaceTypeWidget from "components/osm_image_notes/WorkplaceTypeWidget";
-
-type PKFeature = {[field: string]: any}
+import WorkplaceTypeWidget from "components/map_features/WorkplaceTypeWidget";
+import Modal from "util_components/bootstrap/Modal";
+import WorkplaceEntranceEditor from "components/map_features/WorkplaceEntranceEditor";
 
 type MapFeatureSetProps = {
   schema: JSONSchema,
@@ -22,7 +22,8 @@ type MapFeatureSetProps = {
 }
 
 type MapFeatureSetState = {
-  editingFeature?: PKFeature
+  editingFeature?: MapFeature,
+  addingWorkplaceEntrance?: MapFeature
 }
 
 const initialState: MapFeatureSetState = {
@@ -53,9 +54,9 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
     const {schema, osmFeatureName, osmImageNote} = this.props;
     const {user} = this.context;
     const editable = userCanEditNote(user, osmImageNote);
-    const {editingFeature} = this.state;
+    const {editingFeature, addingWorkplaceEntrance} = this.state;
     // @ts-ignore
-    const pkFeatures = (osmImageNote[(this.getFeatureListFieldName())] || []) as PKFeature[];
+    const mapFeatures = (osmImageNote[(this.getFeatureListFieldName())] || []) as MapFeature[];
 
     const filteredSchema = {...schema};
     filteredSchema.properties = omitFields[osmFeatureName] ? Object.fromEntries(
@@ -63,60 +64,73 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
     ) : schema.properties;
 
     return <>
-      {pkFeatures.map((pkFeature, i) =>
-        <div key={pkFeature.id || i}>
+      {mapFeatures.map((mapFeature, i) =>
+        <div key={mapFeature.id || i}>
           <p className="mt-2">
             <strong>{osmFeatureName}</strong>
-            {(pkFeature != editingFeature) &&
+            {(mapFeature != editingFeature) &&
               <>
                 {' '}
                 {editable &&
                   <Button size="sm" color="primary" outline className="btn-compact"
-                          onClick={() => this.setState({editingFeature: pkFeature})}>Edit</Button>
+                          onClick={() => this.setState({editingFeature: mapFeature})}>Edit</Button>
                 }
                 {' '}
-                {pkFeature.as_osm_tags &&
+                {mapFeature.as_osm_tags &&
                   <Button size="sm" color="secondary" outline className="btn-compact"
-                          onClick={() => this.copyText((pkFeature.id || i) + '-osm-text')}>Copy</Button>
+                          onClick={() => this.copyText((mapFeature.id || i) + '-osm-text')}>Copy</Button>
                 }
                 {editable &&
-                  <ConfirmButton onClick={() => this.onDelete(pkFeature)}
+                  <ConfirmButton onClick={() => this.onDelete(mapFeature)}
                                  className="btn-outline-danger btn-compact btn-sm float-right"
                                  confirm={`Really delete ${osmFeatureName}?`}>Delete</ConfirmButton>
                 }
               </>
             }
           </p>
-          {(pkFeature === editingFeature) ?
+          {(mapFeature === editingFeature) ?
             <Form schema={filteredSchema} uiSchema={this.getUISchema()} className="compact"
-                  formData={pkFeature}
+                  formData={mapFeature}
                   onSubmit={this.onSubmit}>
               <Button size="sm" color="primary" type="submit" className="btn-compact pl-4 pr-4 mr-2">Save</Button>
               <Button tag="span" size="sm" color="secondary" outline className="btn-compact pl-4 pr-4"
                       onClick={this.onCancel}>Cancel</Button>
-              <ConfirmButton onClick={() => this.onDelete(pkFeature)}
+              <ConfirmButton onClick={() => this.onDelete(mapFeature)}
                              className="btn-outline-danger btn-compact btn-sm float-right"
                              confirm={`Really delete ${osmFeatureName}?`}>Delete</ConfirmButton>
             </Form>
             :
             <>
-              {pkFeature.as_osm_tags &&
-              <textarea id={(pkFeature.id || i) + '-osm-text'}
-                        rows={Object.keys(pkFeature.as_osm_tags).length}
+              {mapFeature.as_osm_tags &&
+              <textarea id={(mapFeature.id || i) + '-osm-text'}
+                        rows={Object.keys(mapFeature.as_osm_tags).length}
                         className="form-control"
                         readOnly
-                        value={Object.entries(pkFeature.as_osm_tags).map(([k, v]) => `${k}=${v}`).join('\n')}/>
+                        value={Object.entries(mapFeature.as_osm_tags).map(([k, v]) => `${k}=${v}`).join('\n')}/>
               }
             </>
           }
+          {osmFeatureName == 'Workplace' && <div className="mb-4 mt-1">
+            {editable && !editingFeature &&
+              <Button size="sm" color="primary" outline className="btn-compact"
+                      onClick={() => this.setState({addingWorkplaceEntrance: mapFeature})}>Link entrance</Button>
+            }
+          </div>}
+
         </div>
       )}
       {editable && !editingFeature &&
         <p className="mt-2">
-          <Button size="sm" color="primary" outline className="btn-compact" onClick={this.newPKFeature}>
+          <Button size="sm" color="primary" outline className="btn-compact" onClick={this.newMapFeature}>
             New {osmFeatureName}
           </Button>
         </p>
+      }
+      {addingWorkplaceEntrance &&
+        <Modal onClose={() => this.setState({addingWorkplaceEntrance: undefined})}
+               title={addingWorkplaceEntrance.name + ': link entrance'}>
+          <WorkplaceEntranceEditor workplace={addingWorkplaceEntrance} />
+        </Modal>
       }
     </>
   }
@@ -132,7 +146,7 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
     this.setState({editingFeature: undefined})
   };
 
-  onDelete = (feature: PKFeature) => {
+  onDelete = (feature: MapFeature) => {
     const {osmImageNote, onSubmit} = this.props;
     const fieldName = this.getFeatureListFieldName();
     // @ts-ignore
@@ -144,35 +158,35 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
       .then(() => {if (feature == this.state.editingFeature) this.setState({editingFeature: undefined})});
   };
 
-  newPKFeature = () => {
+  newMapFeature = () => {
     const {osmImageNote, nearbyFeatures, schema} = this.props;
     const listFieldName = this.getFeatureListFieldName();
     // @ts-ignore
-    const pkFeatures = (osmImageNote[listFieldName] || []) as PKFeature[];
+    const mapFeatures = (osmImageNote[listFieldName] || []) as MapFeature[];
     const selectedFeatureIds = osmImageNote.osm_features || [];
     const selectedFeatures = nearbyFeatures.filter((f) => selectedFeatureIds.includes(f.id));
 
-    const newPKFeature: {[k: string]: any} = {};
+    const newMapFeature: {[k: string]: any} = {};
 
     if (schema.properties.street && schema.properties.housenumber) {
       const f = selectedFeatures.find(f => f.tags['addr:housenumber'] && f.tags['addr:street']);
       if (f) {
-        newPKFeature.street = f.tags['addr:street'];
-        newPKFeature.housenumber = f.tags['addr:housenumber'];
+        newMapFeature.street = f.tags['addr:street'];
+        newMapFeature.housenumber = f.tags['addr:housenumber'];
       }
     }
 
     if (schema.properties.name) {
       const f = selectedFeatures.find(f => f.tags['name']);
       if (f) {
-        newPKFeature.name = f.tags['name'];
+        newMapFeature.name = f.tags['name'];
       }
     }
 
-    pkFeatures.push(newPKFeature);
+    mapFeatures.push(newMapFeature);
     // @ts-ignore
-    osmImageNote[listFieldName] = pkFeatures;
-    this.setState({editingFeature: newPKFeature});
+    osmImageNote[listFieldName] = mapFeatures;
+    this.setState({editingFeature: newMapFeature});
   };
 
   private copyText(osmTextId: string) {

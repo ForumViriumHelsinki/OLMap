@@ -11,7 +11,7 @@ import 'components/osm_image_notes/OSMImageNotes.css';
 import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
 import {LocationTuple} from "util_components/types";
 import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
-import MapFeatureSet from "components/osm_image_notes/MapFeatureSet";
+import MapFeatureSet from "components/map_features/MapFeatureSet";
 import Icon from "util_components/bootstrap/Icon";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 import ZoomableImage from "util_components/ZoomableImage";
@@ -131,7 +131,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
           extraFeatures={nearbyAddresses}
           onChange={this.onFeaturesSelected} readOnly={!editingRelatedPlaces}
           maxHeight={null}
-          preselectedFeatureIds={note.osm_features.concat(note.addresses).filter(f => f)}
+          preselectedFeatureIds={(note.osm_features || []).concat(note.addresses || []).filter(f => f)}
           onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
           featureActions={
             (feature: OSMFeature) =>
