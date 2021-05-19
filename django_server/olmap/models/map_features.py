@@ -118,6 +118,19 @@ class MapFeature(models.Model):
                 instance.link_osm_id(nearest_osm.id)
                 linked_count += 1
                 print(f'Linked OSM {cls.__name__} {nearest_osm.id} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')
+            else:
+                for point in tree.query(Point(*note_position).buffer(0.0003)):
+                    node = point.node
+                    dst = distance([node.lat, node.lon], note_position).meters
+                    tags = instance.as_osm_tags()
+                    matches = intersection_matches(node.tags, tags, *cls.required_osm_matching_tags)
+                    if matches and dst < cls.max_distance_to_osm_node:
+                        instance.link_osm_id(node.id)
+                        linked_count += 1
+                        print(
+                            f'Linked OSM {cls.__name__} {node.id} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')
+                        break
+
         print(f'All done; {linked_count} new links created.')
 
     def link_osm_id(self, osm_id):
@@ -314,6 +327,9 @@ class WorkplaceEntrance(Model):
     delivery_types = models.ManyToManyField(DeliveryType, blank=True)
     delivery_hours = models.CharField(blank=True, max_length=64)
     delivery_instructions = models.TextField(blank=True)
+
+    def image_note(self):
+        return self.entrance.image_note
 
 
 class UnloadingPlace(MapFeature):

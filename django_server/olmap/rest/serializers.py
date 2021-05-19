@@ -43,6 +43,16 @@ class UserSerializer(serializers.ModelSerializer):
         return self.user_in_group(user, REVIEWER_GROUP)
 
 
+class BaseOSMImageNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.OSMImageNote
+        fields = ['id', 'comment', 'image', 'lat', 'lon', 'is_reviewed', 'is_processed', 'created_by', 'tags']
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+        return OrderedDict([(key, result[key]) for key in result if result[key] not in [None, []]])
+
+
 class WorkplaceTypeChoiceField(serializers.ChoiceField):
     def __init__(self, **kwargs):
         self.html_cutoff = kwargs.pop('html_cutoff', self.html_cutoff)
@@ -85,8 +95,27 @@ class MapFeatureSerializer(serializers.ModelSerializer):
         return PropSerializer
 
 
+class WorkplaceEntranceSerializer(serializers.ModelSerializer):
+    delivery_types = serializers.SlugRelatedField(slug_field='name', many=True,
+                                                  queryset=models.DeliveryType.objects.all())
+    image_note = BaseOSMImageNoteSerializer(read_only=True)
+    entrance_data = MapFeatureSerializer.get_subclass_for(models.Entrance)(source='entrance', read_only=True)
+
+    class Meta:
+        model = models.WorkplaceEntrance
+        fields = '__all__'
+
+    def __init__(self, instance=None, data=None, **kwargs):
+        if data:
+            if data.get('delivery_types', None):
+                for t in data['delivery_types']:
+                    models.DeliveryType.objects.get_or_create(name=t)
+        return super().__init__(instance, data, **kwargs)
+
+
 class WorkplaceSerializer(MapFeatureSerializer):
     type = WorkplaceTypeChoiceField()
+    workplace_entrances = WorkplaceEntranceSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Workplace
@@ -107,16 +136,6 @@ class OSMImageNoteCommentNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.OSMImageNoteCommentNotification
         fields = ['comment', 'id']
-
-
-class BaseOSMImageNoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.OSMImageNote
-        fields = ['id', 'comment', 'image', 'lat', 'lon', 'is_reviewed', 'is_processed', 'created_by', 'tags']
-
-    def to_representation(self, instance):
-        result = super().to_representation(instance)
-        return OrderedDict([(key, result[key]) for key in result if result[key] not in [None, []]])
 
 
 class DictOSMImageNoteSerializer(BaseOSMImageNoteSerializer):
