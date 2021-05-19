@@ -22,7 +22,8 @@ type OSMImageNotesMapProps = {
   selectLocation?: (l: Location) => any,
   filters: any,
   osmChangeset?: OSMChangeset,
-  location?: Location
+  location?: Location,
+  zoom?: number
 }
 
 type OSMImageNotesMapState = {
@@ -40,7 +41,7 @@ export default class OSMImageNotesMap extends React.Component<OSMImageNotesMapPr
   private dotMarkers: {[id: string]: any} = {};
 
   render() {
-    const {osmChangeset, selectLocation, location} = this.props;
+    const {osmChangeset, selectLocation, location, zoom} = this.props;
     const {changesetLayer} = this.state;
 
     return <>
@@ -48,7 +49,7 @@ export default class OSMImageNotesMap extends React.Component<OSMImageNotesMapPr
         <OSMChangesetMapLayer changeset={osmChangeset}
                               onLayerReady={(changesetLayer) => this.setState({changesetLayer})}/>
       }
-      <MyPositionMap onLocationSelected={selectLocation} location={location}
+      <MyPositionMap onLocationSelected={selectLocation} location={location} zoom={zoom}
                      extraLayers={_.filter([this.getMapLayer(), changesetLayer])}/>
     </>;
   }

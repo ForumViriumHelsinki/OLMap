@@ -17,7 +17,8 @@ import urlMapPosition from "util_components/urlMapPosition";
 type MapProps = {
   onLocationSelected?: (location: any) => any
   extraLayers?: any[],
-  location?: Location
+  location?: Location,
+  zoom?: number
 }
 
 type MapState = { currentPosition?: Location, userMovedMap: boolean };
@@ -89,12 +90,12 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
   }
 
   refreshMap() {
-    const {onLocationSelected} = this.props;
+    const {onLocationSelected, zoom} = this.props;
     const {currentPosition} = this.state;
     // @ts-ignore
     const currentLatLng = currentPosition && [currentPosition.lat, currentPosition.lon];
     const position = this.getInitialPosition();
-    if (!this.state.userMovedMap) this.leafletMap.setView(position, position[2] || 18);
+    if (!this.state.userMovedMap) this.leafletMap.setView(position, position[2] || zoom || 18);
 
     if (onLocationSelected) {
       if (!this.markers.selectedPosition) {

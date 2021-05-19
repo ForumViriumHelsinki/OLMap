@@ -3,7 +3,7 @@ import React from 'react';
 // @ts-ignore
 import Form from "react-jsonschema-form";
 
-import {AppContext, JSONSchema, MapFeature, OSMImageNote} from "components/types";
+import {AppContext, JSONSchema, MapFeature, OSMImageNote, WorkplaceEntrance} from "components/types";
 // @ts-ignore
 import {Button} from "reactstrap";
 import {OSMFeature} from "util_components/osm/types";
@@ -18,12 +18,14 @@ type MapFeatureSetProps = {
   onSubmit: (data: any) => any,
   osmFeatureName: string,
   osmImageNote: OSMImageNote,
-  nearbyFeatures: OSMFeature[]
+  nearbyFeatures: OSMFeature[],
+  refreshNote?: () => any
 }
 
 type MapFeatureSetState = {
   editingFeature?: MapFeature,
-  addingWorkplaceEntrance?: MapFeature
+  editingWorkplaceEntrance?: WorkplaceEntrance,
+  entranceWP?: MapFeature
 }
 
 const initialState: MapFeatureSetState = {
@@ -51,10 +53,10 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
   };
 
   render() {
-    const {schema, osmFeatureName, osmImageNote} = this.props;
+    const {schema, osmFeatureName, osmImageNote, refreshNote} = this.props;
     const {user} = this.context;
     const editable = userCanEditNote(user, osmImageNote);
-    const {editingFeature, addingWorkplaceEntrance} = this.state;
+    const {editingFeature, editingWorkplaceEntrance, entranceWP} = this.state;
     // @ts-ignore
     const mapFeatures = (osmImageNote[(this.getFeatureListFieldName())] || []) as MapFeature[];
 
@@ -111,9 +113,15 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
             </>
           }
           {osmFeatureName == 'Workplace' && <div className="mb-4 mt-1">
+            {mapFeature.workplace_entrances.map((we: WorkplaceEntrance, i: number) =>
+              <Button size="sm" color="primary" outline className="btn-compact" key={we.id}
+                      onClick={() => this.setState({editingWorkplaceEntrance: we, entranceWP: mapFeature})}>
+                Linked entrance {i + 1}
+              </Button>
+            )}{' '}
             {editable && !editingFeature &&
               <Button size="sm" color="primary" outline className="btn-compact"
-                      onClick={() => this.setState({addingWorkplaceEntrance: mapFeature})}>Link entrance</Button>
+                      onClick={() => this.editNewWPEntrance(mapFeature)}>Link entrance</Button>
             }
           </div>}
 
@@ -126,10 +134,16 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
           </Button>
         </p>
       }
-      {addingWorkplaceEntrance &&
-        <Modal onClose={() => this.setState({addingWorkplaceEntrance: undefined})}
-               title={addingWorkplaceEntrance.name + ': link entrance'}>
-          <WorkplaceEntranceEditor workplace={addingWorkplaceEntrance} />
+      {editingWorkplaceEntrance && entranceWP &&
+        <Modal onClose={() => this.setState({editingWorkplaceEntrance: undefined})}
+               title={entranceWP.name + ': link entrance'}>
+          <WorkplaceEntranceEditor
+            workplace={entranceWP}
+            workplaceEntrance={editingWorkplaceEntrance}
+            imageNote={osmImageNote}
+            onSubmit={() => {
+              refreshNote && refreshNote();
+              this.setState({editingWorkplaceEntrance: undefined})}}/>
         </Modal>
       }
     </>
@@ -233,5 +247,9 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
         return [field, {"ui:widget": 'textarea'}]
       });
     return Object.fromEntries(radioFields.concat(customFields).concat(textFields));
+  }
+
+  editNewWPEntrance(workplace: MapFeature) {
+    this.setState({editingWorkplaceEntrance: {workplace: workplace.id}, entranceWP: workplace});
   }
 }
