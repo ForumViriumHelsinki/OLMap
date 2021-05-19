@@ -17,6 +17,9 @@ class OSMFeature(base.Model):
     class Meta:
         ordering = ['id']
 
+    def workplace(self):
+        return self.workplace_set.first()
+
 
 def upload_osm_images_to(instance, filename):
     return f'osm_image_notes/{instance.id}/{filename}'

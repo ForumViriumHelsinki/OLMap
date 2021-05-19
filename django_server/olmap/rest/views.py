@@ -4,6 +4,7 @@ from django.utils import timezone
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView
+from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.response import Response
 
 from drf_jsonschema import to_jsonschema
@@ -178,7 +179,7 @@ class OSMEntrancesViewSet(viewsets.ModelViewSet):
             models.OSMFeature.objects.get_or_create(id=id)
 
 
-class OSMFeaturesViewSet(viewsets.ReadOnlyModelViewSet):
+class OSMFeaturesViewSet(RetrieveModelMixin, viewsets.GenericViewSet):
     queryset = models.OSMFeature.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = OSMFeatureSerializer

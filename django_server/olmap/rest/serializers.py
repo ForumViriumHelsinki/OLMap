@@ -216,10 +216,11 @@ class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImage
 
 class OSMFeatureSerializer(serializers.ModelSerializer):
     image_notes = OSMImageNoteSerializer(many=True, read_only=True)
+    workplace = WorkplaceSerializer(read_only=True)
 
     class Meta:
         model = models.OSMFeature
-        fields = ['id', 'associated_entrances', 'image_notes']
+        fields = ['id', 'associated_entrances', 'image_notes', 'workplace']
 
 
 class OSMEntranceSerializer(serializers.ModelSerializer):
