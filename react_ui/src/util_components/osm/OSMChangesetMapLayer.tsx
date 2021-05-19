@@ -1,7 +1,7 @@
 import React from 'react';
 // @ts-ignore
 import * as L from 'leaflet';
-import {changeset, OSMFeature} from './types';
+import {OSMChangeset, OSMFeature} from './types';
 import Modal, {ModalBody} from "util_components/bootstrap/Modal";
 import {osmFeatureLabel} from "util_components/osm/utils";
 import {capitalize} from "utils";
@@ -12,7 +12,10 @@ const markerColors = {
   modified: '#007bff',
 };
 
-type OSMChangesetMapLayerProps = {}
+type OSMChangesetMapLayerProps = {
+  changeset: OSMChangeset,
+  onLayerReady: (layer: any) => any
+}
 
 type OSMChangesetMapLayerState = {
   selectedNode?: OSMFeature
@@ -22,6 +25,15 @@ const initialState: OSMChangesetMapLayerState = {};
 
 export default class OSMChangesetMapLayer extends React.Component<OSMChangesetMapLayerProps, OSMChangesetMapLayerState> {
   state = initialState;
+
+  componentDidMount() {
+    this.getMapLayer();
+  }
+
+  componentDidUpdate(prevProps: OSMChangesetMapLayerProps) {
+    if (prevProps.changeset != this.props.changeset)
+      this.getMapLayer();
+  }
 
   render() {
     const {selectedNode} = this.state;
@@ -38,7 +50,8 @@ export default class OSMChangesetMapLayer extends React.Component<OSMChangesetMa
     </Modal>;
   }
 
-  getMapLayer(changeset?: changeset) {
+  getMapLayer() {
+    const {changeset, onLayerReady} = this.props;
     if (!changeset) return;
     const mapLayer = L.layerGroup();
     ['created', 'modified', 'deleted'].forEach((status) => {
@@ -53,11 +66,12 @@ export default class OSMChangesetMapLayer extends React.Component<OSMChangesetMa
           fillColor: '#ffffff',
           fillOpacity: 1
         };
-        const marker = L.circleMarker({lon: node.lon, lat: node.lat}, style);
+        const marker = L.circleMarker({lng: node.lon, lat: node.lat}, style);
         marker.on('click', () => this.setState({selectedNode: node}));
         marker.addTo(mapLayer);
       });
     });
+    onLayerReady(mapLayer);
     return mapLayer;
   };
 }

@@ -3,8 +3,8 @@ import React from 'react';
 import _ from 'lodash';
 // @ts-ignore
 import {ButtonDropdown, DropdownItem, DropdownMenu, DropdownToggle} from "reactstrap";
-import Icon from "util_components/bootstrap/Icon";
 import {AppContext, MapFeatureTypes} from "components/types";
+import MapToolButton from "components/osm_image_notes/MapToolButton";
 
 
 type OSMImageNoteFiltersButtonProps = {
@@ -26,10 +26,6 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
   state: OSMImageNoteFiltersButtonState = initialState();
   static contextType = AppContext;
 
-  childProps = {
-    toolButton: {outline: true, color: "primary", size: "sm", className: 'bg-white'}
-  };
-
   render() {
     const {filters, filtersOpen} = this.state;
     const {mapFeatureTypes} = this.props;
@@ -37,8 +33,8 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
     const {user} = this.context;
 
     return <ButtonDropdown isOpen={filtersOpen} toggle={() => this.setState({filtersOpen: !filtersOpen})}>
-      <DropdownToggle {...this.childProps.toolButton}>
-        <Icon icon="filter_alt"/>
+      <DropdownToggle tag="span">
+        <MapToolButton icon="filter_alt"/>
       </DropdownToggle>
       <DropdownMenu>
         <DropdownItem header>Filter</DropdownItem>

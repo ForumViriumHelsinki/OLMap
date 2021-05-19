@@ -83,7 +83,7 @@ export const osmFeatureTypes: OSMFeatureType[] = [
   }
 ];
 
-export type changeset = {
+export type OSMChangeset = {
   id: string,
   created: OSMFeature[],
   modified: OSMFeature[],

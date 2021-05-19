@@ -12,6 +12,7 @@ import OSMImageNoteModal from "components/osm_image_notes/OSMImageNoteModal";
 import NavBar from "util_components/bootstrap/NavBar";
 import Confirm from "util_components/bootstrap/Confirm";
 import OSMImageNotesEditor from "components/osm_image_notes/OSMImageNotesEditor";
+import ImageNotesContextProvider from "components/osm_image_notes/ImageNotesContextProvider";
 
 type UIState = {
   user?: User,
@@ -19,6 +20,7 @@ type UIState = {
   showLogout: boolean,
   menuOpen: boolean
 }
+
 
 class OLMapUI extends React.Component<{}, UIState> {
   state: UIState = {
@@ -47,8 +49,11 @@ class OLMapUI extends React.Component<{}, UIState> {
     });
   };
 
-  // @ts-ignore
-  onResize = () => document.getElementById('OLMapUI').style.height = window.innerHeight;
+  onResize = () => {
+    const el = document.getElementById('OLMapUI');
+    // @ts-ignore
+    if (el) el.style.height = window.innerHeight;
+  };
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.onResize)
@@ -61,7 +66,7 @@ class OLMapUI extends React.Component<{}, UIState> {
     const ImageNote = () => <OSMImageNoteModal note={{id: useParams().noteId}} fullScreen />;
 
     const ResetPassword = () => {
-      const params = useParams();
+      const params = useParams() as any;
       return <ResetPasswordScreen uid={params.uid} token={params.token}/>;
     };
 
@@ -73,7 +78,9 @@ class OLMapUI extends React.Component<{}, UIState> {
           <h5 className="m-2">OLMap</h5>
         </NavBar>
         <div className="flex-grow-1 flex-shrink-1 overflow-auto">
-          <OSMImageNotesEditor {...props}/>
+          <ImageNotesContextProvider>
+            <OSMImageNotesEditor {...props}/>
+          </ImageNotesContextProvider>
         </div>
       </div>;
 

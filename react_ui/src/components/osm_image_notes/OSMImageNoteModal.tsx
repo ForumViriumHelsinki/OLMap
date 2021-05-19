@@ -9,7 +9,7 @@ import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 import 'components/osm_image_notes/OSMImageNotes.css';
 
 import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
-import {LocationTuple} from "util_components/types";
+import {LocationTuple, Location} from "util_components/types";
 import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
 import MapFeatureSet from "components/map_features/MapFeatureSet";
 import Icon from "util_components/bootstrap/Icon";
@@ -22,13 +22,15 @@ import {OSMFeature} from "util_components/osm/types";
 import {formatTimestamp} from "utils";
 import {userCanEditNote} from "./utils";
 import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
+import MapToolButton from "components/osm_image_notes/MapToolButton";
 
 type OSMImageNoteModalProps = {
   mapFeatureTypes?: MapFeatureTypes,
   note: OSMImageNote,
   onClose: () => any,
   showOnMap?: () => any,
-  requestLocation?: (initial: any) => Promise<any>,
+  requestLocation?: (fn: (l: Location) => any, initial: any) => any,
+  cancelLocationRequest?: () => any,
   fullScreen?: boolean
 }
 
@@ -66,7 +68,14 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
     const {onClose, fullScreen} = this.props;
     const {note, repositioning} = this.state;
 
-    if (repositioning || !note) return null;
+    if (repositioning) return <div className="mt-4 text-right">
+      Scroll map to select position{' '}
+      <MapToolButton onClick={this.cancelLocationRequest}>
+        Cancel
+      </MapToolButton>
+    </div>;
+
+    if (!note) return null;
 
     const modalCls = note.image ? 'modal-xl' : 'modal-dialog-centered';
     return fullScreen ? <><h6 className="pt-2">{this.renderTitle()}</h6>{this.renderContent()}</>
@@ -251,9 +260,17 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
     const {requestLocation, note} = this.props;
     if (!requestLocation) return;
     this.setState({repositioning: true});
-    requestLocation(note).then((location: any) => {
+
+    const onLocationSelected = (location: any) => {
       this.updateSelectedNote(location);
       this.setState({repositioning: false});
-    }).catch(() => this.setState({repositioning: false}))
+    };
+    requestLocation(onLocationSelected, note)
   };
+
+  cancelLocationRequest = () => {
+    const {cancelLocationRequest} = this.props;
+    cancelLocationRequest && cancelLocationRequest();
+    this.setState({repositioning: false});
+  }
 }

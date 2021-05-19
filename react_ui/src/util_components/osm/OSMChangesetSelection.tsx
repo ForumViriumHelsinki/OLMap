@@ -3,13 +3,13 @@ import React from 'react';
 import _ from 'lodash';
 
 import ErrorAlert from "util_components/bootstrap/ErrorAlert";
-import {changeset} from './types';
+import {OSMChangeset} from './types';
 
 const changesetUrl = (id: string) => `https://www.openstreetmap.org/api/0.6/changeset/${id}/download`;
 
 type OSMChangesetSelectionProps = {
-  changeset?: changeset,
-  onSelect: (changeset?: changeset) => any,
+  changeset?: OSMChangeset,
+  onSelect: (changeset?: OSMChangeset) => any,
   onCancel?: () => any
 }
 
@@ -52,7 +52,7 @@ export default class OSMChangesetSelection extends React.Component<OSMChangesetS
           created: this.extractNodes(dom.querySelectorAll('create node')),
           modified: this.extractNodes(dom.querySelectorAll('modify node')),
           deleted: this.extractNodes(dom.querySelectorAll('delete node')),
-        };
+        } as OSMChangeset;
         onSelect(changeset)
       })
     })

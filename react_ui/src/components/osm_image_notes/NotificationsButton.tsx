@@ -1,11 +1,11 @@
 import React from 'react';
 // @ts-ignore
 import {ButtonDropdown, DropdownItem, DropdownMenu, DropdownToggle} from "reactstrap";
-import Icon from "util_components/bootstrap/Icon";
 import {AppContext, Notification} from "components/types";
 import sessionRequest from "sessionRequest";
 import {notificationSeenUrl, notificationsUrl} from "urls";
 import {formatTimestamp} from "utils";
+import MapToolButton from "components/osm_image_notes/MapToolButton";
 
 
 type NotificationsButtonProps = {}
@@ -23,19 +23,13 @@ export default class NotificationsButton extends React.Component<NotificationsBu
   state: NotificationsButtonState = initialState();
   static contextType = AppContext;
 
-  childProps = {
-    toolButton: {outline: true, color: "primary", size: "sm", className: 'bg-white'}
-  };
-
   render() {
     const {open, notifications} = this.state;
-    const {user} = this.context;
     if (!notifications || !notifications.length) return null;
 
     return <ButtonDropdown isOpen={open} toggle={() => this.setState({open: !open})}>
-      <DropdownToggle {...this.childProps.toolButton}>
-        <Icon icon="inbox"/>
-        {notifications.length}
+      <DropdownToggle tag="span">
+        <MapToolButton icon="inbox">{notifications.length}</MapToolButton>
       </DropdownToggle>
       <DropdownMenu>
         <div className="text-ellipsis" style={{maxWidth: '50vw', maxHeight: 'calc(100vh - 200px)', overflowY: 'auto'}}>

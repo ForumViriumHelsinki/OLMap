@@ -9,21 +9,20 @@ import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, osmImageNoteUrl} from "urls";
-import {MapFeatureTypes, OSMImageNote} from "components/types";
+import {ImageNotesContext, OSMImageNote} from "components/types";
 import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
 import MapFeatureSet from "components/map_features/MapFeatureSet";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 import {OSMFeature} from "util_components/osm/types";
 import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
 import Confirm from "util_components/bootstrap/Confirm";
+import MapToolButton from "components/osm_image_notes/MapToolButton";
 
 
 type NewOSMImageNoteProps = {
   requestNoteType?: boolean,
   osmFeatures?: number[]
-  mapFeatureTypes?: MapFeatureTypes,
-  onNoteAdded: (note:OSMImageNote) => any,
-  requestLocation: () => Promise<Location | undefined>,
+  requestLocation: (cb: (l: Location) => any) => any,
   cancelLocationRequest: () => any
 }
 
@@ -63,13 +62,10 @@ const {imagesUploading, ...resetState} = initialState();
 
 export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProps, NewOSMImageNoteState> {
   state: NewOSMImageNoteState = initialState();
-
-  childProps = {
-    toolButton: {outline: true, color: "primary", size: "sm", className: 'bg-white'}
-  };
+  static contextType = ImageNotesContext;
 
   render() {
-    const {mapFeatureTypes} = this.props;
+    const {mapFeatureTypes} = this.context;
     const {
       status, lat, lon, submitting, error, imageError, imagesUploading, tags,
       mapFeatureSets, osm_features, nearbyFeatures, nearbyAddresses,
@@ -97,20 +93,16 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
                   <Icon icon="cloud_upload"/> {imagesUploading.length} <Spinner size="sm"/>
                 </Button>
               }
-              <Button {...this.childProps.toolButton} onClick={this.onImageClick}>
-                <Icon icon="camera_alt"/>
-              </Button>{' '}
-              <Button {...this.childProps.toolButton} onClick={this.onCommentClick}>
-                <Icon icon="comment"/>
-              </Button>{' '}
+              <MapToolButton icon="camera_alt" onClick={this.onImageClick} />
+              <MapToolButton icon="comment" onClick={this.onCommentClick} />
             </>,
 
           locating:
             <div className="mt-4 text-right">
               Scroll map to select position{' '}
-              <Button  {...this.childProps.toolButton} onClick={this.onCancel}>
+              <MapToolButton onClick={this.onCancel}>
                 Cancel
-              </Button>
+              </MapToolButton>
             </div>,
           relating:
             <Modal title="Choose related places (optional)" onClose={this.onCancel}>
@@ -168,13 +160,13 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
       {chooseNoteType &&
         <Modal onClose={() => this.setState({chooseNoteType: false})} title={<>
             <p>Add a new picture or textual note on the map:</p>
-            <Button {...this.childProps.toolButton} onClick={this.onImageClick} className="mr-2">
-              <Icon icon="camera_alt"/> Open camera
-            </Button>{' '}
-            <Button {...this.childProps.toolButton}
-                    onClick={() => this.setState({chooseNoteType: false, status: 'locating'})}>
-              <Icon icon="comment"/> Add text
-            </Button>{' '}
+            <MapToolButton icon="camera_alt" onClick={this.onImageClick}>
+               Open camera
+            </MapToolButton>
+            <MapToolButton icon="comment"
+                           onClick={() => this.setState({chooseNoteType: false, status: 'locating'})}>
+              Add text
+            </MapToolButton>
           </>}
         />
       }
@@ -201,7 +193,7 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
   };
 
   onCommentClick = () => {
-    this.props.requestLocation().then(this.onLocationSelected);
+    this.props.requestLocation(this.onLocationSelected);
     this.setState({status: 'locating'});
   };
 
@@ -211,7 +203,7 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
 
   onImageCaptured = () => {
     const files = this.imageEl().files as FileList;
-    this.props.requestLocation().then(this.onLocationSelected);
+    this.props.requestLocation(this.onLocationSelected);
     this.setState({status: "locating", image: files[0]})
   };
 
@@ -237,6 +229,7 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
   onSubmit = () => {
     const {comment, lon, lat, osm_features, addresses, image, imagesUploading, tags, mapFeatureSets} = this.state;
     const fields = {comment, lat, lon, osm_features, addresses, tags, ...mapFeatureSets};
+    const {addNote} = this.context;
 
     this.setState({submitting: true});
 
@@ -247,7 +240,7 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
         this.setState({...resetState, status: "thanks"});
 
         if (!image) {
-          this.props.onNoteAdded(data);
+          addNote(data);
           return;
         }
 
@@ -261,7 +254,7 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
           this.setState({imagesUploading: uploading});
 
           if ((response.status >= 300)) this.setState({imageError: true});
-          this.props.onNoteAdded(data);
+          addNote(data);
         });
       });
     });

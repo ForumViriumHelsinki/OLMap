@@ -58,3 +58,14 @@ export type AppContextType = {
 }
 
 export const AppContext = React.createContext({user: undefined} as AppContextType);
+
+export type ImageNotesContextType = {
+  osmImageNotes?: OSMImageNote[],
+  mapFeatureTypes?: MapFeatureTypes,
+  addNote: (note: OSMImageNote) => any,
+  refreshNote: (note: OSMImageNote) => any,
+  loadImageNotes: () => any,
+  user?: User
+}
+
+export const ImageNotesContext = React.createContext({} as ImageNotesContextType);

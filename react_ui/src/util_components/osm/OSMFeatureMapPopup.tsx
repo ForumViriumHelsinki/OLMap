@@ -1,6 +1,5 @@
 import React from 'react';
 
-// @ts-ignore
 import * as L from 'leaflet';
 
 import Icon from "util_components/bootstrap/Icon";
@@ -71,8 +70,10 @@ export default class OSMFeatureMapPopup extends React.Component<OSMFeatureMapPop
       fillColor: '#28a745',
       fillOpacity: 1
     };
-    L.circleMarker({lon: location[0], lat: location[1]}, style).addTo(mapLayer);
-    L.marker(osmFeature, {icon: new GlyphIcon({glyph: 'star'})}).addTo(mapLayer);
+    L.circleMarker({lng: location[0], lat: location[1]}, style).addTo(mapLayer);
+    // @ts-ignore
+    const icon = new GlyphIcon({glyph: 'star'});
+    L.marker({lng: osmFeature.lon, lat: osmFeature.lat}, {icon}).addTo(mapLayer);
     return mapLayer;
   }
 }
