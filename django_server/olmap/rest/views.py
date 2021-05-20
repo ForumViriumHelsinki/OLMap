@@ -11,14 +11,14 @@ from drf_jsonschema import to_jsonschema
 from olmap import models
 from .permissions import IsReviewer, IsReviewerOrCreator, user_is_reviewer
 from .serializers import (
-    OSMImageNoteWithPropsSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer,
+    OSMImageNoteWithMapFeaturesSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer,
     OSMFeatureSerializer, WorkplaceEntranceSerializer, AddressAsOSMNodeSerializer,
     DictOSMImageNoteSerializer, OSMImageNoteCommentNotificationSerializer, WorkplaceTypeSerializer)
 
 
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
-    serializer_class = OSMImageNoteWithPropsSerializer
+    serializer_class = OSMImageNoteWithMapFeaturesSerializer
     queryset = models.OSMImageNote.objects.filter(visible=True)
 
     # Use simple serializer for list to improve performance:
@@ -116,10 +116,12 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def map_feature_schemas(self, request, pk=None):
         serializer = self.get_serializer()
-        return Response(dict((
-            prop_type.__name__,
-            to_jsonschema(serializer.fields[prop_type.__name__.lower() + '_set'].child)
-        ) for prop_type in models.map_feature_types))
+        schemas = {}
+        for prop_type in models.map_feature_types:
+            schema = to_jsonschema(serializer.fields[prop_type.__name__.lower() + '_set'].child)
+            del schema['properties']['id']
+            schemas[prop_type.__name__] = schema
+        return Response(schemas)
 
 
 class OSMImageNoteCommentsViewSet(viewsets.ModelViewSet):

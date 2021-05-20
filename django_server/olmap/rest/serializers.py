@@ -80,6 +80,8 @@ class WorkplaceTypeChoiceField(serializers.ChoiceField):
 
 
 class MapFeatureSerializer(serializers.ModelSerializer):
+    # Ensure id gets passed to OSMImageNoteWithMapFeaturesSerializer.save_related_map_features:
+    id = serializers.IntegerField(read_only=False)
     as_osm_tags = serializers.ReadOnlyField()
     osm_feature = serializers.PrimaryKeyRelatedField(read_only=True)
 
@@ -176,7 +178,7 @@ class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
         return super().__new__(mcs, name, bases, attrs)
 
 
-class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImageNoteSerializerMeta):
+class OSMImageNoteWithMapFeaturesSerializer(OSMImageNoteSerializer, metaclass=OSMImageNoteSerializerMeta):
     created_by = BaseUserSerializer(read_only=True)
 
     class Meta:
@@ -195,10 +197,12 @@ class OSMImageNoteWithPropsSerializer(OSMImageNoteSerializer, metaclass=OSMImage
     def save_related_map_features(self, instance, relateds, new=False):
         for related_field, fields_list in relateds.items():
             related_manager = getattr(instance, related_field)
-            if not new:
-                related_manager.all().delete()
+            related_manager.exclude(id__in=[f.get('id', None) for f in fields_list]).delete()
             for fields in fields_list:
-                related_manager.create(**fields)
+                if fields.get('id', None):
+                    related_manager.filter(id=fields['id']).update(**fields)
+                else:
+                    related_manager.create(**fields)
 
     def extract_related_map_features(self, validated_data):
         relateds = {}
