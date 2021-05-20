@@ -1,6 +1,6 @@
 import React from 'react';
 import {JSONSchema, MapFeature, OSMImageNote, WorkplaceEntrance} from "components/types";
-import OSMImageNotesMap from "components/osm_image_notes/OSMImageNotesMap";
+import {SimpleOSMImageNotesMap} from "components/osm_image_notes/OSMImageNotesMap";
 import {Location} from "util_components/types";
 import sessionRequest from "sessionRequest";
 import {osmImageNoteUrl, workplaceEntrancesUrl, workplaceEntranceUrl} from "urls";
@@ -81,8 +81,8 @@ export default class WorkplaceEntranceEditor extends React.Component<WorkplaceEn
         <>
           <div className="p-2">Select entrance to link:</div>
           <div style={{height: 400}}>
-            <OSMImageNotesMap filters={{tags: ['Entrance']}} onNoteSelected={this.onNoteSelected}
-                              location={imageNote as Location} zoom={20}/>
+            <SimpleOSMImageNotesMap filters={{tags: ['Entrance']}} onNoteSelected={this.onNoteSelected}
+                                    location={imageNote as Location} zoom={20}/>
           </div>
         </>
       }

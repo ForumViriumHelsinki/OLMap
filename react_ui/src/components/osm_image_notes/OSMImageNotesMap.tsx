@@ -3,6 +3,7 @@ import _ from 'lodash';
 import * as L from 'leaflet';
 
 import MyPositionMap from 'util_components/MyPositionMap';
+import Map from "util_components/Map";
 import {Location} from "util_components/types";
 
 import {ImageNotesContext, OSMImageNote} from "components/types";
@@ -54,7 +55,7 @@ export default class OSMImageNotesMap extends React.Component<OSMImageNotesMapPr
     </>;
   }
 
-  private getMapLayer() {
+  getMapLayer() {
     const {filters, onNoteSelected} = this.props;
     const {osmImageNotes} = this.context;
 
@@ -106,5 +107,14 @@ export default class OSMImageNotesMap extends React.Component<OSMImageNotesMapPr
       delete this.dotMarkers[id];
     });
     return this.mapLayer;
+  }
+}
+
+export class SimpleOSMImageNotesMap extends OSMImageNotesMap {
+  render() {
+    const {selectLocation, location, zoom} = this.props;
+    if (!location) return <></>;
+
+    return <Map latLng={[location.lat, location.lon]} extraLayers={[this.getMapLayer()]} zoom={zoom} />;
   }
 }
