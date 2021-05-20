@@ -151,12 +151,12 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
                 </button>
           }/>
       </div>
-      {canEdit && mapFeatureTypes && this.getRelevantFeatureTypes().map((osmFeatureName) =>
-        <div key={osmFeatureName} className="mr-2 ml-3">
+      {canEdit && mapFeatureTypes && this.getRelevantFeatureTypes().map((featureTypeName) =>
+        <div key={featureTypeName} className="mr-2 ml-3">
             <MapFeatureSet
-              schema={mapFeatureTypes[osmFeatureName]}
+              schema={mapFeatureTypes[featureTypeName]}
               osmImageNote={note}
-              osmFeatureName={osmFeatureName}
+              featureTypeName={featureTypeName}
               nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}
               refreshNote={this.fetchNote}
               onSubmit={(data) => this.updateSelectedNote(data)}/>
