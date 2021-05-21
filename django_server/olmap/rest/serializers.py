@@ -81,7 +81,7 @@ class WorkplaceTypeChoiceField(serializers.ChoiceField):
 
 class MapFeatureSerializer(serializers.ModelSerializer):
     # Ensure id gets passed to OSMImageNoteWithMapFeaturesSerializer.save_related_map_features:
-    id = serializers.IntegerField(read_only=False)
+    id = serializers.IntegerField(read_only=False, required=False)
     as_osm_tags = serializers.ReadOnlyField()
     osm_feature = serializers.PrimaryKeyRelatedField(read_only=True)
 
