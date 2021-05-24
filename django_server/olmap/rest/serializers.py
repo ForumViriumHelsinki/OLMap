@@ -97,11 +97,20 @@ class MapFeatureSerializer(serializers.ModelSerializer):
         return PropSerializer
 
 
+class UnloadingPlaceWithNoteSerializer(MapFeatureSerializer):
+    image_note = BaseOSMImageNoteSerializer(read_only=True)
+
+    class Meta:
+        model = models.UnloadingPlace
+        fields = '__all__'
+
+
 class WorkplaceEntranceSerializer(serializers.ModelSerializer):
     delivery_types = serializers.SlugRelatedField(slug_field='name', many=True,
                                                   queryset=models.DeliveryType.objects.all())
     image_note = BaseOSMImageNoteSerializer(read_only=True)
     entrance_data = MapFeatureSerializer.get_subclass_for(models.Entrance)(source='entrance', read_only=True)
+    unloading_places = UnloadingPlaceWithNoteSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.WorkplaceEntrance

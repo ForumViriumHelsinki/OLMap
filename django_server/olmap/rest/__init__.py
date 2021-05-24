@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework import routers
 
 from .views import (
-    NearbyAddressesView, WorkplaceEntrancesViewSet,
+    NearbyAddressesView, WorkplaceEntrancesViewSet, UnloadingPlacesViewSet,
     OSMImageNotesViewSet, OSMImageNoteCommentsViewSet, OSMImageNotesGeoJSON,
     OSMEntrancesViewSet, OSMFeaturesViewSet, OSMImageNoteCommentNotificationsViewSet, WorkplaceTypeViewSet)
 
@@ -15,6 +15,7 @@ router.register('osm_features', OSMFeaturesViewSet)
 router.register('notifications', OSMImageNoteCommentNotificationsViewSet)
 router.register('workplace_types', WorkplaceTypeViewSet)
 router.register('workplace_entrances', WorkplaceEntrancesViewSet)
+router.register('unloading_places', UnloadingPlacesViewSet)
 
 urlpatterns = [
     path('addresses_at/<str:lon>/<str:lat>/', NearbyAddressesView.as_view(), name='nearby_addresses'),

@@ -331,6 +331,9 @@ class WorkplaceEntrance(Model):
     def image_note(self):
         return self.entrance.image_note
 
+    def unloading_places(self):
+        return self.entrance.unloading_places
+
 
 class UnloadingPlace(MapFeature):
     length = dimension_field()

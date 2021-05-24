@@ -13,7 +13,8 @@ from .permissions import IsReviewer, IsReviewerOrCreator, user_is_reviewer
 from .serializers import (
     OSMImageNoteWithMapFeaturesSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer,
     OSMFeatureSerializer, WorkplaceEntranceSerializer, AddressAsOSMNodeSerializer,
-    DictOSMImageNoteSerializer, OSMImageNoteCommentNotificationSerializer, WorkplaceTypeSerializer)
+    DictOSMImageNoteSerializer, OSMImageNoteCommentNotificationSerializer, WorkplaceTypeSerializer,
+    MapFeatureSerializer)
 
 
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
@@ -197,6 +198,12 @@ class WorkplaceEntrancesViewSet(viewsets.ModelViewSet):
     queryset = models.WorkplaceEntrance.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = WorkplaceEntranceSerializer
+
+
+class UnloadingPlacesViewSet(viewsets.ModelViewSet):
+    queryset = models.UnloadingPlace.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = MapFeatureSerializer.get_subclass_for(models.UnloadingPlace)
 
 
 class OSMImageNotesGeoJSON(ListAPIView):
