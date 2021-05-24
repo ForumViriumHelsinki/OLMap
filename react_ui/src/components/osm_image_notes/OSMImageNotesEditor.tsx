@@ -46,7 +46,6 @@ class OSMImageNotesEditor extends React.Component<OSMImageNotesEditorProps, OSMI
 
     const note = osmImageNotes && selectedNoteId &&
       (_.find(osmImageNotes, {id: selectedNoteId}) || {id: selectedNoteId} as OSMImageNote);
-    console.log(selectedNoteId, note);
 
     return <div className="flex-grow-1">
       <div className="position-absolute map-tools p-3">
