@@ -26,8 +26,7 @@ export default class WorkplaceEntrances extends React.Component<WorkplaceEntranc
   state: WorkplaceEntrancesState = initialState;
 
   static defaultProps = {
-    osmImageNote: {},
-    nearbyFeatures: []
+    osmImageNote: {}
   };
 
   render() {

@@ -99,7 +99,7 @@ export default class WorkplaceEntranceEditor extends React.Component<WorkplaceEn
       .then(response => response.json())
       .then(entranceNote => {
         const {workplace} = this.props;
-        const entrance = entranceNote.entrance_set[0];
+        const entrance = entranceNote.entrance_set && entranceNote.entrance_set[0];
         if (!entrance) return;
         const workplaceEntrance: WorkplaceEntrance = {
           workplace: workplace.id, entrance: entrance.id,

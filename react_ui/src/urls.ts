@@ -32,3 +32,5 @@ export const workplaceTypesUrl = "/rest/workplace_types/";
 
 export const workplaceEntrancesUrl = `/rest/workplace_entrances/`;
 export const workplaceEntranceUrl = (id: number) => `/rest/workplace_entrances/${id}/`;
+
+export const unloadingPlaceUrl = (id: number) => `/rest/unloading_places/${id}/`;

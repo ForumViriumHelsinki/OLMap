@@ -10,6 +10,7 @@ import ConfirmButton from "util_components/bootstrap/ConfirmButton";
 import {userCanEditNote} from "components/osm_image_notes/utils";
 import WorkplaceTypeWidget from "components/map_features/WorkplaceTypeWidget";
 import WorkplaceEntrances from "components/map_features/WorkplaceEntrances";
+import UnloadingPlaceEntrances from "components/map_features/UnloadingPlaceEntrances";
 
 type MapFeatureEditorProps = {
   schema: JSONSchema,
@@ -113,6 +114,9 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
 
       {featureTypeName == 'Workplace' && editable && !editing &&
         <WorkplaceEntrances workplace={mapFeature} osmImageNote={osmImageNote} refreshNote={refreshNote}/>
+      }
+      {featureTypeName == 'UnloadingPlace' && editable && !editing &&
+        <UnloadingPlaceEntrances unloadingPlace={mapFeature} osmImageNote={osmImageNote}/>
       }
     </div>
   }
