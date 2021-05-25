@@ -115,7 +115,7 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
       {featureTypeName == 'Workplace' && editable && !editing &&
         <WorkplaceEntrances workplace={mapFeature} osmImageNote={osmImageNote} refreshNote={refreshNote}/>
       }
-      {featureTypeName == 'UnloadingPlace' && editable && !editing &&
+      {featureTypeName == 'UnloadingPlace' && editable && !editing && mapFeature.id &&
         <UnloadingPlaceEntrances unloadingPlace={mapFeature} osmImageNote={osmImageNote}/>
       }
     </div>

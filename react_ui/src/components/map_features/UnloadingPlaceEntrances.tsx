@@ -33,6 +33,8 @@ export default class UnloadingPlaceEntrances extends React.Component<UnloadingPl
     const {osmImageNote, unloadingPlace} = this.props;
     const {open} = this.state;
 
+    if (!unloadingPlace.entrances) unloadingPlace.entrances = [];
+
     return <div className="mb-4 mt-1">
       {unloadingPlace.entrances.length} entrances linked.{' '}
       <Button size="sm" color="primary" outline className="btn-compact"
