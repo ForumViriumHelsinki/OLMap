@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 import {MapFeature, OSMImageNote} from "components/types";
 // @ts-ignore
 import {Button} from "reactstrap";
@@ -45,9 +46,14 @@ export default class UnloadingPlaceEntrances extends React.Component<UnloadingPl
           <div className="p-2">Select entrances to link ({unloadingPlace.entrances.length} linked):</div>
           <div style={{height: 400}}>
             <SimpleOSMImageNotesMap filters={{tags: ['Entrance']}} onNoteSelected={this.onNoteSelected}
-                                    location={osmImageNote as Location} zoom={20}/>
+                                    location={osmImageNote as Location} zoom={19}
+                                    selectedNotes={unloadingPlace.entrance_notes}/>
           </div>
-
+          <div className="p-2">
+            <button className="btn btn-primary btn-block" onClick={() => this.setState({open: false})}>
+              Done
+            </button>
+          </div>
         </Modal>
       }
     </div>
@@ -60,10 +66,11 @@ export default class UnloadingPlaceEntrances extends React.Component<UnloadingPl
         const {unloadingPlace} = this.props;
         const entrance = entranceNote.entrance_set && entranceNote.entrance_set[0];
         if (!entrance) return;
-        if (unloadingPlace.entrances.includes(entrance.id)) return;
+        const entrances = unloadingPlace.entrances.includes(entrance.id) ?
+          _.without(unloadingPlace.entrances, entrance.id)
+        : unloadingPlace.entrances.concat([entrance.id]);
         const url = unloadingPlaceUrl(unloadingPlace.id);
-        const data = {entrances: unloadingPlace.entrances.concat([entrance.id])};
-        sessionRequest(url, {method: 'PATCH', data}).then(response => {
+        sessionRequest(url, {method: 'PATCH', data: {entrances}}).then(response => {
           if (response.status < 300) {
             response.json().then(data => {
               Object.assign(unloadingPlace, data);

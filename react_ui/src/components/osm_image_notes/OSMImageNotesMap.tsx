@@ -24,7 +24,8 @@ type OSMImageNotesMapProps = {
   filters: any,
   osmChangeset?: OSMChangeset,
   location?: Location,
-  zoom?: number
+  zoom?: number,
+  selectedNotes?: number[]
 }
 
 type OSMImageNotesMapState = {
@@ -56,7 +57,7 @@ export default class OSMImageNotesMap extends React.Component<OSMImageNotesMapPr
   }
 
   getMapLayer() {
-    const {filters, onNoteSelected} = this.props;
+    const {filters, onNoteSelected, selectedNotes} = this.props;
     const {osmImageNotes} = this.context;
 
     if (!this.mapLayer) this.mapLayer = L.layerGroup();
@@ -88,13 +89,14 @@ export default class OSMImageNotesMap extends React.Component<OSMImageNotesMapPr
       const style = {
         radius: 2,
         color: markerColors[category],
-        opacity: 0.05,
+        opacity: selectedNotes && selectedNotes.includes(osmImageNote.id as number) ? 0.4 : 0.05,
         weight: 20,
         fillColor: markerColors[category],
         fillOpacity: 1
       };
       const latLng = {lng: osmImageNote.lon, lat: osmImageNote.lat} as LatLngLiteral;
       if (this.dotMarkers[id]) return this.dotMarkers[id].setStyle(style).setLatLng(latLng);
+
       const marker = L.circleMarker(latLng, style);
       marker.on('click', () => onNoteSelected(osmImageNote));
       marker.addTo(this.mapLayer);
