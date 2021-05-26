@@ -76,7 +76,8 @@ class WorkplaceEntranceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.WorkplaceEntrance
-        fields = '__all__'
+        fields = ['description', 'deliveries', 'delivery_types', 'delivery_hours', 'delivery_instructions',
+                  'entrance', 'workplace', 'image_note', 'entrance_data', 'unloading_places', 'id']
 
     def __init__(self, instance=None, data=None, **kwargs):
         if data:
@@ -89,11 +90,19 @@ class WorkplaceEntranceSerializer(serializers.ModelSerializer):
 @MapFeatureSerializer.register_subclass(models.Workplace)
 class WorkplaceSerializer(MapFeatureSerializer):
     type = WorkplaceTypeChoiceField()
-    workplace_entrances = WorkplaceEntranceSerializer(many=True, read_only=True)
+    workplace_entrances = WorkplaceEntranceSerializer(many=True, required=False)
 
     class Meta:
         model = models.Workplace
         exclude = ['image_note']
+
+
+class WorkplaceWithNoteSerializer(WorkplaceSerializer):
+    image_note = BaseOSMImageNoteSerializer(read_only=True)
+
+    class Meta:
+        model = models.Workplace
+        fields = '__all__'
 
 
 @MapFeatureSerializer.register_subclass(models.UnloadingPlace)

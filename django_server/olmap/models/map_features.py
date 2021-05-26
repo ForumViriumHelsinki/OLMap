@@ -218,6 +218,7 @@ class Entrance(Lockable, BaseAddress):
 
     types = ['main', 'secondary', 'service', 'staircase', 'garage']
     type = choices_field(types)
+    description = models.CharField(blank=True, max_length=96)
     wheelchair = models.BooleanField(blank=True, null=True)
     loadingdock = models.BooleanField(default=False)
 
@@ -228,6 +229,7 @@ class Entrance(Lockable, BaseAddress):
     def as_osm_tags(self):
         return dict(super().as_osm_tags(), **filter_dict({
             'entrance': self.type or 'yes',
+            'description': self.description,
             'door': 'loadingdock' if self.loadingdock else None,
             'wheelchair': bool_to_osm(self.wheelchair)
         }))
@@ -324,6 +326,8 @@ class DeliveryType(Model):
 class WorkplaceEntrance(Model):
     workplace = models.ForeignKey(Workplace, related_name='workplace_entrances', on_delete=models.CASCADE)
     entrance = models.ForeignKey(Entrance, related_name='workplace_entrances', on_delete=models.CASCADE)
+    description = models.CharField(blank=True, max_length=64)
+    deliveries = choices_field(['no', 'yes', 'main'])
     delivery_types = models.ManyToManyField(DeliveryType, blank=True)
     delivery_hours = models.CharField(blank=True, max_length=64)
     delivery_instructions = models.TextField(blank=True)
@@ -333,6 +337,13 @@ class WorkplaceEntrance(Model):
 
     def unloading_places(self):
         return self.entrance.unloading_places
+
+    def save(self, **kwargs):
+        ret = super().save(**kwargs)
+        if self.description and self.workplace.name and not self.entrance.description:
+            self.entrance.description = f'{self.description}, {self.workplace.name}'
+            self.entrance.save()
+        return ret
 
 
 class UnloadingPlace(MapFeature):
