@@ -54,6 +54,7 @@ export type MapFeatureTypes = {
 export type MapFeature = {[field: string]: any}
 
 export type WorkplaceEntrance = {
+  description?: string,
   id?: number,
   image_note?: OSMImageNote,
   entrance_data?: MapFeature,

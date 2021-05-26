@@ -7,12 +7,13 @@ import {osmImageNoteUrl, workplaceEntrancesUrl, workplaceEntranceUrl} from "urls
 import {osmFeatureLabel} from "util_components/osm/utils";
 import {OSMFeature} from "util_components/osm/types";
 // @ts-ignore
-import Form from "@rjsf/bootstrap-4";
+import Form from "react-jsonschema-form";
 
 type WorkplaceEntranceEditorProps = {
   workplace: MapFeature,
   imageNote: OSMImageNote,
   workplaceEntrance: WorkplaceEntrance,
+  schema: JSONSchema,
   onSubmit: () => any
 }
 
@@ -22,27 +23,9 @@ type WorkplaceEntranceEditorState = {
 
 const initialState: WorkplaceEntranceEditorState = {};
 
-const schema: JSONSchema = {
-  properties: {
-    delivery_types: {
-      "type": "string",
-      "maxLength": 64,
-      "title": "Delivery types"
-    },
-    delivery_hours: {
-      "type": "string",
-      "maxLength": 64,
-      "title": "Delivery hours"
-    },
-    delivery_instructions: {
-        "type": "string",
-        "title": "Delivery instructions"
-    }
-  }
-};
-
 const uiSchema = {
-  delivery_instructions: {"ui:widget": 'textarea'}
+  delivery_instructions: {"ui:widget": 'textarea'},
+  delivery_types: {"ui:widget": 'text'}
 };
 
 export default class WorkplaceEntranceEditor extends React.Component<WorkplaceEntranceEditorProps, WorkplaceEntranceEditorState> {
@@ -73,7 +56,7 @@ export default class WorkplaceEntranceEditor extends React.Component<WorkplaceEn
           <div className="font-weight-bold mb-2">
             {entrance && osmFeatureLabel({tags: entrance.as_osm_tags} as OSMFeature)}
           </div>
-          <Form schema={schema} uiSchema={uiSchema} className="compact"
+          <Form schema={this.getSchema()} uiSchema={uiSchema} className="compact"
                   formData={formData}
                   onSubmit={this.onSubmit}/>
         </div>
@@ -87,6 +70,13 @@ export default class WorkplaceEntranceEditor extends React.Component<WorkplaceEn
         </>
       }
     </div>;
+  }
+
+  getSchema() {
+    const {schema} = this.props;
+    const {workplace, entrance, ...filteredProperties} = schema.properties;
+    filteredProperties.delivery_types = {...filteredProperties.delivery_types, type: 'string'};
+    return {...schema, properties: filteredProperties, required: []};
   }
 
   componentDidMount() {
@@ -103,6 +93,7 @@ export default class WorkplaceEntranceEditor extends React.Component<WorkplaceEn
         if (!entrance) return;
         const workplaceEntrance: WorkplaceEntrance = {
           workplace: workplace.id, entrance: entrance.id,
+          description: entrance.description,
           entrance_data: entrance, image_note: entranceNote,
           delivery_hours: '', delivery_instructions: '', delivery_types: []
         };

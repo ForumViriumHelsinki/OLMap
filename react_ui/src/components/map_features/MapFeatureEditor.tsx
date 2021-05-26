@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 // @ts-ignore
 import Form from "react-jsonschema-form";
 
@@ -38,7 +39,8 @@ const customWidgets: AnyObject = {
 };
 
 const omitFields: AnyObject = {
-  UnloadingPlace: ['entrances']
+  UnloadingPlace: ['entrances'],
+  Workplace: ['workplace_entrances']
 };
 
 export default class MapFeatureEditor extends React.Component<MapFeatureEditorProps, MapFeatureEditorState> {
@@ -113,7 +115,8 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
       }
 
       {featureTypeName == 'Workplace' && editable && !editing &&
-        <WorkplaceEntrances workplace={mapFeature} osmImageNote={osmImageNote} refreshNote={refreshNote}/>
+        <WorkplaceEntrances workplace={mapFeature} osmImageNote={osmImageNote} refreshNote={refreshNote}
+                            schema={schema.properties.workplace_entrances.items}/>
       }
       {featureTypeName == 'UnloadingPlace' && editable && !editing && mapFeature.id &&
         <UnloadingPlaceEntrances unloadingPlace={mapFeature} osmImageNote={osmImageNote}/>
@@ -159,13 +162,16 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
   }
 
   onSubmit = (data: any) => {
-    const {onSubmit, osmImageNote, mapFeature} = this.props;
+    const {onSubmit, osmImageNote, mapFeature, featureTypeName} = this.props;
     const fieldName = this.getFeatureListFieldName();
 
     Object.assign(mapFeature, data.formData);
 
     // @ts-ignore
-    Promise.resolve(onSubmit({[fieldName]: osmImageNote[fieldName]}))
+    const mapFeatures = osmImageNote[fieldName]
+      .map((feature: MapFeature) => _.omit(feature, ...(omitFields[featureTypeName] || [])));
+
+    Promise.resolve(onSubmit({[fieldName]: mapFeatures}))
       .then(() => this.setState({editing: false}));
   };
 
