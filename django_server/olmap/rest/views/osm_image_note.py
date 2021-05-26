@@ -1,20 +1,14 @@
-import math
-
 from django.utils import timezone
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView
-from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.response import Response
 
 from drf_jsonschema import to_jsonschema
 from olmap import models
-from .permissions import IsReviewer, IsReviewerOrCreator, user_is_reviewer
-from .serializers import (
-    OSMImageNoteWithMapFeaturesSerializer, OSMImageNoteCommentSerializer, OSMEntranceSerializer,
-    OSMFeatureSerializer, WorkplaceEntranceSerializer, AddressAsOSMNodeSerializer,
-    DictOSMImageNoteSerializer, OSMImageNoteCommentNotificationSerializer, WorkplaceTypeSerializer,
-    MapFeatureSerializer)
+from olmap.rest.permissions import IsReviewerOrCreator, IsReviewer, user_is_reviewer
+from olmap.rest.serializers import DictOSMImageNoteSerializer, OSMImageNoteWithMapFeaturesSerializer, \
+    OSMImageNoteCommentSerializer, OSMImageNoteCommentNotificationSerializer
 
 
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
@@ -168,44 +162,6 @@ class OSMImageNoteCommentNotificationsViewSet(viewsets.ReadOnlyModelViewSet):
         return Response('OK')
 
 
-class OSMEntrancesViewSet(viewsets.ModelViewSet):
-    queryset = models.OSMFeature.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = OSMEntranceSerializer
-
-    def update(self, request, *args, **kwargs):
-        self.ensure_features(request)
-        return super().update(request, *args, **kwargs)
-
-    def ensure_features(self, request):
-        for id in request.data.get('associated_features', []) + [self.kwargs['pk']]:
-            models.OSMFeature.objects.get_or_create(id=id)
-
-
-class OSMFeaturesViewSet(RetrieveModelMixin, viewsets.GenericViewSet):
-    queryset = models.OSMFeature.objects.all()
-    permission_classes = [permissions.AllowAny]
-    serializer_class = OSMFeatureSerializer
-
-
-class WorkplaceTypeViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.WorkplaceType.objects.all().prefetch_related('parents').order_by('label')
-    permission_classes = [permissions.AllowAny]
-    serializer_class = WorkplaceTypeSerializer
-
-
-class WorkplaceEntrancesViewSet(viewsets.ModelViewSet):
-    queryset = models.WorkplaceEntrance.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = WorkplaceEntranceSerializer
-
-
-class UnloadingPlacesViewSet(viewsets.ModelViewSet):
-    queryset = models.UnloadingPlace.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = MapFeatureSerializer.get_subclass_for(models.UnloadingPlace)
-
-
 class OSMImageNotesGeoJSON(ListAPIView):
     serializer_class = DictOSMImageNoteSerializer
     queryset = models.OSMImageNote.objects.filter(visible=True).values()
@@ -224,22 +180,3 @@ class OSMImageNotesGeoJSON(ListAPIView):
                 "properties": serializer.to_representation(note)
             } for note in self.get_queryset()]
         })
-
-
-class NearbyAddressesView(ListAPIView):
-    serializer_class = AddressAsOSMNodeSerializer
-    queryset = models.Address.objects.all()
-    permission_classes = [permissions.AllowAny]
-
-    max_distance_meters = 100
-    m_per_lat = 111200
-
-    def get_queryset(self):
-        lat = float(self.kwargs['lat'])
-        lon = float(self.kwargs['lon'])
-        lat_diff = self.max_distance_meters / self.m_per_lat
-        lon_diff = lat_diff / abs(math.cos(lat * (math.pi / 180)))
-        return self.queryset.filter(
-            lat__gt=lat-lat_diff, lat__lt=lat+lat_diff,
-            lon__gt=lon-lon_diff, lon__lt=lon+lon_diff,
-        )
