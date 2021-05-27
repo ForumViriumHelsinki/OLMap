@@ -1,3 +1,5 @@
+import json
+
 from django.urls import reverse
 from rest_framework import status
 
@@ -143,128 +145,138 @@ class OSMMapFeatureTests(FVHAPITestCase):
         }
 
         data = response.json()
-        workplace = data['Workplace']['properties']['type']
+        workplace = data['Workplace']['properties']
+        workplace_type = workplace['type']
 
-        self.assertDictEqual(data, {
-            'Entrance': {
-                'type': 'object',
-                'properties': dict(address_fields, **lockable_fields, **{
-                    'type': {
-                        'type': 'string',
-                        'enum': ['', 'main', 'secondary', 'service', 'staircase', 'garage'],
-                        'title': 'Type'},
-                    'wheelchair': {'type': ['boolean', 'null'], 'title': 'Wheelchair'},
-                    'loadingdock': {'type': 'boolean', 'title': 'Loadingdock'},
-                })},
-
-            'Steps': {
-                'type': 'object',
-                'properties': {
-                    'step_count': {'type': ['integer', 'null'], 'minimum': 0, 'maximum': 32767, 'title': 'Step count'},
-                    'handrail': {'type': ['boolean', 'null'], 'title': 'Handrail'},
-                    'ramp': {'type': ['boolean', 'null'], 'title': 'Ramp'},
-                    'width': dict(dimension_field, title='Width'),
-                    'incline': {
-                        'type': 'string',
-                        'enum': ['', 'up', 'down'],
-                        'title': 'Incline',
-                        'description': 'From street level'},
-                }},
-
-            'Gate': {
-                'type': 'object',
-                'properties': dict(lockable_fields, lift_gate={'type': 'boolean', 'title': 'Lift gate'})},
-
-            'Barrier': {
-                'type': 'object',
-                'properties': {
-                    'type': {'type': 'string', 'enum': ['', 'fence', 'wall', 'block', 'bollard'], 'title': 'Type'}}},
-
-
-            'Workplace': {
-                'type': 'object',
-                'required': ['type'],
-                'properties': dict(address_fields, **{
-                    'name': {'type': 'string', 'maxLength': 64, 'title': 'Name'},
-                    'phone': {'type': 'string', 'maxLength': 32, 'title': 'Phone'},
-                    'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours'},
-                    'opening_hours_covid19': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours covid19'},
-                    'level': {'type': 'string', 'maxLength': 8, 'title': 'Level', 'description': 'Floor(s), e.g. 1-3'},
-                    'type': {'type': 'integer', 'enum': workplace['enum'], 'enumNames': workplace['enumNames'], 'title': 'Type'},
-                    "delivery_hours": {
-                        "type": "string",
-                        "maxLength": 64,
-                        "title": "Delivery hours"
-                    },
-                    "delivery_instructions": {
-                        "type": "string",
-                        "title": "Delivery instructions"
-                    }
-                })},
-
-            'InfoBoard': {
-                'type': 'object',
-                'properties': {'type': {'type': 'string', 'enum': ['', 'map', 'board'], 'title': 'Type'}}
-
-            },
-
-            'TrafficSign': {
-                'type': 'object',
-                'properties': {
-                    'type': {
-                        'type': 'string',
-                        'enum': ['', 'Max height', 'Max weight', 'No stopping', 'No parking', 'Loading zone', 'Parking'],
-                        'title': 'Type'},
-                    'text': {'type': 'string', 'maxLength': 128, 'title': 'Text'}}
-            },
-
-            "UnloadingPlace": {
-                "type": "object",
-                "properties": {
-                    "length": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "pattern": "^\\-?[0-9]*(\\.[0-9]{1,2})?$",
-                        "title": "Length",
-                        "description": "In meters"
-                    },
-                    "width": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "pattern": "^\\-?[0-9]*(\\.[0-9]{1,2})?$",
-                        "title": "Width",
-                        "description": "In meters"
-                    },
-                    "max_weight": {
-                        "type": [
-                            "string",
-                            "null"
-                        ],
-                        "pattern": "^\\-?[0-9]*(\\.[0-9]{1,2})?$",
-                        "title": "Max weight",
-                        "description": "In tons"
-                    },
-                    "description": {
-                        "type": "string",
-                        "title": "Description"
-                    },
-                    "opening_hours": {
-                        "type": "string",
-                        "maxLength": 64,
-                        "title": "Opening hours"
-                    },
-                    "entrances": {
-                        "type": "array",
-                        "items": {
-                            "type": "integer"
+        try:
+            self.assertDictEqual(data, {
+                'Entrance': {
+                    'type': 'object',
+                    'properties': dict(address_fields, **lockable_fields, **{
+                        'type': {
+                            'type': 'string',
+                            'enum': ['', 'main', 'secondary', 'service', 'staircase', 'garage'],
+                            'title': 'Type'},
+                        "description": {
+                            "type": "string",
+                            "maxLength": 96,
+                            "title": "Description"
                         },
-                        "title": "Entrances"
+                        'wheelchair': {'type': ['boolean', 'null'], 'title': 'Wheelchair'},
+                        'loadingdock': {'type': 'boolean', 'title': 'Loadingdock'},
+                    })},
+
+                'Steps': {
+                    'type': 'object',
+                    'properties': {
+                        'step_count': {'type': ['integer', 'null'], 'minimum': 0, 'maximum': 32767, 'title': 'Step count'},
+                        'handrail': {'type': ['boolean', 'null'], 'title': 'Handrail'},
+                        'ramp': {'type': ['boolean', 'null'], 'title': 'Ramp'},
+                        'width': dict(dimension_field, title='Width'),
+                        'incline': {
+                            'type': 'string',
+                            'enum': ['', 'up', 'down'],
+                            'title': 'Incline',
+                            'description': 'From street level'},
+                    }},
+
+                'Gate': {
+                    'type': 'object',
+                    'properties': dict(lockable_fields, lift_gate={'type': 'boolean', 'title': 'Lift gate'})},
+
+                'Barrier': {
+                    'type': 'object',
+                    'properties': {
+                        'type': {'type': 'string', 'enum': ['', 'fence', 'wall', 'block', 'bollard'], 'title': 'Type'}}},
+
+
+                'Workplace': {
+                    'type': 'object',
+                    'required': ['type'],
+                    'properties': dict(address_fields, **{
+                        'name': {'type': 'string', 'maxLength': 64, 'title': 'Name'},
+                        'phone': {'type': 'string', 'maxLength': 32, 'title': 'Phone'},
+                        'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours'},
+                        'opening_hours_covid19': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours covid19'},
+                        'level': {'type': 'string', 'maxLength': 8, 'title': 'Level', 'description': 'Floor(s), e.g. 1-3'},
+                        'type': {'type': 'integer', 'enum': workplace_type['enum'], 'enumNames': workplace_type['enumNames'], 'title': 'Type'},
+                        "delivery_hours": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "title": "Delivery hours"
+                        },
+                        "delivery_instructions": {
+                            "type": "string",
+                            "title": "Delivery instructions"
+                        },
+                        'workplace_entrances': workplace['workplace_entrances']
+                    })},
+
+                'InfoBoard': {
+                    'type': 'object',
+                    'properties': {'type': {'type': 'string', 'enum': ['', 'map', 'board'], 'title': 'Type'}}
+
+                },
+
+                'TrafficSign': {
+                    'type': 'object',
+                    'properties': {
+                        'type': {
+                            'type': 'string',
+                            'enum': ['', 'Max height', 'Max weight', 'No stopping', 'No parking', 'Loading zone', 'Parking'],
+                            'title': 'Type'},
+                        'text': {'type': 'string', 'maxLength': 128, 'title': 'Text'}}
+                },
+
+                "UnloadingPlace": {
+                    "type": "object",
+                    "properties": {
+                        "length": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "pattern": "^\\-?[0-9]*(\\.[0-9]{1,2})?$",
+                            "title": "Length",
+                            "description": "In meters"
+                        },
+                        "width": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "pattern": "^\\-?[0-9]*(\\.[0-9]{1,2})?$",
+                            "title": "Width",
+                            "description": "In meters"
+                        },
+                        "max_weight": {
+                            "type": [
+                                "string",
+                                "null"
+                            ],
+                            "pattern": "^\\-?[0-9]*(\\.[0-9]{1,2})?$",
+                            "title": "Max weight",
+                            "description": "In tons"
+                        },
+                        "description": {
+                            "type": "string",
+                            "title": "Description"
+                        },
+                        "opening_hours": {
+                            "type": "string",
+                            "maxLength": 64,
+                            "title": "Opening hours"
+                        },
+                        "entrances": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            },
+                            "title": "Entrances"
+                        }
                     }
                 }
-            }
-        })
-
+            })
+        except AssertionError:
+            print(json.dumps(data, indent=2))
+            raise

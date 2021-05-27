@@ -82,7 +82,7 @@ class OSMImageNoteWithMapFeaturesSerializer(OSMImageNoteSerializer, metaclass=OS
     def save_related_map_features(self, instance, relateds, new=False):
         for related_field, fields_list in relateds.items():
             related_manager = getattr(instance, related_field)
-            related_manager.exclude(id__in=[f.get('id', None) for f in fields_list]).delete()
+            related_manager.exclude(id__in=[f['id'] for f in fields_list if f.get('id', None)]).delete()
             for fields in fields_list:
                 if fields.get('id', None):
                     related_manager.filter(id=fields['id']).update(**fields)
