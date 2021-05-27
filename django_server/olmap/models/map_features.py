@@ -199,7 +199,7 @@ class Lockable(models.Model):
     buzzer = models.BooleanField(blank=True, null=True)
     keycode = models.BooleanField(blank=True, null=True)
     phone = models.CharField(blank=True, max_length=32)
-    opening_hours = models.CharField(blank=True, max_length=64)
+    opening_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
 
     class Meta:
         abstract = True
@@ -296,11 +296,11 @@ class Workplace(BaseAddress):
     type = models.ForeignKey(WorkplaceType, on_delete=models.CASCADE)
     name = models.CharField(blank=True, max_length=64)
     phone = models.CharField(blank=True, max_length=32)
-    opening_hours = models.CharField(blank=True, max_length=64)
+    opening_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
     opening_hours_covid19 = models.CharField(blank=True, max_length=64)
     level = models.CharField(blank=True, max_length=8, help_text="Floor(s), e.g. 1-3")
 
-    delivery_hours = models.CharField(blank=True, max_length=64)
+    delivery_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
     delivery_instructions = models.TextField(blank=True)
 
     # For automatic linking of OSM nodes to OLMap instances:
@@ -329,7 +329,7 @@ class WorkplaceEntrance(Model):
     description = models.CharField(blank=True, max_length=64)
     deliveries = choices_field(['no', 'yes', 'main'])
     delivery_types = models.ManyToManyField(DeliveryType, blank=True)
-    delivery_hours = models.CharField(blank=True, max_length=64)
+    delivery_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
     delivery_instructions = models.TextField(blank=True)
 
     def image_note(self):
@@ -351,7 +351,7 @@ class UnloadingPlace(MapFeature):
     width = dimension_field()
     max_weight = models.DecimalField(max_digits=4, decimal_places=2, help_text='In tons', blank=True, null=True)
     description = models.TextField(blank=True)
-    opening_hours = models.CharField(blank=True, max_length=64)
+    opening_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
     entrances = models.ManyToManyField(to=Entrance, related_name='unloading_places', blank=True)
 
     def as_osm_tags(self):
