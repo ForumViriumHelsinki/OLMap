@@ -195,6 +195,13 @@ class OSMMapFeatureTests(FVHAPITestCase):
                 'required': ['type'],
                 'properties': dict(address_fields, **{
                     'name': {'type': 'string', 'maxLength': 64, 'title': 'Name'},
+                    "url_name": {
+                        "type": "string",
+                        "maxLength": 32,
+                        "pattern": "^[-a-zA-Z0-9_]+$",
+                        "title": "Url name",
+                        "description": "Use only letters, numbers and underscores"
+                    },
                     'phone': {'type': 'string', 'maxLength': 32, 'title': 'Phone'},
                     'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours',
                                       'description': 'E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00'},

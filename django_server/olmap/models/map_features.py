@@ -295,6 +295,7 @@ class WorkplaceType(Model):
 class Workplace(BaseAddress):
     type = models.ForeignKey(WorkplaceType, on_delete=models.CASCADE)
     name = models.CharField(blank=True, max_length=64)
+    url_name = models.SlugField(max_length=32, blank=True, help_text='Use only letters, numbers and underscores')
     phone = models.CharField(blank=True, max_length=32)
     opening_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
     opening_hours_covid19 = models.CharField(blank=True, max_length=64)
