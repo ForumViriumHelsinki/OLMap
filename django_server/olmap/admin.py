@@ -41,8 +41,8 @@ class OSMImageNoteAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'image__', 'lat', 'lon', 'created_at', 'created_by', 'modified_at', 'modified_by',
                     'reviewed_by', 'visible', 'osm']
     search_fields = ['comment']
-    readonly_fields = ['image_', 'osm', 'osm_edit']
-    filter_horizontal = ['osm_features']
+    raw_id_fields = ['osm_features', 'addresses']
+    readonly_fields = ['image_', 'osm', 'osm_edit', 'created_by', 'modified_by', 'processed_by', 'reviewed_by']
     list_filter = ['visible', 'created_by', 'reviewed_by']
     date_hierarchy = 'created_at'
 
