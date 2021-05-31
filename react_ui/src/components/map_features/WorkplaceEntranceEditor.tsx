@@ -108,7 +108,7 @@ export default class WorkplaceEntranceEditor extends React.Component<WorkplaceEn
 
     let request;
 
-    formData.delivery_types = formData.delivery_types.split(/, ?/);
+    formData.delivery_types = formData.delivery_types ? formData.delivery_types.split(/, ?/) : [];
 
     if (workplaceEntrance.id) {
       const url = workplaceEntranceUrl(workplaceEntrance.id);
