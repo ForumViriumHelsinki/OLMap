@@ -12,6 +12,7 @@ import {userCanEditNote} from "components/osm_image_notes/utils";
 import WorkplaceTypeWidget from "components/map_features/WorkplaceTypeWidget";
 import WorkplaceEntrances from "components/map_features/WorkplaceEntrances";
 import UnloadingPlaceEntrances from "components/map_features/UnloadingPlaceEntrances";
+import UnloadingPlaceAccessPoints from "components/map_features/UnloadingPlaceAccessPoints";
 
 type MapFeatureEditorProps = {
   schema: JSONSchema,
@@ -119,7 +120,10 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
                             schema={schema.properties.workplace_entrances.items}/>
       }
       {featureTypeName == 'UnloadingPlace' && editable && !editing && mapFeature.id &&
-        <UnloadingPlaceEntrances unloadingPlace={mapFeature} osmImageNote={osmImageNote}/>
+        <div className="mb-4 mt-1">
+          <UnloadingPlaceEntrances unloadingPlace={mapFeature} osmImageNote={osmImageNote}/>
+          <UnloadingPlaceAccessPoints unloadingPlace={mapFeature} osmImageNote={osmImageNote}/>
+        </div>
       }
     </div>
   }

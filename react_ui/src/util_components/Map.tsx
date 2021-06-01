@@ -4,14 +4,16 @@ import * as L from 'leaflet';
 import settings from 'settings.json';
 
 import 'leaflet/dist/leaflet.css';
+import {LocationTuple} from "util_components/types";
 
 type MapProps = {
   onMapInitialized?: (leafletMap: any) => any,
-  latLng: number[],
+  latLng: LocationTuple,
   zoom: number,
   extraLayers?: any[],
   showAttribution: boolean,
-  zoomControl: boolean
+  zoomControl: boolean,
+  onClick?: (latLng: LocationTuple) => any
 }
 
 let idCounter = 0;
@@ -56,7 +58,7 @@ export default class Map extends React.Component<MapProps> {
   }
 
   refreshMap() {
-    const {latLng, zoom, extraLayers, onMapInitialized, showAttribution, zoomControl} = this.props;
+    const {latLng, zoom, extraLayers, onMapInitialized, showAttribution, zoomControl, onClick} = this.props;
 
     if (!this.leafletMap) {
       this.leafletMap = L.map(this.getMapElId(), {
@@ -74,6 +76,13 @@ export default class Map extends React.Component<MapProps> {
         id: 'mapbox/streets-v11',
         accessToken: settings.MapBox.accessToken
       }).addTo(this.leafletMap);
+
+      if (onClick) {
+        this.leafletMap.on('click', (e: any) => {
+          onClick([e.latlng.lat, e.latlng.lng]);
+        });
+      }
+
       if (onMapInitialized) onMapInitialized(this.leafletMap);
     }
     if (extraLayers) extraLayers.forEach(mapLayer => {

@@ -7,7 +7,7 @@ import Modal from "util_components/bootstrap/Modal";
 import {SimpleOSMImageNotesMap} from "components/osm_image_notes/OSMImageNotesMap";
 import {Location} from "util_components/types";
 import sessionRequest from "sessionRequest";
-import {osmImageNoteUrl, unloadingPlaceUrl, workplaceEntrancesUrl, workplaceEntranceUrl} from "urls";
+import {osmImageNoteUrl, unloadingPlaceUrl} from "urls";
 // @ts-ignore
 
 type UnloadingPlaceEntrancesProps = {
@@ -36,7 +36,7 @@ export default class UnloadingPlaceEntrances extends React.Component<UnloadingPl
 
     if (!unloadingPlace.entrances) unloadingPlace.entrances = [];
 
-    return <div className="mb-4 mt-1">
+    return <div>
       {unloadingPlace.entrances.length} entrances linked.{' '}
       <Button size="sm" color="primary" outline className="btn-compact"
               onClick={() => this.setState({open: true})}>Link entrances</Button>

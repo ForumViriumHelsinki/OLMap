@@ -35,7 +35,11 @@ def to_jsonschema(serializer):
     for name, field in serializer.fields.items():
         if field.read_only:
             continue
-        sub_schema = field_to_jsonschema(field)
+        # Edited in OLMap repo: added try / except:
+        try:
+            sub_schema = field_to_jsonschema(field)
+        except KeyError:  # Unknown field type, ignore
+            continue
         if field.required:
             required.append(name)
         properties[name] = sub_schema

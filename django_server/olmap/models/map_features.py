@@ -354,6 +354,7 @@ class UnloadingPlace(MapFeature):
     description = models.TextField(blank=True)
     opening_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
     entrances = models.ManyToManyField(to=Entrance, related_name='unloading_places', blank=True)
+    access_points = models.JSONField(default=list, blank=True)
 
     def as_osm_tags(self):
         return filter_dict({
