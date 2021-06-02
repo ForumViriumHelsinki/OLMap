@@ -60,7 +60,7 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
     const listFieldName = this.getFeatureListFieldName();
     // @ts-ignore
     const mapFeatures = (osmImageNote[listFieldName] || []) as MapFeature[];
-    const selectedFeatureIds = osmImageNote.osm_features || [];
+    const selectedFeatureIds = (osmImageNote.osm_features || []).concat(osmImageNote.addresses || []);
     const selectedFeatures = nearbyFeatures.filter((f) => selectedFeatureIds.includes(f.id));
 
     const newMapFeature: MapFeature = {};

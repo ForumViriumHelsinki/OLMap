@@ -68,7 +68,7 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
     const {mapFeatureTypes} = this.context;
     const {
       status, lat, lon, submitting, error, imageError, imagesUploading, tags,
-      mapFeatureSets, osm_features, nearbyFeatures, nearbyAddresses,
+      mapFeatureSets, osm_features, nearbyFeatures, nearbyAddresses, addresses,
       chooseNoteType, confirmCancel
     } = this.state;
 
@@ -133,7 +133,7 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
                   <div className="ml-2 mr-2">
                     {tags.filter(tag => mapFeatureTypes[tag]).map((tag) =>
                       <MapFeatureSet key={tag} schema={mapFeatureTypes[tag]} featureTypeName={tag}
-                                            osmImageNote={{osm_features, ...mapFeatureSets}}
+                                            osmImageNote={{osm_features, addresses, ...mapFeatureSets}}
                                             onSubmit={(data) => this.addMapFeatureSets(data)}
                                             nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}/>
                     )}
