@@ -1,6 +1,7 @@
 import React from 'react';
 // @ts-ignore
 import * as L from 'leaflet';
+import 'mapbox-gl-leaflet';
 import settings from 'settings.json';
 
 import 'leaflet/dist/leaflet.css';
@@ -68,13 +69,13 @@ export default class Map extends React.Component<MapProps> {
       });
       this.leafletMap.setView(latLng, zoom);
       const attribution = 'Data &copy; <a href="https://www.openstreetmap.org/">OSM</a> contribs, ' +
-        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-        'Img © <a href="https://www.mapbox.com/">Mapbox</a>';
-      L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>';
+      // @ts-ignore
+      L.mapboxGL({
+        style: 'https://raw.githubusercontent.com/HSLdevcom/hsl-map-style/master/simple-style.json',
+        accessToken: settings.MapBox.accessToken,
         attribution: showAttribution ? attribution : '',
         maxZoom: 21,
-        id: 'mapbox/streets-v11',
-        accessToken: settings.MapBox.accessToken
       }).addTo(this.leafletMap);
 
       if (onClick) {

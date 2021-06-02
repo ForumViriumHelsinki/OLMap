@@ -21,6 +21,8 @@
     "geolib": "^3.2.0",
     "leaflet": "^1.6.0",
     "lodash": "^4.17.19",
+    "mapbox-gl": "^2.3.0",
+    "mapbox-gl-leaflet": "^0.0.15",
     "moment": "^2.24.0",
     "overpass-frontend": "^2.4.8",
     "places.js": "^1.17.1",
