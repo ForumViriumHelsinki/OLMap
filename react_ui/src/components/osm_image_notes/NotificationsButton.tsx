@@ -22,6 +22,7 @@ const initialState: () => NotificationsButtonState = () => ({
 export default class NotificationsButton extends React.Component<NotificationsButtonProps, NotificationsButtonState> {
   state: NotificationsButtonState = initialState();
   static contextType = AppContext;
+  private notificationsInterval: any;
 
   render() {
     const {open, notifications} = this.state;
@@ -50,16 +51,21 @@ export default class NotificationsButton extends React.Component<NotificationsBu
 
   componentDidMount() {
     this.loadNotifications();
+    this.notificationsInterval = setInterval(this.loadNotifications, 30000);
   }
 
-  loadNotifications() {
+  componentWillUnmount() {
+    if (this.notificationsInterval) clearInterval(this.notificationsInterval);
+  }
+
+  loadNotifications = () => {
     sessionRequest(notificationsUrl).then((response: any) => {
       if (response.status < 300)
         response.json().then((notifications: Notification[]) => {
           this.setState({notifications});
         });
     })
-  }
+  };
 
   markSeen(notificationId: number) {
     sessionRequest(notificationSeenUrl(notificationId), {method: 'PUT'}).then((response: any) => {
