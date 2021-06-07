@@ -29,7 +29,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
   render() {
     const {filters, filtersOpen} = this.state;
     const {mapFeatureTypes} = this.props;
-    const nonStatusFilters = _.omit(filters, ['is_processed', 'is_reviewed']);
+    const nonStatusFilters = _.omit(filters, ['is_processed', 'is_reviewed', 'is_accepted']);
     const {user} = this.context;
 
     return <ButtonDropdown isOpen={filtersOpen} toggle={() => this.setState({filtersOpen: !filtersOpen})}>
@@ -43,16 +43,22 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
           My notes
         </DropdownItem>
         <DropdownItem divider/>
-        <DropdownItem className={(filters.is_processed === false) ? 'text-primary' : ''}
+        <DropdownItem className={(filters.is_accepted === false) ? 'text-primary' : ''}
                       onClick={() => this.setFilters(
                         (filters.is_processed === false) ? nonStatusFilters
-                        : _.assign({}, filters, {is_processed: false, is_reviewed: false}))}>
+                        : _.assign({}, nonStatusFilters, {is_processed: false, is_reviewed: false, is_accepted: false}))}>
           New
+        </DropdownItem>
+        <DropdownItem className={filters.is_accepted ? 'text-primary' : ''}
+                      onClick={() => this.setFilters(
+                        filters.is_accepted ? nonStatusFilters
+                        : _.assign({}, nonStatusFilters, {is_processed: false, is_reviewed: false, is_accepted: true}))}>
+          Ready for OSM
         </DropdownItem>
         <DropdownItem className={(filters.is_processed) ? 'text-primary' : ''}
                       onClick={() => this.setFilters(
                         (filters.is_processed) ? nonStatusFilters
-                        : _.assign({}, filters, {is_processed: true, is_reviewed: false}))}>
+                        : _.assign({}, nonStatusFilters, {is_processed: true, is_reviewed: false}))}>
           In OSM
         </DropdownItem>
         <DropdownItem className={(filters.is_reviewed) ? 'text-primary' : ''}

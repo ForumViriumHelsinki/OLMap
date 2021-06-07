@@ -13,9 +13,10 @@ import {LatLngLiteral} from "leaflet";
 
 const markerColors = {
   problem: '#ff0000',
-  reviewed: '#28a745',
+  new: '#ff5000',
+  accepted: '#b700ff',
   processed: '#007bff',
-  new: '#ff5000'
+  reviewed: '#28a745',
 };
 
 type OSMImageNotesMapProps = {
@@ -85,6 +86,7 @@ export default class OSMImageNotesMap extends React.Component<OSMImageNotesMapPr
         (osmImageNote.tags || []).includes('Problem') ? 'problem'
         : osmImageNote.is_reviewed ? 'reviewed'
         : osmImageNote.is_processed ? 'processed'
+        : osmImageNote.is_accepted ? 'accepted'
         : 'new';
       const style = {
         radius: 2,

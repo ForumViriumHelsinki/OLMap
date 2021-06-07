@@ -28,10 +28,11 @@ class OSMImageNoteCommentNotificationSerializer(serializers.ModelSerializer):
 class DictOSMImageNoteSerializer(BaseOSMImageNoteSerializer):
     is_reviewed = serializers.BooleanField(read_only=True, source='reviewed_by_id')
     is_processed = serializers.BooleanField(read_only=True, source='processed_by_id')
+    is_accepted = serializers.BooleanField(read_only=True, source='accepted_by_id')
     created_by = serializers.IntegerField(read_only=True, source='created_by_id')
     image = serializers.SerializerMethodField()
 
-    false_default_fields = ['is_reviewed', 'is_processed']
+    false_default_fields = ['is_reviewed', 'is_processed', 'is_accepted']
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
@@ -69,7 +70,7 @@ class OSMImageNoteWithMapFeaturesSerializer(OSMImageNoteSerializer, metaclass=OS
     class Meta:
         model = models.OSMImageNote
         fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'addresses',
-                   'is_reviewed', 'is_processed', 'tags', 'created_by', 'created_at',
+                   'is_reviewed', 'is_processed', 'is_accepted', 'tags', 'created_by', 'created_at',
                    'upvotes', 'downvotes', 'comments'] +
                   [manager_name(prop_type) for prop_type in models.map_feature_types])
 

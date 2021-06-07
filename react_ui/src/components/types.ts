@@ -27,6 +27,7 @@ export type OSMImageNote = {
     comment?: string,
     osm_features: number[],
     addresses: number[],
+    is_accepted?: boolean,
     is_processed?: boolean,
     is_reviewed?: boolean,
     tags?: string[],

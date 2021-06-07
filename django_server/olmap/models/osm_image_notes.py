@@ -39,6 +39,8 @@ class OSMImageNote(TimestampedModel):
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name='created_notes')
     modified_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name='modified_notes')
+    accepted_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='accepted_notes')
     processed_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name='processed_notes')
     reviewed_by = models.ForeignKey(
@@ -92,6 +94,9 @@ class OSMImageNote(TimestampedModel):
 
     def is_processed(self):
         return bool(self.processed_by_id)
+
+    def is_accepted(self):
+        return bool(self.accepted_by_id)
 
     def interested_users(self):
         from olmap.rest.permissions import REVIEWER_GROUP

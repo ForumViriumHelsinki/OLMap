@@ -75,6 +75,13 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response('OK')
 
     @action(methods=['PUT'], detail=True)
+    def mark_accepted(self, request, *args, **kwargs):
+        osm_image_note = self.get_object()
+        osm_image_note.accepted_by = request.user
+        osm_image_note.save()
+        return Response('OK')
+
+    @action(methods=['PUT'], detail=True)
     def mark_processed(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
         osm_image_note.processed_by = request.user

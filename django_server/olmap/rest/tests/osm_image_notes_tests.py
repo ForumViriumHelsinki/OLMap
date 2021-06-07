@@ -373,6 +373,7 @@ class OSMImageNotesTests(FVHAPITestCase):
                     'comment': 'Nice view',
                     'lat': '60.16134702',
                     'lon': '24.94459394',
+                    'is_accepted': False,
                     'is_processed': False,
                     'is_reviewed': False
                 }

@@ -8,8 +8,9 @@ export const changePasswordUrl = '/rest-auth/password/reset/confirm/';
 export const osmImageNotesUrl = "/rest/osm_image_notes/";
 export const osmImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/`;
 
+export const acceptOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/mark_accepted/`;
 export const processedOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/mark_processed/`;
-export const acceptOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/mark_reviewed/`;
+export const reviewedOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/mark_reviewed/`;
 export const rejectOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/hide_note/`;
 
 export const upvoteOSMImageNoteUrl = (id: number) => `/rest/osm_image_notes/${id}/upvote/`;

@@ -6,7 +6,7 @@ import Icon from "util_components/bootstrap/Icon";
 import {Button, ButtonGroup} from "reactstrap";
 import Confirm from "util_components/bootstrap/Confirm";
 import sessionRequest from "sessionRequest";
-import {acceptOSMImageNoteUrl, rejectOSMImageNoteUrl, processedOSMImageNoteUrl} from "urls";
+import {acceptOSMImageNoteUrl, rejectOSMImageNoteUrl, processedOSMImageNoteUrl, reviewedOSMImageNoteUrl} from "urls";
 
 type ReviewActionsProps = {
   imageNote: OSMImageNote,
@@ -44,7 +44,14 @@ export default class OSMImageNoteReviewActions extends React.Component<ReviewAct
           <Icon icon="search"/> OSM
         </Button>
 
-        {!imageNote.is_processed &&
+        {!imageNote.is_accepted &&
+          <Button outline color="success" className="btn-compact" size="sm"
+                  onClick={this.onAccept}>
+            <Icon icon="map"/> Ready for OSM
+          </Button>
+        }
+
+        {imageNote.is_accepted && !imageNote.is_processed &&
           <Button outline color="success" className="btn-compact" size="sm"
                   onClick={() => this.setState({confirmProcessed: true})}>
             <Icon icon="map"/> Added to OSM
@@ -61,7 +68,7 @@ export default class OSMImageNoteReviewActions extends React.Component<ReviewAct
         {confirmAccept &&
           <Confirm title="Mark this image note as reviewed & accepted?"
                    onClose={() => this.setState({confirmAccept: false})}
-                   onConfirm={this.onAccept}/>
+                   onConfirm={this.onReviewed}/>
         }
 
         {confirmProcessed &&
@@ -84,7 +91,7 @@ export default class OSMImageNoteReviewActions extends React.Component<ReviewAct
       </ButtonGroup>;
   }
 
-  onReviewed = (url: string, data?: any) => {
+  registerAction = (url: string, data?: any) => {
     const {imageNote, onReviewed} = this.props;
     sessionRequest(url, {method: 'PUT', data})
     .then((response) => {
@@ -95,15 +102,19 @@ export default class OSMImageNoteReviewActions extends React.Component<ReviewAct
     })
   };
 
-  onProcessed = () => {
-    this.onReviewed(processedOSMImageNoteUrl(this.props.imageNote.id as number));
+  onAccept = () => {
+    this.registerAction(acceptOSMImageNoteUrl(this.props.imageNote.id as number));
   };
 
-  onAccept = () => {
-    this.onReviewed(acceptOSMImageNoteUrl(this.props.imageNote.id as number));
+  onProcessed = () => {
+    this.registerAction(processedOSMImageNoteUrl(this.props.imageNote.id as number));
+  };
+
+  onReviewed = () => {
+    this.registerAction(reviewedOSMImageNoteUrl(this.props.imageNote.id as number));
   };
 
   onReject = (hidden_reason?: string) => {
-    this.onReviewed(rejectOSMImageNoteUrl(this.props.imageNote.id as number), {hidden_reason});
+    this.registerAction(rejectOSMImageNoteUrl(this.props.imageNote.id as number), {hidden_reason});
   };
 }
