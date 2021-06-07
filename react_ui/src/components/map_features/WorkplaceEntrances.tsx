@@ -32,6 +32,8 @@ export default class WorkplaceEntrances extends React.Component<WorkplaceEntranc
     const {osmImageNote, refreshNote, workplace, schema} = this.props;
     const {editingEntrance} = this.state;
 
+    if (!workplace.workplace_entrances) return false;
+
     return <div className="mb-4 mt-1">
       {workplace.name} entrances:{' '}
       {workplace.workplace_entrances.map((we: WorkplaceEntrance, i: number) =>
