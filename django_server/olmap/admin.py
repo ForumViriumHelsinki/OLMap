@@ -21,7 +21,7 @@ admin.site.unregister(User)
 
 @admin.register(User)
 class UserWithNotesAdmin(UserAdmin):
-    list_display = UserAdmin.list_display + ('notes', 'notes_12h')
+    list_display = UserAdmin.list_display + ('last_login', 'notes', 'notes_12h')
 
     def get_queryset(self, request):
         _12_hours_ago = timezone.now() - datetime.timedelta(hours=12)
