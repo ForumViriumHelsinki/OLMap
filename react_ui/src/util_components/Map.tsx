@@ -126,7 +126,7 @@ export default class Map extends React.Component<MapProps, MapState> {
     else
       // @ts-ignore
       this.bgLayer = L.tileLayer.wms('https://kartta.hsy.fi/geoserver/ows?',
-        {layers: 'taustakartat_ja_aluejaot:Ortoilmakuva_2019'}
+        {layers: 'taustakartat_ja_aluejaot:Ortoilmakuva_2019', maxZoom: 19}
       ).addTo(this.leafletMap);
   }
 
