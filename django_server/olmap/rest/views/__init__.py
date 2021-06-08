@@ -3,3 +3,4 @@ from .map_features import WorkplaceTypeViewSet, WorkplaceEntrancesViewSet, Unloa
 from .osm_features import OSMEntrancesViewSet, OSMFeaturesViewSet
 from .osm_image_note import OSMImageNotesViewSet, OSMImageNoteCommentsViewSet, \
     OSMImageNoteCommentNotificationsViewSet, OSMImageNotesGeoJSON
+from .recent_mappers import RecentMappersViewSet

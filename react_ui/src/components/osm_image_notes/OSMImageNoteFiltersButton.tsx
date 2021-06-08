@@ -3,8 +3,10 @@ import React from 'react';
 import _ from 'lodash';
 // @ts-ignore
 import {ButtonDropdown, DropdownItem, DropdownMenu, DropdownToggle} from "reactstrap";
-import {AppContext, MapFeatureTypes} from "components/types";
+import {AppContext, MapFeatureTypes, User} from "components/types";
 import MapToolButton from "components/osm_image_notes/MapToolButton";
+import sessionRequest from "sessionRequest";
+import {recentMappersUrl} from "urls";
 
 
 type OSMImageNoteFiltersButtonProps = {
@@ -14,7 +16,9 @@ type OSMImageNoteFiltersButtonProps = {
 
 type OSMImageNoteFiltersButtonState = {
   filters: any,
-  filtersOpen: boolean
+  filtersOpen: boolean,
+  recentMappers?: User[],
+  mappersOpen?: boolean
 }
 
 const initialState: () => OSMImageNoteFiltersButtonState = () => ({
@@ -26,8 +30,13 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
   state: OSMImageNoteFiltersButtonState = initialState();
   static contextType = AppContext;
 
+  componentDidMount() {
+    sessionRequest(recentMappersUrl).then(response => response.json())
+      .then((recentMappers) => this.setState({recentMappers}))
+  }
+
   render() {
-    const {filters, filtersOpen} = this.state;
+    const {filters, filtersOpen, recentMappers, mappersOpen} = this.state;
     const {mapFeatureTypes} = this.props;
     const nonStatusFilters = _.omit(filters, ['is_processed', 'is_reviewed', 'is_accepted']);
     const {user} = this.context;
@@ -42,6 +51,21 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
                       onClick={() => this.toggleFilter({created_by: user.id})}>
           My notes
         </DropdownItem>
+        {recentMappers &&
+          <div className="dropleft btn-group">
+            <button className="dropdown-item" onClick={() => this.setState({mappersOpen: !mappersOpen})}>
+              By mapper...
+            </button>
+            {mappersOpen && <DropdownMenu>
+              {recentMappers.map(mapper =>
+                <DropdownItem className={(filters.created_by) ? 'text-primary' : ''} key={mapper.id}
+                              onClick={() => this.toggleFilter({created_by: mapper.id})}>
+                  {mapper.username}
+                </DropdownItem>
+              )}
+            </DropdownMenu>}
+          </div>
+        }
         <DropdownItem divider/>
         <DropdownItem className={(filters.is_accepted === false) ? 'text-primary' : ''}
                       onClick={() => this.setFilters(
