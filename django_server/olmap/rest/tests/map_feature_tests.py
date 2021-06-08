@@ -198,7 +198,6 @@ class OSMMapFeatureTests(FVHAPITestCase):
                     "url_name": {
                         "type": "string",
                         "maxLength": 32,
-                        "pattern": "^[-a-zA-Z0-9_]+$",
                         "title": "Url name",
                         "description": "Use only letters, numbers and underscores"
                     },

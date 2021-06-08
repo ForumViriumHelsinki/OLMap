@@ -2,6 +2,7 @@ from time import sleep
 
 import overpy
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import RegexValidator
 from geopy.distance import distance
 from overpy.exception import OverpassTooManyRequests
 from shapely.geometry import Point
@@ -292,10 +293,18 @@ class WorkplaceType(Model):
         return self.label or super().__str__()
 
 
+validator = RegexValidator(
+    r'^[-a-zA-Z0-9_]*\Z',
+    # Translators: "letters" means latin letters: a-z and A-Z.
+    'Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.',
+    'invalid'
+)
+
+
 class Workplace(BaseAddress):
     type = models.ForeignKey(WorkplaceType, on_delete=models.CASCADE)
     name = models.CharField(blank=True, max_length=64)
-    url_name = models.SlugField(max_length=32, blank=True, help_text='Use only letters, numbers and underscores')
+    url_name = models.CharField(max_length=32, blank=True, validators=[validator], help_text='Use only letters, numbers and underscores')
     phone = models.CharField(blank=True, max_length=32)
     opening_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
     opening_hours_covid19 = models.CharField(blank=True, max_length=64)
