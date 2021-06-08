@@ -72,7 +72,7 @@ export default class Map extends React.Component<MapProps> {
         '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>';
       // @ts-ignore
       L.mapboxGL({
-        style: 'https://raw.githubusercontent.com/HSLdevcom/hsl-map-style/master/simple-style.json',
+        style: '/hsl-map-style.json',
         accessToken: settings.MapBox.accessToken,
         attribution: showAttribution ? attribution : '',
         maxZoom: 21,
