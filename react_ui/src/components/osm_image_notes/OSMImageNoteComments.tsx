@@ -7,7 +7,6 @@ import sessionRequest from "sessionRequest";
 import {osmImageNoteCommentsUrl, osmImageNoteCommentUrl} from "urls";
 import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 import Icon from "util_components/bootstrap/Icon";
-import Confirm from "util_components/bootstrap/Confirm";
 
 type OSMImageNoteCommentsProps = {
   osmImageNote: OSMImageNote,
@@ -15,8 +14,7 @@ type OSMImageNoteCommentsProps = {
 }
 
 type OSMImageNoteCommentsState = {
-  error: boolean,
-  confirmDelete?: number
+  error: boolean
 }
 
 const initialState: OSMImageNoteCommentsState = {
@@ -29,7 +27,7 @@ export default class OSMImageNoteComments extends React.Component<OSMImageNoteCo
 
   render() {
     const {osmImageNote} = this.props;
-    const {error, confirmDelete} = this.state;
+    const {error} = this.state;
     const {user} = this.context;
     const comments = osmImageNote.comments || [];
 
@@ -39,7 +37,7 @@ export default class OSMImageNoteComments extends React.Component<OSMImageNoteCo
           <strong>{comment.user || 'Anonymous'} {formatTimestamp(comment.created_at)}:</strong>
           {user.is_reviewer &&
             <button className="btn btn-light btn-compact btn-discrete p-0 ml-1"
-                    onClick={() => this.setState({confirmDelete: comment.id})}>
+                    onClick={() => this.onDelete(comment.id)}>
               <Icon icon="delete_outline"/>
             </button>
           }
@@ -50,10 +48,6 @@ export default class OSMImageNoteComments extends React.Component<OSMImageNoteCo
       <ErrorAlert message="Commenting failed. Try again maybe?" status={error}/>
       <textarea className="form-control" placeholder="Write your comment here" id="new-comment"/>
       <Button className="btn-block" color="primary" onClick={this.submit}>Submit</Button>
-      {confirmDelete &&
-        <Confirm title="Delete comment?" onConfirm={this.onDelete}
-                 onClose={() => this.setState({confirmDelete: undefined})}/>
-      }
     </>;
   }
 
@@ -71,12 +65,10 @@ export default class OSMImageNoteComments extends React.Component<OSMImageNoteCo
     })
   };
 
-  onDelete = () => {
-    const {confirmDelete} = this.state;
+  onDelete = (commentId: number) => {
     const {refreshNote} = this.props;
-    if (!confirmDelete) return;
 
-    sessionRequest(osmImageNoteCommentUrl(confirmDelete), {method: 'DELETE'}).then(response => {
+    sessionRequest(osmImageNoteCommentUrl(commentId), {method: 'DELETE'}).then(response => {
       if (response.status >= 400) this.setState({error: true});
       else {
         this.setState({error: false});
