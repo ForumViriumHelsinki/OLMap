@@ -217,8 +217,10 @@ class Lockable(models.Model):
 class Entrance(Lockable, BaseAddress):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Key:entrance'
 
-    types = ['main', 'secondary', 'service', 'staircase', 'garage']
+    types = ['workplace', 'main', 'secondary', 'service', 'staircase', 'garage', 'other']
     type = choices_field(types)
+    type_mapping = {'workplace': 'yes', 'other': 'yes'}
+
     description = models.CharField(blank=True, max_length=96)
     wheelchair = models.BooleanField(blank=True, null=True)
     loadingdock = models.BooleanField(default=False)
@@ -229,7 +231,7 @@ class Entrance(Lockable, BaseAddress):
 
     def as_osm_tags(self):
         return dict(super().as_osm_tags(), **filter_dict({
-            'entrance': self.type or 'yes',
+            'entrance': self.type_mapping.get(self.type, self.type) or 'yes',
             'description': self.description,
             'door': 'loadingdock' if self.loadingdock else None,
             'wheelchair': bool_to_osm(self.wheelchair)
