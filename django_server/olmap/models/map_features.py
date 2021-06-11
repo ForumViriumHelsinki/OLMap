@@ -5,8 +5,12 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.validators import RegexValidator
 from geopy.distance import distance
 from overpy.exception import OverpassTooManyRequests
-from shapely.geometry import Point
-from shapely.strtree import STRtree
+
+try:
+    from shapely.geometry import Point
+    from shapely.strtree import STRtree
+except (ImportError, OSError):
+    print('Shapely not found, feature - OSM linking will not be available.')
 
 from django.db import models
 
