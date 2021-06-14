@@ -28,11 +28,11 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return super().get_queryset()
 
     def get_permissions(self):
-        if self.action in ['update', 'partial_update', 'hide_note', 'mark_processed']:
+        if self.action in ['update', 'partial_update', 'hide_note']:
             return [IsReviewerOrCreator()]
-        elif self.action in ['upvote', 'downvote']:
+        elif self.action in ['upvote', 'downvote', 'mark_processed']:
             return [permissions.IsAuthenticated()]
-        elif self.action == ['mark_reviewed']:
+        elif self.action == ['mark_accepted', 'mark_reviewed']:
             return [IsReviewer()]
         else:
             return super().get_permissions()

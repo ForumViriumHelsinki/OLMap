@@ -105,9 +105,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
         : nearbyFeatures;
 
     return <>
-      {canEdit &&
-        <OSMImageNoteReviewActions imageNote={note} onReviewed={onClose}/>
-      }
+      <OSMImageNoteReviewActions imageNote={note} onReviewed={onClose}/>
       <OSMImageNoteVotes osmImageNote={note} onUpdate={this.fetchNote}/>
       <ErrorAlert status={error} message="Saving features failed. Try again perhaps?"/>
       {note.image && <ZoomableImage src={note.image} className="noteImage"/>}
@@ -151,7 +149,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
                 </button>
           }/>
       </div>
-      {canEdit && mapFeatureTypes && this.getRelevantFeatureTypes().map((featureTypeName) =>
+      {mapFeatureTypes && this.getRelevantFeatureTypes().map((featureTypeName) =>
         <div key={featureTypeName} className="mr-2 ml-3">
             <MapFeatureSet
               schema={mapFeatureTypes[featureTypeName]}
