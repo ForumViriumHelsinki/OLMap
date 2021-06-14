@@ -31,6 +31,7 @@ export type OSMImageNote = {
     is_processed?: boolean,
     is_reviewed?: boolean,
     tags?: string[],
+    modified_at?: string,
     created_at?: string,
     created_by?: number | {
         id: number,
@@ -38,7 +39,7 @@ export type OSMImageNote = {
     },
     upvotes?: userId[],
     downvotes?: userId[],
-    comments?: OSMImageNoteComment[]
+    comments?: OSMImageNoteComment[],
 };
 
 export type Notification = {

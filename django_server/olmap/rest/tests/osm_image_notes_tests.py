@@ -363,6 +363,7 @@ class OSMImageNotesTests(FVHAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # And it contains the notes as geojson:
+        props = response.json()['features'][0]['properties']
         self.assertDictEqual(response.json(), {
             'type': 'FeatureCollection',
             'features': [{
@@ -375,7 +376,9 @@ class OSMImageNotesTests(FVHAPITestCase):
                     'lon': '24.94459394',
                     'is_accepted': False,
                     'is_processed': False,
-                    'is_reviewed': False
+                    'is_reviewed': False,
+                    'created_at': props['created_at'],
+                    'modified_at': props['modified_at'],
                 }
             }]
         })

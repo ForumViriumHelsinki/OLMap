@@ -3,7 +3,7 @@ import React from 'react';
 import _ from 'lodash';
 // @ts-ignore
 import {ButtonDropdown, DropdownItem, DropdownMenu, DropdownToggle} from "reactstrap";
-import {AppContext, MapFeatureTypes, User} from "components/types";
+import {AppContext, MapFeatureTypes, OSMImageNote, User} from "components/types";
 import MapToolButton from "components/osm_image_notes/MapToolButton";
 import sessionRequest from "sessionRequest";
 import {recentMappersUrl} from "urls";
@@ -26,6 +26,17 @@ const initialState: () => OSMImageNoteFiltersButtonState = () => ({
   filtersOpen: false
 });
 
+const _24h = 24 * 3600 * 1000;
+const _90d = 90 * _24h;
+
+const filter24h = (note: OSMImageNote) =>
+  // @ts-ignore
+  new Date(note.modified_at || note.created_at).valueOf() > new Date().valueOf() - _24h;
+
+const filter90d = (note: OSMImageNote) =>
+  // @ts-ignore
+  new Date(note.modified_at || note.created_at).valueOf() > new Date().valueOf() - _90d;
+
 export default class OSMImageNoteFiltersButton extends React.Component<OSMImageNoteFiltersButtonProps, OSMImageNoteFiltersButtonState> {
   state: OSMImageNoteFiltersButtonState = initialState();
   static contextType = AppContext;
@@ -47,6 +58,14 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
       </DropdownToggle>
       <DropdownMenu>
         <DropdownItem header>Filter</DropdownItem>
+        <DropdownItem className={(filters.newer_than == filter24h) ? 'text-primary' : ''}
+                      onClick={() => this.toggleFilter({newer_than: filter24h})}>
+          24h
+        </DropdownItem>
+        <DropdownItem className={(filters.newer_than == filter90d) ? 'text-primary' : ''}
+                      onClick={() => this.toggleFilter({newer_than: filter90d})}>
+          90 days
+        </DropdownItem>
         <DropdownItem className={(filters.created_by) ? 'text-primary' : ''}
                       onClick={() => this.toggleFilter({created_by: user.id})}>
           My notes
