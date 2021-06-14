@@ -70,8 +70,8 @@ export default class OSMImageNotesMap extends React.Component<OSMImageNotesMapPr
         osmImageNotes.filter((note: OSMImageNote) => {
           for (const [key, value] of filterEntries) {
             if (typeof value == 'function')
-              return value(note);
-            if (value instanceof Array) for (const item of value) {
+              if (!value(note)) return false;
+            else if (value instanceof Array) for (const item of value) {
               // @ts-ignore
               if (!(note[key] || []).includes(item)) return false;
             }
