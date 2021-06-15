@@ -67,7 +67,8 @@ class OSMImageNotesEditor extends React.Component<OSMImageNotesEditorProps, OSMI
         </>}
       </div>
       <OSMImageNotesMap onNoteSelected={(note) => history.push(`/Notes/${note.id}/`)}
-                        filters={filters} selectLocation={selectLocation} location={location}/>
+                        filters={filters} selectLocation={selectLocation} location={location}
+                        osmChangeset={selectedChangeset}/>
       {note &&
         <OSMImageNoteModal mapFeatureTypes={mapFeatureTypes} note={note}
                            onClose={() => {refreshNote(note); history.push('/Notes/')}}

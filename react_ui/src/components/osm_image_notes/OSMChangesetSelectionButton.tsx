@@ -31,7 +31,8 @@ export default class OSMChangesetSelectionButton extends React.Component<OSMChan
           <ModalBody>
             <OSMChangesetSelection changeset={selectedChangeset}
                                    onCancel={() => this.setState({selectChangeset: false})}
-                                   onSelect={onChangesetSelected} />
+                                   onSelect={(cs) =>
+                                    {this.setState({selectChangeset: false}); onChangesetSelected(cs); }} />
           </ModalBody>
         </Modal>
       }
