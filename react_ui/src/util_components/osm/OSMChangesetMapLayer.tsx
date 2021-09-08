@@ -53,7 +53,7 @@ export default class OSMChangesetMapLayer extends React.Component<OSMChangesetMa
   getMapLayer() {
     const {changeset, onLayerReady} = this.props;
     if (!changeset) return;
-    const mapLayer = L.layerGroup();
+    const mapLayer = L.featureGroup();
     ['created', 'modified', 'deleted'].forEach((status) => {
       // @ts-ignore
       changeset[status].forEach((node: OSMFeature) => {

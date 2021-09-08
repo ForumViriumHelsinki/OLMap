@@ -25,7 +25,7 @@ export default class OSMChangesetSelection extends React.Component<OSMChangesetS
   state = initialState;
 
   render() {
-    const {changeset, onSelect, onCancel} = this.props;
+    const {changeset, onCancel} = this.props;
     const {error} = this.state;
     return <>
       <ErrorAlert message="Changeset fetching failed. Check the ID." status={error}/>

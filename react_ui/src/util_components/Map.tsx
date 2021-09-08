@@ -85,6 +85,7 @@ export default class Map extends React.Component<MapProps, MapState> {
 
   refreshMap() {
     const {latLng, zoom, extraLayers, onMapInitialized, showAttribution, zoomControl, onClick} = this.props;
+    const newMap = !this.leafletMap;
 
     if (!this.leafletMap) {
       this.leafletMap = L.map(this.getMapElId(), {
@@ -104,7 +105,10 @@ export default class Map extends React.Component<MapProps, MapState> {
       if (onMapInitialized) onMapInitialized(this.leafletMap);
     }
     if (extraLayers) extraLayers.forEach(mapLayer => {
-      if (!this.leafletMap.hasLayer(mapLayer)) mapLayer.addTo(this.leafletMap)
+      if (!this.leafletMap.hasLayer(mapLayer)) {
+        mapLayer.addTo(this.leafletMap);
+        if (!newMap && mapLayer.getBounds) this.leafletMap.fitBounds(mapLayer.getBounds());
+      }
     })
   }
 
