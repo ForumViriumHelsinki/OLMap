@@ -164,7 +164,7 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
                Open camera
             </MapToolButton>
             <MapToolButton icon="comment"
-                           onClick={() => this.setState({chooseNoteType: false, status: 'locating'})}>
+                           onClick={this.onCommentClick}>
               Add text
             </MapToolButton>
           </>}
@@ -194,7 +194,7 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
 
   onCommentClick = () => {
     this.props.requestLocation(this.onLocationSelected);
-    this.setState({status: 'locating'});
+    this.setState({status: 'locating', chooseNoteType: false});
   };
 
   private imageEl() {
