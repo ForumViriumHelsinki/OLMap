@@ -28,7 +28,7 @@ export const osmFeatureTypes: OSMFeatureType[] = [
     label: (tags) => {
       const {entrance} = tags;
       const address = osmAddressString(tags);
-      return `${address && `${address} `} ${entrance == 'yes' ? '' : entrance} (entrance)`;
+      return `${address && `${address} `} ${entrance == 'yes' ? '' : entrance} entrance`;
     }
   },
   {
@@ -65,7 +65,7 @@ export const osmFeatureTypes: OSMFeatureType[] = [
     label: (tags) => {
       const {name, source} = tags;
       const address = osmAddressString(tags);
-      return `${name ? `${name}: ` : ''}${address} (${source ? 'official' : 'OSM'})`;
+      return name ? `${name}: ${address}` : `${address} (${source ? 'official' : 'OSM'})`;
     }
   },
   {

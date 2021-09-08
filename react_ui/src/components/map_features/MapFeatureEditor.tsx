@@ -13,6 +13,9 @@ import WorkplaceTypeWidget from "components/map_features/WorkplaceTypeWidget";
 import WorkplaceEntrances from "components/map_features/WorkplaceEntrances";
 import UnloadingPlaceEntrances from "components/map_features/UnloadingPlaceEntrances";
 import UnloadingPlaceAccessPoints from "components/map_features/UnloadingPlaceAccessPoints";
+import {osmFeatureLabel} from "util_components/osm/utils";
+import {getDistance} from "geolib";
+import {GeolibInputCoordinates} from "geolib/es/types";
 
 type MapFeatureEditorProps = {
   schema: JSONSchema,
@@ -22,7 +25,8 @@ type MapFeatureEditorProps = {
   osmImageNote: OSMImageNote,
   nearbyFeatures: OSMFeature[],
   refreshNote?: () => any,
-  mapFeature: MapFeature
+  mapFeature: MapFeature,
+  osmFeature?: OSMFeature
 }
 
 type MapFeatureEditorState = {
@@ -59,7 +63,7 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
   }
 
   render() {
-    const {schema, featureTypeName, osmImageNote, refreshNote, mapFeature} = this.props;
+    const {schema, featureTypeName, osmImageNote, refreshNote, mapFeature, osmFeature} = this.props;
     const {user} = this.context;
     const editable = userCanEditNote(user, osmImageNote);
     const {editing} = this.state;
@@ -68,6 +72,10 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
     filteredSchema.properties = omitFields[featureTypeName] ? Object.fromEntries(
       Object.entries(schema.properties).filter(([k, v]) => !omitFields[featureTypeName].includes(k))
     ) : schema.properties;
+
+    const discrepantTags = osmFeature && mapFeature.as_osm_tags &&
+      // @ts-ignore
+      Object.keys(mapFeature.as_osm_tags).filter(k => osmFeature.tags[k] && osmFeature.tags[k] != mapFeature.as_osm_tags[k]);
 
     return <div>
       <p className="mt-2">
@@ -92,6 +100,7 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
           </>
         }
       </p>
+
       {editing ?
         <Form schema={filteredSchema} uiSchema={this.getUISchema()} className="compact"
               formData={mapFeature}
@@ -112,6 +121,25 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
                     readOnly
                     value={Object.entries(mapFeature.as_osm_tags).map(([k, v]) => `${k}=${v}`).join('\n')}/>
           }
+
+          {osmFeature && <table className="table table-bordered table-sm mt-2 mb-2">
+            <tr><th colSpan={3}>
+              OSM: <a href={`https://www.openstreetmap.org/${osmFeature.type}/${osmFeature.id}`} target="osm">
+                {osmFeatureLabel(osmFeature)}
+              </a>
+              {osmFeature.type == 'node' &&
+                <> ({getDistance(osmFeature, osmImageNote as GeolibInputCoordinates)}m)</>
+              }
+            </th></tr>
+            {discrepantTags && discrepantTags.length > 0 && <>
+              <tr><th></th><th>OLMap</th><th>OSM</th></tr>
+              {discrepantTags.map(tag =>
+                // @ts-ignore
+                <tr key={tag}><th>{tag}</th><td>{mapFeature.as_osm_tags[tag]}</td><td>{osmFeature.tags[tag]}</td></tr>
+              )}
+            </>}
+          </table>}
+
         </>
       }
 

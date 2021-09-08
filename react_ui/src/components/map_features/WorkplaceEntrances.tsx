@@ -62,6 +62,6 @@ export default class WorkplaceEntrances extends React.Component<WorkplaceEntranc
 
   editNewWPEntrance() {
     const {workplace} = this.props;
-    this.setState({editingEntrance: {workplace: workplace.id}});
+    this.setState({editingEntrance: {workplace: workplace.id as number}});
   }
 }

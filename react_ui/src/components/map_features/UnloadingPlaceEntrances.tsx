@@ -69,7 +69,7 @@ export default class UnloadingPlaceEntrances extends React.Component<UnloadingPl
         const entrances = unloadingPlace.entrances.includes(entrance.id) ?
           _.without(unloadingPlace.entrances, entrance.id)
         : unloadingPlace.entrances.concat([entrance.id]);
-        const url = unloadingPlaceUrl(unloadingPlace.id);
+        const url = unloadingPlaceUrl(unloadingPlace.id as number);
         sessionRequest(url, {method: 'PATCH', data: {entrances}}).then(response => {
           if (response.status < 300) {
             response.json().then(data => {

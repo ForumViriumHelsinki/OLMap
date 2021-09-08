@@ -92,7 +92,7 @@ export default class WorkplaceEntranceEditor extends React.Component<WorkplaceEn
         const entrance = entranceNote.entrance_set && entranceNote.entrance_set[0];
         if (!entrance) return;
         const workplaceEntrance: WorkplaceEntrance = {
-          workplace: workplace.id, entrance: entrance.id,
+          workplace: workplace.id as number, entrance: entrance.id,
           description: entrance.description,
           entrance_data: entrance, image_note: entranceNote,
           delivery_hours: '', delivery_instructions: '', delivery_types: []

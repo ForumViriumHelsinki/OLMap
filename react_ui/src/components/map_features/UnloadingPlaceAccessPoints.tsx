@@ -98,7 +98,7 @@ export default class UnloadingPlaceAccessPoints extends React.Component<Unloadin
 
   savePoints() {
     const {unloadingPlace} = this.props;
-    const url = unloadingPlaceUrl(unloadingPlace.id);
+    const url = unloadingPlaceUrl(unloadingPlace.id as number);
     sessionRequest(url, {method: 'PATCH', data: {access_points: unloadingPlace.access_points}})
       .then(response => {
         if (response.status < 300) {
