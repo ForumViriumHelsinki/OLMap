@@ -178,7 +178,8 @@ class BaseAddress(MapFeature):
         address_id_index = AddressIndex(addresses)
         address_index = dict([(f'{a["street"]} {a["housenumber"]}', a) for a in addresses])
 
-        instances = cls.objects.prefetch_related('image_note__addresses')
+        instances = cls.objects.prefetch_related('image_note__addresses')\
+            .filter(housenumber__isnull=False, street__isnull=False)
         print(f'Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...')
         linked_count = 0
         for instance in instances:
