@@ -16,6 +16,7 @@ import UnloadingPlaceAccessPoints from "components/map_features/UnloadingPlaceAc
 import {osmFeatureLabel} from "util_components/osm/utils";
 import {getDistance} from "geolib";
 import {GeolibInputCoordinates} from "geolib/es/types";
+import Icon from "util_components/bootstrap/Icon";
 
 type MapFeatureEditorProps = {
   schema: JSONSchema,
@@ -132,6 +133,9 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
               {osmFeature.type == 'node' &&
                 <> ({getDistance(osmFeature, osmImageNote as GeolibInputCoordinates)}m)</>
               }
+              <button className="btn btn-light btn-compact btn-sm ml-2" onClick={this.relinkOsmFeature}>
+                <Icon icon="refresh"/>
+              </button>
             </th></tr>
             {discrepantTags && discrepantTags.length > 0 && <>
               <tr><th></th><th>OLMap</th><th>OSM</th></tr>
@@ -196,34 +200,58 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
   }
 
   onSubmit = (data: any) => {
-    const {onSubmit, osmImageNote, mapFeature, featureTypeName} = this.props;
-    const fieldName = this.getFeatureListFieldName();
-
+    const {mapFeature} = this.props;
     Object.assign(mapFeature, data.formData);
-    this.linkOSMFeature();
+    if (!mapFeature.osm_feature) this.linkOSMFeature();
+    this.saveFeature().then(() => this.setState({editing: false}));
+  };
 
+  saveFeature() {
+    const {onSubmit, osmImageNote, featureTypeName} = this.props;
+    const fieldName = this.getFeatureListFieldName();
     // @ts-ignore
     const mapFeatures = osmImageNote[fieldName]
       .map((feature: MapFeature) => _.omit(feature, ...(omitFields[featureTypeName] || [])));
-
-    Promise.resolve(onSubmit({[fieldName]: mapFeatures, osm_features: osmImageNote.osm_features}))
-      .then(() => this.setState({editing: false}));
+    return Promise.resolve(onSubmit({[fieldName]: mapFeatures, osm_features: osmImageNote.osm_features}))
   };
 
   linkOSMFeature() {
     const {osmImageNote, mapFeature, featureTypeName, nearbyFeatures} = this.props;
-    if (!mapFeature.osm_feature) {
-      if (featureTypeName == "Workplace" && mapFeature.name) {
-        const osmFeature = nearbyFeatures.find(
-          f => f.tags.name && f.tags.name.search(new RegExp(mapFeature.name, 'i')) > -1);
-        if (osmFeature) {
-          const osmId = Number(osmFeature.id);
-          if (!osmImageNote.osm_features.includes(osmId)) osmImageNote.osm_features.push(osmId);
-          mapFeature.osm_feature = osmId;
-        }
+    var osmFeature;
+
+    if (featureTypeName == "Workplace" && mapFeature.name) {
+      osmFeature = nearbyFeatures.find(
+        f => f.tags.name && f.tags.name.search(new RegExp(mapFeature.name, 'i')) > -1);
+    }
+
+    if (featureTypeName == "Entrance") {
+      const entrances = nearbyFeatures.filter((f) =>
+        f.tags.entrance &&
+        f.tags['addr:street'] == mapFeature.street &&
+        f.tags['addr:housenumber'] == mapFeature.housenumber &&
+        (f.tags['addr:unit'] || '') == mapFeature.unit &&
+        // @ts-ignore
+        getDistance(osmImageNote, f) < 5);
+
+      if (entrances.length) {
+        // @ts-ignore
+        entrances.sort((a, b) => getDistance(osmImageNote, a) - getDistance(osmImageNote, b));
+        osmFeature = entrances[0];
       }
     }
+
+    if (osmFeature) {
+      const osmId = Number(osmFeature.id);
+      if (!osmImageNote.osm_features.includes(osmId)) osmImageNote.osm_features.push(osmId);
+      mapFeature.osm_feature = osmId;
+    }
   }
+
+  relinkOsmFeature = () => {
+    this.linkOSMFeature();
+    this.saveFeature();
+    this.forceUpdate();
+  };
 
   private getUISchema() {
     const {schema, featureTypeName} = this.props;
