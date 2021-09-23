@@ -42,7 +42,7 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
       {mapFeatures.map((mapFeature, i) =>
         <MapFeatureEditor key={mapFeature.id} featureTypeName={featureTypeName}
                           mapFeature={mapFeature} onSubmit={onSubmit} schema={schema}
-                          refreshNote={refreshNote} osmImageNote={osmImageNote}
+                          refreshNote={refreshNote} osmImageNote={osmImageNote} nearbyFeatures={nearbyFeatures}
                           osmFeature={mapFeature.osm_feature ? osmFeatureIndex[mapFeature.osm_feature] : undefined}
                           onDelete={() => this.forceUpdate()}/>
       )}

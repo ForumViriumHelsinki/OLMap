@@ -8,6 +8,8 @@ from olmap import models
 
 
 class OSMMapFeatureTests(FVHAPITestCase):
+    maxDiff = None
+
     def test_save_osm_image_note_with_map_feature(self):
         # Given that a user is signed in
         user = self.create_and_login_user()
@@ -115,6 +117,11 @@ class OSMMapFeatureTests(FVHAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # And it contains schemas to create the different types of OSM features:
+        osm_feature_field = {'osm_feature': {
+            "type": "integer",
+            "title": "Osm feature"
+        }}
+
         address_fields = {
             'street': {'type': 'string', 'maxLength': 64, 'title': 'Street'},
             'housenumber': {
@@ -152,7 +159,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
         for (k, v) in {
             'Entrance': {
                 'type': 'object',
-                'properties': dict(address_fields, **lockable_fields, **{
+                'properties': dict(address_fields, **lockable_fields, **osm_feature_field, **{
                     'type': {
                         'type': 'string',
                         'enum': ['', 'workplace', 'main', 'secondary', 'service', 'staircase', 'garage', 'other'],
@@ -168,7 +175,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
 
             'Steps': {
                 'type': 'object',
-                'properties': {
+                'properties': dict(osm_feature_field, **{
                     'step_count': {'type': ['integer', 'null'], 'minimum': 0, 'maximum': 32767, 'title': 'Step count'},
                     'handrail': {'type': ['boolean', 'null'], 'title': 'Handrail'},
                     'ramp': {'type': ['boolean', 'null'], 'title': 'Ramp'},
@@ -178,22 +185,22 @@ class OSMMapFeatureTests(FVHAPITestCase):
                         'enum': ['', 'up', 'down'],
                         'title': 'Incline',
                         'description': 'From street level'},
-                }},
+                })},
 
             'Gate': {
                 'type': 'object',
-                'properties': dict(lockable_fields, lift_gate={'type': 'boolean', 'title': 'Lift gate'})},
+                'properties': dict(lockable_fields, lift_gate={'type': 'boolean', 'title': 'Lift gate'}, **osm_feature_field)},
 
             'Barrier': {
                 'type': 'object',
-                'properties': {
-                    'type': {'type': 'string', 'enum': ['', 'fence', 'wall', 'block', 'bollard'], 'title': 'Type'}}},
+                'properties': dict(osm_feature_field, **{
+                    'type': {'type': 'string', 'enum': ['', 'fence', 'wall', 'block', 'bollard'], 'title': 'Type'}})},
 
 
             'Workplace': {
                 'type': 'object',
                 'required': ['type'],
-                'properties': dict(address_fields, **{
+                'properties': dict(address_fields, **osm_feature_field, **{
                     'name': {'type': 'string', 'maxLength': 64, 'title': 'Name'},
                     "url_name": {
                         "type": "string",
@@ -223,23 +230,24 @@ class OSMMapFeatureTests(FVHAPITestCase):
 
             'InfoBoard': {
                 'type': 'object',
-                'properties': {'type': {'type': 'string', 'enum': ['', 'map', 'board'], 'title': 'Type'}}
+                'properties': dict(osm_feature_field, **{
+                    'type': {'type': 'string', 'enum': ['', 'map', 'board'], 'title': 'Type'}})
 
             },
 
             'TrafficSign': {
                 'type': 'object',
-                'properties': {
+                'properties': dict(osm_feature_field, **{
                     'type': {
                         'type': 'string',
                         'enum': ['', 'Max height', 'Max weight', 'No stopping', 'No parking', 'Loading zone', 'Parking'],
                         'title': 'Type'},
-                    'text': {'type': 'string', 'maxLength': 128, 'title': 'Text'}}
+                    'text': {'type': 'string', 'maxLength': 128, 'title': 'Text'}})
             },
 
             "UnloadingPlace": {
                 "type": "object",
-                "properties": {
+                "properties": dict(osm_feature_field, **{
                     "length": {
                         "type": [
                             "string",
@@ -284,7 +292,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
                         },
                         "title": "Entrances"
                     }
-                }
+                })
             }
         }.items():
             try:

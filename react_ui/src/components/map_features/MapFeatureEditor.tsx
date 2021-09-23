@@ -69,9 +69,11 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
     const {editing} = this.state;
 
     const filteredSchema = {...schema};
+    // Don't show OSM Feature as a silly integer input field in the form:
+    const {osm_feature, ...filteredProps} = schema.properties;
     filteredSchema.properties = omitFields[featureTypeName] ? Object.fromEntries(
-      Object.entries(schema.properties).filter(([k, v]) => !omitFields[featureTypeName].includes(k))
-    ) : schema.properties;
+      Object.entries(filteredProps).filter(([k, v]) => !omitFields[featureTypeName].includes(k))
+    ) : filteredProps;
 
     const discrepantTags = osmFeature && mapFeature.as_osm_tags &&
       // @ts-ignore
@@ -198,14 +200,30 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
     const fieldName = this.getFeatureListFieldName();
 
     Object.assign(mapFeature, data.formData);
+    this.linkOSMFeature();
 
     // @ts-ignore
     const mapFeatures = osmImageNote[fieldName]
       .map((feature: MapFeature) => _.omit(feature, ...(omitFields[featureTypeName] || [])));
 
-    Promise.resolve(onSubmit({[fieldName]: mapFeatures}))
+    Promise.resolve(onSubmit({[fieldName]: mapFeatures, osm_features: osmImageNote.osm_features}))
       .then(() => this.setState({editing: false}));
   };
+
+  linkOSMFeature() {
+    const {osmImageNote, mapFeature, featureTypeName, nearbyFeatures} = this.props;
+    if (!mapFeature.osm_feature) {
+      if (featureTypeName == "Workplace" && mapFeature.name) {
+        const osmFeature = nearbyFeatures.find(
+          f => f.tags.name && f.tags.name.search(new RegExp(mapFeature.name, 'i')) > -1);
+        if (osmFeature) {
+          const osmId = Number(osmFeature.id);
+          if (!osmImageNote.osm_features.includes(osmId)) osmImageNote.osm_features.push(osmId);
+          mapFeature.osm_feature = osmId;
+        }
+      }
+    }
+  }
 
   private getUISchema() {
     const {schema, featureTypeName} = this.props;
