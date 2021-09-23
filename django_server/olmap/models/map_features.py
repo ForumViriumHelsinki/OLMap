@@ -182,17 +182,21 @@ class BaseAddress(MapFeature):
         print(f'Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...')
         linked_count = 0
         for instance in instances:
-            street_address = f'{instance.street} {instance.housenumber}'
-            address = address_index.get(street_address, None)
-            if (not address) or address_id_index.is_linked(instance.image_note):
-                continue
-            note_position = [instance.image_note.lat, instance.image_note.lon]
-            dst = distance(note_position, [address['lat'], address['lon']]).meters
-            if dst < 150:
-                added = instance.image_note.addresses.add(address['id'])
-                if added:
-                    linked_count += 1
-                    print(f'Linked address {street_address} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')
+            housenumbers = [instance.housenumber]
+            if '-' in instance.housenumber:
+                housenumbers = housenumbers + [s.strip() for s in instance.housenumber.split('-')]
+            for housenumber in housenumbers:
+                street_address = f'{instance.street} {housenumber}'
+                address = address_index.get(street_address, None)
+                if (not address) or address_id_index.is_linked(instance.image_note):
+                    continue
+                note_position = [instance.image_note.lat, instance.image_note.lon]
+                dst = distance(note_position, [address['lat'], address['lon']]).meters
+                if dst < 150:
+                    added = instance.image_note.addresses.add(address['id'])
+                    if added:
+                        linked_count += 1
+                        print(f'Linked address {street_address} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')
         print(f'All done; {linked_count} new links created.')
 
 
