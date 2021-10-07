@@ -1,6 +1,5 @@
 import React from 'react';
 import _ from 'lodash';
-// @ts-ignore
 import Form from "react-jsonschema-form";
 
 import {AppContext, JSONSchema, MapFeature, OSMImageNote, WorkplaceEntrance} from "components/types";
@@ -13,10 +12,7 @@ import WorkplaceTypeWidget from "components/map_features/WorkplaceTypeWidget";
 import WorkplaceEntrances from "components/map_features/WorkplaceEntrances";
 import UnloadingPlaceEntrances from "components/map_features/UnloadingPlaceEntrances";
 import UnloadingPlaceAccessPoints from "components/map_features/UnloadingPlaceAccessPoints";
-import {osmFeatureLabel} from "util_components/osm/utils";
-import {getDistance} from "geolib";
-import {GeolibInputCoordinates} from "geolib/es/types";
-import Icon from "util_components/bootstrap/Icon";
+import MapFeatureOSMLink from "components/map_features/MapFeatureOSMLink";
 
 type MapFeatureEditorProps = {
   schema: JSONSchema,
@@ -64,7 +60,9 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
   }
 
   render() {
-    const {schema, featureTypeName, osmImageNote, refreshNote, mapFeature, osmFeature} = this.props;
+    const {
+      schema, featureTypeName, osmImageNote, refreshNote, mapFeature, osmFeature, nearbyFeatures
+    } = this.props;
     const {user} = this.context;
     const editable = userCanEditNote(user, osmImageNote);
     const {editing} = this.state;
@@ -75,10 +73,6 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
     filteredSchema.properties = omitFields[featureTypeName] ? Object.fromEntries(
       Object.entries(filteredProps).filter(([k, v]) => !omitFields[featureTypeName].includes(k))
     ) : filteredProps;
-
-    const discrepantTags = osmFeature && mapFeature.as_osm_tags &&
-      // @ts-ignore
-      Object.keys(mapFeature.as_osm_tags).filter(k => osmFeature.tags[k] && osmFeature.tags[k] != mapFeature.as_osm_tags[k]);
 
     return <div>
       <p className="mt-2">
@@ -125,26 +119,9 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
                     value={Object.entries(mapFeature.as_osm_tags).map(([k, v]) => `${k}=${v}`).join('\n')}/>
           }
 
-          {osmFeature && <table className="table table-bordered table-sm mt-2 mb-2">
-            <tr><th colSpan={3}>
-              OSM: <a href={`https://www.openstreetmap.org/${osmFeature.type}/${osmFeature.id}`} target="osm">
-                {osmFeatureLabel(osmFeature)}
-              </a>
-              {osmFeature.type == 'node' &&
-                <> ({getDistance(osmFeature, osmImageNote as GeolibInputCoordinates)}m)</>
-              }
-              <button className="btn btn-light btn-compact btn-sm ml-2" onClick={this.relinkOsmFeature}>
-                <Icon icon="refresh"/>
-              </button>
-            </th></tr>
-            {discrepantTags && discrepantTags.length > 0 && <>
-              <tr><th></th><th>OLMap</th><th>OSM</th></tr>
-              {discrepantTags.map(tag =>
-                // @ts-ignore
-                <tr key={tag}><th>{tag}</th><td>{mapFeature.as_osm_tags[tag]}</td><td>{osmFeature.tags[tag]}</td></tr>
-              )}
-            </>}
-          </table>}
+          <MapFeatureOSMLink featureTypeName={featureTypeName} mapFeature={mapFeature} osmFeature={osmFeature}
+                             nearbyFeatures={nearbyFeatures} osmImageNote={osmImageNote}
+                             saveFeature={this.saveFeature}/>
 
         </>
       }
@@ -202,55 +179,16 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
   onSubmit = (data: any) => {
     const {mapFeature} = this.props;
     Object.assign(mapFeature, data.formData);
-    if (!mapFeature.osm_feature) this.linkOSMFeature();
     this.saveFeature().then(() => this.setState({editing: false}));
   };
 
-  saveFeature() {
+  saveFeature = () => {
     const {onSubmit, osmImageNote, featureTypeName} = this.props;
     const fieldName = this.getFeatureListFieldName();
     // @ts-ignore
     const mapFeatures = osmImageNote[fieldName]
       .map((feature: MapFeature) => _.omit(feature, ...(omitFields[featureTypeName] || [])));
     return Promise.resolve(onSubmit({[fieldName]: mapFeatures, osm_features: osmImageNote.osm_features}))
-  };
-
-  linkOSMFeature() {
-    const {osmImageNote, mapFeature, featureTypeName, nearbyFeatures} = this.props;
-    var osmFeature;
-
-    if (featureTypeName == "Workplace" && mapFeature.name) {
-      osmFeature = nearbyFeatures.find(
-        f => f.tags.name && f.tags.name.search(new RegExp(mapFeature.name, 'i')) > -1);
-    }
-
-    if (featureTypeName == "Entrance") {
-      const entrances = nearbyFeatures.filter((f) =>
-        f.tags.entrance &&
-        f.tags['addr:street'] == mapFeature.street &&
-        f.tags['addr:housenumber'] == mapFeature.housenumber &&
-        (f.tags['addr:unit'] || '') == mapFeature.unit &&
-        // @ts-ignore
-        getDistance(osmImageNote, f) < 5);
-
-      if (entrances.length) {
-        // @ts-ignore
-        entrances.sort((a, b) => getDistance(osmImageNote, a) - getDistance(osmImageNote, b));
-        osmFeature = entrances[0];
-      }
-    }
-
-    if (osmFeature) {
-      const osmId = Number(osmFeature.id);
-      if (!osmImageNote.osm_features.includes(osmId)) osmImageNote.osm_features.push(osmId);
-      mapFeature.osm_feature = osmId;
-    }
-  }
-
-  relinkOsmFeature = () => {
-    this.linkOSMFeature();
-    this.saveFeature();
-    this.forceUpdate();
   };
 
   private getUISchema() {

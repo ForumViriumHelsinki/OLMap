@@ -17,6 +17,7 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "@types/react-jsonschema-form": "^1.7.6",
     "bootstrap": "^4.4.1",
     "geolib": "^3.2.0",
     "leaflet": "^1.6.0",

@@ -71,11 +71,24 @@ export type WorkplaceEntrance = {
   delivery_instructions?: string
 }
 
-export type AppContextType = {
-    user?: User
+export type OpenOSMChangeset = {
+  id?: number,
+  comment: string
 }
 
-export const AppContext = React.createContext({user: undefined} as AppContextType);
+export type OSMEditContextType = {
+  username: string,
+  password: string,
+  changeset?: OpenOSMChangeset
+}
+
+export type AppContextType = {
+  user?: User
+  osmEditContext?: OSMEditContextType,
+  setOSMContext: (c: OSMEditContextType) => any,
+}
+
+export const AppContext = React.createContext({} as AppContextType);
 
 export type ImageNotesContextType = {
   osmImageNotes?: OSMImageNote[],

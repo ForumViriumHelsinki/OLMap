@@ -1,6 +1,6 @@
 import React from 'react';
-// @ts-ignore
 import Form from "react-jsonschema-form";
+import {JSONSchema6} from "json-schema";
 // @ts-ignore
 import {Button} from 'reactstrap';
 import sessionRequest, {login} from "sessionRequest";
@@ -22,7 +22,7 @@ const initialState: RegisterFormState = {
   loginError: false
 };
 
-const schema = () => ({
+const schema: () => JSONSchema6 = () => ({
   type: 'object',
   properties: {
     username: {type: 'string', title: 'Username', default: ''},
@@ -45,6 +45,7 @@ export default class RegisterForm extends React.Component<RegisterFormProps, Reg
   render() {
     const {formData, errors} = this.state;
     return <Form schema={this.schema} uiSchema={uiSchema} onSubmit={this.onSubmit}
+                 // @ts-ignore
                  formData={formData} showErrorList={false} extraErrors={this.extraErrors()}>
       {errors && errors.non_field_errors &&
         <ErrorAlert message={errors.non_field_errors} status/>
