@@ -190,6 +190,10 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
     const credit = `${note.created_by ? note.created_by.username: 'Anonymous'} on ${formatTimestamp(note.created_at)}`;
 
     return <>
+      {note.comment
+        ? <>{note.comment}<br/>by {credit}</>
+        : `Note by ${credit}`}
+      <br/>
       {showOnMap && <span className="clickable text-primary" onClick={showOnMap}><Icon icon="place"/></span>}
       {' '}
       <span className="clickable text-primary ml-1"
@@ -205,10 +209,10 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
       <a className="text-primary ml-1" target="google-maps" href={`https://maps.google.com/?layer=c&cbll=${note?.lat},${note.lon}`}>
         <span style={{fontSize: 21, marginRight: -4}}>G</span><Icon icon="place"/>
       </a>
+      <a className="text-primary ml-1" target="mapillary" href={`https://www.mapillary.com/app/?lat=${note?.lat}&lng=${note.lon}&z=20&panos=true`}>
+        <span style={{fontSize: 21, marginRight: -4}}>M</span><Icon icon="place"/>
+      </a>
       <textarea id="permalink" value={window.location.href} style={{width: 0, height: 0, opacity: 0}} readOnly/>
-      {note.comment
-        ? <>{note.comment}<br/>by {credit}</>
-        : `Note by ${credit}`}
     </>;
   }
 
