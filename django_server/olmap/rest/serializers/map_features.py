@@ -34,7 +34,7 @@ class MapFeatureSerializer(serializers.ModelSerializer):
     # Ensure id gets passed to OSMImageNoteWithMapFeaturesSerializer.save_related_map_features:
     id = serializers.IntegerField(read_only=False, required=False)
     as_osm_tags = serializers.ReadOnlyField()
-    osm_feature = serializers.PrimaryKeyRelatedField(required=False, queryset=models.OSMFeature.objects)
+    osm_feature = serializers.PrimaryKeyRelatedField(required=False, allow_null=True, queryset=models.OSMFeature.objects)
 
     # Register custom subclasses for specific map feature types here:
     registered_subclasses = {}
