@@ -46,7 +46,16 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
         // @ts-ignore
         .filter(k => osmFeature.tags[k] != mapFeature.as_osm_tags[k]);
 
-    return !osmFeature ? null : <>
+    return !osmFeature ?
+      <table className="table table-bordered table-sm mt-2 mb-2"><tbody>
+        <tr><th colSpan={3}>
+          OSM: Not linked
+          <button className="btn btn-light btn-compact btn-sm ml-2" onClick={this.relinkOsmFeature}>
+            <Icon icon="refresh"/>
+          </button>
+        </th></tr>
+      </tbody></table>
+    : <>
       <table className="table table-bordered table-sm mt-2 mb-2"><tbody>
         <tr><th colSpan={3}>
           OSM: <a href={`https://www.openstreetmap.org/${osmFeature.type}/${osmFeature.id}`} target="osm">
@@ -92,7 +101,7 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
 
   linkOSMFeature() {
     const {osmImageNote, mapFeature, featureTypeName, nearbyFeatures} = this.props;
-    var osmFeature;
+    let osmFeature;
 
     if (featureTypeName == "Workplace" && mapFeature.name) {
       osmFeature = nearbyFeatures.find(
@@ -100,13 +109,18 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
     }
 
     if (featureTypeName == "Entrance") {
-      const entrances = nearbyFeatures.filter((f) =>
+      let entrances = nearbyFeatures.filter((f) =>
         f.tags.entrance &&
         f.tags['addr:street'] == mapFeature.street &&
         f.tags['addr:housenumber'] == mapFeature.housenumber &&
         (f.tags['addr:unit'] || '') == mapFeature.unit &&
         // @ts-ignore
         getDistance(osmImageNote, f) < 5);
+
+      if (!entrances.length) {
+        // @ts-ignore
+        entrances = nearbyFeatures.filter((f) => f.tags.entrance && getDistance(osmImageNote, f) < 2);
+      }
 
       if (entrances.length) {
         // @ts-ignore
