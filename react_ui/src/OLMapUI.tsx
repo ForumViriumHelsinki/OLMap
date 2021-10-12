@@ -22,7 +22,11 @@ type UIState = {
   osmEditContext?: OSMEditContextType
 }
 
-const contextString = localStorage.getItem('osmEditContext');
+let contextString;
+try {
+  contextString = localStorage.getItem('osmEditContext');
+} catch (DOMException) {}
+
 const osmEditContext = contextString ? JSON.parse(contextString) : undefined;
 
 class OLMapUI extends React.Component<{}, UIState> {
