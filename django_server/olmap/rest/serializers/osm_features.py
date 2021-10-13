@@ -14,7 +14,8 @@ class OSMFeatureSerializer(serializers.ModelSerializer):
         fields = ['id', 'associated_entrances', 'image_notes', 'workplace']
 
     def get_image_notes(self, osm_feature):
-        return OSMImageNoteSerializer(osm_feature.image_notes.filter(visible=True), many=True).data
+        notes = osm_feature.image_notes.filter(visible=True)
+        return OSMImageNoteSerializer(notes, many=True, context=self.context).data
 
 
 class OSMEntranceSerializer(serializers.ModelSerializer):
