@@ -408,7 +408,22 @@ class TrafficSign(MapFeature):
             'traffic_sign:2': f'{self.text_sign}[{self.text}]' if self.text else None})
 
 
-map_feature_types = [Entrance, Steps, Gate, Barrier, Workplace, InfoBoard, TrafficSign, UnloadingPlace]
+class BuildingPassage(MapFeature):
+    types = ['footway', 'service']
+    type = choices_field(types, default='footway')
+    width = dimension_field()
+    height = dimension_field()
+
+    def as_osm_tags(self):
+        return filter_dict({
+            'tunnel': 'building_passage',
+            'highway': self.type or 'footway',
+            'width': self.width,
+            'height': self.height
+        })
+
+
+map_feature_types = [Entrance, Steps, Gate, Barrier, Workplace, InfoBoard, TrafficSign, UnloadingPlace, BuildingPassage]
 address_feature_types = [Entrance, Workplace]
 
 
