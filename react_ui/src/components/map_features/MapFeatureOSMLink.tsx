@@ -8,6 +8,7 @@ import Icon from "util_components/bootstrap/Icon";
 import OpenOSMChangesetModal from "util_components/osm/OpenOSMChangesetModal";
 import UpdateNode from "util_components/osm/api/UpdateNode";
 import ErrorAlert from "util_components/bootstrap/ErrorAlert";
+import CreateNode from "util_components/osm/api/CreateNode";
 
 type MapFeatureOSMLinkProps = {
   featureTypeName: string,
@@ -15,7 +16,8 @@ type MapFeatureOSMLinkProps = {
   nearbyFeatures: OSMFeature[],
   mapFeature: MapFeature,
   osmFeature?: OSMFeature,
-  saveFeature: () => any
+  saveFeature: () => any,
+  addNearbyFeature: (f: OSMFeature) => any
 }
 
 type MapFeatureOSMLinkState = {
@@ -38,7 +40,7 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
   tagsToSave: any = null;
 
   render() {
-    const {osmImageNote, mapFeature, osmFeature} = this.props;
+    const {osmImageNote, mapFeature, osmFeature, featureTypeName} = this.props;
     const {showChangeset, error} = this.state;
 
     const discrepantTags = osmFeature && mapFeature.as_osm_tags &&
@@ -46,52 +48,75 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
         // @ts-ignore
         .filter(k => osmFeature.tags[k] != mapFeature.as_osm_tags[k]);
 
-    return !osmFeature ?
-      <table className="table table-bordered table-sm mt-2 mb-2"><tbody>
-        <tr><th colSpan={3}>
-          OSM: Not linked
-          <button className="btn btn-light btn-compact btn-sm ml-2" onClick={this.relinkOsmFeature}>
-            <Icon icon="refresh"/>
-          </button>
-        </th></tr>
-      </tbody></table>
-    : <>
-      <table className="table table-bordered table-sm mt-2 mb-2"><tbody>
-        <tr><th colSpan={3}>
-          OSM: <a href={`https://www.openstreetmap.org/${osmFeature.type}/${osmFeature.id}`} target="osm">
-            {osmFeatureLabel(osmFeature)}
-          </a>
-          {osmFeature.type == 'node' &&
-            <> ({getDistance(osmFeature, osmImageNote as GeolibInputCoordinates)}m)</>
+    return <>
+      {!osmFeature ?
+        <table className="table table-bordered table-sm mt-2 mb-2">
+          <tbody>
+          <tr>
+            <th colSpan={3}>
+              OSM: {mapFeature.osm_feature ? mapFeature.osm_feature + ' (not found)' : 'Not linked'}
+              <button className="btn btn-light btn-compact btn-sm ml-2" onClick={this.relinkOsmFeature}>
+                <Icon icon="refresh"/>
+              </button>
+              {featureTypeName == 'Workplace' && !mapFeature.osm_feature && <>
+                <button className="btn btn-compact btn-sm btn-outline-primary mr-1" onClick={this.addToOSM}>
+                  Add to OSM
+                </button>
+                <button className="btn btn-compact btn-sm btn-outline-secondary mr-1"
+                        onClick={() => this.setState({showChangeset: true})}>
+                  New changeset
+                </button>
+              </>}
+            </th>
+          </tr>
+          </tbody>
+        </table>
+        : <>
+          <table className="table table-bordered table-sm mt-2 mb-2">
+            <tbody>
+            <tr>
+              <th colSpan={3}>
+                OSM: <a href={`https://www.openstreetmap.org/${osmFeature.type}/${osmFeature.id}`} target="osm">
+                {osmFeatureLabel(osmFeature)}
+              </a>
+                {osmFeature.type == 'node' &&
+                <> ({getDistance(osmFeature, osmImageNote as GeolibInputCoordinates)}m)</>
+                }
+                <button className="btn btn-light btn-compact btn-sm ml-2" onClick={this.relinkOsmFeature}>
+                  <Icon icon="refresh"/>
+                </button>
+              </th>
+            </tr>
+            {discrepantTags && discrepantTags.length > 0 && <>
+              <tr>
+                <th></th>
+                <th>OLMap</th>
+                <th>OSM</th>
+              </tr>
+              {discrepantTags.map(tag =>
+                // @ts-ignore
+                <tr key={tag}><th>{tag}</th><td>{mapFeature.as_osm_tags[tag]}</td><td>{osmFeature.tags[tag]}</td></tr>
+              )}
+            </>}
+            </tbody>
+          </table>
+
+          {discrepantTags && discrepantTags.length > 0 &&
+          <div className="mb-4">
+            <button className="btn btn-compact btn-sm btn-outline-primary mr-1" onClick={this.addToOSM}>
+              Add to OSM
+            </button>
+            <button className="btn btn-compact btn-sm btn-outline-danger mr-1" onClick={this.replaceOSM}>
+              Replace OSM
+            </button>
+            <button className="btn btn-compact btn-sm btn-outline-secondary mr-1"
+                    onClick={() => this.setState({showChangeset: true})}>
+              New changeset
+            </button>
+          </div>
           }
-          <button className="btn btn-light btn-compact btn-sm ml-2" onClick={this.relinkOsmFeature}>
-            <Icon icon="refresh"/>
-          </button>
-        </th></tr>
-        {discrepantTags && discrepantTags.length > 0 && <>
-          <tr><th></th><th>OLMap</th><th>OSM</th></tr>
-          {discrepantTags.map(tag =>
-            // @ts-ignore
-            <tr key={tag}><th>{tag}</th><td>{mapFeature.as_osm_tags[tag]}</td><td>{osmFeature.tags[tag]}</td></tr>
-          )}
-        </>}
-      </tbody></table>
-
-      {discrepantTags && discrepantTags.length > 0 &&
-        <div className="mb-4">
-          <button className="btn btn-compact btn-sm btn-outline-primary mr-1" onClick={this.addToOSM}>
-            Add to OSM
-          </button>
-          <button className="btn btn-compact btn-sm btn-outline-danger mr-1" onClick={this.replaceOSM}>
-            Replace OSM
-          </button>
-          <button className="btn btn-compact btn-sm btn-outline-secondary mr-1"
-                  onClick={() => this.setState({showChangeset: true})}>
-            New changeset
-          </button>
-        </div>
+        </>
       }
-
       {error && <ErrorAlert message={error} status/>}
       {showChangeset &&
         <OpenOSMChangesetModal onClose={() => this.setState({showChangeset: false})} onCreated={this._saveToOSM} />
@@ -105,7 +130,10 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
 
     if (featureTypeName == "Workplace" && mapFeature.name) {
       osmFeature = nearbyFeatures.find(
-        f => f.tags.name && f.tags.name.search(new RegExp(mapFeature.name, 'i')) > -1);
+        f => f.tags.name && f.tags.name.match(new RegExp(`^${mapFeature.name}$`, 'i')));
+      if (!osmFeature)
+        osmFeature = nearbyFeatures.find(
+          f => f.tags.name && f.tags.name.search(new RegExp(mapFeature.name, 'i')) > -1);
     }
 
     if (featureTypeName == "Entrance") {
@@ -147,8 +175,8 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
 
   addToOSM = () => {
     const {mapFeature, osmFeature} = this.props;
-    if (!(mapFeature.as_osm_tags && osmFeature)) return;
-    this.tagsToSave = {...osmFeature.tags, ...mapFeature.as_osm_tags}
+    if (!mapFeature.as_osm_tags) return;
+    this.tagsToSave = osmFeature ? {...osmFeature.tags, ...mapFeature.as_osm_tags} : {...mapFeature.as_osm_tags};
     this.saveToOSM()
   };
 
@@ -165,18 +193,37 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
   };
 
   _saveToOSM = (osmContext: OSMEditContextType) => {
-    const {mapFeature, osmFeature} = this.props;
-    if (!osmFeature || !osmContext.changeset || !this.tagsToSave) return;
+    const {osmFeature, osmImageNote, addNearbyFeature, mapFeature, saveFeature} = this.props;
+    if (!osmContext.changeset || !this.tagsToSave) return;
 
-    const props = {changesetId: osmContext.changeset.id, node: osmFeature, tags: this.tagsToSave};
-    osmApiCall(`node/${osmFeature.id}`, UpdateNode, props, osmContext)
-    .then(({response, text}) => {
-      if (response.ok) {
-        osmFeature.tags = {...this.tagsToSave};
-        this.tagsToSave = null;
-        this.setState({error: undefined});
-        this.forceUpdate();
-      } else this.setState({error: text});
-    });
+    if (osmFeature) {
+      const props = {changesetId: osmContext.changeset.id, node: osmFeature, tags: this.tagsToSave};
+      osmApiCall(`node/${osmFeature.id}`, UpdateNode, props, osmContext)
+      .then(({response, text}) => {
+        if (response.ok) {
+          osmFeature.tags = {...this.tagsToSave};
+          this.tagsToSave = null;
+          this.setState({error: undefined});
+          this.forceUpdate();
+        } else this.setState({error: text});
+      });
+    } else {
+      const {lat, lon} = osmImageNote;
+      const props = {changesetId: osmContext.changeset.id, lat, lon, tags: this.tagsToSave};
+      osmApiCall(`node/create`, CreateNode, props, osmContext)
+      .then(({response, text}) => {
+        if (response.ok) {
+          const osmId = parseInt(text);
+          // @ts-ignore
+          addNearbyFeature({id: osmId, lat, lon, type: 'node', tags: {...this.tagsToSave}});
+          this.tagsToSave = null;
+          if (!osmImageNote.osm_features) osmImageNote.osm_features = [];
+          osmImageNote.osm_features.push(osmId);
+          mapFeature.osm_feature = osmId;
+          saveFeature();
+          this.setState({error: undefined});
+        } else this.setState({error: text});
+      });
+    }
   }
 }

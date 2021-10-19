@@ -23,7 +23,8 @@ type MapFeatureEditorProps = {
   nearbyFeatures: OSMFeature[],
   refreshNote?: () => any,
   mapFeature: MapFeature,
-  osmFeature?: OSMFeature
+  osmFeature?: OSMFeature,
+  addNearbyFeature: (f: OSMFeature) => any
 }
 
 type MapFeatureEditorState = {
@@ -61,7 +62,7 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
 
   render() {
     const {
-      schema, featureTypeName, osmImageNote, refreshNote, mapFeature, osmFeature, nearbyFeatures
+      schema, featureTypeName, osmImageNote, refreshNote, mapFeature, osmFeature, nearbyFeatures, addNearbyFeature
     } = this.props;
     const {user} = this.context;
     const editable = userCanEditNote(user, osmImageNote);
@@ -119,10 +120,8 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
                     value={Object.entries(mapFeature.as_osm_tags).map(([k, v]) => `${k}=${v}`).join('\n')}/>
           }
 
-          <MapFeatureOSMLink featureTypeName={featureTypeName} mapFeature={mapFeature} osmFeature={osmFeature}
-                             nearbyFeatures={nearbyFeatures} osmImageNote={osmImageNote}
-                             saveFeature={this.saveFeature}/>
-
+          <MapFeatureOSMLink {...{featureTypeName, mapFeature, osmFeature, nearbyFeatures, osmImageNote,
+                                  addNearbyFeature, saveFeature: this.saveFeature}} />
         </>
       }
 

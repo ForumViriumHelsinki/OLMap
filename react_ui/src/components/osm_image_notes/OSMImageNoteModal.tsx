@@ -157,6 +157,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
               featureTypeName={featureTypeName}
               nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}
               refreshNote={this.fetchNote}
+              addNearbyFeature={(f) => this.setState({nearbyFeatures: [f].concat(nearbyFeatures)})}
               onSubmit={(data) => this.updateSelectedNote(data)}/>
         </div>
       )}

@@ -13,7 +13,8 @@ type MapFeatureSetProps = {
   featureTypeName: string,
   osmImageNote: OSMImageNote,
   nearbyFeatures: OSMFeature[],
-  refreshNote?: () => any
+  refreshNote?: () => any,
+  addNearbyFeature: (f: OSMFeature) => any
 }
 
 type MapFeatureSetState = {}
@@ -31,7 +32,7 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
   };
 
   render() {
-    const {schema, featureTypeName, osmImageNote, refreshNote, onSubmit, nearbyFeatures} = this.props;
+    const {schema, featureTypeName, osmImageNote, refreshNote, onSubmit, nearbyFeatures, addNearbyFeature} = this.props;
     const {user} = this.context;
     const editable = userCanEditNote(user, osmImageNote);
     // @ts-ignore
@@ -40,11 +41,10 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
 
     return <>
       {mapFeatures.map((mapFeature, i) =>
-        <MapFeatureEditor key={mapFeature.id} featureTypeName={featureTypeName}
-                          mapFeature={mapFeature} onSubmit={onSubmit} schema={schema}
-                          refreshNote={refreshNote} osmImageNote={osmImageNote} nearbyFeatures={nearbyFeatures}
-                          osmFeature={mapFeature.osm_feature ? osmFeatureIndex[mapFeature.osm_feature] : undefined}
-                          onDelete={() => this.forceUpdate()}/>
+        <MapFeatureEditor {...{
+          key: mapFeature.id, featureTypeName, mapFeature, onSubmit, schema, refreshNote, osmImageNote, nearbyFeatures,
+          osmFeature: mapFeature.osm_feature ? osmFeatureIndex[mapFeature.osm_feature] : undefined,
+          onDelete: () => this.forceUpdate(), addNearbyFeature}}/>
       )}
 
       {editable &&
