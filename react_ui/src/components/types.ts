@@ -84,8 +84,6 @@ export type OSMEditContextType = {
 
 export type AppContextType = {
   user?: User
-  osmEditContext?: OSMEditContextType,
-  setOSMContext: (c: OSMEditContextType) => any,
 }
 
 export const AppContext = React.createContext({} as AppContextType);

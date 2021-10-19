@@ -6,7 +6,7 @@ import sessionRequest, {logout} from "sessionRequest";
 
 import LoginScreen from 'components/LoginScreen';
 import LoadScreen from "components/LoadScreen";
-import {AppContext, OSMEditContextType, User} from "components/types";
+import {AppContext, User} from "components/types";
 import ResetPasswordScreen from "components/ResetPasswordScreen";
 import OSMImageNoteModal from "components/osm_image_notes/OSMImageNoteModal";
 import NavBar from "util_components/bootstrap/NavBar";
@@ -18,24 +18,15 @@ type UIState = {
   user?: User,
   dataFetched: boolean,
   showLogout: boolean,
-  menuOpen: boolean,
-  osmEditContext?: OSMEditContextType
+  menuOpen: boolean
 }
-
-let contextString;
-try {
-  contextString = localStorage.getItem('osmEditContext');
-} catch (DOMException) {}
-
-const osmEditContext = contextString ? JSON.parse(contextString) : undefined;
 
 class OLMapUI extends React.Component<{}, UIState> {
   state: UIState = {
     user: undefined,
     dataFetched: false,
     showLogout: false,
-    menuOpen: false,
-    osmEditContext
+    menuOpen: false
   };
 
   componentDidMount() {
@@ -68,7 +59,7 @@ class OLMapUI extends React.Component<{}, UIState> {
   }
 
   render() {
-    const {user, dataFetched, showLogout, osmEditContext} = this.state;
+    const {user, dataFetched, showLogout} = this.state;
 
     // @ts-ignore
     const ImageNote = () => <OSMImageNoteModal note={{id: useParams().noteId}} fullScreen />;
@@ -76,11 +67,6 @@ class OLMapUI extends React.Component<{}, UIState> {
     const ResetPassword = () => {
       const params = useParams() as any;
       return <ResetPasswordScreen uid={params.uid} token={params.token}/>;
-    };
-
-    const setOSMContext = (osmEditContext: OSMEditContextType) => {
-      this.setState({osmEditContext});
-      localStorage.setItem('osmEditContext', JSON.stringify(osmEditContext));
     };
 
     const MainUI = (props: {selectedNoteId?: number, newNote?: boolean, osmFeatures?: number[]}) =>
@@ -97,7 +83,7 @@ class OLMapUI extends React.Component<{}, UIState> {
         </div>
       </div>;
 
-    return dataFetched ? <AppContext.Provider value={{user, osmEditContext, setOSMContext}}>
+    return dataFetched ? <AppContext.Provider value={{user}}>
       <Router>
         <Switch>
           <Route path='/login/'>

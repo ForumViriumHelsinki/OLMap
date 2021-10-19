@@ -5,7 +5,7 @@ import Modal, {ModalBody} from "util_components/bootstrap/Modal";
 import CreateChangeset from "util_components/osm/api/CreateChangeset";
 import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 import {AppContext, OSMEditContextType} from "components/types";
-import {osmApiCall} from "util_components/osm/utils";
+import {osmApiCall, osmEditContext, setOSMContext} from "util_components/osm/utils";
 
 const schema: JSONSchema6 = {
   type: 'object',
@@ -43,8 +43,8 @@ export default class OpenOSMChangesetModal extends React.Component<OpenOSMChange
     const {error, formData} = this.state;
     let fields: any;
 
-    if (this.context.osmEditContext) {
-      const {username, password, changeset} = this.context.osmEditContext;
+    if (osmEditContext) {
+      const {username, password, changeset} = osmEditContext;
       fields = {username, password, comment: changeset ? changeset.comment : ''};
     } else fields = {};
 
@@ -59,7 +59,6 @@ export default class OpenOSMChangesetModal extends React.Component<OpenOSMChange
 
   onSubmit = (data: any) => {
     const {username, password, comment} = data.formData;
-    const {setOSMContext} = this.context;
     const {onCreated, onClose} = this.props;
     osmApiCall('changeset/create', CreateChangeset, {comment}, {username, password})
     .then(({response, text}) => {

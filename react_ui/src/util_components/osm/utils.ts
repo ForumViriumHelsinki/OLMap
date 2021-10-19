@@ -15,6 +15,18 @@ export const osmFeatureLabel = (osmFeature: OSMFeature) => {
   return label && capitalize(label).replace('_', ' ');
 };
 
+let contextString;
+try {
+  contextString = localStorage.getItem('osmEditContext');
+} catch (DOMException) {}
+
+export var osmEditContext = contextString ? JSON.parse(contextString) : undefined;
+
+export const setOSMContext = (context: OSMEditContextType) => {
+  osmEditContext = context;
+  localStorage.setItem('osmEditContext', JSON.stringify(osmEditContext));
+};
+
 export const osmApiCall = (url: string, BodyComponent: any, props: any, context: OSMEditContextType) => {
   const _url = apiUrl(url);
   const {username, password} = context;

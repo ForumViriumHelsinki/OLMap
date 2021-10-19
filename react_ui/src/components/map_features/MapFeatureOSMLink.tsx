@@ -1,7 +1,7 @@
 import React from 'react';
 import {AppContext, MapFeature, OSMEditContextType, OSMImageNote} from "components/types";
 import {OSMFeature} from "util_components/osm/types";
-import {osmApiCall, osmFeatureLabel} from "util_components/osm/utils";
+import {osmApiCall, osmEditContext, osmFeatureLabel} from "util_components/osm/utils";
 import {getDistance} from "geolib";
 import {GeolibInputCoordinates} from "geolib/es/types";
 import Icon from "util_components/bootstrap/Icon";
@@ -160,8 +160,6 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
   };
 
   saveToOSM = () => {
-    const {osmEditContext} = this.context;
-
     if (osmEditContext && osmEditContext.changeset) this._saveToOSM(osmEditContext);
     else this.setState({showChangeset: true});
   };
