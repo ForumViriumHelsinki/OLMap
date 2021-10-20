@@ -30,7 +30,7 @@ class OSMImageNote(TimestampedModel):
     lon = models.DecimalField(max_digits=11, decimal_places=8)
     image = models.ImageField(null=True, blank=True, upload_to=upload_osm_images_to)
     comment = models.TextField(blank=True)
-    tags = ArrayField(base_field=models.CharField(max_length=64), default=list)
+    tags = ArrayField(base_field=models.CharField(max_length=64), default=list, blank=True)
     osm_features = models.ManyToManyField(OSMFeature, blank=True, related_name='image_notes')
 
     addresses = models.ManyToManyField(Address, blank=True, related_name='image_notes')
