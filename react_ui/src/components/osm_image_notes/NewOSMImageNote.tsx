@@ -126,10 +126,7 @@ export default class NewOSMImageNote extends React.Component<NewOSMImageNoteProp
                           this.setState({comment: e.target.value})} />
               {mapFeatureTypes &&
                 <>
-                  <p className="m-2">Select tags:</p>
-                  <p className="m-2">
-                    <OSMImageNoteTags {...{tags, mapFeatureTypes}} onChange={tags => this.setState({tags})}/>
-                  </p>
+                  <OSMImageNoteTags {...{tags, mapFeatureTypes}} expanded onChange={tags => this.setState({tags})}/>
                   <div className="ml-2 mr-2">
                     {tags.filter(tag => mapFeatureTypes[tag]).map((tag) =>
                       <MapFeatureSet

@@ -23,15 +23,16 @@ export class ModalActions extends React.Component<{actions: Action[]}> {
 }
 
 type ModalProps = {
-  title: any,
+  title?: any,
   onClose: () => any,
   children?: any,
   className: string,
-  headerContent?: any
+  headerContent?: any,
+  headerCls: string
 }
 
 export default class Modal extends React.Component<ModalProps> {
-  static defaultProps = {className: ''};
+  static defaultProps = {className: '', headerCls: ''};
 
   escFunction = (event: any) => {
     if(event.keyCode === 27) this.props.onClose();
@@ -46,7 +47,7 @@ export default class Modal extends React.Component<ModalProps> {
   }
 
   render() {
-    const {title, onClose, children, className, headerContent} = this.props;
+    const {title, onClose, children, className, headerContent, headerCls} = this.props;
 
     return (<>
       <div className="modal-backdrop show"> </div>
@@ -56,7 +57,7 @@ export default class Modal extends React.Component<ModalProps> {
              onClick={(e) => e.stopPropagation()}>
           <div className="modal-content">
             {(title || headerContent) &&
-              <div className="modal-header">
+              <div className={"modal-header " + headerCls}>
                 {title && <h6 className="modal-title">{title}</h6>}
                 {headerContent}
                 {onClose &&

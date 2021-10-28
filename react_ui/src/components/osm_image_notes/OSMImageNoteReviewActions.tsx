@@ -2,8 +2,6 @@ import React from 'react';
 import {AppContext, OSMImageNote} from "components/types";
 import Icon from "util_components/bootstrap/Icon";
 
-// @ts-ignore
-import {Button, ButtonGroup} from "reactstrap";
 import Confirm from "util_components/bootstrap/Confirm";
 import sessionRequest from "sessionRequest";
 import {acceptOSMImageNoteUrl, rejectOSMImageNoteUrl, processedOSMImageNoteUrl, reviewedOSMImageNoteUrl} from "urls";
@@ -36,39 +34,29 @@ export default class OSMImageNoteReviewActions extends React.Component<ReviewAct
     const {user} = this.context;
     const canEdit = userCanEditNote(user, imageNote);
 
-    const osm_edit_url =
-      `https://www.openstreetmap.org/edit#map=20/${imageNote.lat}/${imageNote.lon}`;
-
-    return !imageNote.is_reviewed &&
-      <ButtonGroup className="btn-block">
-        <Button outline color="success" className="btn-compact" size="sm" tag="a" target="_osm_editor"
-                href={osm_edit_url}>
-          <Icon icon="search"/> OSM
-        </Button>
-
-        {!imageNote.is_accepted && user && user.is_reviewer &&
-          <Button outline color="success" className="btn-compact" size="sm"
-                  onClick={this.onAccept}>
+    return canEdit &&
+      <>
+        <h6 className="dropdown-header">Mark note as:</h6>
+        {!imageNote.is_accepted && !imageNote.is_processed && user && user.is_reviewer &&
+          <button className="dropdown-item" onClick={this.onAccept}>
             <Icon icon="map"/> Ready for OSM
-          </Button>
+          </button>
         }
 
         {imageNote.is_accepted && !imageNote.is_processed && user &&
-          <Button outline color="success" className="btn-compact" size="sm"
-                  onClick={() => this.setState({confirmProcessed: true})}>
+          <button className="dropdown-item" onClick={() => this.setState({confirmProcessed: true})}>
             <Icon icon="map"/> Added to OSM
-          </Button>
+          </button>
         }
 
         {!imageNote.is_reviewed && user && user.is_reviewer &&
-          <Button outline color="success" className="btn-compact" size="sm"
-                  onClick={() => this.setState({confirmAccept: true})}>
-            <Icon icon="done"/> Accept
-          </Button>
+          <button className="dropdown-item" onClick={() => this.setState({confirmAccept: true})}>
+            <Icon icon="done"/> Reviewed in OSM
+          </button>
         }
 
         {confirmAccept &&
-          <Confirm title="Mark this image note as reviewed & accepted?"
+          <Confirm title="Mark this image note as reviewed & accepted in OSM?"
                    onClose={() => this.setState({confirmAccept: false})}
                    onConfirm={this.onReviewed}/>
         }
@@ -80,10 +68,9 @@ export default class OSMImageNoteReviewActions extends React.Component<ReviewAct
         }
 
         {canEdit &&
-          <Button outline color="danger" className="btn-compact modal-header-action" size="sm"
-                  onClick={() => this.setState({confirmReject: true})}>
-            <Icon icon="delete"/> Reject
-          </Button>
+          <button className="dropdown-item" onClick={() => this.setState({confirmReject: true})}>
+            <Icon icon="delete"/> Rejected
+          </button>
         }
 
         {confirmReject &&
@@ -92,7 +79,7 @@ export default class OSMImageNoteReviewActions extends React.Component<ReviewAct
                    inputPlaceholder="Please write here shortly the reason for the rejection."
                    onConfirm={this.onReject}/>
         }
-      </ButtonGroup>;
+      </>;
   }
 
   registerAction = (url: string, data?: any) => {

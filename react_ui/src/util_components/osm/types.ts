@@ -17,7 +17,7 @@ type OSMFeatureType = {
   requiredTag: string,
 }
 
-const osmAddressString = (tags: OSMTags) =>
+export const osmAddressString = (tags: OSMTags) =>
   _.filter([tags['addr:street'], tags['addr:housenumber'], tags['addr:unit']]).join(' ');
 
 // These are searched, in order, to present OSM features as strings:
@@ -32,48 +32,20 @@ export const osmFeatureTypes: OSMFeatureType[] = [
     }
   },
   {
-    name: 'business',
-    requiredTag: 'shop',
+    name: 'street or other named feature',
+    requiredTag: 'name',
     label: (tags) => {
-      const {name} = tags;
-      const shop = tags.shop == 'yes' ? 'business' : tags.shop;
-      const address = osmAddressString(tags);
-      return `${name ? `${name} (${shop})` : shop}${address && `: ${address}`}`;
-    }
-  },
-  {
-    name: 'place',
-    requiredTag: 'place',
-    label: (tags) => {
-      const {name, place} = tags;
-      const address = osmAddressString(tags);
-      return `${name ? `${name} (${place})` : place}${address && `: ${address}`}`;
-    }
-  },
-  {
-    name: 'address with unit',
-    requiredTag: 'addr:unit',
-    label: (tags) => {
-      const {name} = tags;
-      const address = osmAddressString(tags);
-      return `${name ? `${name}: ` : ''}${address}`;
+      const {highway, name} = tags;
+      return `${name}${highway ? ` (${highway} road)` : ''}`;
     }
   },
   {
     name: 'address',
     requiredTag: 'addr:housenumber',
     label: (tags) => {
-      const {name, source} = tags;
+      const {name} = tags;
       const address = osmAddressString(tags);
-      return name ? `${name}: ${address}` : `${address} (${source ? 'official' : 'OSM'})`;
-    }
-  },
-  {
-    name: 'street or other named feature',
-    requiredTag: 'name',
-    label: (tags) => {
-      const {highway, name} = tags;
-      return `${name}${highway ? ` (${highway} road)` : ''}`;
+      return name ? `${name}: ${address}` : address;
     }
   },
   {

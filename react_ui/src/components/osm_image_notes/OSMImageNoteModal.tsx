@@ -8,21 +8,19 @@ import ErrorAlert from "util_components/bootstrap/ErrorAlert";
 
 import 'components/osm_image_notes/OSMImageNotes.css';
 
-import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
 import {LocationTuple, Location} from "util_components/types";
-import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
-import MapFeatureSet from "components/map_features/MapFeatureSet";
-import Icon from "util_components/bootstrap/Icon";
 import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
 import ZoomableImage from "util_components/ZoomableImage";
-import OSMImageNoteVotes from "components/osm_image_notes/OSMImageNoteVotes";
 import OSMImageNoteComments from "components/osm_image_notes/OSMImageNoteComments";
-import AssociateEntranceModal from "components/osm_image_notes/AssociateEntranceModal";
 import {OSMFeature} from "util_components/osm/types";
 import {formatTimestamp} from "utils";
 import {userCanEditNote} from "./utils";
 import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
 import MapToolButton from "components/osm_image_notes/MapToolButton";
+import OSMImageNoteActionsMenu from "components/osm_image_notes/OSMImageNoteActionsMenu";
+import OSMImageNoteAddress from "components/osm_image_notes/OSMImageNoteAddress";
+import OSMImageNoteRelatedPlaces from "components/osm_image_notes/OSMImageNoteRelatedPlaces";
+import OSMImageNoteMapFeatures from "components/osm_image_notes/OSMImageNoteMapFeatures";
 
 type OSMImageNoteModalProps = {
   mapFeatureTypes?: MapFeatureTypes,
@@ -36,16 +34,13 @@ type OSMImageNoteModalProps = {
 
 type OSMImageNoteModalState = {
   note?: OSMImageNote,
-  editingRelatedPlaces: boolean,
   error: boolean
   nearbyFeatures: OSMFeature[],
   nearbyAddresses: OSMFeature[],
-  linkingEntrance?: OSMFeature,
   repositioning: boolean
 }
 
 const initialState: OSMImageNoteModalState = {
-  editingRelatedPlaces: false,
   error: false,
   nearbyFeatures: [],
   nearbyAddresses: [],
@@ -65,8 +60,11 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
   }
 
   render() {
-    const {onClose, fullScreen} = this.props;
+    const {onClose, fullScreen, showOnMap, requestLocation} = this.props;
     const {note, repositioning} = this.state;
+    const {user} = this.context;
+
+    if (!note) return null;
 
     if (repositioning) return <div className="mt-4 text-right">
       Scroll map to select position{' '}
@@ -75,11 +73,22 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
       </MapToolButton>
     </div>;
 
-    if (!note) return null;
+    const canEdit = userCanEditNote(user, note);
+    const adjustPosition = canEdit && requestLocation ? this.adjustPosition : undefined;
+
+    // @ts-ignore
+    const credit = `${note.created_by ? note.created_by.username: 'Anonymous'} on ${formatTimestamp(note.created_at)}`;
+
+    const title = <>
+      <OSMImageNoteActionsMenu {...{showOnMap, note, adjustPosition, closeNote: onClose}} />
+      {note.comment
+        ? <>{note.comment}<br/>by {credit}</>
+        : `Note by ${credit}`}
+    </>;
 
     const modalCls = note.image ? 'modal-xl' : 'modal-dialog-centered';
-    return fullScreen ? <><h6 className="pt-2">{this.renderTitle()}</h6>{this.renderContent()}</>
-    : <Modal title={this.renderTitle()} className={modalCls} onClose={onClose}>
+    return fullScreen ? <><h6 className="pt-2">{title}</h6>{this.renderContent()}</>
+    : <Modal title={title} className={modalCls} onClose={onClose} headerCls="pl-0 pt-2 pr-2 pb-2">
         {this.renderContent()}
       </Modal>
     ;
@@ -87,143 +96,52 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
 
   renderContent() {
     const {mapFeatureTypes, onClose} = this.props;
-    const {note, editingRelatedPlaces, error, nearbyFeatures, nearbyAddresses, linkingEntrance, repositioning} = this.state;
+    const {note, error, nearbyFeatures, nearbyAddresses, repositioning} = this.state;
     const {user} = this.context;
 
     if (repositioning || !note) return null;
 
     const canEdit = userCanEditNote(user, note);
-
+    const readOnly = !canEdit;
     const location = [note.lon, note.lat] as LocationTuple;
-
     const tags = note.tags || [];
 
-    const canEditRelatedPlaces = canEdit && !editingRelatedPlaces;
-    const relatedFeatures =
-      note.osm_features
-        ? nearbyFeatures.filter(f => note.osm_features.includes(f.id))
-        : nearbyFeatures;
-
     return <>
-      <OSMImageNoteReviewActions imageNote={note} onReviewed={onClose}/>
-      <OSMImageNoteVotes osmImageNote={note} onUpdate={this.fetchNote}/>
       <ErrorAlert status={error} message="Saving features failed. Try again perhaps?"/>
       {note.image && <ZoomableImage src={note.image} className="noteImage"/>}
-      <>
-        <p className="m-2 ml-3"><strong>Tags:</strong></p>
-        <div className="m-2 ml-3">
-           <OSMImageNoteTags {...{tags, mapFeatureTypes}} readOnly={!canEdit}
-                             onChange={tags => this.updateSelectedNote({tags})}/>
-        </div>
-      </>
-      <div onClick={() => canEditRelatedPlaces && this.setState({editingRelatedPlaces: true})}
-           className={canEditRelatedPlaces ? "clickable": ''}>
-        <div className="list-group-item">
-          <strong>Related places:</strong>
-          {canEditRelatedPlaces && <div className="float-right"><Icon icon={'edit'}/></div>}
-          {editingRelatedPlaces &&
-            <div className="float-right">
-              <button className="btn btn-light btn-sm btn-compact"
-                      onClick={() => this.setState({editingRelatedPlaces: false})}>
-                Close <Icon icon={'close'}/>
-              </button>
-            </div>
-          }
-        </div>
-        <NearbyAddressesAsOSMLoader
-          location={location}
-          onLoad={nearbyAddresses => this.setState({nearbyAddresses})} />
-        <OSMFeaturesSelection
-          location={location}
-          extraFeatures={nearbyAddresses}
-          onChange={this.onFeaturesSelected} readOnly={!editingRelatedPlaces}
-          maxHeight={null}
-          preselectedFeatureIds={(note.osm_features || []).concat(note.addresses || []).filter(f => f)}
-          onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
-          featureActions={
-            (feature: OSMFeature) =>
-              feature.tags.entrance && note.osm_features && note.osm_features.includes(feature.id) &&
-                <button className="btn btn-light btn-compact float-right"
-                        onClick={(e) => this.linkEntrance(e, feature)}>
-                  <Icon icon="link"/>
-                </button>
-          }/>
-      </div>
-      {mapFeatureTypes && this.getRelevantFeatureTypes().map((featureTypeName) =>
-        <div key={featureTypeName} className="mr-2 ml-3">
-            <MapFeatureSet
-              schema={mapFeatureTypes[featureTypeName]}
-              osmImageNote={note}
-              featureTypeName={featureTypeName}
-              nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}
-              refreshNote={this.fetchNote}
-              addNearbyFeature={(f) => this.setState({nearbyFeatures: [f].concat(nearbyFeatures)})}
-              onSubmit={(data) => this.updateSelectedNote(data)}/>
-        </div>
-      )}
-      <div className="m-2 ml-3">
-        <p>
-          <strong>Comments ({(note.comments || []).length}) </strong>
-          <button className="btn btn-light btn-sm btn-compact float-right" onClick={this.fetchNote}>
-            <Icon icon={'refresh'}/>
-          </button>
-        </p>
-        <OSMImageNoteComments osmImageNote={note} refreshNote={this.fetchNote}/>
-      </div>
 
-      {linkingEntrance && <AssociateEntranceModal
-        entrance={linkingEntrance}
-        nearbyFeatures={relatedFeatures}
-        onClose={() => this.setState({linkingEntrance: undefined})}/>}
+      <OSMImageNoteTags {...{tags, mapFeatureTypes, readOnly}}
+                        onChange={tags => this.updateSelectedNote({tags})}/>
+
+      <NearbyAddressesAsOSMLoader
+        location={location}
+        onLoad={nearbyAddresses => this.setState({nearbyAddresses})} />
+
+      <OSMImageNoteAddress {...{note, nearbyAddresses, readOnly, saveAddresses: this.saveAddresses}}/>
+
+      <OSMImageNoteRelatedPlaces {...{note, readOnly, saveAddresses: this.saveAddresses}}
+        onFeaturesLoaded={(nearbyFeatures) => this.setState({nearbyFeatures})}
+        savePlaces={this.onFeaturesSelected}/>
+
+      {mapFeatureTypes &&
+        <OSMImageNoteMapFeatures
+          mapFeatureTypes={mapFeatureTypes}
+          osmImageNote={note}
+          nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}
+          refreshNote={this.fetchNote}
+          addNearbyFeature={(f) => this.setState({nearbyFeatures: [f].concat(nearbyFeatures)})}
+          onSubmit={(data) => this.updateSelectedNote(data)}/>}
+
+      <OSMImageNoteComments osmImageNote={note} refreshNote={this.fetchNote}/>
     </>;
   }
 
-  renderTitle() {
-    const {showOnMap, requestLocation} = this.props;
-    const {note, repositioning} = this.state;
-    const {user} = this.context;
-
-    if (repositioning || !note) return null;
-
-    const canEdit = userCanEditNote(user, note);
-
-    // @ts-ignore
-    const credit = `${note.created_by ? note.created_by.username: 'Anonymous'} on ${formatTimestamp(note.created_at)}`;
-
-    return <>
-      {note.comment
-        ? <>{note.comment}<br/>by {credit}</>
-        : `Note by ${credit}`}
-      <br/>
-      {showOnMap && <span className="clickable text-primary" onClick={showOnMap}><Icon icon="place"/></span>}
-      {' '}
-      <span className="clickable text-primary ml-1"
-              onClick={this.copyPermalink}>
-        <Icon icon="link"/>
-      </span>
-      {' '}
-      {requestLocation && canEdit &&
-        <span className="clickable text-primary ml-1" onClick={this.adjustPosition}>
-          <Icon icon="open_with"/>
-        </span>}
-      {' '}
-      <a className="text-primary ml-1" target="google-maps" href={`https://maps.google.com/?layer=c&cbll=${note?.lat},${note.lon}`}>
-        <span style={{fontSize: 21, marginRight: -4}}>G</span><Icon icon="place"/>
-      </a>
-      <a className="text-primary ml-1" target="mapillary" href={`https://www.mapillary.com/app/?lat=${note?.lat}&lng=${note.lon}&z=20&panos=true`}>
-        <span style={{fontSize: 21, marginRight: -4}}>M</span><Icon icon="place"/>
-      </a>
-      <textarea id="permalink" value={window.location.href} style={{width: 0, height: 0, opacity: 0}} readOnly/>
-    </>;
-  }
-
-  copyPermalink = () => {
-    (document.getElementById('permalink') as HTMLInputElement).select();
-    document.execCommand('copy');
+  onFeaturesSelected = (featureIds: number[]) => {
+    this.updateSelectedNote({osm_features: featureIds});
   };
 
-  onFeaturesSelected = (featureIds: number[], addresses?: number[]) => {
-    this.updateSelectedNote({osm_features: featureIds, addresses});
+  saveAddresses = (addresses: number[]) => {
+    this.updateSelectedNote({addresses});
   };
 
   updateSelectedNote(data: any, nextState?: any) {
@@ -245,20 +163,6 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
       .then(response => response.json())
       .then(note => this.setState({note}))
   };
-
-  private getRelevantFeatureTypes() {
-    const {note} = this.state;
-    const {mapFeatureTypes} = this.props;
-    if (!note) return [];
-    const tags = note.tags || [];
-    const allTags = Object.keys(mapFeatureTypes || {});
-    return allTags.filter(tag => tags.includes(tag));
-  }
-
-  linkEntrance(e: React.MouseEvent, entrance: OSMFeature) {
-    e.stopPropagation();
-    this.setState({linkingEntrance: entrance})
-  }
 
   adjustPosition = () => {
     const {requestLocation, note} = this.props;

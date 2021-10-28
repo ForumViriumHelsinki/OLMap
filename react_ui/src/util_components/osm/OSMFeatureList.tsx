@@ -33,7 +33,8 @@ type OSMFeatureListProps = {
   onChange: (featureIds: number[]) => any,
   selectedFeatureIds: number[],
   readOnly?: boolean,
-  featureActions?: (feature: OSMFeature) => any
+  featureActions?: (feature: OSMFeature) => any,
+  showFilters: boolean
 }
 
 type OSMFeatureListState = {
@@ -49,11 +50,12 @@ const initialState: OSMFeatureListState = {
 
 export default class OSMFeatureList extends React.Component<OSMFeatureListProps, OSMFeatureListState> {
   state = initialState;
+  static defaultProps = {showFilters: true};
 
   render() {
     const {sortBy, selectedFilters, featureMap} = this.state;
     const selectedFeatures = this.selectedFeatures();
-    const {OSMFeatures, selectedFeatureIds, readOnly, featureActions, location} = this.props;
+    const {OSMFeatures, selectedFeatureIds, readOnly, featureActions, location, showFilters} = this.props;
 
     return <ListGroup>
       {readOnly ?
@@ -69,7 +71,7 @@ export default class OSMFeatureList extends React.Component<OSMFeatureListProps,
           <ListGroupItem>No places selected</ListGroupItem>
       :
         <>
-          {OSMFeatures.length > 5 &&
+          {OSMFeatures.length > 5 && showFilters &&
             <ListGroupItem className="pt-1 pt-sm-2">
               <span className="d-inline-block mt-2 mt-sm-0">
                 Filter:{' '}
