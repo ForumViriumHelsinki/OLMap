@@ -80,7 +80,8 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
     const credit = `${note.created_by ? note.created_by.username: 'Anonymous'} on ${formatTimestamp(note.created_at)}`;
 
     const title = <>
-      <OSMImageNoteActionsMenu {...{showOnMap, note, adjustPosition, closeNote: onClose}} />
+      <OSMImageNoteActionsMenu {...{showOnMap, note, adjustPosition, canEdit, closeNote: onClose}}
+        refreshNote={this.fetchNote} />
       {note.comment
         ? <>{note.comment}<br/>by {credit}</>
         : `Note by ${credit}`}

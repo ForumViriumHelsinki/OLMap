@@ -2,12 +2,16 @@ import React from 'react';
 import Icon from "util_components/bootstrap/Icon";
 import {OSMImageNote} from "components/types";
 import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
+import sessionRequest from "sessionRequest";
+import {osmImageNoteUrl} from "urls";
 
 type OSMImageNoteActionsMenuProps = {
   note: OSMImageNote,
   showOnMap?: () => any,
   adjustPosition?: () => any,
-  closeNote: () => any
+  closeNote: () => any,
+  canEdit: boolean,
+  refreshNote: () => any
 }
 
 type OSMImageNoteActionsMenuState = {
@@ -22,7 +26,7 @@ export default class OSMImageNoteActionsMenu extends React.Component<OSMImageNot
   state = initialState;
 
   render() {
-    const {showOnMap, note, adjustPosition, closeNote} = this.props;
+    const {showOnMap, note, adjustPosition, closeNote, canEdit} = this.props;
     const {lon, lat} = note;
 
     const {show} = this.state;
@@ -46,6 +50,16 @@ export default class OSMImageNoteActionsMenu extends React.Component<OSMImageNot
           <button className="dropdown-item" onClick={adjustPosition}>
             <Icon icon="open_with"/> Move note
           </button>}
+
+        <input name="image" id="image_note_image" className="d-none" type="file"
+           accept="image/*" capture="environment"
+           onChange={this.onImageCaptured}/>
+
+        {canEdit &&
+          <button className="dropdown-item" onClick={this.onImageClick}>
+            <Icon icon="camera_alt"/> {note.image ? 'Update picture' : 'Add picture'}
+          </button>
+        }
 
         <h6 className="dropdown-header">Show position in:</h6>
         {showOnMap ?
@@ -73,4 +87,23 @@ export default class OSMImageNoteActionsMenu extends React.Component<OSMImageNot
     document.execCommand('copy');
   };
 
+  private imageEl() {
+    return document.getElementById('image_note_image') as HTMLInputElement;
+  }
+
+  onImageClick = () => {
+    this.imageEl().click();
+  };
+
+  onImageCaptured = () => {
+    const {note, refreshNote} = this.props;
+    const files = this.imageEl().files as FileList;
+    const image = files[0];
+    let formData = new FormData();
+    formData.append('image', image);
+    sessionRequest(osmImageNoteUrl(note.id as number), {method: 'PATCH', body: formData})
+    .then((response: any) => {
+      if ((response.status < 300)) refreshNote();
+    })
+  };
 }
