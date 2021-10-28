@@ -103,7 +103,10 @@ export default class OSMImageNoteActionsMenu extends React.Component<OSMImageNot
     formData.append('image', image);
     sessionRequest(osmImageNoteUrl(note.id as number), {method: 'PATCH', body: formData})
     .then((response: any) => {
-      if ((response.status < 300)) refreshNote();
+      if ((response.status < 300)) {
+        refreshNote();
+        this.setState({show: false});
+      }
     })
   };
 }
