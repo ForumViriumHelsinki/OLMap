@@ -109,8 +109,6 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
   }
 
   private addNearbyFeature(osmFeature: OSMFeature) {
-    if (osmFeature.type == 'relation') return;
-
     const nearbyOSMFeatures = this.state.nearbyOSMFeatures.slice();
 
     if (osmFeature.type == 'way') {
@@ -129,7 +127,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
       minlat: bounds[0].latitude, maxlat: bounds[1].latitude,
       minlon: bounds[0].longitude, maxlon: bounds[1].longitude};
 
-    const query = osmFeatureTypes.map(({requiredTag}) => `node['${requiredTag}']`).join(';') + ';way[name]';
+    const query = 'node[name];way[name];relation[name][building];relation[name][tourism];node[entrance];node[barrier]';
     const overpassFrontend = new OverpassFrontend(overpassInterpreterPath);
     this.setState({nearbyOSMFeatures: []});
     overpassFrontend.BBoxQuery(query, overpassBounds, {properties: OverpassFrontend.ALL},
