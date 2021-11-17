@@ -111,6 +111,10 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
           Reviewed
         </DropdownItem>
         <DropdownItem divider/>
+        <DropdownItem className={filters.delivery_instructions ? 'text-primary' : ''}
+                      onClick={() => this.toggleFilter({delivery_instructions: true})}>
+          Delivery instructions
+        </DropdownItem>
         {mapFeatureTypes && Object.keys(mapFeatureTypes).map((tag) =>
           <DropdownItem key={tag}
                         className={(filters.tags && filters.tags.includes(tag)) ? 'text-primary' : ''}

@@ -377,6 +377,7 @@ class OSMImageNotesTests(FVHAPITestCase):
                     'is_accepted': False,
                     'is_processed': False,
                     'is_reviewed': False,
+                    'delivery_instructions': False,
                     'created_at': props['created_at'],
                     'modified_at': props['modified_at'],
                 }

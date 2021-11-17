@@ -1,3 +1,4 @@
+from django.db.models import Count, Q
 from django.utils import timezone
 from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
@@ -24,7 +25,8 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.action == 'list':
             # Fetch list as dicts rather than object instances for a bit more speed:
-            return super().get_queryset().values()
+            instructions_count = Count('workplace', filter=~Q(workplace__delivery_instructions=''))
+            return super().get_queryset().values().annotate(delivery_instructions=instructions_count)
         return super().get_queryset()
 
     def get_permissions(self):
