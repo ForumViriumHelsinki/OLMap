@@ -74,13 +74,17 @@ class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
 
 class OSMImageNoteWithMapFeaturesSerializer(OSMImageNoteSerializer, metaclass=OSMImageNoteSerializerMeta):
     created_by = BaseUserSerializer(read_only=True)
+    delivery_instructions = serializers.SerializerMethodField()
 
     class Meta:
         model = models.OSMImageNote
         fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'addresses',
                    'is_reviewed', 'is_processed', 'is_accepted', 'tags', 'created_by', 'created_at',
-                   'upvotes', 'downvotes', 'comments'] +
+                   'upvotes', 'downvotes', 'comments', 'delivery_instructions'] +
                   [manager_name(prop_type) for prop_type in models.map_feature_types])
+
+    def get_delivery_instructions(self, note):
+        return getattr(note, 'delivery_instructions', 0) > 0
 
     def create(self, validated_data):
         relateds = self.extract_related_map_features(validated_data)

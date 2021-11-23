@@ -56,7 +56,8 @@ class OSMImageNotesEditor extends React.Component<OSMImageNotesEditorProps, OSMI
 
         {!selectLocation && <>
           <MapToolButton icon="refresh" onClick={loadImageNotes} />
-          <OSMImageNoteFiltersButton onFiltersChanged={filters => this.setState({filters})}
+          <OSMImageNoteFiltersButton osmImageNotes={osmImageNotes}
+                                     onFiltersChanged={filters => this.setState({filters})}
                                      mapFeatureTypes={mapFeatureTypes} />
           <a href="/editing-process.html" target="_blank">
             <MapToolButton icon="help"/>

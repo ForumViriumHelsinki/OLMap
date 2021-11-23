@@ -7,15 +7,18 @@ import {AppContext, MapFeatureTypes, OSMImageNote, User} from "components/types"
 import MapToolButton from "components/osm_image_notes/MapToolButton";
 import sessionRequest from "sessionRequest";
 import {recentMappersUrl} from "urls";
+import {filterNotes} from "components/osm_image_notes/utils";
 
 
 type OSMImageNoteFiltersButtonProps = {
   mapFeatureTypes?: MapFeatureTypes,
-  onFiltersChanged: (filters: any) => any
+  onFiltersChanged: (filters: any) => any,
+  osmImageNotes?: OSMImageNote[]
 }
 
 type OSMImageNoteFiltersButtonState = {
   filters: any,
+  counts: any,
   filtersOpen: boolean,
   recentMappers?: User[],
   mappersOpen?: boolean
@@ -23,6 +26,7 @@ type OSMImageNoteFiltersButtonState = {
 
 const initialState: () => OSMImageNoteFiltersButtonState = () => ({
   filters: {},
+  counts: {},
   filtersOpen: false
 });
 
@@ -46,11 +50,51 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
       .then((recentMappers) => this.setState({recentMappers}))
   }
 
-  render() {
-    const {filters, filtersOpen, recentMappers, mappersOpen} = this.state;
-    const {mapFeatureTypes} = this.props;
-    const nonStatusFilters = _.omit(filters, ['is_processed', 'is_reviewed', 'is_accepted']);
+  componentDidUpdate(prevProps: Readonly<OSMImageNoteFiltersButtonProps>) {
+    const notes = this.props.osmImageNotes;
+    if (notes && (prevProps.osmImageNotes != notes)) {
+      const filters = Object.entries(this.filterOptions());
+      const counts = filters.map(([k, v]) => [k, filterNotes(v, notes).length]);
+      this.setState({counts: Object.fromEntries(counts)})
+    }
+  }
+
+  filterOptions() {
     const {user} = this.context;
+    const {mapFeatureTypes} = this.props;
+    const {recentMappers} = this.state;
+
+    return {
+      '24h': {newer_than: filter24h},
+      '90 days': {newer_than: filter90d},
+      'My notes': {created_by: user.id},
+
+      'New': {is_processed: false, is_reviewed: false, is_accepted: false},
+      'Ready for OSM': {is_processed: false, is_reviewed: false, is_accepted: true},
+      'In OSM': {is_processed: true, is_accepted: true, is_reviewed: false},
+      'Reviewed': {is_processed: true, is_reviewed: true, is_accepted: true},
+
+      'Delivery instructions': {delivery_instructions: true},
+      ...Object.fromEntries(Object.keys(mapFeatureTypes || {}).map((tag) => [tag, {tags: [tag]}])),
+      ...Object.fromEntries((recentMappers || []).map((mapper) => [mapper.username, {created_by: mapper.id}]))
+    }
+  }
+
+  render() {
+    const {filters, filtersOpen, recentMappers, mappersOpen, counts} = this.state;
+    const {mapFeatureTypes} = this.props;
+    const filterOptions = this.filterOptions();
+
+    const FilterItem = ({label}: {label: string}) => {
+      // @ts-ignore
+      const filter = filterOptions[label];
+      const active = _.isMatch(filters, filter) || (filter.tags && (filters.tags || []).includes(filter.tags[0]));
+      return <DropdownItem className={active ? 'text-primary pr-1' : 'pr-1'}
+                                                                onClick={() => this.toggleFilter(filter)}>
+        <span className="float-right small rounded-pill bg-white position-relative p-1">{counts[label] || ''}</span>
+        <span className="mr-4">{label}</span>
+      </DropdownItem>
+    };
 
     return <ButtonDropdown isOpen={filtersOpen} toggle={() => this.setState({filtersOpen: !filtersOpen})}>
       <DropdownToggle tag="span">
@@ -58,69 +102,28 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
       </DropdownToggle>
       <DropdownMenu>
         <DropdownItem header>Filter</DropdownItem>
-        <DropdownItem className={(filters.newer_than == filter24h) ? 'text-primary' : ''}
-                      onClick={() => this.toggleFilter({newer_than: filter24h})}>
-          24h
-        </DropdownItem>
-        <DropdownItem className={(filters.newer_than == filter90d) ? 'text-primary' : ''}
-                      onClick={() => this.toggleFilter({newer_than: filter90d})}>
-          90 days
-        </DropdownItem>
-        <DropdownItem className={(filters.created_by) ? 'text-primary' : ''}
-                      onClick={() => this.toggleFilter({created_by: user.id})}>
-          My notes
-        </DropdownItem>
+        <FilterItem label={'24h'}/>
+        <FilterItem label={'90 days'}/>
+        <FilterItem label={'My notes'}/>
         {recentMappers &&
           <div className="dropleft btn-group">
             <button className="dropdown-item" onClick={() => this.setState({mappersOpen: !mappersOpen})}>
               By mapper...
             </button>
             {mappersOpen && <DropdownMenu>
-              {recentMappers.map(mapper =>
-                <DropdownItem className={(filters.created_by) ? 'text-primary' : ''} key={mapper.id}
-                              onClick={() => this.toggleFilter({created_by: mapper.id})}>
-                  {mapper.username}
-                </DropdownItem>
-              )}
+              {recentMappers.map(mapper => <FilterItem label={mapper.username} key={mapper.id}/>)}
             </DropdownMenu>}
           </div>
         }
         <DropdownItem divider/>
-        <DropdownItem className={(filters.is_accepted === false) ? 'text-primary' : ''}
-                      onClick={() => this.setFilters(
-                        (filters.is_processed === false) ? nonStatusFilters
-                        : _.assign({}, nonStatusFilters, {is_processed: false, is_reviewed: false, is_accepted: false}))}>
-          New
-        </DropdownItem>
-        <DropdownItem className={filters.is_accepted ? 'text-primary' : ''}
-                      onClick={() => this.setFilters(
-                        filters.is_accepted ? nonStatusFilters
-                        : _.assign({}, nonStatusFilters, {is_processed: false, is_reviewed: false, is_accepted: true}))}>
-          Ready for OSM
-        </DropdownItem>
-        <DropdownItem className={(filters.is_processed) ? 'text-primary' : ''}
-                      onClick={() => this.setFilters(
-                        (filters.is_processed) ? nonStatusFilters
-                        : _.assign({}, nonStatusFilters, {is_processed: true, is_reviewed: false}))}>
-          In OSM
-        </DropdownItem>
-        <DropdownItem className={(filters.is_reviewed) ? 'text-primary' : ''}
-                      onClick={() => this.setFilters(
-                        (filters.is_reviewed) ? nonStatusFilters
-                        : _.assign({}, nonStatusFilters, {is_reviewed: true}))}>
-          Reviewed
-        </DropdownItem>
+        <FilterItem label={'New'}/>
+        <FilterItem label={'Ready for OSM'}/>
+        <FilterItem label={'In OSM'}/>
+        <FilterItem label={'Reviewed'}/>
         <DropdownItem divider/>
-        <DropdownItem className={filters.delivery_instructions ? 'text-primary' : ''}
-                      onClick={() => this.toggleFilter({delivery_instructions: true})}>
-          Delivery instructions
-        </DropdownItem>
+        <FilterItem label="Delivery instructions"/>
         {mapFeatureTypes && Object.keys(mapFeatureTypes).map((tag) =>
-          <DropdownItem key={tag}
-                        className={(filters.tags && filters.tags.includes(tag)) ? 'text-primary' : ''}
-                        onClick={() => this.toggleFilter({tags: tag})}>
-            {tag}
-          </DropdownItem>
+          <FilterItem key={tag} label={tag}/>
         )}
       </DropdownMenu>
     </ButtonDropdown>
@@ -129,17 +132,16 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
   private toggleFilter(filter: any) {
     const filters = Object.assign({}, this.state.filters);
 
-    Object.entries(filter).forEach(([key, value]) => {
-      if (key == 'tags') {
-        if (filters.tags && filters.tags.includes(value)) {
-          filters.tags = _.without(filters.tags, value);
-          if (!filters.tags.length) delete filters.tags;
-        }
-        else filters.tags = (filters.tags || []).concat([value]);
+    if (filter.tags) {
+      const tag = filter.tags[0];
+      if (filters.tags && filters.tags.includes(tag)) {
+        filters.tags = _.without(filters.tags, tag);
+        if (!filters.tags.length) delete filters.tags;
       }
-      else if ((filters[key] == value) || (value === undefined)) delete filters[key];
-      else filters[key] = value;
-    });
+      else filters.tags = (filters.tags || []).concat(filter.tags);
+    }
+    else if (_.isMatch(filters, filter)) Object.keys(filter).forEach(k => delete filters[k]);
+    else Object.assign(filters, filter);
     this.setFilters(filters);
   }
 

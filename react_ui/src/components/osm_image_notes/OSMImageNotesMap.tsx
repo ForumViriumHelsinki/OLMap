@@ -10,6 +10,7 @@ import {ImageNotesContext, OSMImageNote} from "components/types";
 import {OSMChangeset} from "util_components/osm/types";
 import OSMChangesetMapLayer from "util_components/osm/OSMChangesetMapLayer";
 import {LatLngLiteral} from "leaflet";
+import {filterNotes} from "components/osm_image_notes/utils";
 
 const markerColors = {
   problem: '#ff0000',
@@ -63,25 +64,7 @@ export default class OSMImageNotesMap extends React.Component<OSMImageNotesMapPr
 
     if (!this.mapLayer) this.mapLayer = L.layerGroup();
     if (!osmImageNotes) return this.mapLayer;
-
-    const filterEntries = Object.entries(filters || {});
-    const filteredImageNotes =
-      filters ?
-        osmImageNotes.filter((note: OSMImageNote) => {
-          for (const [key, value] of filterEntries) {
-            if (typeof value == 'function') {
-              if (!value(note)) return false;
-            }
-            else if (value instanceof Array) for (const item of value) {
-              // @ts-ignore
-              if (!(note[key] || []).includes(item)) return false;
-            }
-            // @ts-ignore
-            else if (note[key] != value) return false;
-          }
-          return true;
-        })
-      : osmImageNotes;
+    const filteredImageNotes = filterNotes(filters, osmImageNotes);
 
     filteredImageNotes.forEach((osmImageNote: OSMImageNote) => {
       const id = String(osmImageNote.id);

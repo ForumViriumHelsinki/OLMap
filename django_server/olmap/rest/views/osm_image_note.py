@@ -23,11 +23,12 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     }
 
     def get_queryset(self):
+        instructions_count = Count('workplace', filter=~Q(workplace__delivery_instructions=''))
+        queryset = super().get_queryset().annotate(delivery_instructions=instructions_count)
         if self.action == 'list':
             # Fetch list as dicts rather than object instances for a bit more speed:
-            instructions_count = Count('workplace', filter=~Q(workplace__delivery_instructions=''))
-            return super().get_queryset().values().annotate(delivery_instructions=instructions_count)
-        return super().get_queryset()
+            return queryset.values()
+        return queryset
 
     def get_permissions(self):
         if self.action in ['update', 'partial_update', 'hide_note']:
@@ -70,8 +71,8 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     @action(methods=['PUT'], detail=True)
     def mark_reviewed(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
-        if not osm_image_note.processed_by:
-            osm_image_note.processed_by = request.user
+        osm_image_note.processed_by = osm_image_note.processed_by or request.user
+        osm_image_note.accepted_by = osm_image_note.accepted_by or request.user
         osm_image_note.reviewed_by = request.user
         osm_image_note.save()
         return Response('OK')
@@ -87,6 +88,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     def mark_processed(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
         osm_image_note.processed_by = request.user
+        osm_image_note.accepted_by = osm_image_note.accepted_by or request.user
         osm_image_note.save()
         return Response('OK')
 
