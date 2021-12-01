@@ -57,7 +57,8 @@ export type MapFeature = {
   as_osm_tags?: object,
   id?: number,
   osm_feature?: number,
-  [field: string]: any}
+  [field: string]: any
+}
 
 export type WorkplaceEntrance = {
   description?: string,

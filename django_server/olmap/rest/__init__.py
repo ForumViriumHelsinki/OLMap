@@ -7,6 +7,7 @@ from .views import (
     OSMEntrancesViewSet, OSMFeaturesViewSet, OSMImageNoteCommentNotificationsViewSet, WorkplaceTypeViewSet,
     RecentMappersViewSet)
 from .views.map_features import WorkplacesByUrlNameViewSet
+from .views.search import SearchView
 
 router = routers.DefaultRouter()
 router.register('osm_image_notes', OSMImageNotesViewSet)
@@ -21,6 +22,7 @@ router.register('workplaces_by_url_name', WorkplacesByUrlNameViewSet)
 router.register('recent_mappers', RecentMappersViewSet)
 
 urlpatterns = [
+    path('search/', SearchView.as_view(), name='search'),
     path('addresses_at/<str:lon>/<str:lat>/', NearbyAddressesView.as_view(), name='nearby_addresses'),
     path('osm_image_notes.geojson', OSMImageNotesGeoJSON.as_view(), name='osm_image_notes_geojson')
 ] + router.urls

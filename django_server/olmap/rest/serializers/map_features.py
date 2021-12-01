@@ -105,6 +105,14 @@ class WorkplaceWithNoteSerializer(WorkplaceSerializer):
         fields = '__all__'
 
 
+class EntranceWithNoteSerializer(MapFeatureSerializer):
+    image_note = BaseOSMImageNoteSerializer(read_only=True)
+
+    class Meta:
+        model = models.Entrance
+        fields = '__all__'
+
+
 @MapFeatureSerializer.register_subclass(models.UnloadingPlace)
 class UnloadingPlaceSerializer(MapFeatureSerializer):
     entrance_notes = serializers.SlugRelatedField(
