@@ -67,7 +67,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
     return {
       '24h': {newer_than: filter24h},
       '90 days': {newer_than: filter90d},
-      'My notes': {created_by: user.id},
+      'My notes': {created_by: user && user.id},
 
       'New': {is_processed: false, is_reviewed: false, is_accepted: false},
       'Ready for OSM': {is_processed: false, is_reviewed: false, is_accepted: true},
