@@ -40,6 +40,8 @@ export type OSMImageNote = {
     upvotes?: userId[],
     downvotes?: userId[],
     comments?: OSMImageNoteComment[],
+    delivery_instructions?: boolean,
+    height?: number
 };
 
 export type Notification = {

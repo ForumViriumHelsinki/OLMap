@@ -41,6 +41,8 @@ const filter90d = (note: OSMImageNote) =>
   // @ts-ignore
   new Date(note.modified_at || note.created_at).valueOf() > new Date().valueOf() - _90d;
 
+const checkHeight = (note: OSMImageNote) => note.height;
+
 export default class OSMImageNoteFiltersButton extends React.Component<OSMImageNoteFiltersButtonProps, OSMImageNoteFiltersButtonState> {
   state: OSMImageNoteFiltersButtonState = initialState();
   static contextType = AppContext;
@@ -75,6 +77,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
       'Reviewed': {is_processed: true, is_reviewed: true, is_accepted: true},
 
       'Delivery instructions': {delivery_instructions: true},
+      'Height limitation': {height: checkHeight},
       ...Object.fromEntries(Object.keys(mapFeatureTypes || {}).map((tag) => [tag, {tags: [tag]}])),
       ...Object.fromEntries((recentMappers || []).map((mapper) => [mapper.username, {created_by: mapper.id}]))
     }
@@ -91,7 +94,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
       const active = _.isMatch(filters, filter) || (filter.tags && (filters.tags || []).includes(filter.tags[0]));
       return <DropdownItem className={active ? 'text-primary pr-1' : 'pr-1'}
                                                                 onClick={() => this.toggleFilter(filter)}>
-        <span className="float-right small rounded-pill bg-white position-relative p-1">{counts[label] || ''}</span>
+        <span className="float-right small position-relative">{counts[label] || ''}</span>
         <span className="mr-4">{label}</span>
       </DropdownItem>
     };
@@ -122,6 +125,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
         <FilterItem label={'Reviewed'}/>
         <DropdownItem divider/>
         <FilterItem label="Delivery instructions"/>
+        <FilterItem label="Height limitation"/>
         {mapFeatureTypes && Object.keys(mapFeatureTypes).map((tag) =>
           <FilterItem key={tag} label={tag}/>
         )}

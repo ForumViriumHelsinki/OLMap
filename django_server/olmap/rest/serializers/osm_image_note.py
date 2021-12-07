@@ -25,11 +25,23 @@ class OSMImageNoteCommentNotificationSerializer(serializers.ModelSerializer):
         fields = ['comment', 'id']
 
 
+def height_index():
+    """
+    Return a dict {image_note_id: height} for height limitations on entrances, gates and building passages.
+    """
+    index = {}
+    for Model in [models.Entrance, models.Gate, models.BuildingPassage]:
+        for i in Model.objects.filter(height__isnull=False).values('image_note_id', 'height'):
+            index[i['image_note_id']] = i['height']
+    return index
+
+
 class DictOSMImageNoteSerializer(BaseOSMImageNoteSerializer):
     is_reviewed = serializers.BooleanField(read_only=True, source='reviewed_by_id')
     is_processed = serializers.BooleanField(read_only=True, source='processed_by_id')
     is_accepted = serializers.BooleanField(read_only=True, source='accepted_by_id')
     delivery_instructions = serializers.SerializerMethodField()
+    height = serializers.SerializerMethodField()
     created_by = serializers.IntegerField(read_only=True, source='created_by_id')
     image = serializers.SerializerMethodField()
 
@@ -37,7 +49,7 @@ class DictOSMImageNoteSerializer(BaseOSMImageNoteSerializer):
 
     class Meta:
         model = models.OSMImageNote
-        fields = BaseOSMImageNoteSerializer.Meta.fields + ['delivery_instructions']
+        fields = BaseOSMImageNoteSerializer.Meta.fields + ['delivery_instructions', 'height']
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
@@ -50,6 +62,11 @@ class DictOSMImageNoteSerializer(BaseOSMImageNoteSerializer):
 
     def get_delivery_instructions(self, note):
         return note.get('delivery_instructions', 0) > 0
+
+    def get_height(self, note):
+        if not hasattr(self, '_height_index'):
+            self._height_index = height_index()
+        return self._height_index.get(note['id'], None)
 
 
 class OSMImageNoteSerializer(BaseOSMImageNoteSerializer):
@@ -75,16 +92,22 @@ class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
 class OSMImageNoteWithMapFeaturesSerializer(OSMImageNoteSerializer, metaclass=OSMImageNoteSerializerMeta):
     created_by = BaseUserSerializer(read_only=True)
     delivery_instructions = serializers.SerializerMethodField()
+    height = serializers.SerializerMethodField()
 
     class Meta:
         model = models.OSMImageNote
         fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'addresses',
                    'is_reviewed', 'is_processed', 'is_accepted', 'tags', 'created_by', 'created_at',
-                   'upvotes', 'downvotes', 'comments', 'delivery_instructions'] +
+                   'upvotes', 'downvotes', 'comments', 'delivery_instructions', 'height'] +
                   [manager_name(prop_type) for prop_type in models.map_feature_types])
 
     def get_delivery_instructions(self, note):
         return getattr(note, 'delivery_instructions', 0) > 0
+
+    def get_height(self, note):
+        if not hasattr(self, '_height_index'):
+            self._height_index = height_index()
+        return self._height_index.get(note.id, None)
 
     def create(self, validated_data):
         relateds = self.extract_related_map_features(validated_data)
