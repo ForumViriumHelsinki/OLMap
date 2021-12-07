@@ -225,6 +225,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
                         "type": "string",
                         "title": "Delivery instructions"
                     },
+                    'max_vehicle_height': dict(dimension_field, title='Max vehicle height'),
                     'workplace_entrances': workplace['workplace_entrances']
                 })},
 

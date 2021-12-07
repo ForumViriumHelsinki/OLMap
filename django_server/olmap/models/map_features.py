@@ -323,6 +323,7 @@ class Workplace(BaseAddress):
 
     delivery_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
     delivery_instructions = models.TextField(blank=True)
+    max_vehicle_height = dimension_field()
 
     # For automatic linking of OSM nodes to OLMap instances:
     osm_node_query = 'name'
