@@ -27,12 +27,17 @@ class OSMImageNoteCommentNotificationSerializer(serializers.ModelSerializer):
 
 def height_index():
     """
-    Return a dict {image_note_id: height} for height limitations on entrances, gates and building passages.
+    Return a dict {image_note_id: height} for height limitations on workplaces, entrances, gates and building passages.
     """
     index = {}
     for Model in [models.Entrance, models.Gate, models.BuildingPassage]:
         for i in Model.objects.filter(height__isnull=False).values('image_note_id', 'height'):
             index[i['image_note_id']] = i['height']
+
+    workplaces = models.Workplace.objects.filter(max_vehicle_height__isnull=False)
+    for i in workplaces.values('image_note_id', 'max_vehicle_height'):
+        index[i['image_note_id']] = i['max_vehicle_height']
+
     return index
 
 
