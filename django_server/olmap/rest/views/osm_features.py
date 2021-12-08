@@ -20,6 +20,9 @@ class OSMEntrancesViewSet(viewsets.ModelViewSet):
 
 
 class OSMFeaturesViewSet(RetrieveModelMixin, viewsets.GenericViewSet):
-    queryset = models.OSMFeature.objects.all()
+    queryset = models.OSMFeature.objects.all().prefetch_related(
+        'workplace_set__image_note',
+        'workplace_set__workplace_entrances__entrance__image_note',
+        'workplace_set__workplace_entrances__entrance__unloading_places__image_note')
     permission_classes = [permissions.AllowAny]
     serializer_class = OSMFeatureSerializer

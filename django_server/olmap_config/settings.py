@@ -18,8 +18,8 @@ import sys
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(CONFIG_DIR)
 
 
 # Quick-start development settings - unsuitable for production
@@ -215,6 +215,10 @@ DATETIME_FORMAT = "Y-m-d H:i:s"
 SITE_ID = 1
 
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+# Place a valid google account json here to enable translation of delivery instructions;
+# see https://cloud.google.com/translate/docs/setup
+GOOGLE_ACCOUNT_JSON = os.path.join(CONFIG_DIR, "google_service_account.json")
 
 try:
     from .local_settings import *  # noqa

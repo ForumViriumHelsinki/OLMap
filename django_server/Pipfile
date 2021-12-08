@@ -32,6 +32,7 @@ pyproj = ">=2.6.1"
 overpy = "*"
 django-rename-app = "*"
 shapely = "*"
+google-cloud-translate = "*"
 
 [requires]
 python_version = "3.7"

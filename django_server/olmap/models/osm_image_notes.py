@@ -18,7 +18,9 @@ class OSMFeature(base.Model):
         ordering = ['id']
 
     def workplace(self):
-        return self.workplace_set.first()
+        # use all() to ensure prefetch_related works:
+        if len(self.workplace_set.all()):
+            return self.workplace_set.all()[0]
 
 
 def upload_osm_images_to(instance, filename):
