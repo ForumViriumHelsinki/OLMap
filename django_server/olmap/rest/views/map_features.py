@@ -1,10 +1,8 @@
-from rest_framework import viewsets, permissions, mixins
-from rest_framework.viewsets import GenericViewSet
+from rest_framework import viewsets, permissions
 
 from olmap import models
 from olmap.rest.serializers import WorkplaceTypeSerializer, WorkplaceEntranceSerializer, \
     UnloadingPlaceSerializer
-from olmap.rest.serializers.map_features import WorkplaceWithNoteSerializer
 
 
 class WorkplaceTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -23,10 +21,3 @@ class UnloadingPlacesViewSet(viewsets.ModelViewSet):
     queryset = models.UnloadingPlace.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UnloadingPlaceSerializer
-
-
-class WorkplacesByUrlNameViewSet(mixins.RetrieveModelMixin, GenericViewSet):
-    queryset = models.Workplace.objects.all()
-    permission_classes = [permissions.AllowAny]
-    serializer_class = WorkplaceWithNoteSerializer
-    lookup_field = 'url_name'

@@ -11,7 +11,7 @@ class OSMFeatureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.OSMFeature
-        fields = ['id', 'associated_entrances', 'image_notes', 'workplace']
+        fields = ['id', 'workplace', 'image_notes']
 
     def get_image_notes(self, osm_feature):
         notes = osm_feature.image_notes.filter(visible=True)

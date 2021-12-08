@@ -75,14 +75,14 @@ class DictOSMImageNoteSerializer(BaseOSMImageNoteSerializer):
 
 
 class OSMImageNoteSerializer(BaseOSMImageNoteSerializer):
-    upvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
-    downvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
+    # upvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
+    # downvotes = serializers.SlugRelatedField(many=True, read_only=True, slug_field='user_id')
     comments = OSMImageNoteCommentSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.OSMImageNote
         fields = ['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'addresses',
-                  'is_reviewed', 'tags', 'created_by', 'upvotes', 'downvotes', 'comments']
+                  'is_reviewed', 'tags', 'created_by', 'comments']  #, 'upvotes', 'downvotes']
 
 
 class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
@@ -103,7 +103,7 @@ class OSMImageNoteWithMapFeaturesSerializer(OSMImageNoteSerializer, metaclass=OS
         model = models.OSMImageNote
         fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'addresses',
                    'is_reviewed', 'is_processed', 'is_accepted', 'tags', 'created_by', 'created_at',
-                   'upvotes', 'downvotes', 'comments', 'delivery_instructions', 'height'] +
+                   'comments', 'delivery_instructions', 'height'] +  # 'upvotes', 'downvotes',
                   [manager_name(prop_type) for prop_type in models.map_feature_types])
 
     def get_delivery_instructions(self, note):
