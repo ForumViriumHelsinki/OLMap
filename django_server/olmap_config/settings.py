@@ -132,6 +132,8 @@ USE_I18N = True
 
 USE_TZ = True
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 STATIC_URL = '/staticfiles/'
