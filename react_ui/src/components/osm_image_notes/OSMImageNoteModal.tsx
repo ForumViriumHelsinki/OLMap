@@ -1,7 +1,7 @@
 import React from 'react';
 
 import sessionRequest from "sessionRequest";
-import {osmImageNoteUrl} from "urls";
+import {mapFeatureTypesUrl, osmImageNoteUrl} from "urls";
 import {AppContext, MapFeatureTypes, OSMImageNote} from "components/types";
 import Modal from "util_components/bootstrap/Modal";
 import ErrorAlert from "util_components/bootstrap/ErrorAlert";
@@ -37,7 +37,8 @@ type OSMImageNoteModalState = {
   error: boolean
   nearbyFeatures: OSMFeature[],
   nearbyAddresses: OSMFeature[],
-  repositioning: boolean
+  repositioning: boolean,
+  mapFeatureTypes?: MapFeatureTypes
 }
 
 const initialState: OSMImageNoteModalState = {
@@ -53,10 +54,20 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
 
   componentDidMount() {
     this.fetchNote();
+    if (!this.props.mapFeatureTypes) this.loadMapFeatureTypes();
   }
 
   componentDidUpdate(prevProps: Readonly<OSMImageNoteModalProps>) {
     if (prevProps && (prevProps.note.id != this.props.note.id)) this.fetchNote();
+  }
+
+  loadMapFeatureTypes() {
+    sessionRequest(mapFeatureTypesUrl).then((response) => {
+      if (response.status < 300)
+        response.json().then((mapFeatureTypes) => {
+          this.setState({mapFeatureTypes});
+        })
+    })
   }
 
   render() {
@@ -96,7 +107,7 @@ export default class OSMImageNoteModal extends React.Component<OSMImageNoteModal
   }
 
   renderContent() {
-    const {mapFeatureTypes, onClose} = this.props;
+    const mapFeatureTypes = this.props.mapFeatureTypes || this.state.mapFeatureTypes;
     const {note, error, nearbyFeatures, nearbyAddresses, repositioning} = this.state;
     const {user} = this.context;
 

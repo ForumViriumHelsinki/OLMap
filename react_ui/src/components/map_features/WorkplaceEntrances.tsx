@@ -34,7 +34,7 @@ export default class WorkplaceEntrances extends React.Component<WorkplaceEntranc
 
     if (!workplace.workplace_entrances) return false;
 
-    return <div className="mb-4 mt-1">
+    return <div className="mb-1 mt-1">
       {workplace.name} entrances:{' '}
       {workplace.workplace_entrances.map((we: WorkplaceEntrance, i: number) =>
         <Button size="sm" color="primary" outline className="btn-compact mr-2" key={we.id}

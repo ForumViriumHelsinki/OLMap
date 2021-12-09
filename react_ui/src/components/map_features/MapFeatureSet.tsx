@@ -34,9 +34,9 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
   render() {
     const {schema, featureTypeName, osmImageNote, refreshNote, onSubmit, nearbyFeatures, addNearbyFeature} = this.props;
     const {user} = this.context;
-    const editable = userCanEditNote(user, osmImageNote);
     // @ts-ignore
     const mapFeatures = (osmImageNote[(this.getFeatureListFieldName())] || []) as MapFeature[];
+    const editable = userCanEditNote(user, osmImageNote) && (mapFeatures.length == 0);
     const osmFeatureIndex = Object.fromEntries(nearbyFeatures.map(f => [f.id, f]));
 
     return <>
@@ -48,11 +48,11 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
       )}
 
       {editable &&
-        <p className="mt-2">
+        <div className="list-group-item">
           <Button size="sm" color="primary" outline className="btn-compact" onClick={this.newMapFeature}>
             New {featureTypeName}
           </Button>
-        </p>
+        </div>
       }
     </>
   }

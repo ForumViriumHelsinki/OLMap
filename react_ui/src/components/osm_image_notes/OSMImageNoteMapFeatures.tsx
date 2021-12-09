@@ -23,7 +23,7 @@ export default class OSMImageNoteMapFeatures extends React.Component<OSMImageNot
     const {osmImageNote, nearbyFeatures, mapFeatureTypes, refreshNote, onSubmit, addNearbyFeature} = this.props;
     const {} = this.state;
     return this.getRelevantFeatureTypes().map((featureTypeName) =>
-        <div key={featureTypeName} className="mr-2 ml-3">
+        <div key={featureTypeName}>
             <MapFeatureSet {...{osmImageNote, featureTypeName, nearbyFeatures, refreshNote, onSubmit, addNearbyFeature}}
               schema={mapFeatureTypes[featureTypeName]} />
         </div>
