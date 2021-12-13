@@ -87,8 +87,24 @@ class WorkplaceView extends React.Component<FeatureViewProps> {
   }
 }
 
+class UnloadingPlaceView extends React.Component<FeatureViewProps> {
+  render() {
+    const {mapFeature} = this.props;
+    const rows = [['length', 'm'], ['width', 'm'], ['max_weight', 't']].filter(([t]) => mapFeature[t]);
+    return <div>
+      <strong>Unloading place {mapFeature.opening_hours || ''}</strong>
+      {mapFeature.description && <div>{mapFeature.description}</div>}
+      {rows.map(([t, unit]) => <div key={t}>
+        <strong>{capitalize(t.replace('_', ' '))}: </strong>
+        {Number(mapFeature[t]).toPrecision(2)}{unit}
+      </div>)}
+    </div>
+  }
+}
+
 const featureTypeViews: {[type: string]: any} = {
   'Entrance': EntranceView,
+  'UnloadingPlace': UnloadingPlaceView,
   'Workplace': WorkplaceView
 };
 
