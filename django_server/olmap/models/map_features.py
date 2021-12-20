@@ -381,11 +381,7 @@ class UnloadingPlace(MapFeature):
     def as_osm_tags(self):
         return filter_dict({
             'parking:condition': 'loading',
-            'length': self.length,
-            'width': self.width,
-            'max_weight': self.max_weight,
-            'opening_hours': self.opening_hours,
-            'layer': self.layer
+            **as_dict(self, 'length', 'width', 'max_weight', 'opening_hours', 'layer', 'description')
         })
 
 
