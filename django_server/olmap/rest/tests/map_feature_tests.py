@@ -193,7 +193,12 @@ class OSMMapFeatureTests(FVHAPITestCase):
 
             'Gate': {
                 'type': 'object',
-                'properties': dict(lockable_fields, lift_gate={'type': 'boolean', 'title': 'Lift gate'}, **osm_feature_field)},
+                'properties': dict(
+                    lockable_fields,
+                    lift_gate={'type': 'boolean', 'title': 'Lift gate'},
+                    ref={'maxLength': 8, 'title': 'Ref', 'type': 'string'},
+                    **osm_feature_field)
+            },
 
             'Barrier': {
                 'type': 'object',

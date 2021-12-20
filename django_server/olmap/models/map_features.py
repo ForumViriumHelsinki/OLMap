@@ -272,6 +272,7 @@ class Gate(Lockable, MapFeature):
     osm_url = 'https://wiki.openstreetmap.org/wiki/Tag:barrier%3Dgate'
 
     lift_gate = models.BooleanField(default=False)
+    ref = models.CharField(max_length=8, blank=True)
 
     # For automatic linking of OSM nodes to OLMap instances:
     osm_node_query = 'barrier~"^(gate|lift_gate)$"'
@@ -279,7 +280,8 @@ class Gate(Lockable, MapFeature):
 
     def as_osm_tags(self):
         return dict(super().as_osm_tags(), **filter_dict({
-            'barrier': 'lift_gate' if self.lift_gate else 'gate'
+            'barrier': 'lift_gate' if self.lift_gate else 'gate',
+            'ref': self.ref
         }))
 
 
