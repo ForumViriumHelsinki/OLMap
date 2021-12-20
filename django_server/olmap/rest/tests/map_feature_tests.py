@@ -150,6 +150,10 @@ class OSMMapFeatureTests(FVHAPITestCase):
             'phone': {'type': 'string', 'maxLength': 32, 'title': 'Phone'},
             'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours',
                               'description': 'E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00'},
+            'layer': {
+                'description': 'Map layer, e.g. -1 if underground',
+                'maximum': 2147483647, 'minimum': -2147483648,
+                'title': 'Layer', 'type': ['integer', 'null']}
         }
 
         data = response.json()
@@ -280,6 +284,10 @@ class OSMMapFeatureTests(FVHAPITestCase):
                         "title": "Opening hours",
                         'description': 'E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00'
                     },
+                    'layer': {
+                        'description': 'Map layer, e.g. -1 if underground',
+                        'maximum': 2147483647, 'minimum': -2147483648,
+                        'title': 'Layer', 'type': ['integer', 'null']},
                     "entrances": {
                         "type": "array",
                         "items": {

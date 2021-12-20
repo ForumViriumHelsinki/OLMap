@@ -210,6 +210,7 @@ class Lockable(models.Model):
     keycode = models.BooleanField(blank=True, null=True)
     phone = models.CharField(blank=True, max_length=32)
     opening_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
+    layer = models.IntegerField(blank=True, null=True, help_text="Map layer, e.g. -1 if underground")
 
     class Meta:
         abstract = True
@@ -219,7 +220,7 @@ class Lockable(models.Model):
         return filter_dict(dict(
             tags,
             description=(self.buzzer and 'With buzzer') or (self.keycode and 'With keycode'),
-            **as_dict(self, 'access', 'width', 'height', 'phone', 'opening_hours')
+            **as_dict(self, 'access', 'width', 'height', 'phone', 'opening_hours', 'layer')
         ))
 
 
@@ -375,6 +376,7 @@ class UnloadingPlace(MapFeature):
     opening_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
     entrances = models.ManyToManyField(to=Entrance, related_name='unloading_places', blank=True)
     access_points = models.JSONField(default=list, blank=True)
+    layer = models.IntegerField(blank=True, null=True, help_text="Map layer, e.g. -1 if underground")
 
     def as_osm_tags(self):
         return filter_dict({
@@ -382,7 +384,8 @@ class UnloadingPlace(MapFeature):
             'length': self.length,
             'width': self.width,
             'max_weight': self.max_weight,
-            'opening_hours': self.opening_hours
+            'opening_hours': self.opening_hours,
+            'layer': self.layer
         })
 
 
