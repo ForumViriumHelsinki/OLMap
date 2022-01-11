@@ -25,13 +25,16 @@ class SearchView(APIView):
         osm_id = data.pop('osm_id', None)
 
         if osm_id:
-            workplaces = models.Workplace.objects.filter(Q(osm_feature__id=osm_id))
+            workplaces = models.Workplace.objects.filter(osm_feature__id=osm_id)
         elif workplace:
             workplaces = models.Workplace.objects.filter(name=workplace)
         else:
             workplaces = models.Workplace.objects.filter(**data)
 
-        entrances = models.Entrance.objects.filter(**data)
+        if data.get('street', None) and data.get('housenumber', None):
+            entrances = models.Entrance.objects.filter(**data)
+        else:
+            entrances = models.Entrance.objects.none()
 
         return Response({
             'workplaces': WorkplaceWithNoteSerializer(workplaces, many=True).data,
