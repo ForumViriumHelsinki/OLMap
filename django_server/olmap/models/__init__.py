@@ -4,5 +4,5 @@ from .osm_image_notes import (
 from .base import Address
 from .map_features import (
     Entrance, Steps, Gate, Barrier, BuildingPassage, Workplace, WorkplaceType, WorkplaceEntrance,
-    UnloadingPlace, DeliveryType, map_feature_types
+    UnloadingPlace, DeliveryType, map_feature_types, MapFeature
 )

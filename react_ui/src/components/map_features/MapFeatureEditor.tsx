@@ -15,6 +15,9 @@ import UnloadingPlaceAccessPoints from "components/map_features/UnloadingPlaceAc
 import MapFeatureOSMLink from "components/map_features/MapFeatureOSMLink";
 import {addressString, capitalize} from "utils";
 import Icon from "util_components/bootstrap/Icon";
+import sessionRequest from "sessionRequest";
+import {osmImageNotesUrl, workplaceUrl} from "urls";
+import {imageNotesContext} from "components/osm_image_notes/ImageNotesContextProvider";
 
 type MapFeatureEditorProps = {
   schema: JSONSchema,
@@ -169,6 +172,9 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
                 {editable && <div className="mt-3 mb-3 d-flex">
                   <button className="btn btn-sm btn-compact btn-outline-primary d-block flex-grow-1"
                           onClick={() => this.setState({mode: 'editing'})}>Edit</button>
+                  {featureTypeName == 'Workplace' &&
+                    <button className="btn btn-sm btn-compact btn-outline-secondary d-block flex-grow-1"
+                            onClick={this.extractWorkplace}>Extract</button>}
                   <ConfirmButton onClick={() => this.onDelete()}
                                  className="btn-outline-danger btn-compact btn-sm d-block flex-grow-1"
                                  confirm={`Really delete ${featureTypeName}?`}>Delete</ConfirmButton>
@@ -230,6 +236,20 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
       this.setState({mode: 'compact'});
       onDelete && onDelete();
     });
+  };
+
+  extractWorkplace = () => {
+    const {mapFeature} = this.props;
+    const {lat, lon, image, comment} = this.props.osmImageNote;
+    sessionRequest(osmImageNotesUrl, {method: 'POST', data: {lat, lon, tags: ['Workplace']}})
+    .then(response => response.json())
+    .then((imageNote: OSMImageNote) => {
+      sessionRequest(workplaceUrl(mapFeature.id as number), {method: 'PATCH', data: {image_note_id: imageNote.id}})
+      .then(() => {
+        if (imageNotesContext) imageNotesContext.addNote(imageNote);
+        window.location.hash = `#/Notes/${imageNote.id}/`;
+      })
+    })
   };
 
   private copyText(osmTextId: string) {

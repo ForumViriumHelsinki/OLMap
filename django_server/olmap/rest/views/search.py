@@ -37,6 +37,6 @@ class SearchView(APIView):
             entrances = models.Entrance.objects.none()
 
         return Response({
-            'workplaces': WorkplaceWithNoteSerializer(workplaces, many=True).data,
-            'entrances': EntranceWithNoteSerializer(entrances, many=True).data
+            'workplaces': WorkplaceWithNoteSerializer(workplaces, many=True, context={'request': request}).data,
+            'entrances': EntranceWithNoteSerializer(entrances, many=True, context={'request': request}).data
         })

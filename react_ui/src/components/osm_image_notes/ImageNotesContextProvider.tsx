@@ -13,6 +13,8 @@ type ImageNotesContextState = {
 
 const initialState: ImageNotesContextState = {};
 
+export let imageNotesContext: any;
+
 export default class ImageNotesContextProvider extends React.Component<ImageNotesContextProps, ImageNotesContextState> {
   state = initialState;
   static contextType = AppContext;
@@ -31,6 +33,7 @@ export default class ImageNotesContextProvider extends React.Component<ImageNote
   componentDidMount() {
     this.loadImageNotes();
     this.loadMapFeatureTypes();
+    imageNotesContext = this;
   }
 
   loadImageNotes = () => {

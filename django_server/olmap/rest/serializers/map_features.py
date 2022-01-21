@@ -112,7 +112,7 @@ class WorkplaceSerializer(TranslationSerializerMixin, MapFeatureSerializer):
 
     class Meta:
         model = models.Workplace
-        exclude = ['image_note']
+        fields = '__all__'
 
     def to_representation(self, instance):
         # Prefill translated fields for the whole hierarchy in one request to google to speed up the response:

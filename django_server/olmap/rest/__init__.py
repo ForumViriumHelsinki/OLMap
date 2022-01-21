@@ -5,7 +5,7 @@ from .views import (
     NearbyAddressesView, WorkplaceEntrancesViewSet, UnloadingPlacesViewSet,
     OSMImageNotesViewSet, OSMImageNoteCommentsViewSet, OSMImageNotesGeoJSON,
     OSMEntrancesViewSet, OSMFeaturesViewSet, OSMImageNoteCommentNotificationsViewSet, WorkplaceTypeViewSet,
-    RecentMappersViewSet)
+    RecentMappersViewSet, WorkplaceViewSet, WorkplaceByOSMIdViewSet, EntranceViewSet)
 from .views.search import SearchView
 
 router = routers.DefaultRouter()
@@ -18,6 +18,9 @@ router.register('workplace_types', WorkplaceTypeViewSet)
 router.register('workplace_entrances', WorkplaceEntrancesViewSet)
 router.register('unloading_places', UnloadingPlacesViewSet)
 router.register('recent_mappers', RecentMappersViewSet)
+router.register('workplaces', WorkplaceViewSet)
+router.register('workplaces_by_osm', WorkplaceByOSMIdViewSet)
+router.register('entrances', EntranceViewSet)
 
 urlpatterns = [
     path('search/', SearchView.as_view(), name='search'),

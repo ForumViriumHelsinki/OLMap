@@ -31,7 +31,7 @@
     "react-bootstrap": "^1.6.0",
     "react-dom": "^16.12.0",
     "react-jsonschema-form": "^2.0.0-alpha.1",
-    "react-leaflet": "^2.6.0",
+    "react-leaflet": "^3.2.5",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.4",
     "reactstrap": "^8.4.0",
@@ -41,19 +41,13 @@
   "resolutions": {
     "@turf/difference": "6.0.1"
   },
-  "browserslist": {
-    "production": [
-      "defaults",
-      "not ie 11"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
+  "browserslist": [
+     ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ],
   "devDependencies": {
-    "@types/leaflet": "^1.7.0",
+    "@types/leaflet": "^1.7.8",
     "@types/lodash": "^4.14.169",
     "@types/react-router-dom": "^5.1.7"
   }

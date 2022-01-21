@@ -23,7 +23,8 @@ class IsReviewer(UserBelongsToGroup):
 
 
 class IsReviewerOrCreator(permissions.BasePermission):
-    def has_object_permission(self, request, view, image_note_obj):
+    def has_object_permission(self, request, view, instance):
+        image_note_obj = getattr(instance, 'image_note', instance)
         if request.user.is_anonymous:
             # Anonymous users can edit new anonymous notes in order to be able to attach an image to a freshly
             # created note:

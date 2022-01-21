@@ -69,9 +69,11 @@ export type WorkplaceEntrance = {
   entrance_data?: MapFeature,
   workplace: number,
   entrance?: number,
+  deliveries?: 'yes' | 'no' | 'main',
   delivery_types?: string[],
   delivery_hours?: string,
   delivery_instructions?: string
+  unloading_places?: MapFeature[]
 }
 
 export type OpenOSMChangeset = {

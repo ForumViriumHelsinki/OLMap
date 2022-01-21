@@ -83,10 +83,11 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
 
   getInitialPosition() {
     const {currentPosition} = this.state;
+    const {location} = this.props;
     const positionFromUrl = urlMapPosition.read();
     // @ts-ignore
     const currentLatLng = currentPosition && [currentPosition.lat, currentPosition.lon];
-    return (positionFromUrl || currentLatLng || settings.defaultLocation);
+    return location ? [location.lat, location.lon] : (positionFromUrl || currentLatLng || settings.defaultLocation);
   }
 
   refreshMap() {

@@ -32,7 +32,7 @@ export default class ZoomableImage extends React.Component<ZoomableImageProps, Z
     const target = e.target as HTMLElement;
     this.setState({imageZoom});
     if (imageZoom) {
-      target.classList.add('zoom')
+      target.classList.add('zoom');
       this.positionImage(e, true);
     } else this.restoreImage(e);
   };

@@ -13,6 +13,7 @@ import NavBar from "util_components/bootstrap/NavBar";
 import Confirm from "util_components/bootstrap/Confirm";
 import OSMImageNotesEditor from "components/osm_image_notes/OSMImageNotesEditor";
 import ImageNotesContextProvider from "components/osm_image_notes/ImageNotesContextProvider";
+import WorkplaceWizard from "components/workplace_wizard/WorkplaceWizard";
 
 type UIState = {
   user?: User,
@@ -69,7 +70,7 @@ class OLMapUI extends React.Component<{}, UIState> {
       return <ResetPasswordScreen uid={params.uid} token={params.token}/>;
     };
 
-    const MainUI = (props: {selectedNoteId?: number, newNote?: boolean, osmFeatures?: number[]}) =>
+    const WithNavBar: React.FC = (props) =>
       <div style={{height: window.innerHeight}} className="flex-column d-flex" id="OLMapUI">
         <NavBar onIconClick={this.onNavIconClick}
                 icon={user ? "account_circle" : "login"}
@@ -77,11 +78,16 @@ class OLMapUI extends React.Component<{}, UIState> {
           <h5 className="m-2">OLMap</h5>
         </NavBar>
         <div className="flex-grow-1 flex-shrink-1 overflow-auto">
+          {props.children}
+        </div>
+      </div>;
+
+    const MainUI = (props: {selectedNoteId?: number, newNote?: boolean, osmFeatures?: number[]}) =>
+      <WithNavBar>
           <ImageNotesContextProvider>
             <OSMImageNotesEditor {...props}/>
           </ImageNotesContextProvider>
-        </div>
-      </div>;
+      </WithNavBar>;
 
     return dataFetched ? <AppContext.Provider value={{user}}>
       <Router>
@@ -91,6 +97,11 @@ class OLMapUI extends React.Component<{}, UIState> {
           </Route>
           <Route path='/resetPassword/:uid/:token'>
             <ResetPassword/>
+          </Route>
+          <Route path='/ww/'>
+            <WithNavBar>
+              <WorkplaceWizard/>
+            </WithNavBar>
           </Route>
           <Route path='/note/:noteId'>
             <ImageNote/>
