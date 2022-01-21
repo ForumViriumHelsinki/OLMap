@@ -1,6 +1,6 @@
 import {Point} from "components/workplace_wizard/types";
 
-export const geocoderUrl = `http://api.digitransit.fi/geocoding/v1/search`;
+export const geocoderUrl = `//api.digitransit.fi/geocoding/v1/search`;
 export const workplacesUrl = `/rest/workplaces/`;
 export const workplaceUrl = (id: number) => `/rest/workplaces/${id}/`;
 export const olmapWorkplaceByOSMUrl = (id: string) => `/rest/workplaces_by_osm/${id}/`;
