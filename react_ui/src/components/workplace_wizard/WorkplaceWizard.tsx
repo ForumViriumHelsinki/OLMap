@@ -30,10 +30,11 @@ type WorkplaceWizardState = {
   workplace?: Workplace,
   nearbyEntrances?: MapFeature[],
   changed?: boolean,
-  positioning?: MapFeature | 'newUP' | 'newAP',
+  positioning?: MapFeature | 'newUP' | 'newAP' | 'newDeliveryEntrance' | 'newEntrance',
   activeEntrance?: WorkplaceEntrance,
   activeUP?: UnloadingPlace,
-  modalImage?: string
+  modalImage?: string,
+  mapClicked?: LatLngLiteral
 }
 
 const initialState: WorkplaceWizardState = {};
@@ -65,7 +66,8 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
 
   render() {
     const {} = this.props;
-    const {workplace, changed, positioning, nearbyEntrances, modalImage} = this.state;
+    const {workplace, changed, positioning, nearbyEntrances, modalImage,
+           mapClicked, activeEntrance, activeUP} = this.state;
 
     const attribution = 'Data &copy; <a href="https://www.openstreetmap.org/">OSM</a> contribs, ' +
       '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>';
@@ -79,9 +81,7 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
 
     const entrances = (workplace && workplace.workplace_entrances) || [];
 
-    const delivery_entrance =
-      entrances.find(e => e.deliveries == 'main') ||
-      entrances.find(e => e.deliveries == 'yes');
+    const delivery_entrance = this.getDeliveryEntrance();
 
     const Line = ({f1, f2}: {f1: MapFeature, f2: MapFeature}) =>
       <Polyline positions={[this.latLng(f1), this.latLng(f2)]} color="#ff5000" opacity={0.5} weight={1}/>;
@@ -111,6 +111,9 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
         <WWIcon icon="delete" outline /> Poista
       </button>;
 
+    const clickedLatLon = mapClicked && {lat: mapClicked.lat, lon: mapClicked.lng} as MapFeature;
+
+    const toolbarBtn = "btn btn-outline-primary mr-2 btn-compact";
     return <div className="p-2">
       {modalImage && <Modal onClose={() => this.setState({modalImage: undefined})} title="Kuva">
         <ZoomableImage src={modalImage} className="wwModalImg"/>
@@ -137,7 +140,28 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
             }
             <MapContainer style={{height: '40vh'}} center={this.latLng(workplace)} zoom={18}
                           whenCreated={map => {this.map = map}}>
-              {positioning && <DetectClick/>}
+              <DetectClick/>
+              {mapClicked && clickedLatLon &&
+                <Popup closeOnClick={true} closeButton={false} className="wwPopup" position={mapClicked}>
+                  <button className={popupBtn}
+                          onClick={() => this.addEntrance(clickedLatLon, true)}>
+                    <WWIcon icon="door_front" outline/> Uusi toimitussisäänkäynti
+                  </button>
+                  <button className={popupBtn} onClick={() => this.addEntrance(clickedLatLon, false)}>
+                    <WWIcon icon="door_front" className="discrete" outline/> Uusi muu sisäänkäynti
+                  </button>
+                  {activeEntrance &&
+                    <button className={popupBtn} onClick={() => this.addUP(mapClicked)}>
+                      <WWIcon icon="local_shipping" outline /> Lisää lastauspaikka
+                    </button>
+                  }
+                  {activeUP &&
+                    <button className={popupBtn} onClick={() => this.addAP(mapClicked)}>
+                      <WWIcon icon="directions" outline /> Lisää reittipiste
+                    </button>
+                  }
+                </Popup>
+              }
               <TileLayer url="https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}@2x.png"
                          attribution={attribution} id="hsl-map" tileSize={512} zoomOffset={-1} maxZoom={21}/>
 
@@ -220,6 +244,31 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
             </MapContainer>
           </div>
 
+          <div className="mt-2">
+            {workplace && <>
+              <button className={toolbarBtn}
+                      onClick={() => this.setState({positioning: 'newDeliveryEntrance'})}>
+                <WWIcon icon="door_front" outline text={<>Uusi toimitus-<br/>sisäänkäynti</>}/>
+              </button>
+              <button className={toolbarBtn}
+                      onClick={() => this.setState({positioning: 'newEntrance'})}>
+                <WWIcon icon="door_front" className="discrete" outline text={<>Uusi muu<br/>sisäänkäynti</>}/>
+              </button>
+            </>}
+            {activeEntrance &&
+              <button className={toolbarBtn}
+                      onClick={() => {this.setState({positioning: 'newUP'})}}>
+                <WWIcon icon="local_shipping" outline text={<>Lisää<br/>lastauspaikka</>}/>
+              </button>
+            }
+            {activeUP &&
+              <button className={toolbarBtn}
+                      onClick={() => {this.setState({positioning: 'newAP'})}}>
+                <WWIcon icon="directions" outline text={<>Lisää<br/>reittipiste</>}/>
+              </button>
+            }
+          </div>
+
           <textarea className="form-control mt-2" placeholder="Toimitusohjeet" rows={5}
             value={workplace.delivery_instructions}
             onChange={this.instructionsChanged}/>
@@ -234,14 +283,31 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
     </div>;
   }
 
+  private getDeliveryEntrance() {
+    const {workplace} = this.state;
+    const entrances = (workplace && workplace.workplace_entrances) || [];
+    return entrances.find(e => e.deliveries == 'main') ||
+      entrances.find(e => e.deliveries == 'yes');
+  }
+
   componentDidMount() {
-    this.setState(JSON.parse(localStorage.getItem('wwState') || '{}'))
+    const state = JSON.parse(localStorage.getItem('wwState') || '{}');
+    this.setState(state);
+    if (state.workplace) this.loadNearbyEntrances(state.workplace);
   }
 
   removeItem = (item: MapFeature, lst: MapFeature[]) => {
+    const {activeEntrance, activeUP, workplace} = this.state;
     lst.splice(lst.indexOf(item), 1);
     this.closePopup();
-    this.setState({changed: true});
+    const newState: WorkplaceWizardState = {changed: true};
+    if (item == activeEntrance) {
+      newState.activeEntrance = this.getDeliveryEntrance() || ((workplace || {}).workplace_entrances || [])[0];
+      if (activeUP && activeEntrance.unloading_places?.includes(activeUP))
+        newState.activeUP = ((newState.activeEntrance || {}).unloading_places || [])[0];
+    }
+    if (item == activeUP) newState.activeUP = ((activeEntrance || {}).unloading_places || [])[0];
+    this.setState(newState);
     this.forceUpdate();
   };
 
@@ -258,34 +324,60 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
     if (deliveries) entrances.forEach(e => {e.deliveries = undefined;});
     entrances.push(wpEntrance);
     const newWp: Workplace = {...workplace, workplace_entrances: entrances};
-    this.storeState({workplace: newWp, changed: true});
+    this.storeState({workplace: newWp, changed: true, mapClicked: undefined,
+                     activeEntrance: wpEntrance, positioning: undefined});
   };
 
   private closePopup() {
     if (this.map) this.map.closePopup();
   }
 
+  addUP({lat, lng}: LatLngLiteral) {
+    const {activeEntrance, workplace} = this.state;
+    if (!activeEntrance) return;
+
+    this.closePopup();
+    if (!activeEntrance.unloading_places) activeEntrance.unloading_places = [];
+    const unloadingPlace = {lat, lon: lng};
+    activeEntrance.unloading_places.push(unloadingPlace);
+    this.storeState({workplace, changed: true, positioning: undefined,
+                     mapClicked: undefined, activeUP: unloadingPlace});
+    this.forceUpdate(); // State internals updated in place, naughty business...
+  }
+
+  addAP({lat, lng}: LatLngLiteral) {
+    const {activeUP, workplace} = this.state;
+    if (!activeUP) return;
+
+    this.closePopup();
+    if (!activeUP.access_points) activeUP.access_points = [];
+    activeUP.access_points.push({lat, lon: lng});
+    this.storeState({workplace, changed: true, positioning: undefined, mapClicked: undefined});
+    this.forceUpdate(); // State internals updated in place, naughty business...
+  }
+
   positionChosen = (e: LeafletMouseEvent) => {
     const {lat, lng} = e.latlng;
-    const {positioning, workplace, activeEntrance, activeUP} = this.state;
-    if (!positioning) return;
+    const {positioning, workplace, mapClicked} = this.state;
 
-    if (positioning == 'newUP') {
-      if (!activeEntrance) return;
-      if (!activeEntrance.unloading_places) activeEntrance.unloading_places = [];
-      activeEntrance.unloading_places.push({lat, lon: lng});
+    if (document.getElementsByClassName('wwPopup').length) {
+      this.setState({mapClicked: undefined});
+      // @ts-ignore
+      return this.map.closePopup();
     }
 
-    else if (positioning == 'newAP') {
-      if (!activeUP) return;
-      if (!activeUP.access_points) activeUP.access_points = [];
-      activeUP.access_points.push({lat, lon: lng});
-    }
+    if (!positioning) return this.setState({mapClicked: mapClicked ? undefined : e.latlng});
 
-    else {
-      positioning.lat = lat;
-      positioning.lon = lng;
-    }
+    if (positioning == 'newUP') return this.addUP({lat, lng});
+
+    if (positioning == 'newAP') return this.addAP({lat, lng});
+
+    if (positioning == 'newEntrance') return this.addEntrance({lat, lon: lng}, false);
+
+    if (positioning == 'newDeliveryEntrance') return this.addEntrance({lat, lon: lng}, true);
+
+    positioning.lat = lat;
+    positioning.lon = lng;
 
     this.storeState({workplace, changed: true, positioning: undefined});
     this.forceUpdate(); // State internals updated in place, naughty business...
@@ -294,7 +386,7 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
   };
 
   closeWorkplace = () =>
-    this.storeState({workplace: undefined, changed: false});
+    this.storeState({workplace: undefined, changed: false, activeEntrance: undefined, activeUP: undefined});
 
   save = () => {
     const {workplace} = this.state;
@@ -308,13 +400,14 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
         this.setState({workplace, changed: false}))})
   };
 
-  instructionsChanged = (e: ChangeEvent<HTMLTextAreaElement>) =>
-    this.storeState({
-      changed: true, workplace: {...this.state.workplace, delivery_instructions: e.target.value}});
+  instructionsChanged = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const workplace = {...this.state.workplace, delivery_instructions: e.target.value} as Workplace;
+    this.storeState({changed: true, workplace});
+  };
 
-  storeState(state: any) {
+  storeState(state: WorkplaceWizardState) {
     this.setState(state);
-    localStorage.setItem('wwState', JSON.stringify(this.state));
+    localStorage.setItem('wwState', JSON.stringify({workplace: this.state.workplace}));
   }
 
   onSelected = (workplace: Workplace) => {
@@ -334,8 +427,8 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
     })
   };
 
-  loadNearbyEntrances() {
-    const {workplace} = this.state;
+  loadNearbyEntrances(wp?: Workplace) {
+    const workplace = wp || this.state.workplace;
     const {lon, lat} = workplace || {};
     if (!(lon && lat)) return;
     this.storeState({nearbyEntrances: []});
