@@ -85,7 +85,8 @@ class EntranceSerializer(MapFeatureSerializer):
         extra_ups = entrance.unloading_places.exclude(
             id__in=[f['id'] for f in unloading_places_data if f.get('id', None)])
         if len(extra_ups):
-            entrance.unloading_places.remove(extra_ups)
+            for up in extra_ups:
+                entrance.unloading_places.remove(up)
         serializer = UnloadingPlaceSerializer(context=self.context)
         for up_data in unloading_places_data:
             id = up_data.get('id', None)
