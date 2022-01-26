@@ -40,6 +40,19 @@ class WorkplaceViewSet(viewsets.ModelViewSet):
             permission_classes = [IsReviewerOrCreator]
         return [permission() for permission in permission_classes]
 
+    def get_serializer(self, *args, **kwargs):
+        data = kwargs.get('data', None)
+        if data:
+            if isinstance(data.get('image', None), str):
+                data.pop('image')
+            for e in data.get('workplace_entrances', []):
+                if isinstance(e.get('image', None), str):
+                    e.pop('image')
+                for up in e.get('unloading_places', []):
+                    if isinstance(up.get('image', None), str):
+                        up.pop('image')
+        return super().get_serializer(*args, **kwargs)
+
 
 class WorkplaceByOSMIdViewSet(WorkplaceViewSet):
     lookup_field = 'osm_feature'

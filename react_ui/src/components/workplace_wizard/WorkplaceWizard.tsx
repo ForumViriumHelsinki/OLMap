@@ -318,7 +318,7 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
     if (!workplace) return;
 
     const wpEntrance: WorkplaceEntrance = {
-      lat, lon, image_note_id, image, entrance: id, unloading_places: [], deliveries: deliveries ? 'main' : undefined
+      lat, lon, image_note_id, image, entrance_id: id, unloading_places: [], deliveries: deliveries ? 'main' : undefined
     };
     const entrances = workplace?.workplace_entrances || [];
     if (deliveries) entrances.forEach(e => {e.deliveries = undefined;});

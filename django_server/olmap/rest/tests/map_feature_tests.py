@@ -308,3 +308,92 @@ class OSMMapFeatureTests(FVHAPITestCase):
             except AssertionError:
                 print(json.dumps(data[k], indent=2))
                 raise
+
+    def test_create_workplace(self):
+        url = reverse('workplace-list')
+        data = {
+          "lat": 60.16612772,
+          "lon": 24.9494173,
+          "street": "Fabianinkatu",
+          "housenumber": "4",
+          "unit": "",
+          "osm_feature": 4692013476,
+          "workplace_entrances": [
+            {
+              "lat": 60.16607918,
+              "lon": 24.94928504,
+              "osm_feature": 7271539738,
+              "deliveries": "main",
+              "unloading_places": [
+                {
+                  "lat": 60.16605062,
+                  "lon": 24.94917032,
+                  "access_points": [
+                    {
+                      "lat": 60.16564102824166,
+                      "lon": 24.949258097797674
+                    }
+                  ]
+                },
+                {
+                  "lat": 60.16567318,
+                  "lon": 24.94917348,
+                  "access_points": []
+                }
+              ]
+            }
+          ],
+          "name": "Zucchini",
+          "delivery_instructions": "Pienet toimitukset voi tuoda pääovesta, isommat kannattaa tuoda sisäpihan kautta."
+        }
+
+        # When POSTing data for a new workplace, along with entrances, unloading places and access points:
+        response = self.client.post(url, json.dumps(data), content_type='application/json')
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.content)
+
+        # And the response contains the created workplace, entrances, unloading places and access points:
+        r = response.json()
+        self.assert_dict_contains(r, {
+            'lat': 60.16612772,
+            'lon': 24.9494173,
+            'street': 'Fabianinkatu',
+            'housenumber': '4',
+            'osm_feature': 4692013476,
+            'name': 'Zucchini',
+            'delivery_instructions': 'Pienet toimitukset voi tuoda pääovesta, isommat kannattaa tuoda sisäpihan kautta.'
+        })
+
+        entrances = r.get('workplace_entrances', [])
+        self.assertEqual(len(entrances), 1)
+        self.assert_dict_contains(entrances[0], {
+            'lat': 60.16607918, 'lon': 24.94928504, 'osm_feature': 7271539738, 'deliveries': 'main'
+        })
+
+        unloading_places = entrances[0].get('unloading_places', [])
+        self.assertEqual(len(unloading_places), 2)
+
+        self.assert_dict_contains(unloading_places[0], {
+            'lat': 60.16605062, 'lon': 24.94917032,
+            'access_points': [{'lat': 60.16564102824166, 'lon': 24.949258097797674}]
+        })
+
+        # And when subsequently PATCHing updated data with an additional entrance:
+        r['workplace_entrances'].append({'lat': 60.16707918, 'lon': 24.94728504, 'deliveries': 'no'})
+        url = reverse('workplace-detail', kwargs={'pk': r['id']})
+        response = self.client.patch(url, json.dumps(r), content_type='application/json')
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+
+        # And the response contains the additional entrance:
+        r = response.json()
+        entrances = r.get('workplace_entrances', [])
+        self.assertEqual(len(entrances), 2)
+
+        # And image notes have been created in the db for all created workplaces,
+        # entrances and unloading places:
+        notes = models.OSMImageNote.objects.all()
+        self.assertEqual([n.tags for n in notes],
+            [['Workplace'], ['Entrance'], ['UnloadingPlace'], ['UnloadingPlace'], ['Entrance']])
