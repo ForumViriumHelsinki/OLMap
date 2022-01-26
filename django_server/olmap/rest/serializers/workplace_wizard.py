@@ -132,9 +132,11 @@ class WorkplaceEntranceSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         entrance_fields = validated_data.pop('entrance', {})
-        entrance_id = validated_data.get('entrance_id', None)
+        entrance_or_id = validated_data.pop('entrance_id', None)
+        field = 'entrance_id' if isinstance(entrance_or_id, int) else 'entrance'
+        validated_data[field] = entrance_or_id
 
-        if not entrance_id:
+        if not entrance_or_id:
             serializer = EntranceSerializer(context=self.context)
             osm_id = entrance_fields.get('osm_feature_id', None)
             if osm_id:
@@ -144,7 +146,7 @@ class WorkplaceEntranceSerializer(serializers.ModelSerializer):
 
         wp_entrance = super().create(validated_data)
 
-        if entrance_id:
+        if entrance_or_id:
             self.update_entrance(wp_entrance, entrance_fields)
 
         return wp_entrance
