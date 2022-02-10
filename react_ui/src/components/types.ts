@@ -41,7 +41,8 @@ export type OSMImageNote = {
     downvotes?: userId[],
     comments?: OSMImageNoteComment[],
     delivery_instructions?: boolean,
-    height?: number
+    height?: number,
+    layer?: number
 };
 
 export type Notification = {

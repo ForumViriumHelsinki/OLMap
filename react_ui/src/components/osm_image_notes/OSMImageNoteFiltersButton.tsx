@@ -42,6 +42,7 @@ const filter90d = (note: OSMImageNote) =>
   new Date(note.modified_at || note.created_at).valueOf() > new Date().valueOf() - _90d;
 
 const checkHeight = (note: OSMImageNote) => note.height;
+const underground = (note: OSMImageNote) => note.layer && (note.layer < 0);
 
 export default class OSMImageNoteFiltersButton extends React.Component<OSMImageNoteFiltersButtonProps, OSMImageNoteFiltersButtonState> {
   state: OSMImageNoteFiltersButtonState = initialState();
@@ -78,6 +79,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
 
       'Delivery instructions': {delivery_instructions: true},
       'Height limitation': {height: checkHeight},
+      'Underground': {layer: underground},
       ...Object.fromEntries(Object.keys(mapFeatureTypes || {}).map((tag) => [tag, {tags: [tag]}])),
       ...Object.fromEntries((recentMappers || []).map((mapper) => [mapper.username, {created_by: mapper.id}]))
     }
@@ -124,6 +126,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<OSMImageN
         <FilterItem label={'In OSM'}/>
         <FilterItem label={'Reviewed'}/>
         <DropdownItem divider/>
+        <FilterItem label={'Underground'}/>
         <FilterItem label="Delivery instructions"/>
         <FilterItem label="Height limitation"/>
         {mapFeatureTypes && Object.keys(mapFeatureTypes).map((tag) =>

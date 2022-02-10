@@ -81,8 +81,7 @@ class OSMImageNoteSerializer(BaseOSMImageNoteSerializer):
 
     class Meta:
         model = models.OSMImageNote
-        fields = ['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'addresses',
-                  'is_reviewed', 'tags', 'created_by', 'comments']  #, 'upvotes', 'downvotes']
+        fields = BaseOSMImageNoteSerializer.Meta.fields + ['osm_features', 'addresses', 'comments']
 
 
 class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):
@@ -101,10 +100,8 @@ class OSMImageNoteWithMapFeaturesSerializer(OSMImageNoteSerializer, metaclass=OS
 
     class Meta:
         model = models.OSMImageNote
-        fields = (['id', 'comment', 'image', 'lat', 'lon', 'osm_features', 'addresses',
-                   'is_reviewed', 'is_processed', 'is_accepted', 'tags', 'created_by', 'created_at',
-                   'comments', 'delivery_instructions', 'height'] +  # 'upvotes', 'downvotes',
-                  [manager_name(prop_type) for prop_type in models.map_feature_types])
+        fields = OSMImageNoteSerializer.Meta.fields + ['delivery_instructions', 'height'] + \
+                 [manager_name(prop_type) for prop_type in models.map_feature_types]
 
     def get_delivery_instructions(self, note):
         return getattr(note, 'delivery_instructions', 0) > 0

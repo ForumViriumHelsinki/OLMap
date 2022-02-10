@@ -51,6 +51,7 @@ class OSMImageNote(TimestampedModel):
     visible = models.BooleanField(default=True)
     hidden_reason = models.TextField(
         blank=True, help_text="If reviewer decides to hide the note, document reason here.")
+    layer = models.IntegerField(blank=True, null=True, help_text="Map layer, e.g. -1 if underground")
 
     def __str__(self):
         return self.comment or super().__str__()

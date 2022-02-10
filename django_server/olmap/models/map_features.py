@@ -201,7 +201,21 @@ class BaseAddress(MapFeature):
         print(f'All done; {linked_count} new links created.')
 
 
-class Lockable(models.Model):
+class WithLayer(MapFeature):
+    layer = models.IntegerField(blank=True, null=True, help_text="Map layer, e.g. -1 if underground")
+
+    class Meta:
+        abstract = True
+
+    def save(self, **kwargs):
+        ret = super().save(**kwargs)
+        if self.layer and (self.image_note.layer != self.layer):
+            self.image_note.layer = self.layer
+            self.image_note.save()
+        return ret
+
+
+class Lockable(WithLayer):
     accesses = ['yes', 'private', 'delivery', 'no']
     access = choices_field(accesses)
     width = dimension_field()
@@ -210,7 +224,6 @@ class Lockable(models.Model):
     keycode = models.BooleanField(blank=True, null=True)
     phone = models.CharField(blank=True, max_length=32)
     opening_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
-    layer = models.IntegerField(blank=True, null=True, help_text="Map layer, e.g. -1 if underground")
 
     class Meta:
         abstract = True
@@ -370,7 +383,7 @@ class WorkplaceEntrance(Model):
         return ret
 
 
-class UnloadingPlace(MapFeature):
+class UnloadingPlace(WithLayer):
     length = dimension_field()
     width = dimension_field()
     max_weight = models.DecimalField(max_digits=4, decimal_places=2, help_text='In tons', blank=True, null=True)
@@ -378,7 +391,6 @@ class UnloadingPlace(MapFeature):
     opening_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
     entrances = models.ManyToManyField(to=Entrance, related_name='unloading_places', blank=True)
     access_points = models.JSONField(default=list, blank=True)
-    layer = models.IntegerField(blank=True, null=True, help_text="Map layer, e.g. -1 if underground")
 
     def as_osm_tags(self):
         return filter_dict({
