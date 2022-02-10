@@ -38,7 +38,7 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
   }
 
   render() {
-    const {onLocationSelected, extraLayers} = this.props;
+    const {onLocationSelected, extraLayers, children} = this.props;
     const {currentPosition} = this.state;
     const latlng = this.getInitialPosition();
 
@@ -57,7 +57,9 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
             </Button>
         </div>
       }
-      <Map extraLayers={extraLayers} latLng={latlng} onMapInitialized={this.onMapInitialized} backgroundChangeable />
+      <Map extraLayers={extraLayers} latLng={latlng} onMapInitialized={this.onMapInitialized} backgroundChangeable>
+        {children}
+      </Map>
       <Geolocator onLocation={([lon, lat]) => this.setState({currentPosition: {lat, lon}})}/>
     </div>;
   }

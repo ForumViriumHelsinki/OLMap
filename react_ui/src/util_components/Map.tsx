@@ -7,6 +7,9 @@ import settings from 'settings.json';
 import 'leaflet/dist/leaflet.css';
 import {LocationTuple} from "util_components/types";
 import Icon from "util_components/bootstrap/Icon";
+import {MapContainer} from "react-leaflet";
+import {LatLngTuple} from "leaflet";
+import TunnelsMapLayer from "components/workplace_wizard/TunnelsMapLayer";
 
 type MapProps = {
   onMapInitialized?: (leafletMap: any) => any,
@@ -21,7 +24,7 @@ type MapProps = {
 
 let idCounter = 0;
 
-type bgType = 'orthophoto' | 'osm';
+type bgType = 'orthophoto' | 'osm' | 'tunnels';
 type MapState = {
   background: bgType;
 }
@@ -45,14 +48,16 @@ export default class Map extends React.Component<MapProps, MapState> {
     backgroundChangeable: false
   };
 
-  initMapState() {
-    this.leafletMap = null;
-  }
-
   render() {
-    const {backgroundChangeable} = this.props;    
+    const {backgroundChangeable, children, latLng, zoom, showAttribution, zoomControl} = this.props;
+    const {background} = this.state;
     return <>
-      <div id={this.getMapElId()} style={{height: '100%'}}> </div>
+      <MapContainer style={{height: '100%'}} center={latLng as LatLngTuple} zoom={zoom}
+                    whenCreated={map => {this.leafletMap = map; this.refreshMap()}} attributionControl={showAttribution}
+                    zoomControl={zoomControl} preferCanvas>
+        {children}
+        {background == 'tunnels' && <TunnelsMapLayer/>}
+      </MapContainer>
       {backgroundChangeable &&
         <div style={{height: 64, marginTop: -64, position: 'relative', zIndex: 400}}>
           <button className="btn btn-outline-primary ml-2 btn-sm bg-white" onClick={this.switchBackground}>
@@ -63,19 +68,6 @@ export default class Map extends React.Component<MapProps, MapState> {
     </>
   }
 
-  private getMapElId() {
-    return "leafletMap" + this.id;
-  }
-
-  componentDidMount() {
-    this.refreshMap();
-  }
-
-  componentWillUnmount() {
-    if (this.leafletMap) this.leafletMap.remove();
-    this.initMapState()
-  }
-
   componentDidUpdate(prevProps?: Readonly<MapProps>) {
     if (prevProps && prevProps.extraLayers) prevProps.extraLayers.forEach(layer => {
       if (!this.props.extraLayers?.includes(layer)) layer.remove();
@@ -84,16 +76,10 @@ export default class Map extends React.Component<MapProps, MapState> {
   }
 
   refreshMap() {
-    const {latLng, zoom, extraLayers, onMapInitialized, showAttribution, zoomControl, onClick} = this.props;
-    const newMap = !this.leafletMap;
+    const {extraLayers, onMapInitialized, onClick} = this.props;
+    const newMap = !this.bgLayer;
 
-    if (!this.leafletMap) {
-      this.leafletMap = L.map(this.getMapElId(), {
-        attributionControl: showAttribution,
-        zoomControl: zoomControl,
-        preferCanvas: true
-      });
-      this.leafletMap.setView(latLng, zoom);
+    if (!this.bgLayer) {
       this.initBgLayer(this.state.background);
 
       if (onClick) {
@@ -117,9 +103,11 @@ export default class Map extends React.Component<MapProps, MapState> {
     const attribution = 'Data &copy; <a href="https://www.openstreetmap.org/">OSM</a> contribs, ' +
       '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>';
 
+    if (this.bgLayer && (background == 'tunnels')) return;
+
     if (this.bgLayer) this.bgLayer.remove();
 
-    if (background == 'osm')
+    if (['osm', 'tunnels'].includes(background))
       // @ts-ignore
       this.bgLayer = L.mapboxGL({
         style: '/hsl-map-style.json',
@@ -135,7 +123,7 @@ export default class Map extends React.Component<MapProps, MapState> {
   }
 
   switchBackground = () => {
-    const background = {'orthophoto': 'osm', 'osm': 'orthophoto'}[this.state.background] as bgType;
+    const background = {'orthophoto': 'osm', 'osm': 'tunnels', 'tunnels': 'orthophoto'}[this.state.background] as bgType;
     this.setState({background});
     this.initBgLayer(background);
   }
