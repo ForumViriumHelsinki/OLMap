@@ -22,6 +22,7 @@ import Icon from "util_components/bootstrap/Icon";
 import {MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvent} from "react-leaflet";
 import Modal from "util_components/bootstrap/Modal";
 import ZoomableImage from "util_components/ZoomableImage";
+import TunnelsMapLayer from "components/workplace_wizard/TunnelsMapLayer";
 
 
 type WorkplaceWizardProps = {}
@@ -141,6 +142,7 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
             <MapContainer style={{height: '40vh'}} center={this.latLng(workplace)} zoom={18}
                           whenCreated={map => {this.map = map}}>
               <DetectClick/>
+              <TunnelsMapLayer/>
               {mapClicked && clickedLatLon &&
                 <Popup closeOnClick={true} closeButton={false} className="wwPopup" position={mapClicked}>
                   <button className={popupBtn}
@@ -276,7 +278,7 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
             <button className="btn btn-sm btn-compact btn-outline-primary"
                     onClick={this.save}>Tallenna</button>
             <button className="btn btn-sm btn-compact btn-outline-danger"
-                    onClick={this.closeWorkplace}>Peruuta</button>
+                    onClick={this.closeWorkplace}>Sulje</button>
           </div>}
         </>
       }

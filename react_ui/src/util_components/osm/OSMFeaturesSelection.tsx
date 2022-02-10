@@ -2,18 +2,14 @@ import React from 'react';
 // @ts-ignore
 import _ from 'lodash';
 
-// @ts-ignore
-import OverpassFrontend from 'overpass-frontend';
 import {LocationTuple} from "util_components/types";
 import CenteredSpinner from "util_components/bootstrap/CenteredSpinner";
-import {getBoundsOfDistance} from "geolib";
-import {GeolibGeoJSONPoint} from "geolib/es/types";
 // @ts-ignore
 import {Button, ListGroup, ListGroupItem} from "reactstrap";
 import OSMFeatureList from "util_components/osm/OSMFeatureList";
 import {OSMFeature, osmFeatureTypes} from "util_components/osm/types";
 
-import {overpassInterpreterPath} from 'settings.json';
+import {overpassQuery} from "util_components/osm/utils";
 
 type OSMFSState = {
   nearbyOSMFeatures: OSMFeature[],
@@ -108,44 +104,28 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
     this.preselectFeatures();
   }
 
-  private addNearbyFeature(osmFeature: OSMFeature) {
-    const nearbyOSMFeatures = this.state.nearbyOSMFeatures.slice();
-
-    if (osmFeature.type == 'way') {
-      const duplicate = nearbyOSMFeatures.find(
-        f => (f.type == 'way') && (f.tags.name == osmFeature.tags.name));
-      if (duplicate) return;
-    }
-    nearbyOSMFeatures.push(osmFeature);
-    this.setState({nearbyOSMFeatures});
-  }
-
   reloadFeatures() {
     const {location, distance, onSelect, onFeaturesLoaded} = this.props;
-    const bounds = getBoundsOfDistance(location as GeolibGeoJSONPoint, distance);
-    const overpassBounds = {
-      minlat: bounds[0].latitude, maxlat: bounds[1].latitude,
-      minlon: bounds[0].longitude, maxlon: bounds[1].longitude};
-
     const query = 'node[name];way[name];relation[name][building];relation[name][tourism];node[entrance];node[barrier]';
-    const overpassFrontend = new OverpassFrontend(overpassInterpreterPath);
-    this.setState({nearbyOSMFeatures: []});
-    overpassFrontend.BBoxQuery(query, overpassBounds, {properties: OverpassFrontend.ALL},
-      (err: any, response: any) => {
-        if (!_.isEqual(location, this.props.location)) return;
-        if (err) console.error(err);
-        this.addNearbyFeature(response.data);
-      },
-      (err: any) => {
-        if (!_.isEqual(location, this.props.location)) return;
-        if (!this.state.nearbyOSMFeatures.length && onSelect) onSelect([]);
-        else {
-          this.setState({featuresLoading: false});
-          onFeaturesLoaded(this.state.nearbyOSMFeatures);
+    // @ts-ignore
+    overpassQuery(location, distance, query).then((features: OSMFeature[]) => {
+      if (!_.isEqual(location, this.props.location)) return;
+      const nearbyOSMFeatures: OSMFeature[] = [];
+      const wayNames: string[] = [];
+      features.forEach(f => {
+        if (f.type == 'way') {
+          const duplicate = wayNames.find(n => n == f.tags.name);
+          if (duplicate) return;
+          else wayNames.push(f.tags.name);
         }
+        nearbyOSMFeatures.push(f);
+      });
+      if (!nearbyOSMFeatures.length && onSelect) onSelect([]);
+      else {
+        this.setState({nearbyOSMFeatures, featuresLoading: false});
+        onFeaturesLoaded(nearbyOSMFeatures);
       }
-    );
-
+    });
     this.setState({nearbyOSMFeatures: [], featuresLoading: true});
     this.preselectFeatures();
   }
