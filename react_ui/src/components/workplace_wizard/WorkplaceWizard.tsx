@@ -19,10 +19,11 @@ import access_icon from './access.svg';
 import './WorkplaceWizard.scss';
 import sessionRequest from "sessionRequest";
 import Icon from "util_components/bootstrap/Icon";
-import {MapContainer, Marker, Polyline, Popup, TileLayer, useMapEvent} from "react-leaflet";
+import {Marker, Polyline, Popup, useMapEvent} from "react-leaflet";
 import Modal from "util_components/bootstrap/Modal";
 import ZoomableImage from "util_components/ZoomableImage";
-import TunnelsMapLayer from "components/workplace_wizard/TunnelsMapLayer";
+import MyPositionMap from "util_components/MyPositionMap";
+import {Location} from "util_components/types";
 
 
 type WorkplaceWizardProps = {}
@@ -69,9 +70,6 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
     const {} = this.props;
     const {workplace, changed, positioning, nearbyEntrances, modalImage,
            mapClicked, activeEntrance, activeUP} = this.state;
-
-    const attribution = 'Data &copy; <a href="https://www.openstreetmap.org/">OSM</a> contribs, ' +
-      '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>';
 
     const DetectClick = () => {
       useMapEvent('click', this.positionChosen);
@@ -139,111 +137,108 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
                         onClick={() => this.setState({positioning: undefined})}>Peruuta</button>
               </div>
             }
-            <MapContainer style={{height: '40vh'}} center={this.latLng(workplace)} zoom={18}
-                          whenCreated={map => {this.map = map}}>
-              <DetectClick/>
-              <TunnelsMapLayer/>
-              {mapClicked && clickedLatLon &&
-                <Popup closeOnClick={true} closeButton={false} className="wwPopup" position={mapClicked}>
-                  <button className={popupBtn}
-                          onClick={() => this.addEntrance(clickedLatLon, true)}>
-                    <WWIcon icon="door_front" outline/> Uusi toimitussisäänkäynti
-                  </button>
-                  <button className={popupBtn} onClick={() => this.addEntrance(clickedLatLon, false)}>
-                    <WWIcon icon="door_front" className="discrete" outline/> Uusi muu sisäänkäynti
-                  </button>
-                  {activeEntrance &&
-                    <button className={popupBtn} onClick={() => this.addUP(mapClicked)}>
-                      <WWIcon icon="local_shipping" outline /> Lisää lastauspaikka
+            <div style={{height: '40vh'}}>
+              <MyPositionMap zoom={18} location={workplace as Location} onMapInitialized={map => {this.map = map}}>
+                <DetectClick/>
+                {mapClicked && clickedLatLon &&
+                  <Popup closeOnClick={true} closeButton={false} className="wwPopup" position={mapClicked}>
+                    <button className={popupBtn}
+                            onClick={() => this.addEntrance(clickedLatLon, true)}>
+                      <WWIcon icon="door_front" outline/> Uusi toimitussisäänkäynti
                     </button>
-                  }
-                  {activeUP &&
-                    <button className={popupBtn} onClick={() => this.addAP(mapClicked)}>
-                      <WWIcon icon="directions" outline /> Lisää reittipiste
+                    <button className={popupBtn} onClick={() => this.addEntrance(clickedLatLon, false)}>
+                      <WWIcon icon="door_front" className="discrete" outline/> Uusi muu sisäänkäynti
                     </button>
-                  }
-                </Popup>
-              }
-              <TileLayer url="https://cdn.digitransit.fi/map/v1/{id}/{z}/{x}/{y}@2x.png"
-                         attribution={attribution} id="hsl-map" tileSize={512} zoomOffset={-1} maxZoom={21}/>
-
-              <Marker position={this.latLng(workplace)} icon={icons.workplace}>
-                <Popup closeOnClick={true} closeButton={false} className="wwPopup">
-                  <MoveButton f={workplace}/>
-                </Popup>
-              </Marker>
-
-              {nearbyEntrances && nearbyEntrances.map(entrance =>
-                <Marker key={entrance.id} position={this.latLng(entrance)} icon={icons.nearbyEntrance}
-                        zIndexOffset={-1000}>
-                  <Popup closeOnClick={true} closeButton={false} className="wwPopup">
-                    <ImageButton f={entrance}/>
-                    <div className="p-2 font-weight-bold"><WWIcon icon="location_city"/> Yhdistä:</div>
-                    <button className={popupBtn} onClick={() => this.addEntrance(entrance, true)}>
-                      <WWIcon icon="door_front" outline/> Toimitussisäänkäynti
-                    </button>
-                    <button className={popupBtn} onClick={() => this.addEntrance(entrance, false)}>
-                      <WWIcon icon="door_front" className="discrete" outline/> Muu sisäänkäynti
-                    </button>
-                  </Popup>
-                </Marker>
-              )}
-
-              {delivery_entrance && <>
-                <Marker position={this.latLng(delivery_entrance)} icon={icons.delivery}>
-                  <Popup closeOnClick={true} closeButton={false} className="wwPopup">
-                    <ImageButton f={delivery_entrance}/>
-                    <MoveButton f={delivery_entrance}/>
-                    <AddUPButton e={delivery_entrance}/>
-                    <RemoveButton item={delivery_entrance} lst={entrances}/>
-                  </Popup>
-                </Marker>
-                <Line f1={workplace} f2={delivery_entrance} />
-              </>}
-
-              {entrances.filter(e => e != delivery_entrance).map(entrance =>
-                <React.Fragment key={entrance.id}>
-                  <Marker position={this.latLng(entrance)} icon={icons.entrance}>
-                    <Popup closeOnClick={true} closeButton={false} className="wwPopup">
-                      <ImageButton f={entrance}/>
-                      <MoveButton f={entrance}/>
-                      <AddUPButton e={entrance}/>
-                      <RemoveButton item={entrance} lst={entrances}/>
-                    </Popup>
-                  </Marker>
-                  <Line f1={workplace} f2={entrance} />
-                </React.Fragment>
-              )}
-
-              {entrances.map(entrance => entrance.unloading_places?.map(up =>
-                <React.Fragment key={up.id}>
-                  <Marker position={this.latLng(up)} icon={icons.unloading}>
-                    <Popup closeOnClick={true} closeButton={false} className="wwPopup">
-                      <ImageButton f={up}/>
-                      <MoveButton f={up}/>
-                      <button className={popupBtn}
-                              onClick={() => {this.closePopup(); this.setState({positioning: 'newAP', activeUP: up})}}>
+                    {activeEntrance &&
+                      <button className={popupBtn} onClick={() => this.addUP(mapClicked)}>
+                        <WWIcon icon="local_shipping" outline /> Lisää lastauspaikka
+                      </button>
+                    }
+                    {activeUP &&
+                      <button className={popupBtn} onClick={() => this.addAP(mapClicked)}>
                         <WWIcon icon="directions" outline /> Lisää reittipiste
                       </button>
-                      <RemoveButton item={up} lst={entrance.unloading_places as UnloadingPlace[]}/>
+                    }
+                  </Popup>
+                }
+                <Marker position={this.latLng(workplace)} icon={icons.workplace}>
+                  <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+                    <MoveButton f={workplace}/>
+                  </Popup>
+                </Marker>
+
+                {nearbyEntrances && nearbyEntrances.map(entrance =>
+                  <Marker key={entrance.id} position={this.latLng(entrance)} icon={icons.nearbyEntrance}
+                          zIndexOffset={-1000}>
+                    <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+                      <ImageButton f={entrance}/>
+                      <div className="p-2 font-weight-bold"><WWIcon icon="location_city"/> Yhdistä:</div>
+                      <button className={popupBtn} onClick={() => this.addEntrance(entrance, true)}>
+                        <WWIcon icon="door_front" outline/> Toimitussisäänkäynti
+                      </button>
+                      <button className={popupBtn} onClick={() => this.addEntrance(entrance, false)}>
+                        <WWIcon icon="door_front" className="discrete" outline/> Muu sisäänkäynti
+                      </button>
                     </Popup>
                   </Marker>
-                  <Line f1={entrance} f2={up} />
+                )}
 
-                  {up.access_points?.map((ap: AccessPoint, i) =>
-                    <React.Fragment key={i}>
-                      <Marker position={this.latLng(ap)} icon={icons.access}>
-                        <Popup closeOnClick={true} closeButton={false} className="wwPopup">
-                          <MoveButton f={ap}/>
-                          <RemoveButton item={ap} lst={up.access_points as MapFeature[]}/>
-                        </Popup>
-                      </Marker>
-                      <Line f1={up} f2={ap} />
-                    </React.Fragment>
-                  )}
-                </React.Fragment>
-              ))}
-            </MapContainer>
+                {delivery_entrance && <>
+                  <Marker position={this.latLng(delivery_entrance)} icon={icons.delivery}>
+                    <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+                      <ImageButton f={delivery_entrance}/>
+                      <MoveButton f={delivery_entrance}/>
+                      <AddUPButton e={delivery_entrance}/>
+                      <RemoveButton item={delivery_entrance} lst={entrances}/>
+                    </Popup>
+                  </Marker>
+                  <Line f1={workplace} f2={delivery_entrance} />
+                </>}
+
+                {entrances.filter(e => e != delivery_entrance).map(entrance =>
+                  <React.Fragment key={entrance.id}>
+                    <Marker position={this.latLng(entrance)} icon={icons.entrance}>
+                      <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+                        <ImageButton f={entrance}/>
+                        <MoveButton f={entrance}/>
+                        <AddUPButton e={entrance}/>
+                        <RemoveButton item={entrance} lst={entrances}/>
+                      </Popup>
+                    </Marker>
+                    <Line f1={workplace} f2={entrance} />
+                  </React.Fragment>
+                )}
+
+                {entrances.map(entrance => entrance.unloading_places?.map(up =>
+                  <React.Fragment key={up.id}>
+                    <Marker position={this.latLng(up)} icon={icons.unloading}>
+                      <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+                        <ImageButton f={up}/>
+                        <MoveButton f={up}/>
+                        <button className={popupBtn}
+                                onClick={() => {this.closePopup(); this.setState({positioning: 'newAP', activeUP: up})}}>
+                          <WWIcon icon="directions" outline /> Lisää reittipiste
+                        </button>
+                        <RemoveButton item={up} lst={entrance.unloading_places as UnloadingPlace[]}/>
+                      </Popup>
+                    </Marker>
+                    <Line f1={entrance} f2={up} />
+
+                    {up.access_points?.map((ap: AccessPoint, i) =>
+                      <React.Fragment key={i}>
+                        <Marker position={this.latLng(ap)} icon={icons.access}>
+                          <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+                            <MoveButton f={ap}/>
+                            <RemoveButton item={ap} lst={up.access_points as MapFeature[]}/>
+                          </Popup>
+                        </Marker>
+                        <Line f1={up} f2={ap} />
+                      </React.Fragment>
+                    )}
+                  </React.Fragment>
+                ))}
+              </MyPositionMap>
+            </div>
           </div>
 
           <div className="mt-2">

@@ -18,7 +18,8 @@ type MapProps = {
   onLocationSelected?: (location: any) => any
   extraLayers?: any[],
   location?: Location,
-  zoom?: number
+  zoom?: number,
+  onMapInitialized?: (leafletMap: any) => any
 }
 
 type MapState = { currentPosition?: Location, userMovedMap: boolean };
@@ -128,6 +129,7 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
   }
 
   onMapInitialized = (leafletMap: any) => {
+    const {onMapInitialized} = this.props;
     this.leafletMap = leafletMap;
     this.leafletMap.on('zoomstart', () => this.setState({userMovedMap: true}));
     this.leafletMap.on('movestart', () => this.setState({userMovedMap: true}));
@@ -135,6 +137,7 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
     this.leafletMap.on('zoomend', () => urlMapPosition.write(...this.getMapState()));
     this.leafletMap.on('moveend', () => urlMapPosition.write(...this.getMapState()));
     this.refreshMap();
+    if (onMapInitialized) onMapInitialized(leafletMap);
   };
 
   private mapMoved() {
