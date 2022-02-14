@@ -262,7 +262,7 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
         <button className="btn btn-sm btn-compact btn-outline-primary"
                 onClick={this.save}>Tallenna</button>
         <button className="btn btn-sm btn-compact btn-outline-danger"
-                onClick={onClose()}>Sulje</button>
+                onClick={onClose}>Sulje</button>
       </div>}
     </>
   }
