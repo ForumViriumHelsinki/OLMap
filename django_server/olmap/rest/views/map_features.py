@@ -5,10 +5,8 @@ from rest_framework.response import Response
 
 from olmap import models
 from olmap.rest.permissions import IsReviewerOrCreator
-from olmap.rest.serializers import WorkplaceTypeSerializer, WorkplaceEntranceSerializer, \
-    UnloadingPlaceSerializer
-
-from olmap.rest.serializers.workplace_wizard import WorkplaceSerializer, EntranceSerializer
+from olmap.rest.serializers import WorkplaceTypeSerializer, WorkplaceEntranceSerializer
+from olmap.rest.serializers.workplace_wizard import WorkplaceSerializer, EntranceSerializer, UnloadingPlaceSerializer
 
 
 class WorkplaceTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -23,18 +21,32 @@ class WorkplaceEntrancesViewSet(viewsets.ModelViewSet):
     serializer_class = WorkplaceEntranceSerializer
 
 
-class UnloadingPlacesViewSet(viewsets.ModelViewSet):
-    queryset = models.UnloadingPlace.objects.all()
+class MapFeatureViewSet(viewsets.ReadOnlyModelViewSet):
+    @action(methods=['GET'], detail=False)
+    def near(self, request, *args, **kwargs):
+        lat, lon = (float(request.query_params.get(s, '0')) for s in ['lat', 'lon'])
+        if lat and lon:
+            min_, max_ = (geopy.distance.distance(meters=60).destination((lat, lon), bearing=b) for b in (225, 45))
+            queryset = self.filter_queryset(self.get_queryset()).filter(
+                image_note__lat__gte=min_.latitude, image_note__lat__lte=max_.latitude,
+                image_note__lon__gte=min_.longitude, image_note__lon__lte=max_.longitude,
+            )
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+class UnloadingPlacesViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
+    queryset = models.UnloadingPlace.objects.exclude(image_note__visible=False)
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UnloadingPlaceSerializer
 
 
-class WorkplaceViewSet(viewsets.ModelViewSet):
-    queryset = models.Workplace.objects.all()
+class WorkplaceViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
+    queryset = models.Workplace.objects.exclude(image_note__visible=False)
     serializer_class = WorkplaceSerializer
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        if self.action in ['list', 'retrieve', 'search']:
             permission_classes = [permissions.AllowAny]
         else:
             permission_classes = [IsReviewerOrCreator]
@@ -53,23 +65,20 @@ class WorkplaceViewSet(viewsets.ModelViewSet):
                         up.pop('image')
         return super().get_serializer(*args, **kwargs)
 
+    @action(methods=['GET'], detail=False)
+    def search(self, request, *args, **kwargs):
+        name = request.query_params.get('name', None)
+        if not name:
+            return Response(status=404)
+        queryset = self.filter_queryset(self.get_queryset()).filter(name__istartswith=name)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
 
 class WorkplaceByOSMIdViewSet(WorkplaceViewSet):
     lookup_field = 'osm_feature'
 
 
-class EntranceViewSet(viewsets.ReadOnlyModelViewSet):
+class EntranceViewSet(MapFeatureViewSet):
     queryset = models.Entrance.objects.filter(image_note__visible=True)
     serializer_class = EntranceSerializer
-
-    @action(methods=['GET'], detail=False)
-    def near(self, request, *args, **kwargs):
-        lat, lon = (float(request.query_params.get(s, '0')) for s in ['lat', 'lon'])
-        if lat and lon:
-            min_, max_ = (geopy.distance.distance(meters=60).destination((lat, lon), bearing=b) for b in (225, 45))
-            queryset = self.filter_queryset(self.get_queryset()).filter(
-                image_note__lat__gte=min_.latitude, image_note__lat__lte=max_.latitude,
-                image_note__lon__gte=min_.longitude, image_note__lon__lte=max_.longitude,
-            )
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)

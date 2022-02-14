@@ -1,7 +1,8 @@
 import React from 'react';
 import {Workplace} from "components/workplace_wizard/types";
 import {geocoderFocus} from "components/workplace_wizard/settings";
-import {geocoderUrl} from "components/workplace_wizard/urls";
+import {geocoderUrl, workplaceSearchUrl} from "components/workplace_wizard/urls";
+import sessionRequest from "sessionRequest";
 
 type WorkplaceAutofillProps = {
   onSelected: (wp: Workplace) => any
@@ -35,7 +36,8 @@ type WorkplaceAutofillState = {
   housenumber?: string,
   unit?: string,
   suggestions?: Suggestion[],
-  closed?: boolean
+  closed?: boolean,
+  olmapWorkplaces?: Workplace[]
 }
 
 const initialState: WorkplaceAutofillState = {};
@@ -45,8 +47,11 @@ export default class WorkplaceAutofill extends React.Component<WorkplaceAutofill
   private blurred?: any;
 
   render() {
-    const {} = this.props;
-    const {name, street, housenumber, unit, suggestions, closed} = this.state;
+    const {onSelected} = this.props;
+    const {name, street, housenumber, unit, closed} = this.state;
+    const olmapWorkplaces = this.state.olmapWorkplaces || [];
+    const suggestions = this.state.suggestions || [];
+
     return <>
       <div className="dropdown" onBlur={this.blur} onFocus={this.focus}>
         <form className="form-inline">
@@ -59,8 +64,14 @@ export default class WorkplaceAutofill extends React.Component<WorkplaceAutofill
           <input type="text" placeholder="Rappu" className="form-control col-2" value={unit}
                  onChange={(e) => this.onChange('unit', e)}/>
         </form>
-        {suggestions && suggestions.length > 0 && !closed &&
+
+        {(suggestions.length > 0 || olmapWorkplaces.length > 0) && !closed &&
           <div className="dropdown-menu show">
+            {olmapWorkplaces.map((wp) =>
+              <button className="dropdown-item" key={wp.id} onClick={() => onSelected(wp)}>
+                {wp.name}, {wp.street} {wp.housenumber}
+              </button>)}
+
             {suggestions.map(s => {
               const {label, id} = s.properties;
               return <button className="dropdown-item" key={id} onClick={() => this.onSelect(s)}>{label}</button>
@@ -95,6 +106,9 @@ export default class WorkplaceAutofill extends React.Component<WorkplaceAutofill
     this.setState({[field]: value});
     if (['name', 'street'].includes(field) && value.length > 2)
       this.fetchSuggestions(value).then(suggestions => this.setState({suggestions, closed: false}));
+    if (field == 'name' && value.length > 2)
+      sessionRequest(workplaceSearchUrl(value)).then(r => r.json())
+        .then(olmapWorkplaces => this.setState({olmapWorkplaces}))
   }
 
   onSelectBtn = () => {

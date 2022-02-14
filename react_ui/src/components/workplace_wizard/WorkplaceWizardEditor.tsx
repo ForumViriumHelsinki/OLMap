@@ -22,6 +22,7 @@ import Modal from "util_components/bootstrap/Modal";
 import ZoomableImage from "util_components/ZoomableImage";
 import MyPositionMap from "util_components/MyPositionMap";
 import EntrancesMapLayer from "components/workplace_wizard/EntrancesMapLayer";
+import UnloadingPlacesMapLayer from "components/workplace_wizard/UnloadingPlacesMapLayer";
 
 
 type WorkplaceWizardEditorProps = {
@@ -125,6 +126,17 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
         </button>
       </Popup>;
 
+    const NearbyUPPopup = ({unloadingPlace}: {unloadingPlace: MapFeature}) =>
+      <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+        <ImageButton f={unloadingPlace}/>
+        {activeEntrance ?
+          <button className={popupBtn} onClick={() => this.addUP(unloadingPlace)}>
+            <WWIcon icon="local_shipping" outline/> Yhdistä
+          </button>
+        : <div className="p-2 font-weight-bold">Luo sisäänkäynti ensin!</div>
+        }
+      </Popup>;
+
     const clickedLatLon = mapClicked && {lat: mapClicked.lat, lon: mapClicked.lng} as MapFeature;
 
     const toolbarBtn = "btn btn-outline-primary mr-2 btn-compact";
@@ -154,7 +166,7 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
                   <WWIcon icon="door_front" className="discrete" outline/> Uusi muu sisäänkäynti
                 </button>
                 {activeEntrance &&
-                  <button className={popupBtn} onClick={() => this.addUP(mapClicked)}>
+                  <button className={popupBtn} onClick={() => this.addUP(clickedLatLon)}>
                     <WWIcon icon="local_shipping" outline /> Lisää lastauspaikka
                   </button>
                 }
@@ -172,6 +184,7 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
             </Marker>
 
             <EntrancesMapLayer location={{lat: workplace.lat, lon: workplace.lon}} Popup={NearbyEntrancePopup}/>
+            <UnloadingPlacesMapLayer location={{lat: workplace.lat, lon: workplace.lon}} Popup={NearbyUPPopup}/>
 
             {delivery_entrance && <>
               <Marker position={this.latLng(delivery_entrance)} icon={icons.delivery}>
@@ -267,19 +280,27 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
     </>
   }
 
-  private getDeliveryEntrance() {
-    const {workplace} = this.state;
+  private getDeliveryEntrance(wp?: Workplace) {
+    const workplace = wp || this.state.workplace;
     const entrances = workplace.workplace_entrances || [];
     return entrances.find(e => e.deliveries == 'main') ||
       entrances.find(e => e.deliveries == 'yes');
   }
 
   componentDidMount() {
-    this.setState({workplace: this.props.workplace});
+    this.initWPFromProps();
+  }
+
+  private initWPFromProps() {
+    const workplace = this.props.workplace;
+    this.setState({
+      workplace: workplace,
+      activeEntrance: this.getDeliveryEntrance(workplace) || (workplace.workplace_entrances || [])[0]
+    });
   }
 
   componentDidUpdate({workplace}: Readonly<WorkplaceWizardEditorProps>) {
-    if (workplace != this.props.workplace) this.setState({workplace: this.props.workplace});
+    if (workplace != this.props.workplace) this.initWPFromProps();
   }
 
   removeItem = (item: MapFeature, lst: MapFeature[]) => {
@@ -317,16 +338,15 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
     if (this.map) this.map.closePopup();
   }
 
-  addUP({lat, lng}: LatLngLiteral) {
+  addUP(up: MapFeature) {
     const {activeEntrance, workplace} = this.state;
     if (!activeEntrance) return;
 
     this.closePopup();
     if (!activeEntrance.unloading_places) activeEntrance.unloading_places = [];
-    const unloadingPlace = {lat, lon: lng};
-    activeEntrance.unloading_places.push(unloadingPlace);
+    activeEntrance.unloading_places.push(up);
     this.storeState({workplace, changed: true, positioning: undefined,
-                     mapClicked: undefined, activeUP: unloadingPlace});
+                     mapClicked: undefined, activeUP: up});
     this.forceUpdate(); // State internals updated in place, naughty business...
   }
 
@@ -353,7 +373,7 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
 
     if (!positioning) return this.setState({mapClicked: mapClicked ? undefined : e.latlng});
 
-    if (positioning == 'newUP') return this.addUP({lat, lng});
+    if (positioning == 'newUP') return this.addUP({lat, lon: lng});
 
     if (positioning == 'newAP') return this.addAP({lat, lng});
 

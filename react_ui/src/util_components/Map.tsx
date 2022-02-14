@@ -59,11 +59,10 @@ export default class Map extends React.Component<MapProps, MapState> {
         {background == 'tunnels' && <TunnelsMapLayer/>}
       </MapContainer>
       {backgroundChangeable &&
-        <div style={{height: 64, marginTop: -64, position: 'relative', zIndex: 400}}>
-          <button className="btn btn-outline-primary ml-2 btn-sm bg-white" onClick={this.switchBackground}>
-            <Icon icon="layers"/>
-          </button>
-        </div>
+        <button style={{marginTop: -64, position: 'relative', zIndex: 400}}
+                className="btn btn-outline-primary ml-2 btn-sm bg-white" onClick={this.switchBackground}>
+          <Icon icon="layers"/>
+        </button>
       }
     </>
   }

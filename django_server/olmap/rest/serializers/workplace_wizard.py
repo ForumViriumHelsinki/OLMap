@@ -91,11 +91,11 @@ class EntranceSerializer(MapFeatureSerializer):
         for up_data in unloading_places_data:
             id = up_data.get('id', None)
             if id:
-                up = entrance.unloading_places.get(id=id)
+                up = models.UnloadingPlace.objects.get(id=id)
                 serializer.update(up, up_data)
             else:
                 up = serializer.create(up_data)
-                entrance.unloading_places.add(up)
+            entrance.unloading_places.add(up)
 
     def create(self, validated_data):
         unloading_places = validated_data.pop('unloading_places', [])
