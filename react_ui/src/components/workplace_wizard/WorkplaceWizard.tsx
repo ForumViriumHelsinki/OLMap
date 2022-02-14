@@ -2,7 +2,6 @@ import React, {ChangeEvent} from 'react';
 import WorkplaceAutofill from "components/workplace_wizard/WorkplaceAutofill";
 import {AccessPoint, MapFeature, UnloadingPlace, Workplace, WorkplaceEntrance} from "components/workplace_wizard/types";
 import {
-  nearbyEntrancesUrl,
   olmapWorkplaceByOSMUrl,
   workplacesUrl,
   workplaceUrl
@@ -24,13 +23,13 @@ import Modal from "util_components/bootstrap/Modal";
 import ZoomableImage from "util_components/ZoomableImage";
 import MyPositionMap from "util_components/MyPositionMap";
 import {Location} from "util_components/types";
+import EntrancesMapLayer from "components/workplace_wizard/EntrancesMapLayer";
 
 
 type WorkplaceWizardProps = {}
 
 type WorkplaceWizardState = {
   workplace?: Workplace,
-  nearbyEntrances?: MapFeature[],
   changed?: boolean,
   positioning?: MapFeature | 'newUP' | 'newAP' | 'newDeliveryEntrance' | 'newEntrance',
   activeEntrance?: WorkplaceEntrance,
@@ -56,7 +55,6 @@ const icons = {
   workplace: icon(wp_icon),
   delivery: icon(delivery_icon),
   entrance: icon(entrance_icon),
-  nearbyEntrance: icon(delivery_icon, 20, 'discrete'),
   unloading: icon(unloading_icon),
   access: icon(access_icon)
 };
@@ -68,7 +66,7 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
 
   render() {
     const {} = this.props;
-    const {workplace, changed, positioning, nearbyEntrances, modalImage,
+    const {workplace, changed, positioning, modalImage,
            mapClicked, activeEntrance, activeUP} = this.state;
 
     const DetectClick = () => {
@@ -109,6 +107,18 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
       <button className={popupBtn} onClick={() => this.removeItem(item, lst)}>
         <WWIcon icon="delete" outline /> Poista
       </button>;
+
+    const NearbyEntrancePopup = ({entrance}: {entrance: MapFeature}) =>
+      <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+        <ImageButton f={entrance}/>
+        <div className="p-2 font-weight-bold"><WWIcon icon="location_city"/> Yhdistä:</div>
+        <button className={popupBtn} onClick={() => this.addEntrance(entrance, true)}>
+          <WWIcon icon="door_front" outline/> Toimitussisäänkäynti
+        </button>
+        <button className={popupBtn} onClick={() => this.addEntrance(entrance, false)}>
+          <WWIcon icon="door_front" className="discrete" outline/> Muu sisäänkäynti
+        </button>
+      </Popup>;
 
     const clickedLatLon = mapClicked && {lat: mapClicked.lat, lon: mapClicked.lng} as MapFeature;
 
@@ -167,21 +177,7 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
                   </Popup>
                 </Marker>
 
-                {nearbyEntrances && nearbyEntrances.map(entrance =>
-                  <Marker key={entrance.id} position={this.latLng(entrance)} icon={icons.nearbyEntrance}
-                          zIndexOffset={-1000}>
-                    <Popup closeOnClick={true} closeButton={false} className="wwPopup">
-                      <ImageButton f={entrance}/>
-                      <div className="p-2 font-weight-bold"><WWIcon icon="location_city"/> Yhdistä:</div>
-                      <button className={popupBtn} onClick={() => this.addEntrance(entrance, true)}>
-                        <WWIcon icon="door_front" outline/> Toimitussisäänkäynti
-                      </button>
-                      <button className={popupBtn} onClick={() => this.addEntrance(entrance, false)}>
-                        <WWIcon icon="door_front" className="discrete" outline/> Muu sisäänkäynti
-                      </button>
-                    </Popup>
-                  </Marker>
-                )}
+                <EntrancesMapLayer location={{lat: workplace.lat, lon: workplace.lon}} Popup={NearbyEntrancePopup}/>
 
                 {delivery_entrance && <>
                   <Marker position={this.latLng(delivery_entrance)} icon={icons.delivery}>
@@ -290,7 +286,6 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
   componentDidMount() {
     const state = JSON.parse(localStorage.getItem('wwState') || '{}');
     this.setState(state);
-    if (state.workplace) this.loadNearbyEntrances(state.workplace);
   }
 
   removeItem = (item: MapFeature, lst: MapFeature[]) => {
@@ -378,8 +373,6 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
 
     this.storeState({workplace, changed: true, positioning: undefined});
     this.forceUpdate(); // State internals updated in place, naughty business...
-
-    if (positioning == workplace) this.loadNearbyEntrances();
   };
 
   closeWorkplace = () =>
@@ -415,23 +408,12 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
 
     sessionRequest(olmapWorkplaceByOSMUrl(osm_feature))
     .then(response => {
-      if (response.status != 200) return this.loadNearbyEntrances();
-
+      if (response.status != 200) return;
       response.json().then((workplace) => {
         this.storeState({workplace});
-        this.loadNearbyEntrances();
       })
     })
   };
-
-  loadNearbyEntrances(wp?: Workplace) {
-    const workplace = wp || this.state.workplace;
-    const {lon, lat} = workplace || {};
-    if (!(lon && lat)) return;
-    this.storeState({nearbyEntrances: []});
-    sessionRequest(nearbyEntrancesUrl({lon, lat})).then(response => response.json())
-    .then(nearbyEntrances => this.storeState({nearbyEntrances}))
-  }
 
   private latLng(feature: MapFeature) {
     const {lat, lon} = feature || {};
