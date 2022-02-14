@@ -136,6 +136,18 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
           f => f.tags.name && f.tags.name.search(new RegExp(mapFeature.name, 'i')) > -1);
     }
 
+    if (featureTypeName == "Gate") {
+      let gates = nearbyFeatures.filter((f) =>
+        f.tags.barrier == 'gate' &&
+        // @ts-ignore
+        getDistance(osmImageNote, f) < 5);
+      if (gates.length) {
+        // @ts-ignore
+        gates.sort((a, b) => getDistance(osmImageNote, a) - getDistance(osmImageNote, b));
+        osmFeature = gates[0];
+      }
+    }
+
     if (featureTypeName == "Entrance") {
       let entrances = nearbyFeatures.filter((f) =>
         f.tags.entrance &&
