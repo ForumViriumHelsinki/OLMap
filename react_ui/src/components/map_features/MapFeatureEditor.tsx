@@ -239,8 +239,10 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
   };
 
   extractWorkplace = () => {
-    const {mapFeature} = this.props;
-    const {lat, lon, image, comment} = this.props.osmImageNote;
+    const {mapFeature, onSubmit} = this.props;
+    const osmImageNote = this.props.osmImageNote;
+    const {lat, lon} = osmImageNote;
+
     sessionRequest(osmImageNotesUrl, {method: 'POST', data: {lat, lon, tags: ['Workplace']}})
     .then(response => response.json())
     .then((imageNote: OSMImageNote) => {
@@ -248,7 +250,11 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
       .then(() => {
         if (imageNotesContext) imageNotesContext.addNote(imageNote);
         window.location.hash = `#/Notes/${imageNote.id}/`;
-      })
+      });
+
+      // @ts-ignore
+      if (osmImageNote.workplace_set.length == 1)
+       onSubmit({tags: (osmImageNote.tags || []).filter(t => t != 'Workplace')})
     })
   };
 
