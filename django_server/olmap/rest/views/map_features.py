@@ -26,7 +26,7 @@ class MapFeatureViewSet(viewsets.ReadOnlyModelViewSet):
     def near(self, request, *args, **kwargs):
         lat, lon = (float(request.query_params.get(s, '0')) for s in ['lat', 'lon'])
         if lat and lon:
-            min_, max_ = (geopy.distance.distance(meters=60).destination((lat, lon), bearing=b) for b in (225, 45))
+            min_, max_ = (geopy.distance.distance(meters=100).destination((lat, lon), bearing=b) for b in (225, 45))
             queryset = self.filter_queryset(self.get_queryset()).filter(
                 image_note__lat__gte=min_.latitude, image_note__lat__lte=max_.latitude,
                 image_note__lon__gte=min_.longitude, image_note__lon__lte=max_.longitude,
