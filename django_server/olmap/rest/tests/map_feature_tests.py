@@ -28,7 +28,8 @@ class OSMMapFeatureTests(FVHAPITestCase):
                 'access': 'private',
                 'width': '0.9',
                 'buzzer': True,
-                'type': 'staircase'
+                'type': 'staircase',
+                'layer': -1
             }]
         }
         response = self.client.post(url, data=fields, format='json')
@@ -38,6 +39,9 @@ class OSMMapFeatureTests(FVHAPITestCase):
 
         # And a note is created in db:
         note = models.OSMImageNote.objects.get()
+
+        # And any passed layer info is saved to the note:
+        self.assertEqual(note.layer, -1)
 
         # And it creates any passed tags:
         self.assertSetEqual(set(note.tags), set(fields['tags']))
@@ -50,6 +54,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
             'description': 'With buzzer',
             'access': 'private',
             'width': 0.9,
+            'layer': -1,
             'entrance': 'staircase'})
 
     def test_save_osm_image_note_with_empty_map_feature_list(self):
@@ -95,6 +100,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
                 'street': 'Bulevardi',
                 'housenumber': '31',
                 'access': 'private',
+                'layer': -1,
                 'type': 'service'}]}
         response = self.client.patch(url, data=fields, format='json')
 
@@ -104,6 +110,9 @@ class OSMMapFeatureTests(FVHAPITestCase):
         # And the map_features have been changed:
         note = models.OSMImageNote.objects.get()
         self.assertSetEqual(set(note.entrance_set.values_list('street', flat=True)), set(['Bulevardi']))
+
+        # And any passed layer info is saved to the note:
+        self.assertEqual(note.layer, -1)
 
     def test_osm_image_note_map_feature_schemas(self):
         # Given that a user is signed in

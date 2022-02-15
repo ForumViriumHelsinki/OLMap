@@ -123,7 +123,10 @@ class OSMImageNoteWithMapFeaturesSerializer(OSMImageNoteSerializer, metaclass=OS
             related_manager.exclude(id__in=[f['id'] for f in fields_list if f.get('id', None)]).delete()
             for fields in fields_list:
                 if fields.get('id', None):
-                    related_manager.filter(id=fields['id']).update(**fields)
+                    f = related_manager.get(id=fields['id'])
+                    for k, v in fields.items():
+                        setattr(f, k, v)
+                    f.save()
                 else:
                     related_manager.create(**fields)
 
