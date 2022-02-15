@@ -171,6 +171,7 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
 
     if (osmFeature) {
       const osmId = Number(osmFeature.id);
+      if (!osmImageNote.osm_features) osmImageNote.osm_features = [];
       if (!osmImageNote.osm_features.includes(osmId)) osmImageNote.osm_features.push(osmId);
       mapFeature.osm_feature = osmId;
     }
