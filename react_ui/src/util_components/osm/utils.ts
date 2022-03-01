@@ -35,7 +35,11 @@ export const setOSMContext = (context: OSMEditContextType) => {
 export const osmApiCall = (url: string, BodyComponent: any, props: any, context: OSMEditContextType) => {
   const _url = apiUrl(url);
   const {username, password} = context;
-  const body = renderToStaticMarkup(React.createElement(BodyComponent, props));
+
+  // ref attribute gets replaced by React, therefore substitution:
+  const body = renderToStaticMarkup(React.createElement(BodyComponent, props))
+               .replace(/replaceWithRef/g, 'ref');
+
   const Authorization = `Basic ${btoa(username + ':' + password)}`;
 
   return fetch(_url, {body, method: 'PUT', headers: {'Content-Type': 'application/xml', Authorization}})

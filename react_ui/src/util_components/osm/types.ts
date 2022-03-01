@@ -2,6 +2,7 @@
 import _ from 'lodash';
 
 export type OSMFeature = {
+  nodes?: number[];
   type: "node" | "way" | "relation",
   id: number,
   lat: number,
