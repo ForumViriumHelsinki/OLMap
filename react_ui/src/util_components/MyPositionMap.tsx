@@ -99,7 +99,10 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
     // @ts-ignore
     const currentLatLng = currentPosition && [currentPosition.lat, currentPosition.lon];
     const position = this.getInitialPosition();
-    if (!this.state.userMovedMap) this.leafletMap.setView(position, position[2] || zoom || 18);
+    if (!this.state.userMovedMap) {
+      const defaultZoom = onLocationSelected ? 21 : 18;
+      this.leafletMap.setView(position, position[2] || zoom || defaultZoom);
+    }
 
     if (onLocationSelected) {
       if (!this.markers.selectedPosition) {
