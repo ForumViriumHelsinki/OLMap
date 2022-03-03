@@ -22,6 +22,13 @@ class WorkplaceEntrancesViewSet(viewsets.ModelViewSet):
 
 
 class MapFeatureViewSet(viewsets.ReadOnlyModelViewSet):
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve', 'search', 'near']:
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = [IsReviewerOrCreator]
+        return [permission() for permission in permission_classes]
+
     @action(methods=['GET'], detail=False)
     def near(self, request, *args, **kwargs):
         lat, lon = (float(request.query_params.get(s, '0')) for s in ['lat', 'lon'])
@@ -37,20 +44,12 @@ class MapFeatureViewSet(viewsets.ReadOnlyModelViewSet):
 
 class UnloadingPlacesViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
     queryset = models.UnloadingPlace.objects.exclude(image_note__visible=False)
-    permission_classes = [permissions.IsAuthenticated]
     serializer_class = UnloadingPlaceSerializer
 
 
 class WorkplaceViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
     queryset = models.Workplace.objects.exclude(image_note__visible=False)
     serializer_class = WorkplaceSerializer
-
-    def get_permissions(self):
-        if self.action in ['list', 'retrieve', 'search']:
-            permission_classes = [permissions.AllowAny]
-        else:
-            permission_classes = [IsReviewerOrCreator]
-        return [permission() for permission in permission_classes]
 
     def get_serializer(self, *args, **kwargs):
         data = kwargs.get('data', None)
