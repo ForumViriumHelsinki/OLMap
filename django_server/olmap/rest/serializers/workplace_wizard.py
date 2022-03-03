@@ -16,14 +16,15 @@ class MapFeatureSerializer(serializers.ModelSerializer):
         fields = ['lat', 'lon', 'image_note_id', 'id', 'image', 'osm_feature']
 
     def update(self, instance, validated_data):
-        note_fields = validated_data.pop('image_note', {})
+        note_fields = validated_data.pop('image_note', None)
 
         note_or_id = validated_data.pop('image_note_id', None)
-        field = 'image_note_id' if isinstance(note_or_id, int) else 'image_note'
-        validated_data[field] = note_or_id
-
+        if note_or_id:
+            field = 'image_note_id' if isinstance(note_or_id, int) else 'image_note'
+            validated_data[field] = note_or_id
         ret = super().update(instance, validated_data)
-        self.update_note(instance, note_fields)
+        if note_fields:
+            self.update_note(instance, note_fields)
         return ret
 
     def update_note(self, instance, note_fields):
