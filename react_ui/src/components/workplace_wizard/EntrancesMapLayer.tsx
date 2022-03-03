@@ -9,10 +9,11 @@ import * as L from "leaflet";
 import delivery_icon from './delivery_entrance.svg';
 import sessionRequest from "sessionRequest";
 import {LatLngLiteral} from "leaflet";
+import {ImageButton, popupBtn, WWIcon} from "components/workplace_wizard/util_components";
 
 type EntrancesMapLayerProps = {
   location: Point,
-  Popup?: any
+  addEntrance: (e: MapFeature, deliveries: boolean) => any
 }
 
 type EntrancesMapLayerState = {
@@ -33,12 +34,21 @@ export default class EntrancesMapLayer extends React.Component<EntrancesMapLayer
   state = initialState;
 
   render() {
-    const {Popup} = this.props;
+    const {addEntrance} = this.props;
     const {nearbyEntrances} = this.state;
     return nearbyEntrances && nearbyEntrances.map(entrance =>
       <Marker key={entrance.id} position={this.latLng(entrance)} icon={icon}
               zIndexOffset={-1000}>
-        {Popup && <Popup entrance={entrance}/>}
+        <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+          <ImageButton f={entrance}/>
+          <div className="p-2 font-weight-bold"><WWIcon icon="location_city"/> Yhdistä:</div>
+          <button className={popupBtn} onClick={() => addEntrance(entrance, true)}>
+            <WWIcon icon="door_front" outline/> Toimitussisäänkäynti
+          </button>
+          <button className={popupBtn} onClick={() => addEntrance(entrance, false)}>
+            <WWIcon icon="door_front" className="discrete" outline/> Muu sisäänkäynti
+          </button>
+        </Popup>
       </Marker>
     ) || null;
   }

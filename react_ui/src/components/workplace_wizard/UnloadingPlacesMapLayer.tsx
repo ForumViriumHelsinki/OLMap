@@ -9,10 +9,11 @@ import * as L from "leaflet";
 import up_icon from './unloading.svg';
 import sessionRequest from "sessionRequest";
 import {LatLngLiteral} from "leaflet";
+import {ImageButton, popupBtn, WWIcon} from "components/workplace_wizard/util_components";
 
 type UnloadingPlacesMapLayerProps = {
   location: Point,
-  Popup?: any
+  addUP: any
 }
 
 type UnloadingPlacesMapLayerState = {
@@ -33,12 +34,20 @@ export default class UnloadingPlacesMapLayer extends React.Component<UnloadingPl
   state = initialState;
 
   render() {
-    const {Popup} = this.props;
+    const {addUP} = this.props;
     const {nearbyUnloadingPlaces} = this.state;
     return nearbyUnloadingPlaces && nearbyUnloadingPlaces.map(unloadingPlace =>
       <Marker key={unloadingPlace.id} position={this.latLng(unloadingPlace)} icon={icon}
               zIndexOffset={-1000}>
-        {Popup && <Popup unloadingPlace={unloadingPlace}/>}
+        <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+          <ImageButton f={unloadingPlace}/>
+          {addUP ?
+            <button className={popupBtn} onClick={() => addUP(unloadingPlace)}>
+              <WWIcon icon="local_shipping" outline/> Yhdistä
+            </button>
+          : <div className="p-2 font-weight-bold">Luo sisäänkäynti ensin!</div>
+          }
+        </Popup>
       </Marker>
     ) || null;
   }
