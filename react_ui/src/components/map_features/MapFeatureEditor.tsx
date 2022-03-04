@@ -18,6 +18,7 @@ import Icon from "util_components/bootstrap/Icon";
 import sessionRequest from "sessionRequest";
 import {osmImageNotesUrl, workplaceUrl} from "urls";
 import {imageNotesContext} from "components/osm_image_notes/ImageNotesContextProvider";
+import MapFeatureForm, {omitFields} from "components/map_features/MapFeatureForm";
 
 type MapFeatureEditorProps = {
   schema: JSONSchema,
@@ -40,17 +41,6 @@ type MapFeatureEditorState = {
 
 const initialState: MapFeatureEditorState = {
   mode: 'compact'
-};
-
-type AnyObject = {[key: string]: any};
-
-const customWidgets: AnyObject = {
-  Workplace: {type: WorkplaceTypeWidget}
-};
-
-const omitFields: AnyObject = {
-  UnloadingPlace: ['entrances'],
-  Workplace: ['workplace_entrances']
 };
 
 type FeatureViewProps = {
@@ -133,12 +123,6 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
     const editable = userCanEditNote(user, osmImageNote);
     const {mode} = this.state;
 
-    const filteredSchema = {...schema};
-    // Don't show OSM Feature as a silly integer input field in the form:
-    const {osm_feature, ...filteredProps} = schema.properties;
-    filteredSchema.properties = omitFields[featureTypeName] ? Object.fromEntries(
-      Object.entries(filteredProps).filter(([k, v]) => !omitFields[featureTypeName].includes(k))
-    ) : filteredProps;
     const TypeView = featureTypeViews[featureTypeName];
 
     const nextMode: {[m: string]: Mode} = {
@@ -156,16 +140,8 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
           {TypeView ? <TypeView {...{mapFeature}}/> : <strong>{featureTypeName}</strong>}
 
           {mode == 'editing' ?
-            <Form schema={filteredSchema} uiSchema={this.getUISchema()} className="compact"
-                  formData={mapFeature}
-                  onSubmit={this.onSubmit}>
-              <Button size="sm" color="primary" type="submit" className="btn-compact pl-4 pr-4 mr-2">Save</Button>
-              <Button tag="span" size="sm" color="secondary" outline className="btn-compact pl-4 pr-4"
-                      onClick={this.onCancel}>Cancel</Button>
-              <ConfirmButton onClick={() => this.onDelete()}
-                             className="btn-outline-danger btn-compact btn-sm float-right"
-                             confirm={`Really delete ${featureTypeName}?`}>Delete</ConfirmButton>
-            </Form>
+            <MapFeatureForm featureTypeName={featureTypeName} schema={schema} onSubmit={this.onSubmit}
+                            onDelete={this.onDelete} onCancel={this.onCancel} mapFeature={mapFeature}/>
           :
             <>
               {mode == 'expanded' && <>
@@ -210,7 +186,7 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
     </div>
   }
 
-  private onCancel = () => {
+  onCancel = () => {
     const {osmImageNote, mapFeature, onDelete} = this.props;
     const fieldName = this.getFeatureListFieldName();
     // @ts-ignore
@@ -281,29 +257,4 @@ export default class MapFeatureEditor extends React.Component<MapFeatureEditorPr
       .map((feature: MapFeature) => _.omit(feature, ...(omitFields[featureTypeName] || [])));
     return Promise.resolve(onSubmit({[fieldName]: mapFeatures, osm_features: osmImageNote.osm_features}))
   };
-
-  private getUISchema() {
-    const {schema, featureTypeName} = this.props;
-    const radioFields = Object.entries(schema.properties)
-      .filter(([field, spec]) =>
-        // @ts-ignore
-        String(spec.type) == String(["boolean", "null"]))
-      .map(([field, spec]) => {
-        // @ts-ignore
-        return [field, {"ui:widget": "radio"}]
-      });
-    const customWidgetsForSchema = customWidgets[featureTypeName] || {};
-    const customFields = Object.entries(schema.properties)
-      .filter(([field, spec]) => customWidgetsForSchema[field])
-      .map(([field, spec]) => {
-        return [field, {"ui:widget": customWidgetsForSchema[field]}]
-      });
-    const textFields = Object.entries(schema.properties)
-        // @ts-ignore
-      .filter(([field, spec]) => spec.type == 'string' && !spec.maxLength && !spec.enum)
-      .map(([field, spec]) => {
-        return [field, {"ui:widget": 'textarea'}]
-      });
-    return Object.fromEntries(radioFields.concat(customFields).concat(textFields));
-  }
 }
