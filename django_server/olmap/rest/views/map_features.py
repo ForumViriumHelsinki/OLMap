@@ -26,7 +26,7 @@ class MapFeatureViewSet(viewsets.ReadOnlyModelViewSet):
         if self.action in ['list', 'retrieve', 'search', 'near']:
             permission_classes = [permissions.AllowAny]
         else:
-            permission_classes = [IsReviewerOrCreator]
+            permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
     @action(methods=['GET'], detail=False)
