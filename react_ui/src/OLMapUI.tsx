@@ -10,7 +10,6 @@ import {AppContext, User} from "components/types";
 import ResetPasswordScreen from "components/ResetPasswordScreen";
 import OSMImageNoteModal from "components/osm_image_notes/OSMImageNoteModal";
 import NavBar from "util_components/bootstrap/NavBar";
-import Confirm from "util_components/bootstrap/Confirm";
 import OSMImageNotesEditor from "components/osm_image_notes/OSMImageNotesEditor";
 import ImageNotesContextProvider from "components/osm_image_notes/ImageNotesContextProvider";
 import WorkplaceWizard from "components/workplace_wizard/WorkplaceWizard";
@@ -60,7 +59,7 @@ class OLMapUI extends React.Component<{}, UIState> {
   }
 
   render() {
-    const {user, dataFetched, showLogout} = this.state;
+    const {user, dataFetched} = this.state;
 
     // @ts-ignore
     const ImageNote = () => <OSMImageNoteModal note={{id: useParams().noteId}} fullScreen />;
@@ -72,9 +71,7 @@ class OLMapUI extends React.Component<{}, UIState> {
 
     const WithNavBar: React.FC = (props) =>
       <div style={{height: window.innerHeight}} className="flex-column d-flex" id="OLMapUI">
-        <NavBar onIconClick={this.onNavIconClick}
-                icon={user ? "account_circle" : "login"}
-                iconText={user ? user.username : 'Sign in'}>
+        <NavBar user={user} logout={this.logout}>
           <h5 className="m-2">OLMap</h5>
         </NavBar>
         <div className="flex-grow-1 flex-shrink-1 overflow-auto">
@@ -82,7 +79,7 @@ class OLMapUI extends React.Component<{}, UIState> {
         </div>
       </div>;
 
-    const MainUI = (props: {selectedNoteId?: number, newNote?: boolean, osmFeatures?: number[]}) =>
+    const MapUI = (props: {selectedNoteId?: number, newNote?: boolean, osmFeatures?: number[]}) =>
       <WithNavBar>
           <ImageNotesContextProvider>
             <OSMImageNotesEditor {...props}/>
@@ -108,24 +105,17 @@ class OLMapUI extends React.Component<{}, UIState> {
           </Route>
           <Route path='/Notes/new/:osmId(\d+)?/' render={(props: any) => {
             const {osmId} = props.match.params;
-            return <MainUI newNote osmFeatures={osmId && [Number(osmId)]}/>
+            return <MapUI newNote osmFeatures={osmId && [Number(osmId)]}/>
           }} />
-          <Route path='(/Notes)?/:noteId(\d+)?' render={(props: any) =>
-            <MainUI selectedNoteId={props.match.params.noteId && Number(props.match.params.noteId)}/>
+          <Route path='/Notes/:noteId(\d+)?' render={(props: any) =>
+            <MapUI selectedNoteId={props.match.params.noteId && Number(props.match.params.noteId)}/>
           } />
+          <Route>
+            <Redirect to="/ww/" />
+          </Route>
         </Switch>
       </Router>
-      {showLogout &&
-        <Confirm title="Log out?"
-                 onClose={() => this.setState({showLogout: false})}
-                 onConfirm={this.logout}/>
-      }
     </AppContext.Provider> : <LoadScreen/>;
-  }
-
-  onNavIconClick = () => {
-    if (this.state.user) this.setState({showLogout: true});
-    else window.location.hash = '#/login/'
   }
 }
 
