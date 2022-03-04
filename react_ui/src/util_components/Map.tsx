@@ -75,6 +75,7 @@ export default class Map extends React.Component<MapProps, MapState> {
   }
 
   refreshMap() {
+    if (!this.leafletMap) return;
     const {extraLayers, onMapInitialized, onClick} = this.props;
     const newMap = !this.bgLayer;
 

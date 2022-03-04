@@ -94,6 +94,7 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
   }
 
   refreshMap() {
+    if (!this.leafletMap) return;
     const {onLocationSelected, zoom} = this.props;
     const {currentPosition} = this.state;
     // @ts-ignore

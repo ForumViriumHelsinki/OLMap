@@ -13,15 +13,14 @@ import MyPositionMap from "util_components/MyPositionMap";
 import EntrancesMapLayer from "components/workplace_wizard/EntrancesMapLayer";
 import UnloadingPlacesMapLayer from "components/workplace_wizard/UnloadingPlacesMapLayer";
 import {
-  APMarker,
-  EntranceMarker,
   Line,
   MapClickedPopup,
-  positioningOptions,
-  UPMarker,
-  WorkplaceMarker
+  positioningOptions
 } from "components/workplace_wizard/util_components";
 import WWToolbar from "components/workplace_wizard/WWToolbar";
+import {loadMapFeatureTypes} from "components/osm_image_notes/ImageNotesContextProvider";
+import {MapFeatureTypes} from "components/types";
+import {APMarker, EntranceMarker, UPMarker, WorkplaceMarker} from "components/workplace_wizard/map_markers";
 
 
 type WorkplaceWizardEditorProps = {
@@ -35,7 +34,8 @@ type WorkplaceWizardEditorState = {
   positioning?: MapFeature | positioningOptions,
   activeEntrance?: WorkplaceEntrance,
   activeUP?: UnloadingPlace,
-  mapClicked?: LatLngLiteral
+  mapClicked?: LatLngLiteral,
+  mapFeatureTypes?: MapFeatureTypes
 }
 
 const initialState: WorkplaceWizardEditorState = {
@@ -51,7 +51,9 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
 
   render() {
     const {onClose} = this.props;
-    const {changed, positioning, mapClicked, activeEntrance, activeUP, workplace} = this.state;
+    const {
+      changed, positioning, mapClicked, activeEntrance, activeUP, workplace, mapFeatureTypes
+    } = this.state;
 
     const DetectClick = () => {
       useMapEvent('click', this.positionChosen);
@@ -82,20 +84,23 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
             <UnloadingPlacesMapLayer location={{lat: workplace.lat, lon: workplace.lon}} addUP={this.addUP}/>
 
             {delivery_entrance && <>
-              <EntranceMarker icon="delivery" entrance={delivery_entrance} entrances={entrances} editor={this}/>
+              <EntranceMarker icon="delivery" entrance={delivery_entrance}
+                              entrances={entrances} editor={this} schema={mapFeatureTypes && mapFeatureTypes.Entrance}/>
               <Line f1={workplace} f2={delivery_entrance} />
             </>}
 
             {entrances.filter(e => e != delivery_entrance).map((entrance, i) =>
               <React.Fragment key={i}>
-              <EntranceMarker icon="entrance" entrance={entrance} entrances={entrances} editor={this}/>
+              <EntranceMarker icon="entrance" entrance={entrance} entrances={entrances}
+                              editor={this} schema={mapFeatureTypes && mapFeatureTypes.Entrance}/>
                 <Line f1={workplace} f2={entrance} />
               </React.Fragment>
             )}
 
             {entrances.map(entrance => entrance.unloading_places?.map((up, i) =>
               <React.Fragment key={i}>
-                <UPMarker up={up} entrance={entrance} editor={this} />
+                <UPMarker up={up} entrance={entrance} editor={this}
+                          schema={mapFeatureTypes && mapFeatureTypes.UnloadingPlace}/>
                 <Line f1={entrance} f2={up} />
 
                 {up.access_points?.map((ap: AccessPoint, i) =>
@@ -148,6 +153,7 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
 
   componentDidMount() {
     this.initWPFromProps();
+    loadMapFeatureTypes().then(mapFeatureTypes => this.setState({mapFeatureTypes}))
   }
 
   private initWPFromProps() {
@@ -183,7 +189,8 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
     const {workplace} = this.state;
 
     const wpEntrance: WorkplaceEntrance = {
-      lat, lon, image_note_id, image, entrance_id: id, unloading_places: [], deliveries: deliveries ? 'main' : undefined
+      lat, lon, image_note_id, image, entrance_id: id, unloading_places: [], entrance_fields: entrance,
+      deliveries: deliveries ? 'main' : undefined
     };
     const entrances = workplace.workplace_entrances || [];
     if (deliveries) entrances.forEach(e => {e.deliveries = '';});

@@ -77,11 +77,22 @@ export default class ImageNotesContextProvider extends React.Component<ImageNote
   };
 
   loadMapFeatureTypes() {
-    sessionRequest(mapFeatureTypesUrl).then((response) => {
-      if (response.status < 300)
-        response.json().then((mapFeatureTypes) => {
-          this.setState({mapFeatureTypes});
-        })
+    loadMapFeatureTypes().then((mapFeatureTypes) => {
+      this.setState({mapFeatureTypes});
     })
   }
 }
+
+
+export var mapFeatureTypes: any;
+
+export const loadMapFeatureTypes = () => {
+  if (mapFeatureTypes) return Promise.resolve(mapFeatureTypes);
+  else return sessionRequest(mapFeatureTypesUrl).then((response) => {
+    if (response.status < 300)
+      return response.json().then((featureTypes) => {
+        mapFeatureTypes = featureTypes;
+        return mapFeatureTypes;
+      })
+  })
+};

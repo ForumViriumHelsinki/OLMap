@@ -50,6 +50,8 @@ class MapFeatureSerializer(serializers.ModelSerializer):
             class Meta:
                 model = prop_type
                 exclude = ['image_note']
+
+        cls.registered_subclasses[prop_type] = PropSerializer
         return PropSerializer
 
     @classmethod

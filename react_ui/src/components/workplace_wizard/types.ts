@@ -18,6 +18,7 @@ export type UnloadingPlace = MapFeature & {
 
 export type WorkplaceEntrance = MapFeature & {
   entrance_id?: number,
+  entrance_fields?: any,
   description?: string,
   deliveries?: 'yes' | 'no' | 'main' | '',
   unloading_places?: UnloadingPlace[]

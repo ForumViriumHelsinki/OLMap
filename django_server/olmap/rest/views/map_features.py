@@ -43,12 +43,15 @@ class MapFeatureViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class UnloadingPlacesViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
-    queryset = models.UnloadingPlace.objects.exclude(image_note__visible=False)
+    queryset = models.UnloadingPlace.objects.exclude(image_note__visible=False).select_related('image_note')
     serializer_class = UnloadingPlaceSerializer
 
 
 class WorkplaceViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
-    queryset = models.Workplace.objects.exclude(image_note__visible=False)
+    queryset = models.Workplace.objects.exclude(image_note__visible=False)\
+        .select_related('image_note')\
+        .prefetch_related('workplace_entrances__entrance__image_note',
+                          'workplace_entrances__entrance__unloading_places__image_note')
     serializer_class = WorkplaceSerializer
 
     def get_serializer(self, *args, **kwargs):
@@ -79,5 +82,5 @@ class WorkplaceByOSMIdViewSet(WorkplaceViewSet):
 
 
 class EntranceViewSet(MapFeatureViewSet):
-    queryset = models.Entrance.objects.filter(image_note__visible=True)
+    queryset = models.Entrance.objects.filter(image_note__visible=True).select_related('image_note')
     serializer_class = EntranceSerializer

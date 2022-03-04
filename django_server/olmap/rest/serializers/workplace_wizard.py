@@ -6,7 +6,7 @@ from olmap import models
 class MapFeatureSerializer(serializers.ModelSerializer):
     lat = serializers.FloatField(source='image_note.lat')
     lon = serializers.FloatField(source='image_note.lon')
-    image = serializers.ImageField(source='image_note.image', required=False, allow_null=True)
+    image = serializers.ImageField(source='image_note.image', read_only=True)
     image_note_id = serializers.PrimaryKeyRelatedField(
         queryset=models.OSMImageNote.objects.all(), required=False)
     id = serializers.IntegerField(required=False)
@@ -65,7 +65,8 @@ mf_fields = MapFeatureSerializer.Meta.fields
 class UnloadingPlaceSerializer(MapFeatureSerializer):
     class Meta:
         model = models.UnloadingPlace
-        fields = mf_fields + ['access_points']
+        fields = mf_fields + ['access_points', 'layer', 'length', 'width',
+                              'max_weight', 'description', 'opening_hours']
 
 
 class EntranceSerializer(MapFeatureSerializer):
@@ -74,7 +75,8 @@ class EntranceSerializer(MapFeatureSerializer):
     class Meta:
         model = models.Entrance
         fields = mf_fields + ['street', 'housenumber', 'unit', 'type', 'description',
-                              'loadingdock', 'layer', 'unloading_places']
+                              'loadingdock', 'layer', 'unloading_places', 'access',
+                              'width', 'height', 'buzzer', 'keycode', 'phone', 'opening_hours', 'wheelchair']
 
     def update(self, instance, validated_data):
         unloading_places = validated_data.pop('unloading_places', [])
@@ -115,25 +117,36 @@ class WorkplaceEntranceSerializer(serializers.ModelSerializer):
     image_note_id = serializers.IntegerField(source='entrance.image_note_id', required=False)
     unloading_places = UnloadingPlaceSerializer(many=True, required=False, source='entrance.unloading_places')
     entrance_id = serializers.PrimaryKeyRelatedField(queryset=models.Entrance.objects.all(), required=False)
+    entrance_fields = EntranceSerializer(source='entrance')
     id = serializers.IntegerField(required=False)
 
     class Meta:
         model = models.WorkplaceEntrance
-        fields = mf_fields + ['entrance_id', 'deliveries', 'unloading_places', 'description']
+        fields = mf_fields + ['entrance_id', 'deliveries', 'unloading_places', 'description', 'entrance_fields']
+
+    def is_valid(self, raise_exception=False):
+        try:
+            self.initial_data['entrance_fields']['unloading_places'] = self.initial_data['unloading_places']
+        except KeyError:
+            pass
+        return super().is_valid(raise_exception)
 
     def update(self, instance, validated_data):
-        entrance_fields = validated_data.pop('entrance', {})
+        entrance_fields = self.extract_entrance(validated_data)
         validated_data['entrance'] = validated_data.pop('entrance_id', None)
         ret = super().update(instance, validated_data)
         self.update_entrance(instance, entrance_fields)
         return ret
+
+    def extract_entrance(self, validated_data):
+        return validated_data.pop('entrance', {})
 
     def update_entrance(self, instance, entrance_data):
         serializer = EntranceSerializer(context=self.context)
         serializer.update(instance.entrance, entrance_data)
 
     def create(self, validated_data):
-        entrance_fields = validated_data.pop('entrance', {})
+        entrance_fields = self.extract_entrance(validated_data)
         entrance_or_id = validated_data.pop('entrance_id', None)
         field = 'entrance_id' if isinstance(entrance_or_id, int) else 'entrance'
         validated_data[field] = entrance_or_id
@@ -161,6 +174,14 @@ class WorkplaceSerializer(MapFeatureSerializer):
         model = models.Workplace
         fields = mf_fields + ['street', 'housenumber', 'unit', 'osm_feature', 'workplace_entrances',
                               'name', 'delivery_instructions', 'max_vehicle_height']
+
+    def is_valid(self, raise_exception=False):
+        for e in self.initial_data['workplace_entrances']:
+            try:
+                e['entrance_fields']['unloading_places'] = e['unloading_places']
+            except KeyError:
+                pass
+        return super().is_valid(raise_exception)
 
     def update(self, instance, validated_data):
         entrances = validated_data.pop('workplace_entrances', [])
