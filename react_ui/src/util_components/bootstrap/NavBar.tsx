@@ -19,9 +19,6 @@ export default class NavBar extends React.Component<NavBarProps, NavBarState> {
   render() {
     const {user, children, logout} = this.props;
     const {showMenu, showLogout} = this.state;
-    const icon = user ? "account_circle" : "login";
-    const iconText = user ? user.username : 'Sign in';
-    const iconCls = "text-center d-inline-block ml-2 mt-1 clickable";
     const showCls = showMenu ? ' show' : '';
 
     return <nav className="navbar navbar-dark bg-primary text-light p-0 flex-shrink-0">
