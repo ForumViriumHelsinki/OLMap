@@ -4,6 +4,7 @@ import {Location} from 'util_components/types';
 import {workplacesUrl, workplaceUrl} from "components/workplace_wizard/urls";
 import * as L from "leaflet";
 import {LatLngLiteral, LeafletMouseEvent} from "leaflet";
+import _ from "lodash";
 
 import './WorkplaceWizard.scss';
 import sessionRequest from "sessionRequest";
@@ -85,15 +86,15 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
               <Line f1={workplace} f2={delivery_entrance} />
             </>}
 
-            {entrances.filter(e => e != delivery_entrance).map(entrance =>
-              <React.Fragment key={entrance.id}>
+            {entrances.filter(e => e != delivery_entrance).map((entrance, i) =>
+              <React.Fragment key={i}>
               <EntranceMarker icon="entrance" entrance={entrance} entrances={entrances} editor={this}/>
                 <Line f1={workplace} f2={entrance} />
               </React.Fragment>
             )}
 
-            {entrances.map(entrance => entrance.unloading_places?.map(up =>
-              <React.Fragment key={up.id}>
+            {entrances.map(entrance => entrance.unloading_places?.map((up, i) =>
+              <React.Fragment key={i}>
                 <UPMarker up={up} entrance={entrance} editor={this} />
                 <Line f1={entrance} f2={up} />
 
@@ -185,14 +186,14 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
       lat, lon, image_note_id, image, entrance_id: id, unloading_places: [], deliveries: deliveries ? 'main' : undefined
     };
     const entrances = workplace.workplace_entrances || [];
-    if (deliveries) entrances.forEach(e => {e.deliveries = undefined;});
+    if (deliveries) entrances.forEach(e => {e.deliveries = '';});
     entrances.push(wpEntrance);
     const newWp: Workplace = {...workplace, workplace_entrances: entrances};
     this.storeState({workplace: newWp, changed: true, mapClicked: undefined,
                      activeEntrance: wpEntrance, positioning: undefined});
   };
 
-  private closePopup() {
+  closePopup() {
     if (this.map) this.map.closePopup();
   }
 
@@ -251,10 +252,17 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
 
     const [url, method] = workplace.id ? [workplaceUrl(workplace.id), 'PATCH'] : [workplacesUrl, 'POST'];
 
-    sessionRequest(url, {method, data: workplace})
-    .then(response => {
-      if (response.status < 300) response.json().then((workplace) =>
-        this.setState({workplace, changed: false}))})
+    return sessionRequest(url, {method, data: workplace})
+      .then(response => {
+        if (response.status < 300)
+          return response.json().then((newWorkplace) => {
+            for (const e of newWorkplace.workplace_entrances)
+              e.deliveries = e.deliveries || '';
+            _.merge(workplace, newWorkplace);
+            this.setState({workplace, changed: false});
+            return workplace;
+          })
+      })
   };
 
   instructionsChanged = (e: ChangeEvent<HTMLTextAreaElement>) => {

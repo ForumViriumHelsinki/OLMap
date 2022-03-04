@@ -9,7 +9,8 @@ import * as L from "leaflet";
 import up_icon from './unloading.svg';
 import sessionRequest from "sessionRequest";
 import {LatLngLiteral} from "leaflet";
-import {ImageButton, popupBtn, WWIcon} from "components/workplace_wizard/util_components";
+import {popupBtn, WWIcon} from "components/workplace_wizard/util_components";
+import {ImageButton} from "components/workplace_wizard/ImageButton";
 
 type UnloadingPlacesMapLayerProps = {
   location: Point,

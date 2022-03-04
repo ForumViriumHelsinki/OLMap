@@ -9,7 +9,8 @@ import * as L from "leaflet";
 import delivery_icon from './delivery_entrance.svg';
 import sessionRequest from "sessionRequest";
 import {LatLngLiteral} from "leaflet";
-import {ImageButton, popupBtn, WWIcon} from "components/workplace_wizard/util_components";
+import {popupBtn, WWIcon} from "components/workplace_wizard/util_components";
+import {ImageButton} from "components/workplace_wizard/ImageButton";
 
 type EntrancesMapLayerProps = {
   location: Point,

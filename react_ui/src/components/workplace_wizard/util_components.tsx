@@ -1,15 +1,14 @@
 import {AccessPoint, MapFeature, UnloadingPlace, Workplace, WorkplaceEntrance} from "components/workplace_wizard/types";
 import {Marker, Polyline, Popup} from "react-leaflet";
-import React, {useState} from "react";
+import React from "react";
 import {default as L, LatLngLiteral} from "leaflet";
 import Icon from "util_components/bootstrap/Icon";
-import Modal from "util_components/bootstrap/Modal";
-import ZoomableImage from "util_components/ZoomableImage";
 import wp_icon from "components/workplace_wizard/workplace.svg";
 import delivery_icon from "components/workplace_wizard/delivery_entrance.svg";
 import entrance_icon from "components/workplace_wizard/entrance.svg";
 import unloading_icon from "components/workplace_wizard/unloading.svg";
 import access_icon from "components/workplace_wizard/access.svg";
+import {ImageButton} from "components/workplace_wizard/ImageButton";
 
 export const latLng = (feature: MapFeature) => {
   const {lat, lon} = feature || {};
@@ -24,18 +23,6 @@ export const Line = ({f1, f2}: {f1: MapFeature, f2: MapFeature}) =>
 
 export const WWIcon = (props: any) =>
   <Icon {...props} align="bottom"/>;
-
-export const ImageButton = ({f}: {f: MapFeature}) => {
-  const [visible, setVisible] = useState(false);
-  return !f.image ? null : <>
-    <button className={popupBtn} onClick={() => setVisible(true)}>
-      <WWIcon icon="photo_camera" outline/> Näytä kuva
-    </button>
-    {visible && <Modal onClose={() => setVisible(false)} title="Kuva">
-      <ZoomableImage src={f.image} className="wwModalImg"/>
-    </Modal>}
-  </>;
-};
 
 export const MoveButton = ({onClick}: {onClick: () => any}) =>
   <button className={popupBtn} onClick={onClick}>
@@ -112,7 +99,7 @@ type EntranceMarkerProps = {
 export const EntranceMarker = ({entrance, entrances, editor, icon}: EntranceMarkerProps) =>
   <Marker position={latLng(entrance)} icon={icons[icon]}>
     <Popup closeOnClick={true} closeButton={false} className="wwPopup">
-      <ImageButton f={entrance}/>
+      <ImageButton f={entrance} editor={editor}/>
       <MoveButton onClick={() => editor.move(entrance)}/>
       <AddUPButton onClick={() => editor.positionNewUP(entrance)}/>
       <RemoveButton onClick={() => editor.removeItem(entrance, entrances)}/>
@@ -128,7 +115,7 @@ type UPMarkerProps = {
 export const UPMarker = ({up, entrance, editor}: UPMarkerProps) =>
   <Marker position={latLng(up)} icon={icons.unloading}>
     <Popup closeOnClick={true} closeButton={false} className="wwPopup">
-      <ImageButton f={up}/>
+      <ImageButton f={up} editor={editor}/>
       <MoveButton onClick={() => editor.move(up)}/>
       <button className={popupBtn} onClick={() => {editor.positionNewAP(up)}}>
         <WWIcon icon="directions" outline /> Lisää reittipiste
