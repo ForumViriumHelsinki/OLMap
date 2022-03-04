@@ -8,6 +8,7 @@ import './WorkplaceWizard.scss';
 import sessionRequest from "sessionRequest";
 import Icon from "util_components/bootstrap/Icon";
 import WorkplaceWizardEditor from "components/workplace_wizard/WorkplaceWizardEditor";
+import {AppContext} from "components/types";
 
 
 type WorkplaceWizardProps = {}

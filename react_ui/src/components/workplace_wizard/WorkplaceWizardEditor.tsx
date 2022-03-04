@@ -126,6 +126,40 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
         <button className="btn btn-sm btn-compact btn-outline-danger"
                 onClick={onClose}>Sulje</button>
       </div>}
+      <div className="mt-5 p-3 card">
+        <h5>Käyttöohjeita</h5>
+        {!delivery_entrance &&
+          <p>
+            Klikkaa ensin Uusi toimitus-sisäänkäynti ja lisää se kartalle oikeaan
+            kohtaan (tärkein, kun tätä tehdään tavarankuljetuksiin).
+          </p>
+        }
+        {activeEntrance && !activeUP &&
+          <p>
+            Lisää seuraavaksi lastauspaikka, mihin auton voi jättää kuormauksen ajaksi.
+          </p>
+        }
+        {activeUP && !(activeUP.access_points || []).length &&
+          <p>
+            Jos ajoreitti ei ole itsestään selvä kannattaa lisätä reittipiste, mitä kautta
+            lastauspaikalle käännytään katuverkosta.
+          </p>
+        }
+        <p>
+          Voit lisätä myös muita sisäänkäyntejä (myös pääovi on “muu sisäänkäynti”, jos se ei ole
+          tavarankuljetuksiin).
+
+          Klikkaamalla näitä lisättyjä ikoneita aukeaa valikko, jossa kutakin ikonia pystyy
+          muokkaamaan tai lisäämään valokuvan paikasta.
+        </p>
+        <p>
+          Toimitusohjeet-tekstikenttään kannattaa kirjoittaa lyhyesti, mitä paikassa on
+          huomioitava (esim. korkeusrajoitus, yksisuuntaisuus, paikalle johtavan kyltin teksti tms.)
+        </p>
+        <p>
+          Paina lopuksi Tallenna. ;)
+        </p>
+      </div>
     </>
   }
 

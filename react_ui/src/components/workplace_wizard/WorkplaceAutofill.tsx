@@ -3,6 +3,7 @@ import {Workplace} from "components/workplace_wizard/types";
 import {geocoderFocus} from "components/workplace_wizard/settings";
 import {geocoderUrl, workplaceSearchUrl} from "components/workplace_wizard/urls";
 import sessionRequest from "sessionRequest";
+import {AppContext} from "components/types";
 
 type WorkplaceAutofillProps = {
   onSelected: (wp: Workplace) => any
@@ -45,8 +46,10 @@ const initialState: WorkplaceAutofillState = {};
 export default class WorkplaceAutofill extends React.Component<WorkplaceAutofillProps, WorkplaceAutofillState> {
   state = initialState;
   private blurred?: any;
+  static contextType = AppContext;
 
   render() {
+    const {user} = this.context;
     const {onSelected} = this.props;
     const {name, street, housenumber, unit, closed} = this.state;
     const olmapWorkplaces = this.state.olmapWorkplaces || [];
@@ -82,6 +85,25 @@ export default class WorkplaceAutofill extends React.Component<WorkplaceAutofill
       {name && street && housenumber &&
         <button className="btn btn-outline-primary btn-block" onClick={this.onSelectBtn}>Valitse</button>
       }
+      <div className="mt-5 p-3 card">
+        <h5>Käyttöohjeita</h5>
+        <p>OLMap on helppo nettityökalu tavarantoimituspaikkojen tarkan sijainnin tallentamiseen ja jakamiseen.</p>
+        <p>Laite kysyy sijainnin jakoa, sen voi sallia tai estää. Salliminen voi sujuvoittaa käyttöä, jos tekee tallennusta paikan päällä.</p>
+        {!user && <p>
+          Yksinkertaisia ohjeita voi luoda ilman käyttäjätiliä, mutta jotta voi palata myöhemmin ja
+          muokata ohjeita <b>suositellaan tilin luomista</b>. Käyttäjätilin luonti onnistuu yläkulman
+          valikosta {"->"} Log in {"->"} Register.
+        </p>}
+        <h6 className="text-primary mt-5">Toimipisteen toimitusohjeet</h6>
+        <p>
+          Tällä työkalulla voi tällä hetkellä tallentaa vain yrityksiä ym. toimipisteitä (ei asuintaloja).
+          <ul>
+            <li>Kirjoita toimipisteen nimi ja osoite.</li>
+            <li>Jos kirjoittamisen aikana pudotusvalikkoon tulee sopiva ehdotus, valitse se.</li>
+            <li>Jos sopivaa ehdotusta ei tule, kirjoita loppuun asti. Kirjoittamastasi tulee toimipisteen nimi.</li>
+          </ul>
+        </p>
+      </div>
     </>;
   }
 
