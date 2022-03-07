@@ -9,7 +9,9 @@ export type MapFeature = Point & {
   id?: number,
   osm_feature?: string,
   image_note_id?: number,
-  image?: string
+  image?: string,
+  created_by?: number,
+  created_at?: string
 };
 
 export type UnloadingPlace = MapFeature & {

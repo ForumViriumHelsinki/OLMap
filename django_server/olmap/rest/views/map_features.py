@@ -4,7 +4,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from olmap import models
-from olmap.rest.permissions import IsReviewerOrCreator
+from olmap.rest.permissions import IsAuthenticatedOrNewDataPoint
 from olmap.rest.serializers import WorkplaceTypeSerializer, WorkplaceEntranceSerializer
 from olmap.rest.serializers.workplace_wizard import WorkplaceSerializer, EntranceSerializer, UnloadingPlaceSerializer
 
@@ -23,10 +23,10 @@ class WorkplaceEntrancesViewSet(viewsets.ModelViewSet):
 
 class MapFeatureViewSet(viewsets.ReadOnlyModelViewSet):
     def get_permissions(self):
-        if self.action in ['list', 'retrieve', 'search', 'near']:
+        if self.action in ['list', 'retrieve', 'search', 'near', 'create']:
             permission_classes = [permissions.AllowAny]
         else:
-            permission_classes = [permissions.IsAuthenticated]
+            permission_classes = [IsAuthenticatedOrNewDataPoint]
         return [permission() for permission in permission_classes]
 
     @action(methods=['GET'], detail=False)
@@ -49,9 +49,7 @@ class UnloadingPlacesViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
 
 class WorkplaceViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
     queryset = models.Workplace.objects.exclude(image_note__visible=False)\
-        .select_related('image_note')\
-        .prefetch_related('workplace_entrances__entrance__image_note',
-                          'workplace_entrances__entrance__unloading_places__image_note')
+        .select_related('image_note')
     serializer_class = WorkplaceSerializer
 
     def get_serializer(self, *args, **kwargs):

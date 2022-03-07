@@ -32,3 +32,12 @@ class IsReviewerOrCreator(permissions.BasePermission):
         if request.user.groups.filter(name=REVIEWER_GROUP).exists():
             return True
         return image_note_obj.created_by_id == request.user.id
+
+
+class IsAuthenticatedOrNewDataPoint(permissions.BasePermission):
+    def has_object_permission(self, request, view, instance):
+        image_note_obj = getattr(instance, 'image_note', instance)
+        # Anonymous users can edit new anonymous notes in order to be able to attach an image to a freshly
+        # created note:
+        return ((not request.user.is_anonymous) or
+                (image_note_obj.created_by is None and image_note_obj.created_at > now() - timedelta(minutes=30)))

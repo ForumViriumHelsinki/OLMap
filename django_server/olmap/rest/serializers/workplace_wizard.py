@@ -7,13 +7,15 @@ class MapFeatureSerializer(serializers.ModelSerializer):
     lat = serializers.FloatField(source='image_note.lat')
     lon = serializers.FloatField(source='image_note.lon')
     image = serializers.ImageField(source='image_note.image', read_only=True)
+    created_by = serializers.PrimaryKeyRelatedField(source='image_note.created_by', read_only=True)
+    created_at = serializers.DateTimeField(source='image_note.created_at', read_only=True)
     image_note_id = serializers.PrimaryKeyRelatedField(
         queryset=models.OSMImageNote.objects.all(), required=False)
     id = serializers.IntegerField(required=False)
 
     class Meta:
         model = models.MapFeature
-        fields = ['lat', 'lon', 'image_note_id', 'id', 'image', 'osm_feature']
+        fields = ['lat', 'lon', 'image_note_id', 'id', 'image', 'osm_feature', 'created_by', 'created_at']
 
     def update(self, instance, validated_data):
         note_fields = validated_data.pop('image_note', None)
@@ -65,7 +67,7 @@ mf_fields = MapFeatureSerializer.Meta.fields
 class UnloadingPlaceSerializer(MapFeatureSerializer):
     class Meta:
         model = models.UnloadingPlace
-        fields = mf_fields + ['access_points', 'layer', 'length', 'width',
+        fields = mf_fields + ['access_points', 'layer', 'length', 'width', 'entrances',
                               'max_weight', 'description', 'opening_hours']
 
 
@@ -94,7 +96,7 @@ class EntranceSerializer(MapFeatureSerializer):
         for up_data in unloading_places_data:
             id = up_data.get('id', None)
             if id:
-                up = models.UnloadingPlace.objects.get(id=id)
+                up = models.UnloadingPlace.objects.select_related('image_note').get(id=id)
                 serializer.update(up, up_data)
             else:
                 up = serializer.create(up_data)
@@ -113,6 +115,8 @@ class WorkplaceEntranceSerializer(serializers.ModelSerializer):
     lat = serializers.FloatField(source='entrance.image_note.lat')
     lon = serializers.FloatField(source='entrance.image_note.lon')
     image = serializers.ImageField(source='entrance.image_note.image', required=False, allow_null=True)
+    created_by = serializers.PrimaryKeyRelatedField(source='entrance.image_note.created_by', read_only=True)
+    created_at = serializers.DateTimeField(source='entrance.image_note.created_at', read_only=True)
     osm_feature = serializers.IntegerField(source='entrance.osm_feature_id', required=False, allow_null=True)
     image_note_id = serializers.IntegerField(source='entrance.image_note_id', required=False)
     unloading_places = UnloadingPlaceSerializer(many=True, required=False, source='entrance.unloading_places')
@@ -195,7 +199,9 @@ class WorkplaceSerializer(MapFeatureSerializer):
         for entrance_data in entrances_data:
             id = entrance_data.get('id', None)
             if id:
-                entrance = workplace.workplace_entrances.get(id=id)
+                entrance = workplace.workplace_entrances\
+                    .select_related('entrance__image_note')\
+                    .get(id=id)
                 serializer.update(entrance, entrance_data)
             else:
                 serializer.create(dict(entrance_data, workplace=workplace))

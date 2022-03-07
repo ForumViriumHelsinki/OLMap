@@ -127,10 +127,15 @@ export default class WorkplaceAutofill extends React.Component<WorkplaceAutofill
     const value = e.target.value;
     this.setState({[field]: value});
     if (['name', 'street'].includes(field) && value.length > 2)
-      this.fetchSuggestions(value).then(suggestions => this.setState({suggestions, closed: false}));
+      this.fetchSuggestions(value).then(suggestions => {
+        // @ts-ignore
+        if (this.state[field] == value) this.setState({suggestions, closed: false})
+      });
     if (field == 'name' && value.length > 2)
       sessionRequest(workplaceSearchUrl(value)).then(r => r.json())
-        .then(olmapWorkplaces => this.setState({olmapWorkplaces}))
+        .then(olmapWorkplaces => {
+          if (this.state[field] == value) this.setState({olmapWorkplaces})
+        })
   }
 
   onSelectBtn = () => {

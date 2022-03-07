@@ -19,7 +19,7 @@ import {
 } from "components/workplace_wizard/util_components";
 import WWToolbar from "components/workplace_wizard/WWToolbar";
 import {loadMapFeatureTypes} from "components/osm_image_notes/ImageNotesContextProvider";
-import {MapFeatureTypes} from "components/types";
+import {AppContext, MapFeatureTypes} from "components/types";
 import {APMarker, EntranceMarker, UPMarker, WorkplaceMarker} from "components/workplace_wizard/map_markers";
 
 
@@ -46,10 +46,12 @@ const initialState: WorkplaceWizardEditorState = {
 
 export default class WorkplaceWizardEditor extends React.Component<WorkplaceWizardEditorProps, WorkplaceWizardEditorState> {
   state = initialState;
+  static contextType = AppContext;
 
   map?: L.Map = undefined;
 
   render() {
+    const {user} = this.context;
     const {onClose} = this.props;
     const {
       changed, positioning, mapClicked, activeEntrance, activeUP, workplace, mapFeatureTypes
@@ -62,23 +64,33 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
 
     const entrances = workplace.workplace_entrances || [];
     const delivery_entrance = this.getDeliveryEntrance();
+    const isNew = !workplace.created_at || (Date.now() - Date.parse(workplace.created_at) < 30 * 60 * 1000);
+    const canEdit = user || (!workplace.created_by && isNew);
 
     return !workplace.lat ? null : <>
       <p>{workplace.street} {workplace.housenumber} {workplace.unit || ''}</p>
+      {!canEdit &&
+        <div className="alert alert-danger">
+          Et voi muuttaa tätä toimipistettä kirjautumatta. <a href="#/login/">Kirjaudu ensin</a> jos haluat
+          tehdä tallennettavia muutoksia.
+        </div>
+      }
       <div className="card d-block position-relative">
         {positioning &&
-          <div className="mapOverlay">
-            Valitse kohta klikkaamalla karttaa!
-            <button className="ml-2 btn btn-sm btn-compact btn-outline-dark"
-                    onClick={() => this.setState({positioning: undefined})}>Peruuta</button>
-          </div>
+        <div className="mapOverlay">
+          Valitse kohta klikkaamalla karttaa!
+          <button className="ml-2 btn btn-sm btn-compact btn-outline-dark"
+                  onClick={() => this.setState({positioning: undefined})}>Peruuta</button>
+        </div>
         }
         <div style={{height: '40vh'}}>
-          <MyPositionMap zoom={18} location={workplace as Location} onMapInitialized={map => {this.map = map}}>
+          <MyPositionMap zoom={18} location={workplace as Location} onMapInitialized={map => {
+            this.map = map
+          }}>
             <DetectClick/>
             {mapClicked &&
-              <MapClickedPopup clickedLatLng={mapClicked} activeEntrance={activeEntrance}
-                               editor={this} activeUP={activeUP} />}
+            <MapClickedPopup clickedLatLng={mapClicked} activeEntrance={activeEntrance}
+                             editor={this} activeUP={activeUP}/>}
             <WorkplaceMarker workplace={workplace} onMove={() => this.move(workplace)}/>
             <EntrancesMapLayer location={{lat: workplace.lat, lon: workplace.lon}} addEntrance={this.addEntrance}/>
             <UnloadingPlacesMapLayer location={{lat: workplace.lat, lon: workplace.lon}} addUP={this.addUP}/>
@@ -86,14 +98,14 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
             {delivery_entrance && <>
               <EntranceMarker icon="delivery" entrance={delivery_entrance}
                               entrances={entrances} editor={this} schema={mapFeatureTypes && mapFeatureTypes.Entrance}/>
-              <Line f1={workplace} f2={delivery_entrance} />
+              <Line f1={workplace} f2={delivery_entrance}/>
             </>}
 
             {entrances.filter(e => e != delivery_entrance).map((entrance, i) =>
               <React.Fragment key={i}>
-              <EntranceMarker icon="entrance" entrance={entrance} entrances={entrances}
-                              editor={this} schema={mapFeatureTypes && mapFeatureTypes.Entrance}/>
-                <Line f1={workplace} f2={entrance} />
+                <EntranceMarker icon="entrance" entrance={entrance} entrances={entrances}
+                                editor={this} schema={mapFeatureTypes && mapFeatureTypes.Entrance}/>
+                <Line f1={workplace} f2={entrance}/>
               </React.Fragment>
             )}
 
@@ -101,12 +113,12 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
               <React.Fragment key={i}>
                 <UPMarker up={up} entrance={entrance} editor={this}
                           schema={mapFeatureTypes && mapFeatureTypes.UnloadingPlace}/>
-                <Line f1={entrance} f2={up} />
+                <Line f1={entrance} f2={up}/>
 
                 {up.access_points?.map((ap: AccessPoint, i) =>
                   <React.Fragment key={i}>
                     <APMarker ap={ap} editor={this} up={up}/>
-                    <Line f1={up} f2={ap} />
+                    <Line f1={up} f2={ap}/>
                   </React.Fragment>
                 )}
               </React.Fragment>
@@ -115,35 +127,38 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
         </div>
       </div>
 
-      <WWToolbar addFeature={(positioning) => this.setState({positioning})} activeUP={activeUP} activeEntrance={activeEntrance} />
+      <WWToolbar addFeature={(positioning) => this.setState({positioning})} activeUP={activeUP}
+                 activeEntrance={activeEntrance}/>
 
       <textarea className="form-control mt-2" placeholder="Toimitusohjeet" rows={5}
-        value={workplace.delivery_instructions}
-        onChange={this.instructionsChanged}/>
-      {changed && <div className="btn-group mt-2 d-flex">
+                value={workplace.delivery_instructions}
+                onChange={this.instructionsChanged}/>
+      {changed && canEdit && <div className="btn-group mt-2 d-flex">
         <button className="btn btn-sm btn-compact btn-outline-primary"
-                onClick={this.save}>Tallenna</button>
+                onClick={this.save}>Tallenna
+        </button>
         <button className="btn btn-sm btn-compact btn-outline-danger"
-                onClick={onClose}>Sulje</button>
+                onClick={onClose}>Sulje
+        </button>
       </div>}
       <div className="mt-5 p-3 card">
         <h5>Käyttöohjeita</h5>
         {!delivery_entrance &&
-          <p>
-            Klikkaa ensin Uusi toimitus-sisäänkäynti ja lisää se kartalle oikeaan
-            kohtaan (tärkein, kun tätä tehdään tavarankuljetuksiin).
-          </p>
+        <p>
+          Klikkaa ensin Uusi toimitus-sisäänkäynti ja lisää se kartalle oikeaan
+          kohtaan (tärkein, kun tätä tehdään tavarankuljetuksiin).
+        </p>
         }
         {activeEntrance && !activeUP &&
-          <p>
-            Lisää seuraavaksi lastauspaikka, mihin auton voi jättää kuormauksen ajaksi.
-          </p>
+        <p>
+          Lisää seuraavaksi lastauspaikka, mihin auton voi jättää kuormauksen ajaksi.
+        </p>
         }
         {activeUP && !(activeUP.access_points || []).length &&
-          <p>
-            Jos ajoreitti ei ole itsestään selvä kannattaa lisätä reittipiste, mitä kautta
-            lastauspaikalle käännytään katuverkosta.
-          </p>
+        <p>
+          Jos ajoreitti ei ole itsestään selvä kannattaa lisätä reittipiste, mitä kautta
+          lastauspaikalle käännytään katuverkosta.
+        </p>
         }
         <p>
           Voit lisätä myös muita sisäänkäyntejä (myös pääovi on “muu sisäänkäynti”, jos se ei ole
@@ -227,11 +242,15 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
       deliveries: deliveries ? 'main' : undefined
     };
     const entrances = workplace.workplace_entrances || [];
-    if (deliveries) entrances.forEach(e => {e.deliveries = '';});
+    if (deliveries) entrances.forEach(e => {
+      e.deliveries = '';
+    });
     entrances.push(wpEntrance);
     const newWp: Workplace = {...workplace, workplace_entrances: entrances};
-    this.storeState({workplace: newWp, changed: true, mapClicked: undefined,
-                     activeEntrance: wpEntrance, positioning: undefined});
+    this.storeState({
+      workplace: newWp, changed: true, mapClicked: undefined,
+      activeEntrance: wpEntrance, positioning: undefined
+    });
   };
 
   closePopup() {
@@ -245,8 +264,10 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
     this.closePopup();
     if (!activeEntrance.unloading_places) activeEntrance.unloading_places = [];
     activeEntrance.unloading_places.push(up);
-    this.storeState({workplace, changed: true, positioning: undefined,
-                     mapClicked: undefined, activeUP: up});
+    this.storeState({
+      workplace, changed: true, positioning: undefined,
+      mapClicked: undefined, activeUP: up
+    });
     this.forceUpdate(); // State internals updated in place, naughty business...
   };
 
