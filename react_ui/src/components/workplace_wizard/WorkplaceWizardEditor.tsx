@@ -143,6 +143,7 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
       </div>}
       <div className="mt-5 p-3 card">
         <h5>Käyttöohjeita</h5>
+        <p><a href="https://youtu.be/2VHsi2N-NW8" target="_blank">Katso ohjeet videomuodossa</a></p>
         {!delivery_entrance &&
         <p>
           Klikkaa ensin Uusi toimitus-sisäänkäynti ja lisää se kartalle oikeaan

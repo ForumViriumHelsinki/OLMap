@@ -87,6 +87,7 @@ export default class WorkplaceAutofill extends React.Component<WorkplaceAutofill
       }
       <div className="mt-5 p-3 card">
         <h5>Käyttöohjeita</h5>
+        <p><a href="https://youtu.be/2VHsi2N-NW8" target="_blank">Katso ohjeet videomuodossa</a></p>
         <p>OLMap on helppo nettityökalu tavarantoimituspaikkojen tarkan sijainnin tallentamiseen ja jakamiseen.</p>
         <p>Laite kysyy sijainnin jakoa, sen voi sallia tai estää. Salliminen voi sujuvoittaa käyttöä, jos tekee tallennusta paikan päällä.</p>
         {!user && <p>
