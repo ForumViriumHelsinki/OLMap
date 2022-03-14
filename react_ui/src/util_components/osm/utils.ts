@@ -7,8 +7,6 @@ import {OSMEditContextType} from "components/types";
 import {getBoundsOfDistance} from "geolib";
 import {overpassInterpreterPath} from "settings.json";
 import _ from "lodash";
-// @ts-ignore
-import OverpassFrontend from 'overpass-frontend';
 
 export const osmFeatureLabel = (osmFeature: OSMFeature) => {
   const {tags} = osmFeature;
@@ -46,27 +44,17 @@ export const osmApiCall = (url: string, BodyComponent: any, props: any, context:
   .then(response => response.text().then(text => ({response, text})));
 };
 
-export const overpassQuery = (location: any, distance: number, query: string) => {
-  // @ts-ignore
-  const bounds = getBoundsOfDistance(location, distance);
-  const overpassBounds = {
-    minlat: bounds[0].latitude, maxlat: bounds[1].latitude,
-    minlon: bounds[0].longitude, maxlon: bounds[1].longitude
-  };
+export const overpassQuery = (query: string, location?: any, distance?: number) => {
+  let overpassBounds: any;
 
-  const overpassFrontend = new OverpassFrontend(overpassInterpreterPath);
-
-  const features: OSMFeature[] = [];
-
-  return new Promise((resolve) =>
-    overpassFrontend.BBoxQuery(query, overpassBounds, {properties: OverpassFrontend.ALL},
-      (err: any, response: any) => {
-        if (err) console.error(err);
-        features.push(response.data);
-      },
-      (err: any) => {
-        resolve(features);
-      }
-    )
-  );
+  if (location && distance) {
+    // @ts-ignore
+    const bounds = getBoundsOfDistance(location, distance);
+    overpassBounds = [bounds[0].latitude, bounds[0].longitude, bounds[1].latitude, bounds[1].longitude];
+  }
+  const bbox = overpassBounds ? `[bbox:${overpassBounds.join(',')}]` : '';
+  const body = `[out:json]${bbox}; (${query};)->.result; .result out body geom qt;`;
+  return fetch(overpassInterpreterPath, {method: 'POST', body})
+    .then(response => response.json())
+    .then(({elements}) => elements)
 };

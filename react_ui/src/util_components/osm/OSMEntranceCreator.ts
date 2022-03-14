@@ -50,7 +50,7 @@ export default class OSMEntranceCreator {
 
   findPointsToAdd() {
     // @ts-ignore
-    return overpassQuery(this.coord, this.searchRadius, this.query).then((elements: OSMFeature[]) => {
+    return overpassQuery(this.query, this.coord, this.searchRadius).then((elements: OSMFeature[]) => {
       [this.building, this.entrancePoint] =
         this.findNearestFeature(elements, f => f.tags.building, this.point);
       if (!this.entrancePoint) this.entrancePoint = this.point;

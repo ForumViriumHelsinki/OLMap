@@ -95,6 +95,12 @@ class OLMapUI extends React.Component<{}, UIState> {
           <Route path='/resetPassword/:uid/:token'>
             <ResetPassword/>
           </Route>
+          <Route path='/ww/osm/:osmType/:osmId' render={(props: any) => {
+            const {osmType, osmId} = props.match.params;
+            return <WithNavBar>
+              <WorkplaceWizard {...{osmType, osmId}} />
+            </WithNavBar>
+          }}/>
           <Route path='/ww/'>
             <WithNavBar>
               <WorkplaceWizard/>

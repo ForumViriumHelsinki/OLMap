@@ -41,7 +41,7 @@ export default class TunnelsMapLayer extends React.Component<TunnelsMapLayerProp
   }
 
   componentDidMount() {
-    overpassQuery(geocoderFocus, 5000, query).then((elements) => {
+    overpassQuery(query, geocoderFocus, 5000).then((elements) => {
       this.setState({tunnelFeatures: osmtogeojson({elements}) as GeoJsonObject});
     })
   }

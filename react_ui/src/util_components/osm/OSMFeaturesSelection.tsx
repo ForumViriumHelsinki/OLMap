@@ -108,7 +108,7 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
     const {location, distance, onSelect, onFeaturesLoaded} = this.props;
     const query = 'node[name];way[name];relation[name][building];relation[name][tourism];node[entrance];node[barrier]';
     // @ts-ignore
-    overpassQuery(location, distance, query).then((features: OSMFeature[]) => {
+    overpassQuery(query, location, distance).then((features: OSMFeature[]) => {
       if (!_.isEqual(location, this.props.location)) return;
       const nearbyOSMFeatures: OSMFeature[] = [];
       const wayNames: string[] = [];

@@ -9,9 +9,13 @@ import sessionRequest from "sessionRequest";
 import Icon from "util_components/bootstrap/Icon";
 import WorkplaceWizardEditor from "components/workplace_wizard/WorkplaceWizardEditor";
 import {AppContext} from "components/types";
+import {overpassQuery} from "util_components/osm/utils";
 
 
-type WorkplaceWizardProps = {}
+type WorkplaceWizardProps = {
+  osmType?: 'node' | 'way' | 'relation',
+  osmId?: string
+}
 
 type WorkplaceWizardState = {
   workplace?: Workplace,
@@ -25,7 +29,6 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
   map?: L.Map = undefined;
 
   render() {
-    const {} = this.props;
     const {workplace} = this.state;
 
     return <div className="p-2">
@@ -41,8 +44,23 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
   }
 
   componentDidMount() {
-    const state = JSON.parse(localStorage.getItem('wwState') || '{}');
-    this.setState(state);
+    const {osmType, osmId} = this.props;
+    if (osmType && osmId) {
+      overpassQuery(`${osmType}(${osmId})`).then(([osmWorkplace]) => {
+        const {lat, lon, tags} = osmWorkplace;
+        this.onSelected({
+          lon, lat,
+          osm_feature: osmId,
+          name: tags.name,
+          street: tags['addr:street'],
+          housenumber: tags['addr:housenumber'],
+          unit: tags['addr:unit']
+        })
+      })
+    } else {
+      const state = JSON.parse(localStorage.getItem('wwState') || '{}');
+      this.setState(state);
+    }
   }
 
   closeWorkplace = () =>
