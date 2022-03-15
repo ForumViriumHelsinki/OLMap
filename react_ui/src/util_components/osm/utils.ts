@@ -53,7 +53,7 @@ export const overpassQuery = (query: string, location?: any, distance?: number) 
     overpassBounds = [bounds[0].latitude, bounds[0].longitude, bounds[1].latitude, bounds[1].longitude];
   }
   const bbox = overpassBounds ? `[bbox:${overpassBounds.join(',')}]` : '';
-  const body = `[out:json]${bbox}; (${query};)->.result; .result out body geom qt;`;
+  const body = `[out:json]${bbox}; (${query};)->.result; .result out meta geom qt;`;
   return fetch(overpassInterpreterPath, {method: 'POST', body})
     .then(response => response.json())
     .then(({elements}) => elements)
