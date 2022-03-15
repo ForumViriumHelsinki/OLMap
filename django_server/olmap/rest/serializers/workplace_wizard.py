@@ -180,7 +180,7 @@ class WorkplaceSerializer(MapFeatureSerializer):
                               'name', 'delivery_instructions', 'max_vehicle_height']
 
     def is_valid(self, raise_exception=False):
-        for e in self.initial_data['workplace_entrances']:
+        for e in self.initial_data.get('workplace_entrances', []):
             try:
                 e['entrance_fields']['unloading_places'] = e['unloading_places']
             except KeyError:
