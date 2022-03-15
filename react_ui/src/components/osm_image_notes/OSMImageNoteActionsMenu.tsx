@@ -36,7 +36,7 @@ export default class OSMImageNoteActionsMenu extends React.Component<OSMImageNot
     const googleUrl = `https://maps.google.com/?layer=c&cbll=${note?.lat},${note.lon}`;
     const mapillaryUrl = `https://www.mapillary.com/app/?lat=${note?.lat}&lng=${note.lon}&z=20&panos=true`;
     const osmUrl = `https://www.openstreetmap.org/edit#map=20/${lat}/${lon}`;
-
+    const hel3dUrl = `https://kartta.hel.fi/3d/?startingmap=Cesium%20Map&lang=en&layerToActivate=%5B%22Mesh%20(2017)%22%5D&cameraPosition=${lon}%2C${Number(lat)-0.0001}%2C140&groundPosition=${lon}%2C${lat}/`;
 
     return <div className={"dropdown d-inline-block" + showCls}>
       <button className="btn btn-light p-1" onClick={() => this.setState({show: !show})}>
@@ -66,6 +66,9 @@ export default class OSMImageNoteActionsMenu extends React.Component<OSMImageNot
             <button className="dropdown-item" onClick={showOnMap}>OLMap</button>
           : <a className="dropdown-item" href={noteUrl} target="_blank">OLMap</a>
         }
+        <a className="dropdown-item" target="hel3d" href={hel3dUrl}>
+          Helsinki 3D
+        </a>
         <a className="dropdown-item" target="google-maps" href={googleUrl}>
           Google Street View
         </a>
