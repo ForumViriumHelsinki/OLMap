@@ -18,15 +18,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
-from rest_framework.schemas import get_schema_view
+
 from olmap import rest
-
-
-schema_view = get_schema_view(
-    title="Open Logistics Map API",
-    description="API for interacting with packages in the Open Logistics Map application",
-    version="1.0.0", public=True)
-
+from olmap.rest.schema import schema_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),

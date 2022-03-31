@@ -17,6 +17,15 @@ class SearchSerializer(serializers.Serializer):
 
 
 class SearchView(APIView):
+    """
+    Allow searching for OLMap data based on search criteria; returns image notes and/or workplaces matching
+    the given criteria. Intended to be used by other services to check availability of OLMap instructions
+    for a particular workplace.
+
+    Possibly unneeded & superceded by the search function in the workplaces API.
+    """
+    schema = None  # Remove from API spec for now, possibly to be removed from the API as well
+
     def post(self, request):
         serializer = SearchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

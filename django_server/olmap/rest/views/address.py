@@ -2,12 +2,18 @@ import math
 
 from rest_framework import permissions
 from rest_framework.generics import ListAPIView
+from rest_framework.schemas.openapi import AutoSchema
 
 from olmap import models
 from olmap.rest.serializers import AddressAsOSMNodeSerializer
 
 
 class NearbyAddressesView(ListAPIView):
+    """
+    Returns official address points near a specified coordinate, approximately within 100m distance.
+    The addresses are returned in a format compatible with OSM tagging practice.
+    """
+    schema = AutoSchema(tags=["Addresses"])
     serializer_class = AddressAsOSMNodeSerializer
     queryset = models.Address.objects.all()
     permission_classes = [permissions.AllowAny]

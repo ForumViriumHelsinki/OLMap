@@ -4,6 +4,7 @@ from rest_framework import viewsets, permissions
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
+from rest_framework.schemas.openapi import AutoSchema
 
 from drf_jsonschema import to_jsonschema
 from olmap import models
@@ -13,6 +14,12 @@ from olmap.rest.serializers import DictOSMImageNoteSerializer, OSMImageNoteWithM
 
 
 class OSMImageNotesViewSet(viewsets.ModelViewSet):
+    """
+    Returns OLMap image notes, i.e. map data points with associated images and map features such as entrances,
+    workplaces, steps, gates etc. Note that the list representation is limited, request an individual note by ID
+    to get a full representation.
+    """
+    schema = AutoSchema(tags=["Image notes"])
     permission_classes = [permissions.AllowAny]
     serializer_class = OSMImageNoteWithMapFeaturesSerializer
     queryset = models.OSMImageNote.objects.filter(visible=True)
@@ -131,6 +138,17 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
 
 
 class OSMImageNoteCommentsViewSet(viewsets.ModelViewSet):
+    """
+    Returns image note comments, i.e. comments made by authenticated or anonymous users to the map data points in
+    OLMap. The response depends on the authenticated user:
+
+     * If no user is authenticated, return an empty list. Comments can still be accessed by loading individual
+       image notes through the image notes API, the comments are then included in the response.
+     * If a normal user is authenticated, returns all comments made by that user and allows deleting individual
+       comments with DELETE requests
+     * If a reviewer user is authenticated, returns and allows deletion of all comments.
+    """
+    schema = AutoSchema(tags=["Image note comments"])
     queryset = models.OSMImageNoteComment.objects.all().select_related('user')
     permission_classes = [permissions.AllowAny]
     serializer_class = OSMImageNoteCommentSerializer
@@ -152,6 +170,11 @@ class OSMImageNoteCommentsViewSet(viewsets.ModelViewSet):
 
 
 class OSMImageNoteCommentNotificationsViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Returns any pending notifications of new comments on image notes, i.e. comments made on notes of interest to
+    the authenticated user and not yet marked as seen. If no user is authenticated, return an empty list.
+    """
+    schema = AutoSchema(tags=["Image note comments"])
     queryset = models.OSMImageNoteCommentNotification.objects\
         .filter(seen__isnull=True)\
         .select_related('comment__user')\
@@ -166,6 +189,10 @@ class OSMImageNoteCommentNotificationsViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(methods=['PUT'], detail=True)
     def mark_seen(self, request, *args, **kwargs):
+        """
+        Marks the notification as seen, i.e. removes it from the list of pending notifications for the authenticated
+        user.
+        """
         notification = self.get_object()
         if not notification.seen:
             notification.seen = timezone.now()
@@ -174,6 +201,12 @@ class OSMImageNoteCommentNotificationsViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class OSMImageNotesGeoJSON(ListAPIView):
+    """
+    Returns OLMap image notes as geojson for easy inclusion in other services.
+    Note that the response may be huge, load it only using tools efficient at handling big JSON responses.
+    Loading in Swagger UI not recommended.
+    """
+    schema = AutoSchema(tags=["Image notes"])
     serializer_class = DictOSMImageNoteSerializer
     queryset = models.OSMImageNote.objects.filter(visible=True).values()
     permission_classes = [permissions.AllowAny]

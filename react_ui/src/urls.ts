@@ -24,8 +24,6 @@ export const notificationSeenUrl = (id: number) => `/rest/notifications/${id}/ma
 
 export const mapFeatureTypesUrl = "/rest/osm_image_notes/map_feature_schemas/";
 
-export const osmEntranceUrl = (id: number) => `/rest/osm_entrances/${id}/`;
-
 export const nearbyAddressesUrl = (location: LocationTuple) =>
   `/rest/addresses_at/${location[0]}/${location[1]}/`;
 

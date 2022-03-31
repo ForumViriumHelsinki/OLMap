@@ -16,9 +16,3 @@ class OSMFeatureSerializer(serializers.ModelSerializer):
     def get_image_notes(self, osm_feature):
         notes = osm_feature.image_notes.filter(visible=True)
         return OSMImageNoteSerializer(notes, many=True, context=self.context).data
-
-
-class OSMEntranceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.OSMFeature
-        fields = ['id', 'associated_features']

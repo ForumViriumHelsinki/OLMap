@@ -4,14 +4,13 @@ from rest_framework import routers
 from .views import (
     NearbyAddressesView, WorkplaceEntrancesViewSet, UnloadingPlacesViewSet,
     OSMImageNotesViewSet, OSMImageNoteCommentsViewSet, OSMImageNotesGeoJSON,
-    OSMEntrancesViewSet, OSMFeaturesViewSet, OSMImageNoteCommentNotificationsViewSet, WorkplaceTypeViewSet,
+    OSMFeaturesViewSet, OSMImageNoteCommentNotificationsViewSet, WorkplaceTypeViewSet,
     RecentMappersViewSet, WorkplaceViewSet, WorkplaceByOSMIdViewSet, EntranceViewSet)
 from .views.search import SearchView
 
 router = routers.DefaultRouter()
 router.register('osm_image_notes', OSMImageNotesViewSet)
 router.register('osm_image_note_comments', OSMImageNoteCommentsViewSet)
-router.register('osm_entrances', OSMEntrancesViewSet, basename='osmentrance')
 router.register('osm_features', OSMFeaturesViewSet)
 router.register('notifications', OSMImageNoteCommentNotificationsViewSet)
 router.register('workplace_types', WorkplaceTypeViewSet)
