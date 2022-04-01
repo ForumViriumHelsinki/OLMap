@@ -1,5 +1,5 @@
 import geopy.distance
-from rest_framework import viewsets, permissions, pagination
+from rest_framework import viewsets, permissions, pagination, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.schemas.openapi import AutoSchema
@@ -8,7 +8,7 @@ from olmap import models
 from olmap.rest.permissions import IsAuthenticatedOrNewDataPoint
 from olmap.rest.serializers import WorkplaceTypeSerializer, WorkplaceEntranceSerializer
 from olmap.rest.serializers.workplace_wizard import WorkplaceSerializer, EntranceSerializer, UnloadingPlaceSerializer
-from olmap.rest.schema import SchemaWithParameters, with_parameters
+from olmap.rest.schema import SchemaWithParameters, with_parameters, with_example
 
 
 class WorkplaceTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -72,14 +72,17 @@ class UnloadingPlacesViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
     serializer_class = UnloadingPlaceSerializer
 
 
-class WorkplaceViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
-    """
-    Returns workplaces, i.e. possible destinations for deliveries. Companies, government offices, schools etc.
-    """
-    schema = SchemaWithParameters(tags=["Workplaces"])
+class BaseWorkplaceViewSet(viewsets.GenericViewSet):
     queryset = models.Workplace.objects.exclude(image_note__visible=False)\
         .select_related('image_note')
     serializer_class = WorkplaceSerializer
+
+
+class WorkplaceViewSet(BaseWorkplaceViewSet, MapFeatureViewSet, viewsets.ModelViewSet):
+    """
+    Returns workplaces, i.e. possible destinations for deliveries. Companies, government offices, schools etc.
+    """
+    schema = SchemaWithParameters(tags=["Workplaces"], tags_by_action={'search': ['Quick start'], 'create': ['Quick start']})
 
     def get_serializer(self, *args, **kwargs):
         data = kwargs.get('data', None)
@@ -97,6 +100,10 @@ class WorkplaceViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
     @with_parameters(['name'])
     @action(methods=['GET'], detail=False)
     def search(self, request, *args, **kwargs):
+        """
+        Search for a particular workplace by name (case insensitive, but must match the start of the name as saved
+        in OLMap). Returns a list of matching OLMap workplaces along with delivery instructions if available.
+        """
         name = request.query_params.get('name', None)
         if not name:
             return Response(status=404)
@@ -104,8 +111,22 @@ class WorkplaceViewSet(MapFeatureViewSet, viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new workplace in the OLMap database, potentially along with delivery instructions and entrance /
+        unloading place locations.
+        """
+        return super().create(request, *args, **kwargs)
 
-class WorkplaceByOSMIdViewSet(WorkplaceViewSet):
+
+class WorkplaceByOSMIdViewSet(BaseWorkplaceViewSet, mixins.RetrieveModelMixin):
+    """
+    This endpoint makes it possible to query if a particular workplace found in OpenStreetMap exists in the OLMap
+    database, and if so load any delivery instructions attached to it. This may be especially convenient in combination
+    with e.g. the DigiTransit geocoder (see <https://digitransit.fi/en/developers/apis/2-geocoding-api/address-search/> )
+    which may return OSM nodes along with their ID as results to geocoding searches.
+    """
+    schema = SchemaWithParameters(tags=["Workplaces", "Quick start"], operation_id_base='osm_workplace')
     lookup_field = 'osm_feature'
 
 

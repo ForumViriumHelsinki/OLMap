@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from olmap import models
+from olmap.rest.schema import with_example
 
 
 class MapFeatureSerializer(serializers.ModelSerializer):
@@ -121,7 +122,7 @@ class WorkplaceEntranceSerializer(serializers.ModelSerializer):
     image_note_id = serializers.IntegerField(source='entrance.image_note_id', required=False)
     unloading_places = UnloadingPlaceSerializer(many=True, required=False, source='entrance.unloading_places')
     entrance_id = serializers.PrimaryKeyRelatedField(queryset=models.Entrance.objects.all(), required=False)
-    entrance_fields = EntranceSerializer(source='entrance')
+    entrance_fields = EntranceSerializer(source='entrance', required=False)
     id = serializers.IntegerField(required=False)
 
     class Meta:
@@ -130,7 +131,8 @@ class WorkplaceEntranceSerializer(serializers.ModelSerializer):
 
     def is_valid(self, raise_exception=False):
         try:
-            self.initial_data['entrance_fields']['unloading_places'] = self.initial_data['unloading_places']
+            f = self.initial_data.setdefault('entrance_fields', {})
+            f['unloading_places'] = self.initial_data['unloading_places']
         except KeyError:
             pass
         return super().is_valid(raise_exception)
@@ -171,6 +173,41 @@ class WorkplaceEntranceSerializer(serializers.ModelSerializer):
         return wp_entrance
 
 
+example_workplace = {
+  "street": "Unioninkatu",
+  "housenumber": "4",
+  "name": "Esimerkkikauppa",
+  "lon": 24.951103,
+  "lat": 60.163786,
+  "delivery_instructions": "Rappusia matkalla, kamat kantoon!",
+  "workplace_entrances": [
+    {
+      "lat": 60.16378357,
+      "lon": 24.95137255,
+      "deliveries": "main",
+      "unloading_places": [
+        {
+          "lat": 60.16372649193593,
+          "lon": 24.951447844505314,
+          "access_points": [
+            {
+              "lat": 60.163633184821336,
+              "lon": 24.951673150062565
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "lat": 60.16367581809711,
+      "lon": 24.951109886169437,
+      "unloading_places": []
+    }
+  ]
+}
+
+
+@with_example(example_workplace)
 class WorkplaceSerializer(MapFeatureSerializer):
     workplace_entrances = WorkplaceEntranceSerializer(many=True, required=False)
 

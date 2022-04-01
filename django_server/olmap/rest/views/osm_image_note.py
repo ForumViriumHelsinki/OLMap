@@ -9,6 +9,7 @@ from rest_framework.schemas.openapi import AutoSchema
 from drf_jsonschema import to_jsonschema
 from olmap import models
 from olmap.rest.permissions import IsReviewerOrCreator, IsReviewer, user_is_reviewer
+from olmap.rest.schema import SchemaWithParameters
 from olmap.rest.serializers import DictOSMImageNoteSerializer, OSMImageNoteWithMapFeaturesSerializer, \
     OSMImageNoteCommentSerializer, OSMImageNoteCommentNotificationSerializer
 
@@ -19,7 +20,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     workplaces, steps, gates etc. Note that the list representation is limited, request an individual note by ID
     to get a full representation.
     """
-    schema = AutoSchema(tags=["Image notes"])
+    schema = SchemaWithParameters(tags=["Image notes"], tags_by_action={'list': ['Quick start'], 'retrieve': ['Quick start']})
     permission_classes = [permissions.AllowAny]
     serializer_class = OSMImageNoteWithMapFeaturesSerializer
     queryset = models.OSMImageNote.objects.filter(visible=True)
@@ -206,7 +207,7 @@ class OSMImageNotesGeoJSON(ListAPIView):
     Note that the response may be huge, load it only using tools efficient at handling big JSON responses.
     Loading in Swagger UI not recommended.
     """
-    schema = AutoSchema(tags=["Image notes"])
+    schema = AutoSchema(tags=["Image notes", "Quick_start"], operation_id_base='geojson_image_note')
     serializer_class = DictOSMImageNoteSerializer
     queryset = models.OSMImageNote.objects.filter(visible=True).values()
     permission_classes = [permissions.AllowAny]

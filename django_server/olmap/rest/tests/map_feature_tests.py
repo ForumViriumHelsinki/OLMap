@@ -5,6 +5,7 @@ from rest_framework import status
 
 from .base import FVHAPITestCase
 from olmap import models
+from ..serializers.workplace_wizard import example_workplace
 
 
 class OSMMapFeatureTests(FVHAPITestCase):
@@ -157,7 +158,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
             'buzzer': {'type': ['boolean', 'null'], 'title': 'Buzzer'},
             'keycode': {'type': ['boolean', 'null'], 'title': 'Keycode'},
             'phone': {'type': 'string', 'maxLength': 32, 'title': 'Phone'},
-            'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours',
+            'opening_hours': {'type': 'string', 'maxLength': 256, 'title': 'Opening hours',
                               'description': 'E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00'},
             'layer': {
                 'description': 'Map layer, e.g. -1 if underground',
@@ -221,7 +222,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
                 'properties': dict(address_fields, **osm_feature_field, **{
                     'name': {'type': 'string', 'maxLength': 64, 'title': 'Name'},
                     'phone': {'type': 'string', 'maxLength': 32, 'title': 'Phone'},
-                    'opening_hours': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours',
+                    'opening_hours': {'type': 'string', 'maxLength': 256, 'title': 'Opening hours',
                                       'description': 'E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00'},
                     'opening_hours_covid19': {'type': 'string', 'maxLength': 64, 'title': 'Opening hours covid19'},
                     'level': {'type': 'string', 'maxLength': 8, 'title': 'Level', 'description': 'Floor(s), e.g. 1-3'},
@@ -294,7 +295,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
                     },
                     "opening_hours": {
                         "type": "string",
-                        "maxLength": 64,
+                        "maxLength": 256,
                         "title": "Opening hours",
                         'description': 'E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00'
                     },
@@ -406,3 +407,13 @@ class OSMMapFeatureTests(FVHAPITestCase):
         notes = models.OSMImageNote.objects.all()
         self.assertEqual([n.tags for n in notes],
             [['Workplace'], ['Entrance'], ['UnloadingPlace'], ['UnloadingPlace'], ['Entrance']])
+
+    def test_workplace_api_example(self):
+        url = reverse('workplace-list')
+        data = example_workplace
+
+        # When POSTing data for a new workplace, along with entrances, unloading places and access points:
+        response = self.client.post(url, json.dumps(data), content_type='application/json')
+
+        # Then an OK response is received:
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.content)
