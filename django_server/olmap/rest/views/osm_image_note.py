@@ -51,6 +51,16 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         return self.serializer_classes.get(self.action, self.serializer_class)
 
+    def list(self, request, *args, **kwargs):
+        """
+        Returns OLMap image notes, i.e. map data points with associated images and map features such as entrances,
+        workplaces, steps, gates etc. Things to keep in mind:
+
+        * The list representation is limited, request an individual note by ID to get a full representation.
+        * **The list response may be huge**, load it only using tools efficient at handling big JSON responses.
+        """
+        return super().list(request, *args, **kwargs)
+
     def create(self, request, *args, **kwargs):
         self.ensure_features(request)
         return super().create(request, *args, **kwargs)
@@ -204,10 +214,10 @@ class OSMImageNoteCommentNotificationsViewSet(viewsets.ReadOnlyModelViewSet):
 class OSMImageNotesGeoJSON(ListAPIView):
     """
     Returns OLMap image notes as geojson for easy inclusion in other services.
-    Note that the response may be huge, load it only using tools efficient at handling big JSON responses.
+    **Note that the response may be huge**, load it only using tools efficient at handling big JSON responses.
     Loading in Swagger UI not recommended.
     """
-    schema = AutoSchema(tags=["Image notes", "Quick_start"], operation_id_base='geojson_image_note')
+    schema = AutoSchema(tags=["Image notes", "Quick start"], operation_id_base='geojson_image_note')
     serializer_class = DictOSMImageNoteSerializer
     queryset = models.OSMImageNote.objects.filter(visible=True).values()
     permission_classes = [permissions.AllowAny]

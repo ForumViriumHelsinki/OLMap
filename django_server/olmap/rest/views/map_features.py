@@ -51,6 +51,9 @@ class MapFeatureViewSet(viewsets.ReadOnlyModelViewSet):
     @with_parameters(['lat', 'lon'])
     @action(methods=['GET'], detail=False)
     def near(self, request, *args, **kwargs):
+        """
+        Return features within approximately 100m of the position passed as lat, lon in the query parameters.
+        """
         lat, lon = (float(request.query_params.get(s, '0')) for s in ['lat', 'lon'])
         if lat and lon:
             min_, max_ = (geopy.distance.distance(meters=100).destination((lat, lon), bearing=b) for b in (225, 45))
@@ -82,7 +85,10 @@ class WorkplaceViewSet(BaseWorkplaceViewSet, MapFeatureViewSet, viewsets.ModelVi
     """
     Returns workplaces, i.e. possible destinations for deliveries. Companies, government offices, schools etc.
     """
-    schema = SchemaWithParameters(tags=["Workplaces"], tags_by_action={'search': ['Quick start'], 'create': ['Quick start']})
+    schema = SchemaWithParameters(tags=["Workplaces"], tags_by_action={
+        'search': ['Quick start'],
+        'create': ['Quick start'],
+        'near': ['Quick start']})
 
     def get_serializer(self, *args, **kwargs):
         data = kwargs.get('data', None)
@@ -135,7 +141,7 @@ class EntranceViewSet(MapFeatureViewSet):
     Returns entrances entered into OLMap, along with any attached unloading places, images and links to
     corresponding OSM entrances.
     """
-    schema = SchemaWithParameters(tags=["Entrances"])
+    schema = SchemaWithParameters(tags=["Entrances"], tags_by_action={'near': ['Quick start']})
     queryset = models.Entrance.objects.filter(image_note__visible=True)\
         .select_related('image_note')\
         .prefetch_related('unloading_places__image_note', 'unloading_places__entrances')
