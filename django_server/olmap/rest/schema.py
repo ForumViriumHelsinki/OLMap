@@ -1,3 +1,4 @@
+from rest_framework import renderers
 from rest_framework.schemas import get_schema_view
 from rest_framework.schemas.openapi import SchemaGenerator, AutoSchema
 
@@ -76,10 +77,22 @@ class Generator(SchemaGenerator):
         return s
 
 
+class PlainJSONRenderer(renderers.JSONOpenAPIRenderer):
+    """
+    Same as JSONOpenAPIRenderer, but presents itself as application/json to satisfy requests with
+    Accept: application/json header.
+    """
+    media_type = 'application/json'
+    format = 'json'
+
+
 schema_view = get_schema_view(
     title="Open Logistics Map API",
     description=api_description,
-    version="1.0.0", public=True, generator_class=Generator)
+    version="1.0.0", public=True, generator_class=Generator,
+    renderer_classes=[
+        PlainJSONRenderer, renderers.OpenAPIRenderer,
+        renderers.JSONOpenAPIRenderer, renderers.BrowsableAPIRenderer])
 
 
 class SchemaWithParameters(AutoSchema):
