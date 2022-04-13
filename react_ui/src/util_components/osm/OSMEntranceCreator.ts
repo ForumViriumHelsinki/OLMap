@@ -12,6 +12,8 @@ import {OSMEditContextType} from "components/types";
 type GeoJSONPoint = any;
 type GeoJSONPolygon = any;
 
+const osmCache: any = {};
+
 /**
  * Class for handling all the necessary logic for creating a new OSM entrance as close as feasible to a given
  * point on the map, i.e.:
@@ -45,7 +47,13 @@ export default class OSMEntranceCreator {
   findNearestFeature(elements: OSMFeature[], filter: (f: GeoJSONPolygon) => any, p: GeoJSONPoint) {
     const filtered: (OSMFeature & {nearest?: Feature<Point>})[] = elements.filter(filter);
     if (!filtered.length) return [undefined, undefined];
-    const {features} = osmtogeojson({elements: filtered});
+    const features = osmtogeojson({elements: filtered}).features
+      .map(f => {
+        const cached = osmCache[f.id as number];
+        // @ts-ignore
+        return (cached && (cached.version > f.version)) ? cached : f;
+      } );
+
     // @ts-ignore
     features.forEach((b, i) => {
       // @ts-ignore
@@ -137,6 +145,10 @@ export default class OSMEntranceCreator {
     return osmApiCall(`way/${this.building.id}`, UpdateWay, props, osmEditContext)
       .then(({response, text}) => {
         if (!response.ok) throw new Error(text);
+        // @ts-ignore
+        osmCache[this.building.id] = this.building;
+        // @ts-ignore
+        this.building.version += 1;
         return entrance;
       });
   }
@@ -168,6 +180,10 @@ export default class OSMEntranceCreator {
         return osmApiCall(`way/${this.road.id}`, UpdateWay, props, osmEditContext)
           .then(({response, text}) => {
             if (!response.ok) throw new Error(text);
+            // @ts-ignore
+            osmCache[this.building.id] = this.building;
+            // @ts-ignore
+            this.building.version += 1;
             const props = {
               // @ts-ignore
               changesetId: osmEditContext.changeset.id,
