@@ -7,11 +7,10 @@ import {GeolibInputCoordinates} from "geolib/es/types";
 import Icon from "util_components/bootstrap/Icon";
 import OpenOSMChangesetModal from "util_components/osm/OpenOSMChangesetModal";
 import ErrorAlert from "util_components/bootstrap/ErrorAlert";
-import OSMEntranceCreator from "util_components/osm/OSMEntranceCreator";
-import {Location} from "util_components/types";
 
 import CreateNode from "util_components/osm/api/CreateNode";
 import UpdateNode from "util_components/osm/api/UpdateNode";
+import OSMEntranceCreationModal from "components/map_features/OSMEntranceCreationModal";
 
 
 type MapFeatureOSMLinkProps = {
@@ -27,7 +26,7 @@ type MapFeatureOSMLinkProps = {
 type MapFeatureOSMLinkState = {
   showChangeset?: boolean,
   error?: string,
-  entranceCreator?: OSMEntranceCreator
+  showOSMEntranceModal?: boolean
 }
 
 const initialState: MapFeatureOSMLinkState = {};
@@ -46,7 +45,7 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
 
   render() {
     const {osmImageNote, mapFeature, osmFeature, featureTypeName} = this.props;
-    const {showChangeset, error, entranceCreator} = this.state;
+    const {showChangeset, error, showOSMEntranceModal} = this.state;
 
     const discrepantTags = osmFeature && mapFeature.as_osm_tags &&
       Object.keys({...mapFeature.as_osm_tags, ...osmFeature.tags})
@@ -55,8 +54,7 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
 
     const isWp = featureTypeName == 'Workplace';
     const isEntrance = featureTypeName == 'Entrance';
-    const canAddEntrance = isEntrance && entranceCreator && entranceCreator.entrancePoint;
-    const canAdd = !mapFeature.osm_feature && (isWp || canAddEntrance);
+    const canAdd = !mapFeature.osm_feature && (isWp || isEntrance);
 
     return <>
       {!osmFeature ?
@@ -132,19 +130,12 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
         <OpenOSMChangesetModal onClose={() => this.setState({showChangeset: false})}
                                onCreated={osmFeature ? this.updateOSMNode : this.createOSMNode} />
       }
+      {showOSMEntranceModal &&
+        <OSMEntranceCreationModal osmImageNote={osmImageNote} osmContext={osmEditContext} entrance={mapFeature}
+          onCreated={this.onOSMNodeCreated}
+          onClose={() => this.setState({showOSMEntranceModal: false})}/>
+      }
     </>
-  }
-
-  componentDidMount() {
-    const {mapFeature, featureTypeName} = this.props;
-    if (featureTypeName == 'Entrance' && !mapFeature.osm_feature)
-      this.prepareEntranceAddition();
-  }
-
-  prepareEntranceAddition() {
-    const {osmImageNote} = this.props;
-    new OSMEntranceCreator(osmImageNote as Location).findPointsToAdd()
-      .then(entranceCreator => this.setState({entranceCreator}));
   }
 
   linkOSMFeature() {
@@ -246,41 +237,30 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
   };
 
   createOSMNode = (osmContext: OSMEditContextType) => {
-    const {osmImageNote, addNearbyFeature, mapFeature, saveFeature} = this.props;
-    const {entranceCreator} = this.state;
+    const {osmImageNote, featureTypeName} = this.props;
     if (!osmContext.changeset || !this.tagsToSave) return;
+    if (featureTypeName == 'Entrance') return this.setState({showOSMEntranceModal: true});
 
     const {lat, lon} = osmImageNote;
     const props = {changesetId: osmContext.changeset.id, lat, lon, tags: this.tagsToSave};
 
-    const osmPromise: Promise<OSMFeature> =
-      entranceCreator ?
-        entranceCreator.createEntrance(osmContext, this.tagsToSave, this.getEntrancePathTags())
-      : osmApiCall(`node/create`, CreateNode, props, osmContext)
-        .then(({response, text}) => {
-          if (!response.ok) throw new Error(text);
-          const osmId = parseInt(text);
-          return {id: osmId, lat, lon, type: 'node', tags: {...this.tagsToSave}} as OSMFeature;
-    });
-
-    osmPromise.then((osmNode: OSMFeature) => {
-      addNearbyFeature(osmNode);
-      this.tagsToSave = null;
-      if (!osmImageNote.osm_features) osmImageNote.osm_features = [];
-      osmImageNote.osm_features.push(osmNode.id);
-      mapFeature.osm_feature = osmNode.id;
-      this.setState({error: undefined});
-    }).then(() => saveFeature())
+    osmApiCall(`node/create`, CreateNode, props, osmContext)
+    .then(({response, text}) => {
+      if (!response.ok) throw new Error(text);
+      const osmId = parseInt(text);
+      return {id: osmId, lat, lon, type: 'node', tags: {...this.tagsToSave}} as OSMFeature;
+    }).then(this.onOSMNodeCreated)
     .catch((error) => this.setState({error: error.message || error}));
   };
 
-  getEntrancePathTags() {
-    const {osmImageNote, mapFeature} = this.props;
-    // @ts-ignore
-    const steps = (osmImageNote.steps_set || [])[0];
-    const pathType = mapFeature.type == 'garage' ? 'service' : 'footway';
-
-    if (steps) return steps.as_osm_tags;
-    return {highway: pathType, access: mapFeature.access || 'destination'};
+  onOSMNodeCreated = (osmNode: OSMFeature) => {
+    const {osmImageNote, addNearbyFeature, mapFeature, saveFeature} = this.props;
+    addNearbyFeature(osmNode);
+    this.tagsToSave = null;
+    if (!osmImageNote.osm_features) osmImageNote.osm_features = [];
+    osmImageNote.osm_features.push(osmNode.id);
+    mapFeature.osm_feature = osmNode.id;
+    this.setState({showOSMEntranceModal: false});
+    return saveFeature()
   }
 }

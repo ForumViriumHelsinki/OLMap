@@ -19,7 +19,8 @@ type MapProps = {
   showAttribution: boolean,
   zoomControl: boolean,
   onClick?: (latLng: LocationTuple) => any,
-  backgroundChangeable: boolean
+  backgroundChangeable: boolean,
+  height: any
 }
 
 let idCounter = 0;
@@ -45,14 +46,15 @@ export default class Map extends React.Component<MapProps, MapState> {
     latLng: settings.defaultLocation,
     showAttribution: true,
     zoomControl: true,
-    backgroundChangeable: false
+    backgroundChangeable: false,
+    height: '100%'
   };
 
   render() {
-    const {backgroundChangeable, children, latLng, zoom, showAttribution, zoomControl} = this.props;
+    const {backgroundChangeable, children, latLng, zoom, showAttribution, zoomControl, height} = this.props;
     const {background} = this.state;
     return <>
-      <MapContainer style={{height: '100%'}} center={latLng as LatLngTuple} zoom={zoom}
+      <MapContainer style={{height}} center={latLng as LatLngTuple} zoom={zoom}
                     whenCreated={map => {this.leafletMap = map; this.refreshMap()}} attributionControl={showAttribution}
                     zoomControl={zoomControl} preferCanvas>
         {children}

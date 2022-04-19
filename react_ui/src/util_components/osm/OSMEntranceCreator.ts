@@ -47,12 +47,7 @@ export default class OSMEntranceCreator {
   findNearestFeature(elements: OSMFeature[], filter: (f: GeoJSONPolygon) => any, p: GeoJSONPoint) {
     const filtered: (OSMFeature & {nearest?: Feature<Point>})[] = elements.filter(filter);
     if (!filtered.length) return [undefined, undefined];
-    const features = osmtogeojson({elements: filtered}).features
-      .map(f => {
-        const cached = osmCache[f.id as number];
-        // @ts-ignore
-        return (cached && (cached.version > f.version)) ? cached : f;
-      } );
+    const features = osmtogeojson({elements: filtered}).features;
 
     // @ts-ignore
     features.forEach((b, i) => {
@@ -75,11 +70,16 @@ export default class OSMEntranceCreator {
   findPointsToAdd() {
     // @ts-ignore
     return overpassQuery(this.query, this.coord, this.searchRadius).then((elements: OSMFeature[]) => {
+      const freshElems = elements.map(f => {
+        const cached = osmCache[f.id as number];
+        // @ts-ignore
+        return (cached && (cached.version > f.version)) ? cached : f;
+      } );
       [this.building, this.entrancePoint] =
-        this.findNearestFeature(elements, f => f.tags.building, this.point);
+        this.findNearestFeature(freshElems, f => f.tags.building, this.point);
       if (!this.entrancePoint) this.entrancePoint = this.point;
       [this.road, this.accessPoint] =
-        this.findNearestFeature(elements, f => f.tags.highway, this.entrancePoint);
+        this.findNearestFeature(freshElems, f => f.tags.highway, this.entrancePoint);
       return this
     })
   }
@@ -122,7 +122,7 @@ export default class OSMEntranceCreator {
         const osmId = parseInt(text);
         const entrance: OSMFeature = {id: osmId, lat, lon, type: 'node', tags};
         return this.addToBuilding(osmEditContext, entrance)
-          .then(() => this.connectRoad(osmEditContext, entrance, pathTags))
+          .then(() => pathTags && this.connectRoad(osmEditContext, entrance, pathTags))
           .then(() => entrance)
       })
   }
@@ -139,7 +139,10 @@ export default class OSMEntranceCreator {
 
     // @ts-ignore
     const {index} = this.entrancePoint.properties;
-    (this.building.nodes as number[]).splice(index + 1, 0, entrance.id);
+    // @ts-ignore
+    this.building.nodes.splice(index + 1, 0, entrance.id);
+    // @ts-ignore
+    this.building.geometry = this.newBuildingGeometry();
     const props = {changesetId: osmEditContext.changeset.id, way: this.building};
 
     return osmApiCall(`way/${this.building.id}`, UpdateWay, props, osmEditContext)
@@ -151,6 +154,16 @@ export default class OSMEntranceCreator {
         this.building.version += 1;
         return entrance;
       });
+  }
+
+  newBuildingGeometry() {
+    if (!this.building || !this.building.geometry || !this.entrancePoint) return;
+    // @ts-ignore
+    const {index} = this.entrancePoint.properties;
+    const [lon, lat] = this.entrancePoint.geometry.coordinates;
+    const newGeom = [...this.building.geometry];
+    newGeom.splice(index + 1, 0, {lat, lon});
+    return newGeom;
   }
 
   /**
@@ -173,7 +186,9 @@ export default class OSMEntranceCreator {
         if (!response.ok) throw new Error(text);
         const osmId = parseInt(text);
         // @ts-ignore
-        (this.road.nodes as number[]).splice(index + 1, 0, osmId);
+        this.road.nodes.splice(index + 1, 0, osmId);
+        // @ts-ignore
+        this.road.geometry = this.newRoadGeometry();
         // @ts-ignore
         const props = {changesetId: osmEditContext.changeset.id, way: this.road};
         // @ts-ignore
@@ -181,9 +196,9 @@ export default class OSMEntranceCreator {
           .then(({response, text}) => {
             if (!response.ok) throw new Error(text);
             // @ts-ignore
-            osmCache[this.building.id] = this.building;
+            osmCache[this.road.id] = this.road;
             // @ts-ignore
-            this.building.version += 1;
+            this.road.version += 1;
             const props = {
               // @ts-ignore
               changesetId: osmEditContext.changeset.id,
@@ -196,4 +211,15 @@ export default class OSMEntranceCreator {
         return entrance;
       })
   }
+
+  newRoadGeometry() {
+    if (!this.road || !this.road.geometry || !this.accessPoint) return;
+    // @ts-ignore
+    const {index} = this.accessPoint.properties;
+    const [lon, lat] = this.accessPoint.geometry.coordinates;
+    const newGeom = [...this.road.geometry];
+    newGeom.splice(index + 1, 0, {lat, lon});
+    return newGeom;
+  }
+
 }
