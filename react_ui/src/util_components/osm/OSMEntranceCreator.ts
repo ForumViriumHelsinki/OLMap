@@ -53,9 +53,13 @@ export default class OSMEntranceCreator {
     features.forEach((b, i) => {
       // @ts-ignore
       let lineString: Feature<LineString>;
+      // @ts-ignore
+      const {lat, lon} = filtered[i].geometry[1];
       if (b.geometry.type == 'Polygon') {
         lineString = polygonToLineString(b as Feature<Polygon>) as Feature<LineString>;
-        lineString.geometry.coordinates.reverse(); // evil osmtogeojson reverses the coords for polys...
+        // Chaotic evil osmtogeojson sometimes mysteriously reverses the coords for polys:
+        if (String(lineString.geometry.coordinates[1]) != String([lon, lat]))
+          lineString.geometry.coordinates.reverse();
       } else lineString = b as Feature<LineString>;
       filtered[i].nearest = nearestPointOnLine(lineString, p)
     });
