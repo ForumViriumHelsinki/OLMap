@@ -1,9 +1,8 @@
 import {Location} from "util_components/types";
 import {osmApiCall, overpassQuery} from "util_components/osm/utils";
 import {OSMFeature} from "util_components/osm/types";
-import osmtogeojson from "osmtogeojson";
-import {nearestPointOnLine, point, polygonToLineString} from "@turf/turf";
-import {Point, Feature, LineString, Polygon} from 'geojson'
+import {nearestPointOnLine, point, lineString} from "@turf/turf";
+import {Point, Feature} from 'geojson'
 import CreateNode from "util_components/osm/api/CreateNode";
 import UpdateWay from "util_components/osm/api/UpdateWay";
 import CreateWay from "util_components/osm/api/CreateWay";
@@ -44,31 +43,24 @@ export default class OSMEntranceCreator {
     this.point = point([lon, lat]);
   }
 
-  findNearestFeature(elements: OSMFeature[], filter: (f: GeoJSONPolygon) => any, p: GeoJSONPoint) {
-    const filtered: (OSMFeature & {nearest?: Feature<Point>})[] = elements.filter(filter);
+  findNearestFeature(elements: OSMFeature[], filter: (f: GeoJSONPolygon) => any, p: GeoJSONPoint): [OSMFeature | undefined, Feature<Point> | undefined] {
+    const filtered: OSMFeature[] = elements.filter(filter);
     if (!filtered.length) return [undefined, undefined];
-    const features = osmtogeojson({elements: filtered}).features;
 
+    let nearest: Feature<Point>;
+    let nearestFeature: OSMFeature;
     // @ts-ignore
-    features.forEach((b, i) => {
+    filtered.forEach(feature => {
       // @ts-ignore
-      let lineString: Feature<LineString>;
+      const n = nearestPointOnLine(lineString(feature.geometry.map(({lat, lon}) => [lon, lat])), p);
       // @ts-ignore
-      const {lat, lon} = filtered[i].geometry[1];
-      if (b.geometry.type == 'Polygon') {
-        lineString = polygonToLineString(b as Feature<Polygon>) as Feature<LineString>;
-        // Chaotic evil osmtogeojson sometimes mysteriously reverses the coords for polys:
-        if (String(lineString.geometry.coordinates[1]) != String([lon, lat]))
-          lineString.geometry.coordinates.reverse();
-      } else lineString = b as Feature<LineString>;
-      filtered[i].nearest = nearestPointOnLine(lineString, p)
+      if (!nearest || n.properties.dist < nearest.properties.dist) {
+        nearest = n;
+        nearestFeature = feature;
+      }
     });
-    filtered.sort((a, b) =>
-      // @ts-ignore
-      a.nearest.properties.dist - b.nearest.properties.dist);
-
-    const {nearest, ...nearestFeature} = filtered[0];
-    return [nearestFeature, nearest] as [OSMFeature, Feature<Point>]
+    // @ts-ignore
+    return [nearestFeature, nearest];
   }
 
   findPointsToAdd() {

@@ -36,7 +36,10 @@ export default class OSMImageNoteActionsMenu extends React.Component<OSMImageNot
     const googleUrl = `https://maps.google.com/?layer=c&cbll=${note?.lat},${note.lon}`;
     const mapillaryUrl = `https://www.mapillary.com/app/?lat=${note?.lat}&lng=${note.lon}&z=20&panos=true`;
     const osmUrl = `https://www.openstreetmap.org/edit#map=20/${lat}/${lon}`;
-    const hel3dUrl = `https://kartta.hel.fi/3d/?startingmap=Cesium%20Map&lang=en&layerToActivate=%5B%22Mesh%20(2017)%22%5D&cameraPosition=${lon}%2C${Number(lat)-0.0001}%2C140&groundPosition=${lon}%2C${lat}/`;
+
+    const hel3dLayers = `layerToActivate=%5B%22Mesh%20(2017)%22%5D`;
+    const hel3dPosition = `cameraPosition=${lon}%2C${Number(lat) - 0.0001}%2C140&groundPosition=${lon}%2C${lat}`;
+    const hel3dUrl = `https://kartta.hel.fi/3d/?startingmap=Cesium%20Map&lang=en&${hel3dLayers}&${hel3dPosition}/`;
 
     return <div className={"dropdown d-inline-block" + showCls}>
       <button className="btn btn-light p-1" onClick={() => this.setState({show: !show})}>
