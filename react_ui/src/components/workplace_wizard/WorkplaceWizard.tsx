@@ -46,7 +46,7 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
   componentDidMount() {
     const {osmType, osmId} = this.props;
     if (osmType && osmId) {
-      overpassQuery(`${osmType}(${osmId})`).then(([osmWorkplace]) => {
+      overpassQuery(`(${osmType}(${osmId});)->.result;`).then(([osmWorkplace]) => {
         let {lat, lon, tags, bounds} = osmWorkplace;
         if (bounds && !lat) {
           lat = (bounds.minlat + bounds.maxlat) / 2;

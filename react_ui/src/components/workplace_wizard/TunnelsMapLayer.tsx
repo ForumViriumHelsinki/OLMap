@@ -18,10 +18,10 @@ type TunnelsMapLayerState = {
 const initialState: TunnelsMapLayerState = {};
 
 const query = `
-  way[layer~"^-[123456789]"][highway!~"^(footway|steps|corridor|cycleway)"][highway][tunnel];
+  (way[layer~"^-[123456789]"][highway!~"^(footway|steps|corridor|cycleway)"][highway][tunnel];
   node[layer~"^-[123456789]"][barrier=gate];
   node[layer~"^-[123456789]"][entrance];
-  node[layer~"^-[123456789]"]["parking:condition"=loading]`;
+  node[layer~"^-[123456789]"]["parking:condition"=loading];)->.result;`;
 
 const options = {
   nodes: {radius: 4, stroke: false, fillOpacity: 1, fillColor: '#000'},

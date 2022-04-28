@@ -76,8 +76,8 @@ export default class OSMEntranceCreationModal extends React.Component<OSMEntranc
   }
 
   prepareEntranceAddition() {
-    const {osmImageNote} = this.props;
-    new OSMEntranceCreator(osmImageNote as Location).findPointsToAdd()
+    const {osmImageNote, entrance} = this.props;
+    new OSMEntranceCreator(osmImageNote as Location, entrance.layer).findPointsToAdd()
       .then(entranceCreator => this.setState({entranceCreator}));
   }
 

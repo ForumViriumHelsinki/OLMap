@@ -26,21 +26,26 @@ const osmCache: any = {};
  *    entrance node to the path with a new OSM way.
  */
 export default class OSMEntranceCreator {
-  query = 'way[building];relation[building];way[highway]';
   point: Feature<Point>;
   searchRadius = 10;
   coord: Location;
+  layer?: any;
 
   building?: OSMFeature;
   entrancePoint?: Feature<Point>;
   road?: OSMFeature;
   accessPoint?: Feature<Point>;
 
-  constructor(coord: Location) {
+  constructor(coord: Location, layer?: any) {
     const {lat, lon} = coord;
     this.coord = coord;
+    this.layer = layer;
     // @ts-ignore
     this.point = point([lon, lat]);
+  }
+
+  query() {
+    return `relation[building]; (way(r);way[building];way[highway][layer${this.layer ? '=' + this.layer : '!~".*"'}];)->.result;`;
   }
 
   findNearestFeature(elements: OSMFeature[], filter: (f: GeoJSONPolygon) => any, p: GeoJSONPoint): [OSMFeature | undefined, Feature<Point> | undefined] {
@@ -65,17 +70,17 @@ export default class OSMEntranceCreator {
 
   findPointsToAdd() {
     // @ts-ignore
-    return overpassQuery(this.query, this.coord, this.searchRadius).then((elements: OSMFeature[]) => {
+    return overpassQuery(this.query(), this.coord, this.searchRadius).then((elements: OSMFeature[]) => {
       const freshElems = elements.map(f => {
         const cached = osmCache[f.id as number];
         // @ts-ignore
         return (cached && (cached.version > f.version)) ? cached : f;
       } );
       [this.building, this.entrancePoint] =
-        this.findNearestFeature(freshElems, f => f.tags.building, this.point);
+        this.findNearestFeature(freshElems, f => !(f.tags && f.tags.highway), this.point);
       if (!this.entrancePoint) this.entrancePoint = this.point;
       [this.road, this.accessPoint] =
-        this.findNearestFeature(freshElems, f => f.tags.highway, this.entrancePoint);
+        this.findNearestFeature(freshElems, f => f.tags && f.tags.highway, this.entrancePoint);
       return this
     })
   }
@@ -95,7 +100,7 @@ export default class OSMEntranceCreator {
     // If entrance address is the same as building address, do not duplicate the address information in the
     // entrance node; if building address is not set, set it based on entrance:
     if (tags['addr:housenumber'] || tags['addr:street'])
-      if (this.building)
+      if (this.building && this.building.tags)
         if (this.building.tags['addr:housenumber'] || this.building.tags['addr:street']) {
           if ((tags['addr:housenumber'] == this.building.tags['addr:housenumber']) &&
             (tags['addr:street'] == this.building.tags['addr:street'])) {
