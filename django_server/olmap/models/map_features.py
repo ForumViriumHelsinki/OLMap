@@ -413,6 +413,8 @@ class TrafficSign(MapFeature):
     text = models.CharField(max_length=128, blank=True)
 
     def as_osm_tags(self):
+        if not self.type:
+            return {}
         code = self.types[self.type]
         if self.type in self.text_in_signs:
             return {'traffic_sign': f'{code}[{self.text}]'}

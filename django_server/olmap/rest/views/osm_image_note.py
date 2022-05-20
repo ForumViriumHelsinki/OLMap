@@ -235,3 +235,30 @@ class OSMImageNotesGeoJSON(ListAPIView):
                 "properties": serializer.to_representation(note)
             } for note in self.get_queryset()]
         })
+
+
+class FullOSMImageNotesGeoJSON(ListAPIView):
+    """
+    Returns OLMap image notes with all attached map features (entrances, workplaces etc.) as geojson.
+    **Note that the response will be huge**, load it only using tools efficient at handling big JSON responses.
+    Loading in Swagger UI not recommended.
+    Composing this response is resource-intensive, so only available to reviewer users.
+    """
+    schema = AutoSchema(tags=["Image notes"], operation_id_base='geojson_full_image_note')
+    serializer_class = OSMImageNoteWithMapFeaturesSerializer
+    queryset = models.OSMImageNote.objects.filter(visible=True)
+    permission_classes = [IsReviewer]
+
+    def list(self, request, *args, **kwargs):
+        serializer = self.get_serializer()
+        return Response({
+            "type": "FeatureCollection",
+            "features": [{
+                "type": "Feature",
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [note.lon, note.lat]
+                },
+                "properties": serializer.to_representation(note)
+            } for note in self.get_queryset()]
+        })
