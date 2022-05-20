@@ -93,6 +93,9 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
                 <button className="btn btn-light btn-compact btn-sm ml-2" onClick={this.relinkOsmFeature}>
                   <Icon icon="refresh"/>
                 </button>
+                <button className="btn btn-light btn-compact btn-sm ml-1" onClick={this.unlinkOsmFeature}>
+                  <Icon icon="link_off"/>
+                </button>
               </th>
             </tr>
             {discrepantTags && discrepantTags.length > 0 && <>
@@ -165,8 +168,8 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
     if (featureTypeName == "Entrance") {
       let entrances = nearbyFeatures.filter((f) =>
         f.tags.entrance &&
-        f.tags['addr:street'] == mapFeature.street &&
-        f.tags['addr:housenumber'] == mapFeature.housenumber &&
+        (!f.tags['addr:street'] || (f.tags['addr:street'] == mapFeature.street)) &&
+        (!f.tags['addr:housenumber'] || (f.tags['addr:housenumber'] == mapFeature.housenumber)) &&
         (f.tags['addr:unit'] || '') == mapFeature.unit &&
         // @ts-ignore
         getDistance(osmImageNote, f) < 5);
@@ -196,6 +199,14 @@ export default class MapFeatureOSMLink extends React.Component<MapFeatureOSMLink
   relinkOsmFeature = () => {
     const {saveFeature} = this.props;
     this.linkOSMFeature();
+    saveFeature();
+    this.forceUpdate();
+  };
+
+  unlinkOsmFeature = () => {
+    const {saveFeature, mapFeature} = this.props;
+    // @ts-ignore
+    mapFeature.osm_feature = null;
     saveFeature();
     this.forceUpdate();
   };
