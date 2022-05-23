@@ -67,6 +67,8 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
     const isNew = !workplace.created_at || (Date.now() - Date.parse(workplace.created_at) < 30 * 60 * 1000);
     const canEdit = user || (!workplace.created_by && isNew);
 
+    const gatesolveUrl = workplace && workplace.id && `https://app.gatesolve.com/olmap/workplace/${workplace.id}`;
+
     return !workplace.lat ? null : <>
       <p>{workplace.street} {workplace.housenumber} {workplace.unit || ''}</p>
       {!canEdit &&
@@ -141,6 +143,9 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
                 onClick={onClose}>Sulje
         </button>
       </div>}
+      <p>{(changed || !gatesolveUrl) ? 'Katsellaksesi ohjeita Gatesolvella, tallenna ensin.' : <>
+        Esikatsele ohjeet Gatesolvella ja jaa linkki: <a target="_blank" href={gatesolveUrl}>{gatesolveUrl}</a>
+      </>}</p>
       <div className="mt-5 p-3 card">
         <h5>Käyttöohjeita</h5>
         <p><a href="https://youtu.be/2VHsi2N-NW8" target="_blank">Katso ohjeet videomuodossa</a></p>
