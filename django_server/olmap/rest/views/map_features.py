@@ -142,7 +142,7 @@ class WorkplaceWithNoteViewSet(BaseWorkplaceViewSet, mixins.RetrieveModelMixin):
     Fetch a particular Workplace by OLMap id, serializing it along with any entrances etc. with the image notes
     as separate objects and supporting field translations.
     """
-    schema = SchemaWithParameters(tags=["Workplaces"], operation_id_base='osm_workplace_with_note')
+    schema = SchemaWithParameters(tags=["Workplaces"], operation_id_base='workplace_with_note')
     serializer_class = WorkplaceWithNoteSerializer
 
 

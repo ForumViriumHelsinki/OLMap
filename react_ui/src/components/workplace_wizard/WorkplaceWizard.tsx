@@ -1,7 +1,7 @@
 import React from 'react';
 import WorkplaceAutofill from "components/workplace_wizard/WorkplaceAutofill";
 import {Workplace} from "components/workplace_wizard/types";
-import {olmapWorkplaceByOSMUrl} from "components/workplace_wizard/urls";
+import {olmapWorkplaceByOSMUrl, workplaceUrl} from "components/workplace_wizard/urls";
 import * as L from "leaflet";
 
 import './WorkplaceWizard.scss';
@@ -14,7 +14,8 @@ import {overpassQuery} from "util_components/osm/utils";
 
 type WorkplaceWizardProps = {
   osmType?: 'node' | 'way' | 'relation',
-  osmId?: string
+  osmId?: string,
+  olmapId?: string
 }
 
 type WorkplaceWizardState = {
@@ -44,7 +45,7 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
   }
 
   componentDidMount() {
-    const {osmType, osmId} = this.props;
+    const {osmType, osmId, olmapId} = this.props;
     if (osmType && osmId) {
       overpassQuery(`(${osmType}(${osmId});)->.result;`).then(([osmWorkplace]) => {
         let {lat, lon, tags, bounds} = osmWorkplace;
@@ -61,6 +62,8 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
           unit: tags['addr:unit']
         })
       })
+    } else if (olmapId) {
+      this.loadWorkplace(workplaceUrl(olmapId));
     } else {
       const state = JSON.parse(localStorage.getItem('wwState') || '{}');
       this.setState(state);
@@ -81,8 +84,11 @@ export default class WorkplaceWizard extends React.Component<WorkplaceWizardProp
 
     if (!osm_feature) return;
 
-    sessionRequest(olmapWorkplaceByOSMUrl(osm_feature))
-    .then(response => {
+    this.loadWorkplace(olmapWorkplaceByOSMUrl(osm_feature));
+  };
+
+  loadWorkplace = (url: string) => {
+    sessionRequest(url).then(response => {
       if (response.status != 200) return;
       response.json().then((workplace) => {
         this.storeState({workplace});

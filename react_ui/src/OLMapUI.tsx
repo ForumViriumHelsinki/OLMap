@@ -101,6 +101,18 @@ class OLMapUI extends React.Component<{}, UIState> {
               <WorkplaceWizard {...{osmType, osmId}} />
             </WithNavBar>
           }}/>
+          <Route path='/ww/id/:olmapId' render={(props: any) => {
+            const {olmapId} = props.match.params;
+            return <WithNavBar>
+              <WorkplaceWizard {...{olmapId}} />
+            </WithNavBar>
+          }}/>
+          <Route path='/ww/osm/:osmType/:osmId' render={(props: any) => {
+            const {osmType, osmId} = props.match.params;
+            return <WithNavBar>
+              <WorkplaceWizard {...{osmType, osmId}} />
+            </WithNavBar>
+          }}/>
           <Route path='/ww/'>
             <WithNavBar>
               <WorkplaceWizard/>
