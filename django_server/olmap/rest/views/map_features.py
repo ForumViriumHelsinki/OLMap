@@ -7,6 +7,7 @@ from rest_framework.schemas.openapi import AutoSchema
 from olmap import models
 from olmap.rest.permissions import IsAuthenticatedOrNewDataPoint
 from olmap.rest.serializers import WorkplaceTypeSerializer, WorkplaceEntranceSerializer
+from olmap.rest.serializers.map_features import WorkplaceWithNoteSerializer
 from olmap.rest.serializers.workplace_wizard import WorkplaceSerializer, EntranceSerializer, UnloadingPlaceSerializer
 from olmap.rest.schema import SchemaWithParameters, with_parameters, with_example
 
@@ -134,6 +135,15 @@ class WorkplaceByOSMIdViewSet(BaseWorkplaceViewSet, mixins.RetrieveModelMixin):
     """
     schema = SchemaWithParameters(tags=["Workplaces", "Quick start"], operation_id_base='osm_workplace')
     lookup_field = 'osm_feature'
+
+
+class WorkplaceWithNoteViewSet(BaseWorkplaceViewSet, mixins.RetrieveModelMixin):
+    """
+    Fetch a particular Workplace by OLMap id, serializing it along with any entrances etc. with the image notes
+    as separate objects and supporting field translations.
+    """
+    schema = SchemaWithParameters(tags=["Workplaces"], operation_id_base='osm_workplace_with_note')
+    serializer_class = WorkplaceWithNoteSerializer
 
 
 class EntranceViewSet(MapFeatureViewSet):
