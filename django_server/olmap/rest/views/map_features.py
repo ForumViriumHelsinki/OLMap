@@ -1,4 +1,5 @@
 import geopy.distance
+from django.http import HttpResponseBadRequest
 from rest_framework import viewsets, permissions, pagination, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -56,12 +57,14 @@ class MapFeatureViewSet(viewsets.ReadOnlyModelViewSet):
         Return features within approximately 100m of the position passed as lat, lon in the query parameters.
         """
         lat, lon = (float(request.query_params.get(s, '0')) for s in ['lat', 'lon'])
-        if lat and lon:
-            min_, max_ = (geopy.distance.distance(meters=100).destination((lat, lon), bearing=b) for b in (225, 45))
-            queryset = self.filter_queryset(self.get_queryset()).filter(
-                image_note__lat__gte=min_.latitude, image_note__lat__lte=max_.latitude,
-                image_note__lon__gte=min_.longitude, image_note__lon__lte=max_.longitude,
-            )
+        if not (lat and lon):
+            return HttpResponseBadRequest()
+
+        min_, max_ = (geopy.distance.distance(meters=100).destination((lat, lon), bearing=b) for b in (225, 45))
+        queryset = self.filter_queryset(self.get_queryset()).filter(
+            image_note__lat__gte=min_.latitude, image_note__lat__lte=max_.latitude,
+            image_note__lon__gte=min_.longitude, image_note__lon__lte=max_.longitude,
+        )
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
