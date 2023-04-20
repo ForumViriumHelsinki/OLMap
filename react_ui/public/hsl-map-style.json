@@ -44,7 +44,7 @@
   "pitch": 0,
   "sources": {
     "vector": {
-      "url": "https://cdn.digitransit.fi/map/v1/hsl-vector-map/index.json",
+      "url": "https://cdn.digitransit.fi/map/v2/hsl-vector-map/index.json?digitransit-subscription-key=d253c31db9ab41c195f7ef36fc250da4",
       "type": "vector"
     },
     "parkandride": {
