@@ -5,5 +5,6 @@
   },
   "useMockGeolocation": [24.944368, 60.161687],
   "defaultLocation": [60.17012, 24.94290],
-  "overpassInterpreterPath": "https://overpass.fvh.io/api/interpreter"
+  "overpassInterpreterPath": "https://overpass.fvh.io/api/interpreter",
+  "digitransitKey": "d253c31db9ab41c195f7ef36fc250da4"
 }

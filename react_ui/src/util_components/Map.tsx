@@ -111,11 +111,8 @@ export default class Map extends React.Component<MapProps, MapState> {
 
     if (['osm', 'tunnels'].includes(background))
       // @ts-ignore
-      this.bgLayer = L.mapboxGL({
-        style: '/hsl-map-style.json',
-        accessToken: settings.MapBox.accessToken,
-        attribution: showAttribution ? attribution : '',
-        maxZoom: 21,
+      this.bgLayer = L.tileLayer("https://cdn.digitransit.fi/map/v2/hsl-map-256/{z}/{x}/{y}.png?digitransit-subscription-key=" + settings.digitransitKey,
+        {attribution: showAttribution ? attribution : '', maxZoom: 21,
       }).addTo(this.leafletMap);
     else
       // @ts-ignore
