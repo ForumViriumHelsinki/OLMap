@@ -129,7 +129,7 @@ class OLMapUI extends React.Component<{}, UIState> {
             <MapUI selectedNoteId={props.match.params.noteId && Number(props.match.params.noteId)}/>
           } />
           <Route>
-            <Redirect to="/ww/" />
+            <Redirect to="/Notes/" />
           </Route>
         </Switch>
       </Router>

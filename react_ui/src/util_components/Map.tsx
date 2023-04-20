@@ -31,7 +31,7 @@ type MapState = {
 }
 
 const initialState: MapState = {
-  background: 'tunnels'
+  background: 'osm'
 };
 
 export default class Map extends React.Component<MapProps, MapState> {
