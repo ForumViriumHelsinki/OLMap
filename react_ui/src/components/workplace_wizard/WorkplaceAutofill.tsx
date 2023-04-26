@@ -4,6 +4,7 @@ import {geocoderFocus} from "components/workplace_wizard/settings";
 import {geocoderUrl, workplaceSearchUrl} from "components/workplace_wizard/urls";
 import sessionRequest from "sessionRequest";
 import {AppContext} from "components/types";
+import settings from 'settings.json';
 
 type WorkplaceAutofillProps = {
   onSelected: (wp: Workplace) => any
@@ -120,7 +121,14 @@ export default class WorkplaceAutofill extends React.Component<WorkplaceAutofill
   };
 
   fetchSuggestions(value: string) {
-    const url = `${geocoderUrl}?text=${value}&focus.point.lat=${geocoderFocus.lat}&focus.point.lon=${geocoderFocus.lon}`;
+    const params = {
+      text: value,
+      'focus.point.lat': geocoderFocus.lat,
+      'focus.point.lon': geocoderFocus.lon,
+      'digitransit-subscription-key': settings.digitransitKey
+    };
+    const urlParams = Object.entries(params).map(([k, v]) => `${k}=${v}`).join('&');
+    const url = `${geocoderUrl}?${urlParams}`;
     return fetch(url).then(response => response.json()).then(data => data.features)
   }
 

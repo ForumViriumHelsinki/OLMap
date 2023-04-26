@@ -4,7 +4,7 @@
   "private": true,
   "description": "UI for the Open Logistics Map application",
   "scripts": {
-    "start": "react-scripts start --no-cache",
+    "start": "react-scripts --openssl-legacy-provider start --no-cache",
     "build": "react-scripts build",
     "test": "react-scripts test --no-cache",
     "eject": "react-scripts eject"
