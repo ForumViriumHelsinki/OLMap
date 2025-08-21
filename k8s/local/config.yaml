@@ -1,0 +1,64 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: olmap-config
+data:
+  # Django Configuration
+  DJANGO_DEBUG: "true"
+  DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,olmap-backend,olmap-backend.default.svc.cluster.local"
+  DJANGO_MIGRATE: "true"
+  DJANGO_CORS_ALLOW_ALL: "true"
+  
+  # Database Configuration
+  SQL_ENGINE: "django.db.backends.postgresql"
+  SQL_HOST: "postgres"
+  SQL_PORT: "5432"
+  
+  # Frontend Configuration
+  FRONTEND_ROOT: "http://localhost:3000/"
+  
+  # Email Configuration (development)
+  EMAIL_HOST: "localhost"
+  EMAIL_PORT: "25"
+  ADMIN_EMAIL: "admin@localhost"
+  
+  # SMS Configuration (disabled for local)
+  SMS_PLATFORM: "None"
+  
+  # React Environment Variables
+  REACT_APP_SERVER_ROOT: "http://localhost:8000"
+  REACT_APP_OVERPASS_URL: "https://overpass.fvh.io/api/interpreter"
+  REACT_APP_DEFAULT_LAT: "60.17012"
+  REACT_APP_DEFAULT_LON: "24.94290"
+  REACT_APP_USE_MOCK_LOCATION: "true"
+  REACT_APP_MOCK_LAT: "60.161687"
+  REACT_APP_MOCK_LON: "24.944368"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: olmap-secret
+type: Opaque
+stringData:
+  # Django Secret Key (generate a new one for production)
+  DJANGO_SECRET_KEY: "dev-secret-key-change-in-production-(*z-ann&51^6l361#ymu0y9tbdk=_g*=3cy8)p%vcizdc0%_qv"
+  
+  # Database credentials (matches postgres-secret)
+  POSTGRES_DB: "olmap_dev"
+  POSTGRES_USER: "olmap_user"
+  POSTGRES_PASSWORD: "olmap_password"
+  
+  # API Keys (add your own values)
+  REACT_APP_MAPBOX_TOKEN: "pk.eyJ1Ijoiam9oYW4tZnZoIiwiYSI6ImNrNDJtOGh5cDAxczIzb3FpdHg1Z3c5MGwifQ.bp9ubCm67HLIorEUb21K3A"
+  REACT_APP_DIGITRANSIT_KEY: "d253c31db9ab41c195f7ef36fc250da4"
+  
+  # Optional service credentials (empty for local development)
+  TWILIO_ACCOUNT_SID: ""
+  TWILIO_AUTH_TOKEN: ""
+  TWILIO_SENDER_NR: ""
+  GATEWAY_API_KEY: ""
+  GATEWAY_API_SECRET: ""
+  GATEWAY_API_TOKEN: ""
+  EMAIL_HOST_USER: ""
+  EMAIL_HOST_PASSWORD: ""
+  SENTRY_DSN: ""

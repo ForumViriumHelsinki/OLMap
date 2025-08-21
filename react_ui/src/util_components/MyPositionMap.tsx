@@ -2,7 +2,7 @@ import React from 'react';
 import {getBounds} from 'geolib';
 // @ts-ignore
 import * as L from 'leaflet';
-import settings from 'settings.json';
+import settings from '../settings.js';
 
 import 'leaflet/dist/leaflet.css';
 

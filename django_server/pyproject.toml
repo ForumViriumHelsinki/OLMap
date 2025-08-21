@@ -1,0 +1,103 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "olmap"
+version = "0.1.0"
+description = "Open Logistics Map - Geospatial web application for logistics-related geographical features"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    {name = "OLMap Development Team"}
+]
+keywords = ["django", "gis", "openstreetmap", "logistics", "geospatial"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 3.0",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Scientific/Engineering :: GIS",
+]
+
+dependencies = [
+    "django>=3.0",
+    "djangorestframework>=3.10",
+    "pyaml>=19.4",
+    "uritemplate>=3.0",
+    "coreapi>=2.3",
+    "django-cors-headers>=3.2",
+    "django-rest-auth>=0.9",
+    "django-allauth>=0.41",
+    "jsonschema>=3.2",
+    "twilio>=6.35",
+    "uuid",
+    "psycopg2-binary>2.8",
+    "Pillow>=7.0",
+    "dj-inmemorystorage>=2.0",
+    "gunicorn>=20.0",
+    "sentry-sdk>=0.14.1",
+    "geocoder>=1.38",
+    "smsframework_gatewayapi",
+    "elastic-apm>=5.5",
+    "geopy",
+    "pyproj>=2.6.1",
+    "overpy",
+    "django-rename-app",
+    "shapely",
+    "google-cloud-translate",
+]
+
+[project.optional-dependencies]
+dev = [
+    "flake8>=3.7",
+    "coverage>=5.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["olmap*"]
+
+[tool.flake8]
+max-line-length = 120
+exclude = [
+    "migrations",
+    "__pycache__",
+    "*.pyc",
+    ".git",
+    ".tox",
+    "build",
+    "dist",
+    ".eggs",
+    "*.egg-info",
+]
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "*/migrations/*",
+    "*/venv/*",
+    "*/env/*",
+    "manage.py",
+    "*/settings/*",
+    "*/tests/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]

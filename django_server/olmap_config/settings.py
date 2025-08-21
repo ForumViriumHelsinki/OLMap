@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import sys
 
@@ -25,13 +24,19 @@ BASE_DIR = os.path.dirname(CONFIG_DIR)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '(*z-ann&51^6l361#ymu0y9tbdk=_g*=3cy8)p%vcizdc0%_qv'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() in ('true', '1', 'yes', 'on')
 
-ALLOWED_HOSTS = ['citylogistiikka.fvh.io', '127.0.0.1', 'localhost']
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if DEBUG:
+        # Only allow fallback in debug mode for development
+        SECRET_KEY = 'dev-only-secret-key-not-for-production'
+    else:
+        raise ValueError("DJANGO_SECRET_KEY environment variable must be set in production")
+
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'citylogistiikka.fvh.io,127.0.0.1,localhost').split(',')
 
 
 # Application definition
@@ -65,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'olmap_config.urls'
@@ -134,7 +140,8 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = os.environ.get('DJANGO_CORS_ALLOW_ALL', 'False').lower() in ('true', '1', 'yes', 'on')
+CORS_ALLOWED_ORIGINS = os.environ.get('DJANGO_CORS_ALLOWED_ORIGINS', '').split(',') if os.environ.get('DJANGO_CORS_ALLOWED_ORIGINS') else []
 
 STATIC_URL = '/staticfiles/'
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
@@ -181,35 +188,33 @@ if LOG_DB_QUERIES:
     }
 
 TWILIO = {
-    'ACCOUNT_SID': 'configure in local settings',
-    'AUTH_TOKEN': 'configure in local settings',
-    'SENDER_NR': 'configure in local settings'
+    'ACCOUNT_SID': os.environ.get('TWILIO_ACCOUNT_SID', ''),
+    'AUTH_TOKEN': os.environ.get('TWILIO_AUTH_TOKEN', ''),
+    'SENDER_NR': os.environ.get('TWILIO_SENDER_NR', '')
 }
 GATEWAY_API = {
-    'KEY': 'configure in local settings',
-    'SECRET': 'configure in local settings',
-    'TOKEN': 'configure in local settings'
+    'KEY': os.environ.get('GATEWAY_API_KEY', ''),
+    'SECRET': os.environ.get('GATEWAY_API_SECRET', ''),
+    'TOKEN': os.environ.get('GATEWAY_API_TOKEN', '')
 }
-SMS_PLATFORM = 'None'
+SMS_PLATFORM = os.environ.get('SMS_PLATFORM', 'None')
 
-FRONTEND_ROOT = "https://app.olmap.org/"
+FRONTEND_ROOT = os.environ.get('FRONTEND_ROOT', 'https://app.olmap.org/')
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-ADMINS = [['FVH Django admins', 'django-admins@forumvirium.fi']]
-EMAIL_HOST = 'localhost'
-EMAIL_HOST_PASSWORD = ''
-EMAIL_HOST_USER = ''
-EMAIL_PORT = 25
+ADMINS = [['FVH Django admins', os.environ.get('ADMIN_EMAIL', 'django-admins@forumvirium.fi')]]
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '25'))
 
-if not DEBUG:
+SENTRY_DSN = os.environ.get('SENTRY_DSN', '')
+if not DEBUG and SENTRY_DSN:
     sentry_sdk.init(
-        dsn="https://2e6f09304d6844a48667c0384d6561af@sentry.fvh.io/6",
+        dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
-
-        # If you wish to associate users to errors (assuming you are using
-        # django.contrib.auth) you may enable sending PII data.
-        send_default_pii=True
+        send_default_pii=os.environ.get('SENTRY_SEND_PII', 'True').lower() in ('true', '1', 'yes', 'on')
     )
 
 DATETIME_FORMAT = "Y-m-d H:i:s"

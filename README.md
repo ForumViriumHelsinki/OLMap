@@ -5,17 +5,15 @@ App for collecting and discussing geospatial features important for last mile ci
 ## Installation
 
 **Prerequisites**: 
-* Python 3.7 with pip
-* Node.js 13.3 with ./node_modules/.bin in the PATH
+* Python 3.9+ with uv
+* Node.js 18+ with npm
 * Postgres with a db available as configured in django_server/olmap_config/settings.py
 
 In project root:
 
 ```
-sudo pip install pipenv
 cd django_server
-pipenv install
-pipenv shell
+uv pip install -e .
 python manage.py migrate
 python manage.py createsuperuser
 <Configure user to your satisfaction>
@@ -26,8 +24,7 @@ python manage.py runserver
 In react_ui:
 
 ```
-npm install yarn
-yarn install
-yarn start
+npm install
+npm start
 <Verify that you can login to React UI at 127.0.0.1:3000 using your superuser or courier user credentials>
 ```

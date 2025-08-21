@@ -4,7 +4,7 @@ import {geocoderFocus} from "components/workplace_wizard/settings";
 import {geocoderUrl, workplaceSearchUrl} from "components/workplace_wizard/urls";
 import sessionRequest from "sessionRequest";
 import {AppContext} from "components/types";
-import settings from 'settings.json';
+import settings from '../../settings.js';
 
 type WorkplaceAutofillProps = {
   onSelected: (wp: Workplace) => any

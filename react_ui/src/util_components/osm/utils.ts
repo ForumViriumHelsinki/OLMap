@@ -5,8 +5,9 @@ import {renderToStaticMarkup} from "react-dom/server";
 import React from "react";
 import {OSMEditContextType} from "components/types";
 import {getBoundsOfDistance} from "geolib";
-import {overpassInterpreterPath} from "settings.json";
 import _ from "lodash";
+import settings from "../../settings.js";
+const {overpassInterpreterPath} = settings;
 
 export const osmFeatureLabel = (osmFeature: OSMFeature) => {
   const {tags} = osmFeature;

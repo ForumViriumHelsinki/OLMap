@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: olmap-frontend
+  labels:
+    app: olmap-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: olmap-frontend
+  template:
+    metadata:
+      labels:
+        app: olmap-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: olmap-frontend
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: olmap-config
+        - secretRef:
+            name: olmap-secret
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: olmap-frontend
+  labels:
+    app: olmap-frontend
+spec:
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    app: olmap-frontend
+  type: ClusterIP

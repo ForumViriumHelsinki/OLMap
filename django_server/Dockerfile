@@ -1,26 +1,54 @@
-# pull base image
-FROM python:3.7
+# Multi-stage build for production Django application
+FROM python:3.13-slim as base
 
-# set work directory
-WORKDIR /usr/src/app
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_NO_CACHE=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
-# set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Install system dependencies and uv
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    netcat-openbsd \
+    curl \
+    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && rm -rf /var/lib/apt/lists/*
 
-# copy Pipfile
-COPY Pipfile /usr/src/app/
-COPY Pipfile.lock /usr/src/app/
+# Add uv to PATH
+ENV PATH="/root/.local/bin:$PATH"
 
-# install dependencies
-RUN pip install pipenv
-RUN pipenv install --system --deploy
+# Create non-root user
+RUN groupadd -r olmap && useradd -r -g olmap olmap
 
-# copy entrypoint.sh
-COPY ./entrypoint.sh /usr/src/app/entrypoint.sh
+# Set work directory
+WORKDIR /app
 
-# copy project
-COPY . /usr/src/app/
+# Install Python dependencies
+COPY pyproject.toml ./
+RUN uv pip install --system -e .
 
-# run entrypoint.sh
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+# Copy entrypoint and make it executable
+COPY --chown=olmap:olmap entrypoint.sh ./
+RUN chmod +x entrypoint.sh
+
+# Copy project files
+COPY --chown=olmap:olmap . .
+
+# Collect static files (provide temporary secret key for build)
+RUN DJANGO_SECRET_KEY=build-time-only python manage.py collectstatic --noinput
+
+# Switch to non-root user
+USER olmap
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import requests; requests.get('http://localhost:8000/health/', timeout=10)"
+
+# Default command
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "--timeout", "120", "olmap_config.wsgi:application"]

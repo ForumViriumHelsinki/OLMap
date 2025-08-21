@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: olmap-backend
+  labels:
+    app: olmap-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: olmap-backend
+  template:
+    metadata:
+      labels:
+        app: olmap-backend
+    spec:
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:16-alpine
+        command:
+          - sh
+          - -c
+          - |
+            echo "Waiting for PostgreSQL to be ready..."
+            until pg_isready -h postgres -p 5432 -U postgres; do
+              echo "PostgreSQL is not ready yet. Waiting..."
+              sleep 2
+            done
+            echo "PostgreSQL is ready!"
+      containers:
+      - name: backend
+        image: olmap-backend
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - configMapRef:
+            name: olmap-config
+        - secretRef:
+            name: olmap-secret
+        livenessProbe:
+          httpGet:
+            path: /health/
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready/
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        volumeMounts:
+        - name: static-files
+          mountPath: /app/staticfiles
+        - name: media-files
+          mountPath: /app/uploads
+      volumes:
+      - name: static-files
+        emptyDir: {}
+      - name: media-files
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: olmap-backend
+  labels:
+    app: olmap-backend
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+  selector:
+    app: olmap-backend
+  type: ClusterIP

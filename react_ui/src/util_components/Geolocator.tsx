@@ -1,6 +1,6 @@
 import React from 'react';
 import Modal, {ModalBody} from "util_components/bootstrap/Modal";
-import settings from "settings.json";
+import settings from "../settings.js";
 import {LocationTuple} from './types';
 
 export default class Geolocator extends React.Component<{onLocation: (location: LocationTuple) => any}> {
@@ -26,7 +26,7 @@ export default class Geolocator extends React.Component<{onLocation: (location: 
   componentDidMount() {
     // @ts-ignore
     const useMockGeolocation = settings.useMockGeolocation;
-    if (useMockGeolocation) {
+    if (useMockGeolocation && Array.isArray(useMockGeolocation)) {
       setTimeout(() => this.props.onLocation(useMockGeolocation), 500);
       this.mockInterval = setInterval(
         () => this.props.onLocation(useMockGeolocation),

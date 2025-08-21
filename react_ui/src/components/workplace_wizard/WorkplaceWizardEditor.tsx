@@ -8,7 +8,7 @@ import _ from "lodash";
 
 import './WorkplaceWizard.scss';
 import sessionRequest from "sessionRequest";
-import {useMapEvent} from "react-leaflet";
+import {useLeaflet} from "react-leaflet";
 import MyPositionMap from "util_components/MyPositionMap";
 import EntrancesMapLayer from "components/workplace_wizard/EntrancesMapLayer";
 import UnloadingPlacesMapLayer from "components/workplace_wizard/UnloadingPlacesMapLayer";
@@ -58,7 +58,15 @@ export default class WorkplaceWizardEditor extends React.Component<WorkplaceWiza
     } = this.state;
 
     const DetectClick = () => {
-      useMapEvent('click', this.positionChosen);
+      const map = useLeaflet().map;
+      React.useEffect(() => {
+        if (map) {
+          map.on('click', this.positionChosen);
+          return () => {
+            map.off('click', this.positionChosen);
+          };
+        }
+      }, [map]);
       return null;
     };
 

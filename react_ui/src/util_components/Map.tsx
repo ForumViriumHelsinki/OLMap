@@ -2,12 +2,12 @@ import React from 'react';
 // @ts-ignore
 import * as L from 'leaflet';
 import 'mapbox-gl-leaflet';
-import settings from 'settings.json';
+import settings from '../settings.js';
 
 import 'leaflet/dist/leaflet.css';
 import {LocationTuple} from "util_components/types";
 import Icon from "util_components/bootstrap/Icon";
-import {MapContainer} from "react-leaflet";
+import {Map as LeafletMap} from "react-leaflet";
 import {LatLngTuple} from "leaflet";
 import TunnelsMapLayer from "components/workplace_wizard/TunnelsMapLayer";
 
@@ -54,12 +54,12 @@ export default class Map extends React.Component<MapProps, MapState> {
     const {backgroundChangeable, children, latLng, zoom, showAttribution, zoomControl, height} = this.props;
     const {background} = this.state;
     return <>
-      <MapContainer style={{height}} center={latLng as LatLngTuple} zoom={zoom}
-                    whenCreated={map => {this.leafletMap = map; this.refreshMap()}} attributionControl={showAttribution}
-                    zoomControl={zoomControl} preferCanvas>
+      <LeafletMap style={{height}} center={latLng as LatLngTuple} zoom={zoom}
+                  whenCreated={(map: L.Map) => {this.leafletMap = map; this.refreshMap()}} attributionControl={showAttribution}
+                  zoomControl={zoomControl} preferCanvas>
         {children}
         {background == 'tunnels' && <TunnelsMapLayer/>}
-      </MapContainer>
+      </LeafletMap>
       {backgroundChangeable &&
         <button style={{marginTop: -64, position: 'relative', zIndex: 400}}
                 className="btn btn-outline-primary ml-2 btn-sm bg-white" onClick={this.switchBackground}>

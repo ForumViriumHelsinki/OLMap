@@ -21,6 +21,7 @@ from django.views.generic import TemplateView
 
 from olmap import rest
 from olmap.rest.schema import schema_view
+from olmap.health import health_check, ready_check
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,7 +32,10 @@ urlpatterns = [
     path('swagger-ui/', TemplateView.as_view(
         template_name='swagger-ui.html',
         extra_context={'schema_url': 'openapi-schema'}
-    ), name='swagger-ui')
+    ), name='swagger-ui'),
+    # Health check endpoints
+    path('health/', health_check, name='health-check'),
+    path('ready/', ready_check, name='ready-check'),
 ]
 
 if settings.DEBUG:
