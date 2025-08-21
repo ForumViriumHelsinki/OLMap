@@ -1,0 +1,21 @@
+{
+  "packages": {
+    "django_server": {
+      "release-type": "python",
+      "package-name": "olmap-backend",
+      "component": "olmap-backend"
+    },
+    "react_ui": {
+      "release-type": "node",
+      "package-name": "olmap-frontend",
+      "component": "olmap-frontend"
+    }
+  },
+  "plugins": [
+    {
+      "type": "linked-versions",
+      "groupName": "olmap-containers",
+      "components": ["olmap-backend", "olmap-frontend"]
+    }
+  ]
+}
