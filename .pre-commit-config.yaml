@@ -1,0 +1,86 @@
+---
+# Pre-commit hooks ordered by speed - fail fast on simple issues
+repos:
+  # 1. FASTEST: Basic file hygiene checks (milliseconds)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-merge-conflict     # Super fast
+      - id: check-case-conflict      # Filesystem check
+      - id: check-symlinks           # Filesystem check
+      - id: check-added-large-files  # File size check
+        args: [--maxkb=1000]
+      - id: check-yaml               # Basic YAML syntax
+      - id: check-json               # Basic JSON syntax
+      - id: check-toml               # Basic TOML syntax
+      - id: trailing-whitespace      # Simple regex
+      - id: end-of-file-fixer       # Simple check
+      - id: mixed-line-ending       # Simple check
+        args: [--fix=lf]
+
+  # 2. FAST: Lightweight linters (seconds)
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [-c=.yamllint]
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.7
+    hooks:
+      - id: actionlint
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.13.0-beta
+    hooks:
+      - id: hadolint-docker
+
+  # 3. MEDIUM: Formatters (fast but process more files)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.2
+    hooks:
+      - id: ruff         # Linting (very fast)
+        args: [--fix]
+      - id: ruff-format  # Formatting (very fast)
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
+    hooks:
+      - id: prettier
+        files: \.(js|jsx|ts|tsx|json|css|scss|md)$
+        exclude: ^(build/|node_modules/)
+
+  # 4. HEAVIER: Security scanning
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+
+  # 5. HEAVIEST: Type checking and deeper analysis
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v8.57.0
+    hooks:
+      - id: eslint
+        files: \.(js|jsx|ts|tsx)$
+        args: [--fix]
+        additional_dependencies:
+          - eslint@8.57.0
+          - typescript@5.3.3
+          - '@typescript-eslint/parser@6.21.0'
+          - '@typescript-eslint/eslint-plugin@6.21.0'
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        files: ^django_server/
+        additional_dependencies: [django-stubs, djangorestframework-stubs]
+
+  # Commit message validation (only runs on commit-msg stage)
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.2.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: []
