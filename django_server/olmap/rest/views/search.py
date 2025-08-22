@@ -1,10 +1,9 @@
-from django.db.models import Q
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from olmap import models
-from olmap.rest.serializers.map_features import WorkplaceWithNoteSerializer, EntranceWithNoteSerializer
+from olmap.rest.serializers.map_features import EntranceWithNoteSerializer, WorkplaceWithNoteSerializer
 
 
 class SearchSerializer(serializers.Serializer):
@@ -24,14 +23,15 @@ class SearchView(APIView):
 
     Possibly unneeded & superceded by the search function in the workplaces API.
     """
+
     schema = None  # Remove from API spec for now, possibly to be removed from the API as well
 
     def post(self, request):
         serializer = SearchSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = dict(serializer.data)
-        workplace = data.pop('workplace', None)
-        osm_id = data.pop('osm_id', None)
+        workplace = data.pop("workplace", None)
+        osm_id = data.pop("osm_id", None)
 
         if osm_id:
             workplaces = models.Workplace.objects.filter(osm_feature__id=osm_id)
@@ -40,12 +40,14 @@ class SearchView(APIView):
         else:
             workplaces = models.Workplace.objects.filter(**data)
 
-        if data.get('street', None) and data.get('housenumber', None):
+        if data.get("street") and data.get("housenumber"):
             entrances = models.Entrance.objects.filter(**data)
         else:
             entrances = models.Entrance.objects.none()
 
-        return Response({
-            'workplaces': WorkplaceWithNoteSerializer(workplaces, many=True, context={'request': request}).data,
-            'entrances': EntranceWithNoteSerializer(entrances, many=True, context={'request': request}).data
-        })
+        return Response(
+            {
+                "workplaces": WorkplaceWithNoteSerializer(workplaces, many=True, context={"request": request}).data,
+                "entrances": EntranceWithNoteSerializer(entrances, many=True, context={"request": request}).data,
+            }
+        )

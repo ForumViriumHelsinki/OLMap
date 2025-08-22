@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import sys
 
@@ -25,73 +26,73 @@ BASE_DIR = os.path.dirname(CONFIG_DIR)
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'False').lower() in ('true', '1', 'yes', 'on')
+DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() in ("true", "1", "yes", "on")
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 if not SECRET_KEY:
     if DEBUG:
         # Only allow fallback in debug mode for development
-        SECRET_KEY = 'dev-only-secret-key-not-for-production'
+        SECRET_KEY = "dev-only-secret-key-not-for-production"
     else:
         raise ValueError("DJANGO_SECRET_KEY environment variable must be set in production")
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'citylogistiikka.fvh.io,127.0.0.1,localhost').split(',')
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "citylogistiikka.fvh.io,127.0.0.1,localhost").split(",")
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'olmap',
-    'corsheaders',
-    'rest_framework',
-    'rest_framework.authtoken',
-    'django.contrib.sites',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'rest_auth',
-    'rest_auth.registration',
-    'olmap_config.apps.AdminConfig',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django_rename_app'
+    "olmap",
+    "corsheaders",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "rest_auth",
+    "rest_auth.registration",
+    "olmap_config.apps.AdminConfig",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django_rename_app",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
-ROOT_URLCONF = 'olmap_config.urls'
+ROOT_URLCONF = "olmap_config.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'olmap_config.wsgi.application'
+WSGI_APPLICATION = "olmap_config.wsgi.application"
 
 
 # Database
@@ -113,16 +114,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -130,98 +131,102 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'Europe/Helsinki'
+TIME_ZONE = "Europe/Helsinki"
 
 USE_I18N = True
 
 USE_TZ = True
 
-DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
-CORS_ORIGIN_ALLOW_ALL = os.environ.get('DJANGO_CORS_ALLOW_ALL', 'False').lower() in ('true', '1', 'yes', 'on')
-CORS_ALLOWED_ORIGINS = os.environ.get('DJANGO_CORS_ALLOWED_ORIGINS', '').split(',') if os.environ.get('DJANGO_CORS_ALLOWED_ORIGINS') else []
+CORS_ORIGIN_ALLOW_ALL = os.environ.get("DJANGO_CORS_ALLOW_ALL", "False").lower() in ("true", "1", "yes", "on")
+CORS_ALLOWED_ORIGINS = (
+    os.environ.get("DJANGO_CORS_ALLOWED_ORIGINS", "").split(",")
+    if os.environ.get("DJANGO_CORS_ALLOWED_ORIGINS")
+    else []
+)
 
-STATIC_URL = '/staticfiles/'
+STATIC_URL = "/staticfiles/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-MEDIA_URL = '/uploads/'
+MEDIA_URL = "/uploads/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ]
 }
 
 REST_AUTH_SERIALIZERS = {
-    'USER_DETAILS_SERIALIZER': 'olmap.rest.serializers.UserSerializer',
-    'PASSWORD_RESET_SERIALIZER': 'olmap.rest.serializers.PasswordResetSerializer'
+    "USER_DETAILS_SERIALIZER": "olmap.rest.serializers.UserSerializer",
+    "PASSWORD_RESET_SERIALIZER": "olmap.rest.serializers.PasswordResetSerializer",
 }
 
 LOG_DB_QUERIES = False
 
 if LOG_DB_QUERIES:
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'filters': {
-            'require_debug_true': {
-                '()': 'django.utils.log.RequireDebugTrue',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "filters": {
+            "require_debug_true": {
+                "()": "django.utils.log.RequireDebugTrue",
             }
         },
-        'handlers': {
-            'console': {
-                'level': 'DEBUG',
-                'filters': ['require_debug_true'],
-                'class': 'logging.StreamHandler',
+        "handlers": {
+            "console": {
+                "level": "DEBUG",
+                "filters": ["require_debug_true"],
+                "class": "logging.StreamHandler",
             }
         },
-        'loggers': {
-            'django.db.backends': {
-                'level': 'DEBUG',
-                'handlers': ['console'],
+        "loggers": {
+            "django.db.backends": {
+                "level": "DEBUG",
+                "handlers": ["console"],
             }
-        }
+        },
     }
 
 TWILIO = {
-    'ACCOUNT_SID': os.environ.get('TWILIO_ACCOUNT_SID', ''),
-    'AUTH_TOKEN': os.environ.get('TWILIO_AUTH_TOKEN', ''),
-    'SENDER_NR': os.environ.get('TWILIO_SENDER_NR', '')
+    "ACCOUNT_SID": os.environ.get("TWILIO_ACCOUNT_SID", ""),
+    "AUTH_TOKEN": os.environ.get("TWILIO_AUTH_TOKEN", ""),
+    "SENDER_NR": os.environ.get("TWILIO_SENDER_NR", ""),
 }
 GATEWAY_API = {
-    'KEY': os.environ.get('GATEWAY_API_KEY', ''),
-    'SECRET': os.environ.get('GATEWAY_API_SECRET', ''),
-    'TOKEN': os.environ.get('GATEWAY_API_TOKEN', '')
+    "KEY": os.environ.get("GATEWAY_API_KEY", ""),
+    "SECRET": os.environ.get("GATEWAY_API_SECRET", ""),
+    "TOKEN": os.environ.get("GATEWAY_API_TOKEN", ""),
 }
-SMS_PLATFORM = os.environ.get('SMS_PLATFORM', 'None')
+SMS_PLATFORM = os.environ.get("SMS_PLATFORM", "None")
 
-FRONTEND_ROOT = os.environ.get('FRONTEND_ROOT', 'https://app.olmap.org/')
+FRONTEND_ROOT = os.environ.get("FRONTEND_ROOT", "https://app.olmap.org/")
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-ADMINS = [['FVH Django admins', os.environ.get('ADMIN_EMAIL', 'django-admins@forumvirium.fi')]]
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'localhost')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '25'))
+ADMINS = [["FVH Django admins", os.environ.get("ADMIN_EMAIL", "django-admins@forumvirium.fi")]]
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "25"))
 
-SENTRY_DSN = os.environ.get('SENTRY_DSN', '')
+SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
 if not DEBUG and SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
-        send_default_pii=os.environ.get('SENTRY_SEND_PII', 'True').lower() in ('true', '1', 'yes', 'on')
+        send_default_pii=os.environ.get("SENTRY_SEND_PII", "True").lower() in ("true", "1", "yes", "on"),
     )
 
 DATETIME_FORMAT = "Y-m-d H:i:s"
 
 SITE_ID = 1
 
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = "none"
 
 # Place a valid google account json here to enable translation of delivery instructions;
 # see https://cloud.google.com/translate/docs/setup
@@ -232,8 +237,8 @@ try:
 except ImportError:
     pass
 
-if 'test' in sys.argv:
-    DEFAULT_FILE_STORAGE = 'inmemorystorage.InMemoryStorage'
+if "test" in sys.argv:
+    DEFAULT_FILE_STORAGE = "inmemorystorage.InMemoryStorage"
     TEST = True
     # INMEMORYSTORAGE_PERSIST = True
 else:

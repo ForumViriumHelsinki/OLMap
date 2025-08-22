@@ -1,21 +1,22 @@
 from io import BytesIO
 
-from PIL import Image as Img, UnidentifiedImageError, ExifTags
 from django.contrib.auth.models import User
 from django.contrib.postgres.fields import ArrayField
 from django.core.files import File
 from django.db import models
+from PIL import ExifTags, UnidentifiedImageError
+from PIL import Image as Img
 
 from . import base
-from .base import TimestampedModel, Address
+from .base import Address, TimestampedModel
 
 
 class OSMFeature(base.Model):
     id = models.BigIntegerField(primary_key=True)
-    associated_entrances = models.ManyToManyField('OSMFeature', related_name='associated_features', blank=True)
+    associated_entrances = models.ManyToManyField("OSMFeature", related_name="associated_features", blank=True)
 
     class Meta:
-        ordering = ['id']
+        ordering = ["id"]
 
     def workplace(self):
         # use all() to ensure prefetch_related works:
@@ -24,7 +25,7 @@ class OSMFeature(base.Model):
 
 
 def upload_osm_images_to(instance, filename):
-    return f'osm_image_notes/{instance.id}/{filename}'
+    return f"osm_image_notes/{instance.id}/{filename}"
 
 
 class OSMImageNote(TimestampedModel):
@@ -33,24 +34,28 @@ class OSMImageNote(TimestampedModel):
     image = models.ImageField(null=True, blank=True, upload_to=upload_osm_images_to)
     comment = models.TextField(blank=True)
     tags = ArrayField(base_field=models.CharField(max_length=64), default=list, blank=True)
-    osm_features = models.ManyToManyField(OSMFeature, blank=True, related_name='image_notes')
+    osm_features = models.ManyToManyField(OSMFeature, blank=True, related_name="image_notes")
 
-    addresses = models.ManyToManyField(Address, blank=True, related_name='image_notes')
+    addresses = models.ManyToManyField(Address, blank=True, related_name="image_notes")
 
-    created_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='created_notes')
+    created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="created_notes")
     modified_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='modified_notes')
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name="modified_notes"
+    )
     accepted_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='accepted_notes')
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name="accepted_notes"
+    )
     processed_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='processed_notes')
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name="processed_notes"
+    )
     reviewed_by = models.ForeignKey(
-        User, null=True, blank=True, on_delete=models.SET_NULL, related_name='reviewed_notes')
+        User, null=True, blank=True, on_delete=models.SET_NULL, related_name="reviewed_notes"
+    )
 
     visible = models.BooleanField(default=True)
     hidden_reason = models.TextField(
-        blank=True, help_text="If reviewer decides to hide the note, document reason here.")
+        blank=True, help_text="If reviewer decides to hide the note, document reason here."
+    )
     layer = models.IntegerField(blank=True, null=True, help_text="Map layer, e.g. -1 if underground")
 
     def __str__(self):
@@ -66,10 +71,10 @@ class OSMImageNote(TimestampedModel):
             return super().save(*args, **kwargs)
 
         for orientation in ExifTags.TAGS.keys():
-            if ExifTags.TAGS[orientation] == 'Orientation':
+            if ExifTags.TAGS[orientation] == "Orientation":
                 break
 
-        exif = pilImage._getexif()  # noqa
+        exif = pilImage._getexif()
         if not exif:
             return super().save(*args, **kwargs)
 
@@ -86,7 +91,7 @@ class OSMImageNote(TimestampedModel):
             pilImage = pilImage.rotate(90, expand=True)
 
         output = BytesIO()
-        pilImage.save(output, format='JPEG', quality=75)
+        pilImage.save(output, format="JPEG", quality=75)
         output.seek(0)
         self.image = File(output, self.image.name)
 
@@ -105,9 +110,9 @@ class OSMImageNote(TimestampedModel):
         from olmap.rest.permissions import REVIEWER_GROUP
 
         return User.objects.filter(
-            models.Q(id__in=[self.created_by_id, self.modified_by_id, self.processed_by_id, self.reviewed_by_id]) |
-            models.Q(image_note_comments__image_note=self) |
-            models.Q(groups__name=REVIEWER_GROUP)
+            models.Q(id__in=[self.created_by_id, self.modified_by_id, self.processed_by_id, self.reviewed_by_id])
+            | models.Q(image_note_comments__image_note=self)
+            | models.Q(groups__name=REVIEWER_GROUP)
         ).distinct()
 
     def link_osm_id(self, osm_id):
@@ -119,23 +124,23 @@ class OSMImageNote(TimestampedModel):
 
 
 class ImageNoteUpvote(base.Model):
-    user = models.ForeignKey(User, related_name='image_note_upvotes', on_delete=models.CASCADE)
-    image_note = models.ForeignKey(OSMImageNote, related_name='upvotes', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="image_note_upvotes", on_delete=models.CASCADE)
+    image_note = models.ForeignKey(OSMImageNote, related_name="upvotes", on_delete=models.CASCADE)
 
 
 class ImageNoteDownvote(base.Model):
-    user = models.ForeignKey(User, related_name='image_note_downvotes', on_delete=models.CASCADE)
-    image_note = models.ForeignKey(OSMImageNote, related_name='downvotes', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="image_note_downvotes", on_delete=models.CASCADE)
+    image_note = models.ForeignKey(OSMImageNote, related_name="downvotes", on_delete=models.CASCADE)
 
 
 class OSMImageNoteComment(base.Model):
-    user = models.ForeignKey(User, related_name='image_note_comments', on_delete=models.CASCADE, null=True)
-    image_note = models.ForeignKey(OSMImageNote, related_name='comments', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="image_note_comments", on_delete=models.CASCADE, null=True)
+    image_note = models.ForeignKey(OSMImageNote, related_name="comments", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     comment = models.TextField()
 
     class Meta:
-        ordering = ['created_at']
+        ordering = ["created_at"]
 
     def __str__(self):
         return self.comment or super().__str__()
@@ -151,6 +156,6 @@ class OSMImageNoteComment(base.Model):
 
 
 class OSMImageNoteCommentNotification(base.Model):
-    comment = models.ForeignKey(OSMImageNoteComment, related_name='notifications', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
+    comment = models.ForeignKey(OSMImageNoteComment, related_name="notifications", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="notifications", on_delete=models.CASCADE)
     seen = models.DateTimeField(null=True, blank=True, db_index=True)

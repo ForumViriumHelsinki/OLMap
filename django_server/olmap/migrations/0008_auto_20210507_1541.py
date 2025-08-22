@@ -4,27 +4,26 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0007_auto_20210506_1604'),
+        ("olmap", "0007_auto_20210506_1604"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='office',
-            name='image_note',
+            model_name="office",
+            name="image_note",
         ),
         migrations.RemoveField(
-            model_name='shop',
-            name='image_note',
+            model_name="shop",
+            name="image_note",
         ),
         migrations.DeleteModel(
-            name='Amenity',
+            name="Amenity",
         ),
         migrations.DeleteModel(
-            name='Office',
+            name="Office",
         ),
         migrations.DeleteModel(
-            name='Shop',
+            name="Shop",
         ),
     ]

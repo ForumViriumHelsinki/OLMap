@@ -3,16 +3,16 @@ from google.cloud import translate_v2 as translate
 from rest_framework import serializers
 
 
-class TranslationSerializerMixin(object):
-    translated_fields = [] # Override in subclasses
+class TranslationSerializerMixin:
+    translated_fields = []  # Override in subclasses
 
     def get_requested_language(self):
-        return self.context['request'].query_params.get('language', None)
+        return self.context["request"].query_params.get("language", None)
 
     def create_translated_fields(self, instance):
         if len(self.translated_fields) == 0:
             return
-        if hasattr(instance, self.translated_fields[0] + '_translated'):
+        if hasattr(instance, self.translated_fields[0] + "_translated"):
             return
         self.prefill_translated_fields([([instance], self.translated_fields)])
 
@@ -25,7 +25,7 @@ class TranslationSerializerMixin(object):
         for instances, field_names in instance_lists:
             for instance in instances:
                 for f in field_names:
-                    if getattr(instance, f) and not getattr(instance, f + '_translated', None):
+                    if getattr(instance, f) and not getattr(instance, f + "_translated", None):
                         instance_fields.append((instance, f))
 
         if not len(instance_fields):
@@ -36,14 +36,14 @@ class TranslationSerializerMixin(object):
         result = translate_client.translate(values, target_language=language)
 
         for i, (instance, f) in enumerate(instance_fields):
-            setattr(instance, f + '_translated', result[i]['translatedText'])
-            setattr(instance, f + '_language', result[i]['detectedSourceLanguage'])
+            setattr(instance, f + "_translated", result[i]["translatedText"])
+            setattr(instance, f + "_language", result[i]["detectedSourceLanguage"])
 
 
 class TranslatedField(serializers.Field):
     def __init__(self, **kwargs):
-        kwargs['source'] = '*'
-        kwargs['read_only'] = True
+        kwargs["source"] = "*"
+        kwargs["read_only"] = True
         super().__init__(**kwargs)
 
     def to_representation(self, value):

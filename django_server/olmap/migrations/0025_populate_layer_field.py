@@ -3,11 +3,10 @@
 from django.db import migrations
 
 
-
 def forwards(apps, schema_editor):
-    Entrance = apps.get_model('olmap', 'Entrance')
-    Gate = apps.get_model('olmap', 'Gate')
-    UnloadingPlace = apps.get_model('olmap', 'UnloadingPlace')
+    Entrance = apps.get_model("olmap", "Entrance")
+    Gate = apps.get_model("olmap", "Gate")
+    UnloadingPlace = apps.get_model("olmap", "UnloadingPlace")
 
     for Model in [Entrance, Gate, UnloadingPlace]:
         for i in Model.objects.all().filter(layer__lt=0):
@@ -16,11 +15,8 @@ def forwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0024_osmimagenote_layer'),
+        ("olmap", "0024_osmimagenote_layer"),
     ]
 
-    operations = [
-        migrations.RunPython(forwards, lambda m, s: None)
-    ]
+    operations = [migrations.RunPython(forwards, lambda m, s: None)]

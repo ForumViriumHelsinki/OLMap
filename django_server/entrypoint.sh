@@ -4,11 +4,11 @@ set -e
 # Wait for PostgreSQL to be ready
 if [ "${SQL_HOST:-}" ]; then
     echo "Waiting for PostgreSQL at $SQL_HOST:$SQL_PORT..."
-    
+
     while ! nc -z $SQL_HOST $SQL_PORT; do
       sleep 0.1
     done
-    
+
     echo "PostgreSQL started"
 fi
 

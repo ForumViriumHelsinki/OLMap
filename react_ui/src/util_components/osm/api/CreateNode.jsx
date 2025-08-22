@@ -1,10 +1,13 @@
-import React from 'react';
+import React from "react";
 
-const CreateNode = ({changesetId, lon, lat, tags}) =>
+const CreateNode = ({ changesetId, lon, lat, tags }) => (
   <osm>
     <node changeset={changesetId} lat={lat} lon={lon}>
-      {Object.entries(tags).map(([k, v]) => <tag k={k} v={v} key={k}/>)}
+      {Object.entries(tags).map(([k, v]) => (
+        <tag k={k} v={v} key={k} />
+      ))}
     </node>
-  </osm>;
+  </osm>
+);
 
 export default CreateNode;

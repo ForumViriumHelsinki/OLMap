@@ -5,8 +5,12 @@ from rest_auth.serializers import PasswordResetSerializer as BasePasswordResetSe
 
 class PasswordResetForm(BasePasswordResetForm):
     def save(self, **kwargs):
-        kwargs = dict(kwargs, domain_override='app.olmap.org', use_https=True,
-                      from_email=settings.EMAIL_HOST_USER or 'olmap@olmap.org')
+        kwargs = dict(
+            kwargs,
+            domain_override="app.olmap.org",
+            use_https=True,
+            from_email=settings.EMAIL_HOST_USER or "olmap@olmap.org",
+        )
         return super().save(**kwargs)
 
 

@@ -10,18 +10,19 @@ try:
     from shapely.geometry import Point
     from shapely.strtree import STRtree
 except (ImportError, OSError):
-    print('Shapely not found, feature - OSM linking will not be available.')
+    print("Shapely not found, feature - OSM linking will not be available.")
 
 from django.db import models
 
+from olmap.utils import intersection_matches
+
 from . import Address
 from .base import Model
-from .osm_image_notes import OSMImageNote, OSMFeature
-from olmap.utils import intersection_matches
+from .osm_image_notes import OSMFeature, OSMImageNote
 
 
 def dimension_field():
-    return models.DecimalField(max_digits=4, decimal_places=2, help_text='In meters', blank=True, null=True)
+    return models.DecimalField(max_digits=4, decimal_places=2, help_text="In meters", blank=True, null=True)
 
 
 def choices_field(choices, **kwargs):
@@ -37,10 +38,10 @@ def as_dict(obj, *keys):
 
 
 def bool_to_osm(b):
-    return {True: 'yes', False: 'no', None: None}[b]
+    return {True: "yes", False: "no", None: None}[b]
 
 
-class FeatureIndex(object):
+class FeatureIndex:
     def __init__(self, features):
         if not len(features):
             self.index = {}
@@ -63,7 +64,7 @@ class OSMFeatureIndex(FeatureIndex):
 
 class AddressIndex(FeatureIndex):
     def get_id(self, feature):
-        return feature['id']
+        return feature["id"]
 
     def note_features(self, note):
         return note.addresses.all()
@@ -95,13 +96,13 @@ class MapFeature(models.Model):
         node[{cls.osm_node_query}](area:3600034914)->.nodes;
         .nodes out;
         """
-        print(f'Fetching Helsinki {cls.__name__}s from OSM...')
+        print(f"Fetching Helsinki {cls.__name__}s from OSM...")
         try:
             result = api.query(query)
         except OverpassTooManyRequests:
             sleep(30)
             result = api.query(query)
-        print(f'{len(result.nodes)} {cls.__name__}s found.')
+        print(f"{len(result.nodes)} {cls.__name__}s found.")
 
         points = []
         for node in result.nodes:
@@ -110,8 +111,8 @@ class MapFeature(models.Model):
             points.append(p)
         tree = STRtree(points)
 
-        instances = cls.objects.filter(osm_feature=None).prefetch_related('image_note__osm_features')
-        print(f'Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...')
+        instances = cls.objects.filter(osm_feature=None).prefetch_related("image_note__osm_features")
+        print(f"Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...")
         linked_count = 0
         for instance in instances:
             note_position = [instance.image_note.lat, instance.image_note.lon]
@@ -122,7 +123,9 @@ class MapFeature(models.Model):
             if matches and dst < cls.max_distance_to_osm_node:
                 instance.link_osm_id(nearest_osm.id)
                 linked_count += 1
-                print(f'Linked OSM {cls.__name__} {nearest_osm.id} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')
+                print(
+                    f"Linked OSM {cls.__name__} {nearest_osm.id} to note {instance.image_note_id}; distance {str(dst)[:4]}m."
+                )
             else:
                 for point in tree.query(Point(*note_position).buffer(0.0003)):
                     node = point.node
@@ -133,10 +136,11 @@ class MapFeature(models.Model):
                         instance.link_osm_id(node.id)
                         linked_count += 1
                         print(
-                            f'Linked OSM {cls.__name__} {node.id} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')
+                            f"Linked OSM {cls.__name__} {node.id} to note {instance.image_note_id}; distance {str(dst)[:4]}m."
+                        )
                         break
 
-        print(f'All done; {linked_count} new links created.')
+        print(f"All done; {linked_count} new links created.")
 
     def link_osm_id(self, osm_id):
         feature = OSMFeature.objects.get_or_create(id=osm_id)[0]
@@ -147,58 +151,57 @@ class MapFeature(models.Model):
 
 
 class InfoBoard(MapFeature):
-    types = ['map', 'board']
-    type = choices_field(types, default='board')
+    types = ["map", "board"]
+    type = choices_field(types, default="board")
 
     def as_osm_tags(self):
-        return {
-            'tourism': 'information',
-            'information': self.type or 'board'
-        }
+        return {"tourism": "information", "information": self.type or "board"}
 
 
 class BaseAddress(MapFeature):
     street = models.CharField(max_length=64, blank=True)
-    housenumber = models.CharField(max_length=8, blank=True, null=True, help_text='E.g. 3-5')
+    housenumber = models.CharField(max_length=8, blank=True, null=True, help_text="E.g. 3-5")
     unit = models.CharField(max_length=8, blank=True)
 
     class Meta:
         abstract = True
 
     def as_osm_tags(self):
-        return dict(super().as_osm_tags(), **filter_dict({
-            'addr:street': self.street,
-            'addr:housenumber': self.housenumber,
-            'addr:unit': self.unit
-        }))
+        return dict(
+            super().as_osm_tags(),
+            **filter_dict({"addr:street": self.street, "addr:housenumber": self.housenumber, "addr:unit": self.unit}),
+        )
 
     @classmethod
     def link_notes_to_official_address(cls):
-        addresses = Address.objects.filter(city='Helsinki').values()
+        addresses = Address.objects.filter(city="Helsinki").values()
         address_id_index = AddressIndex(addresses)
         address_index = dict([(f'{a["street"]} {a["housenumber"]}', a) for a in addresses])
 
-        instances = cls.objects.prefetch_related('image_note__addresses')\
-            .filter(housenumber__isnull=False, street__isnull=False)
-        print(f'Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...')
+        instances = cls.objects.prefetch_related("image_note__addresses").filter(
+            housenumber__isnull=False, street__isnull=False
+        )
+        print(f"Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...")
         linked_count = 0
         for instance in instances:
             housenumbers = [instance.housenumber]
-            if '-' in instance.housenumber:
-                housenumbers = housenumbers + [s.strip() for s in instance.housenumber.split('-')]
+            if "-" in instance.housenumber:
+                housenumbers = housenumbers + [s.strip() for s in instance.housenumber.split("-")]
             for housenumber in housenumbers:
-                street_address = f'{instance.street} {housenumber}'
-                address = address_index.get(street_address, None)
+                street_address = f"{instance.street} {housenumber}"
+                address = address_index.get(street_address)
                 if (not address) or address_id_index.is_linked(instance.image_note):
                     continue
                 note_position = [instance.image_note.lat, instance.image_note.lon]
-                dst = distance(note_position, [address['lat'], address['lon']]).meters
+                dst = distance(note_position, [address["lat"], address["lon"]]).meters
                 if dst < 150:
-                    added = instance.image_note.addresses.add(address['id'])
+                    added = instance.image_note.addresses.add(address["id"])
                     if added:
                         linked_count += 1
-                        print(f'Linked address {street_address} to note {instance.image_note_id}; distance {str(dst)[:4]}m.')
-        print(f'All done; {linked_count} new links created.')
+                        print(
+                            f"Linked address {street_address} to note {instance.image_note_id}; distance {str(dst)[:4]}m."
+                        )
+        print(f"All done; {linked_count} new links created.")
 
 
 class WithLayer(MapFeature):
@@ -216,7 +219,7 @@ class WithLayer(MapFeature):
 
 
 class Lockable(WithLayer):
-    accesses = ['yes', 'private', 'delivery', 'no']
+    accesses = ["yes", "private", "delivery", "no"]
     access = choices_field(accesses)
     width = dimension_field()
     height = dimension_field()
@@ -229,90 +232,100 @@ class Lockable(WithLayer):
         abstract = True
 
     def as_osm_tags(self):
-        tags = hasattr(super(), 'as_osm_tags') and super().as_osm_tags() or {}
-        return filter_dict(dict(
-            tags,
-            description=(self.buzzer and 'With buzzer') or (self.keycode and 'With keycode'),
-            **as_dict(self, 'access', 'width', 'height', 'phone', 'opening_hours', 'layer')
-        ))
+        tags = (hasattr(super(), "as_osm_tags") and super().as_osm_tags()) or {}
+        return filter_dict(
+            dict(
+                tags,
+                description=(self.buzzer and "With buzzer") or (self.keycode and "With keycode"),
+                **as_dict(self, "access", "width", "height", "phone", "opening_hours", "layer"),
+            )
+        )
 
 
 class Entrance(Lockable, BaseAddress):
-    osm_url = 'https://wiki.openstreetmap.org/wiki/Key:entrance'
+    osm_url = "https://wiki.openstreetmap.org/wiki/Key:entrance"
 
-    types = ['workplace', 'main', 'secondary', 'service', 'staircase', 'garage', 'other']
+    types = ["workplace", "main", "secondary", "service", "staircase", "garage", "other"]
     type = choices_field(types)
-    type_mapping = {'workplace': 'yes', 'other': 'yes'}
+    type_mapping = {"workplace": "yes", "other": "yes"}
 
     description = models.CharField(blank=True, max_length=96)
     wheelchair = models.BooleanField(blank=True, null=True)
     loadingdock = models.BooleanField(default=False)
 
     # For automatic linking of OSM nodes to OLMap instances:
-    osm_node_query = 'entrance'
-    required_osm_matching_tags = ['addr:unit', 'addr:housenumber', 'addr:street', 'entrance']
+    osm_node_query = "entrance"
+    required_osm_matching_tags = ["addr:unit", "addr:housenumber", "addr:street", "entrance"]
 
     def as_osm_tags(self):
-        return dict(super().as_osm_tags(), **filter_dict({
-            'entrance': self.type_mapping.get(self.type, self.type) or 'yes',
-            'description': self.description,
-            'door': 'loadingdock' if self.loadingdock else None,
-            'wheelchair': bool_to_osm(self.wheelchair)
-        }))
+        return dict(
+            super().as_osm_tags(),
+            **filter_dict(
+                {
+                    "entrance": self.type_mapping.get(self.type, self.type) or "yes",
+                    "description": self.description,
+                    "door": "loadingdock" if self.loadingdock else None,
+                    "wheelchair": bool_to_osm(self.wheelchair),
+                }
+            ),
+        )
 
 
 class Steps(MapFeature):
-    osm_url = 'https://wiki.openstreetmap.org/wiki/Tag:highway%3Dsteps'
+    osm_url = "https://wiki.openstreetmap.org/wiki/Tag:highway%3Dsteps"
 
     step_count = models.PositiveSmallIntegerField(null=True, blank=True)
     handrail = models.BooleanField(null=True, blank=True)
     ramp = models.BooleanField(null=True, blank=True)
     width = dimension_field()
-    incline = choices_field(['up', 'down'], help_text="From street level")
+    incline = choices_field(["up", "down"], help_text="From street level")
 
     def as_osm_tags(self):
-        return dict(super().as_osm_tags(), **filter_dict(dict(
-            highway='steps',
-            step_count=self.step_count,
-            handrail=bool_to_osm(self.handrail),
-            ramp=bool_to_osm(self.ramp),
-            width=self.width,
-            incline=self.incline
-        )))
+        return dict(
+            super().as_osm_tags(),
+            **filter_dict(
+                dict(
+                    highway="steps",
+                    step_count=self.step_count,
+                    handrail=bool_to_osm(self.handrail),
+                    ramp=bool_to_osm(self.ramp),
+                    width=self.width,
+                    incline=self.incline,
+                )
+            ),
+        )
 
 
 class Gate(Lockable, MapFeature):
-    osm_url = 'https://wiki.openstreetmap.org/wiki/Tag:barrier%3Dgate'
+    osm_url = "https://wiki.openstreetmap.org/wiki/Tag:barrier%3Dgate"
 
     lift_gate = models.BooleanField(default=False)
     ref = models.CharField(max_length=8, blank=True)
 
     # For automatic linking of OSM nodes to OLMap instances:
     osm_node_query = 'barrier~"^(gate|lift_gate)$"'
-    required_osm_matching_tags = ['barrier']
+    required_osm_matching_tags = ["barrier"]
 
     def as_osm_tags(self):
-        return dict(super().as_osm_tags(), **filter_dict({
-            'barrier': 'lift_gate' if self.lift_gate else 'gate',
-            'ref': self.ref
-        }))
+        return dict(
+            super().as_osm_tags(),
+            **filter_dict({"barrier": "lift_gate" if self.lift_gate else "gate", "ref": self.ref}),
+        )
 
 
 class Barrier(MapFeature):
-    osm_url = 'https://wiki.openstreetmap.org/wiki/Key:barrier'
+    osm_url = "https://wiki.openstreetmap.org/wiki/Key:barrier"
 
-    types = ['fence', 'wall', 'block', 'bollard']
+    types = ["fence", "wall", "block", "bollard"]
     type = choices_field(types)
 
     def as_osm_tags(self):
-        return dict(super().as_osm_tags(), **filter_dict({
-            'barrier': self.type or 'yes'
-        }))
+        return dict(super().as_osm_tags(), **filter_dict({"barrier": self.type or "yes"}))
 
 
 class WorkplaceType(Model):
     label = models.CharField(max_length=64)
-    parents = models.ManyToManyField('WorkplaceType', blank=True, related_name='children')
+    parents = models.ManyToManyField("WorkplaceType", blank=True, related_name="children")
     synonyms = ArrayField(base_field=models.CharField(max_length=64), default=list)
     osm_tags = models.JSONField()
 
@@ -321,10 +334,10 @@ class WorkplaceType(Model):
 
 
 validator = RegexValidator(
-    r'^[-a-zA-Z0-9_]*\Z',
+    r"^[-a-zA-Z0-9_]*\Z",
     # Translators: "letters" means latin letters: a-z and A-Z.
-    'Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.',
-    'invalid'
+    "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.",
+    "invalid",
 )
 
 
@@ -341,16 +354,17 @@ class Workplace(BaseAddress):
     max_vehicle_height = dimension_field()
 
     # For automatic linking of OSM nodes to OLMap instances:
-    osm_node_query = 'name'
-    required_osm_matching_tags = ['name']
+    osm_node_query = "name"
+    required_osm_matching_tags = ["name"]
     max_distance_to_osm_node = 20
 
     def as_osm_tags(self):
         return dict(
             super().as_osm_tags(),
-            **filter_dict(as_dict(self, 'name', 'phone', 'opening_hours', 'level')),
-            **filter_dict({'opening_hours:covid19': self.opening_hours_covid19}),
-            **self.type.osm_tags)
+            **filter_dict(as_dict(self, "name", "phone", "opening_hours", "level")),
+            **filter_dict({"opening_hours:covid19": self.opening_hours_covid19}),
+            **self.type.osm_tags,
+        )
 
 
 class DeliveryType(Model):
@@ -361,10 +375,10 @@ class DeliveryType(Model):
 
 
 class WorkplaceEntrance(Model):
-    workplace = models.ForeignKey(Workplace, related_name='workplace_entrances', on_delete=models.CASCADE)
-    entrance = models.ForeignKey(Entrance, related_name='workplace_entrances', on_delete=models.CASCADE)
+    workplace = models.ForeignKey(Workplace, related_name="workplace_entrances", on_delete=models.CASCADE)
+    entrance = models.ForeignKey(Entrance, related_name="workplace_entrances", on_delete=models.CASCADE)
     description = models.CharField(blank=True, max_length=64)
-    deliveries = choices_field(['no', 'yes', 'main'])
+    deliveries = choices_field(["no", "yes", "main"])
     delivery_types = models.ManyToManyField(DeliveryType, blank=True)
     delivery_hours = models.CharField(blank=True, max_length=64, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
     delivery_instructions = models.TextField(blank=True)
@@ -378,7 +392,7 @@ class WorkplaceEntrance(Model):
     def save(self, **kwargs):
         ret = super().save(**kwargs)
         if self.description and self.workplace.name and not self.entrance.description:
-            self.entrance.description = f'{self.description}, {self.workplace.name}'
+            self.entrance.description = f"{self.description}, {self.workplace.name}"
             self.entrance.save()
         return ret
 
@@ -386,30 +400,34 @@ class WorkplaceEntrance(Model):
 class UnloadingPlace(WithLayer):
     length = dimension_field()
     width = dimension_field()
-    max_weight = models.DecimalField(max_digits=4, decimal_places=2, help_text='In tons', blank=True, null=True)
+    max_weight = models.DecimalField(max_digits=4, decimal_places=2, help_text="In tons", blank=True, null=True)
     description = models.TextField(blank=True)
     opening_hours = models.CharField(blank=True, max_length=256, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00")
-    entrances = models.ManyToManyField(to=Entrance, related_name='unloading_places', blank=True)
+    entrances = models.ManyToManyField(to=Entrance, related_name="unloading_places", blank=True)
     access_points = models.JSONField(default=list, blank=True)
 
     def as_osm_tags(self):
-        return filter_dict({
-            'parking:condition': 'loading',
-            **as_dict(self, 'length', 'width', 'max_weight', 'opening_hours', 'layer', 'description')
-        })
+        return filter_dict(
+            {
+                "parking:condition": "loading",
+                **as_dict(self, "length", "width", "max_weight", "opening_hours", "layer", "description"),
+            }
+        )
 
 
 class TrafficSign(MapFeature):
-    osm_url = 'https://wiki.openstreetmap.org/wiki/Key:traffic_sign'
-    types = {'Max height': 'FI:342',
-             'Max weight': 'FI:344',
-             'No stopping': 'FI:371',
-             'No parking': 'FI:372',
-             'Loading zone': 'FI:C43',
-             'Parking': 'FI:521'}
+    osm_url = "https://wiki.openstreetmap.org/wiki/Key:traffic_sign"
+    types = {
+        "Max height": "FI:342",
+        "Max weight": "FI:344",
+        "No stopping": "FI:371",
+        "No parking": "FI:372",
+        "Loading zone": "FI:C43",
+        "Parking": "FI:521",
+    }
     type = choices_field(types.keys())
-    text_in_signs = ['Max height', 'Max weight']
-    text_sign='FI:871'
+    text_in_signs = ["Max height", "Max weight"]
+    text_sign = "FI:871"
     text = models.CharField(max_length=128, blank=True)
 
     def as_osm_tags(self):
@@ -417,25 +435,27 @@ class TrafficSign(MapFeature):
             return {}
         code = self.types[self.type]
         if self.type in self.text_in_signs:
-            return {'traffic_sign': f'{code}[{self.text}]'}
-        return filter_dict({
-            'traffic_sign': f'{code}',
-            'traffic_sign:2': f'{self.text_sign}[{self.text}]' if self.text else None})
+            return {"traffic_sign": f"{code}[{self.text}]"}
+        return filter_dict(
+            {"traffic_sign": f"{code}", "traffic_sign:2": f"{self.text_sign}[{self.text}]" if self.text else None}
+        )
 
 
 class BuildingPassage(MapFeature):
-    types = ['footway', 'service']
-    type = choices_field(types, default='footway')
+    types = ["footway", "service"]
+    type = choices_field(types, default="footway")
     width = dimension_field()
     height = dimension_field()
 
     def as_osm_tags(self):
-        return filter_dict({
-            'tunnel': 'building_passage',
-            'highway': self.type or 'footway',
-            'width': self.width,
-            'height': self.height
-        })
+        return filter_dict(
+            {
+                "tunnel": "building_passage",
+                "highway": self.type or "footway",
+                "width": self.width,
+                "height": self.height,
+            }
+        )
 
 
 map_feature_types = [Entrance, Steps, Gate, Barrier, Workplace, InfoBoard, TrafficSign, UnloadingPlace, BuildingPassage]
@@ -443,7 +463,7 @@ address_feature_types = [Entrance, Workplace]
 
 
 def manager_name(prop_type):
-    return prop_type.__name__.lower() + '_set'
+    return prop_type.__name__.lower() + "_set"
 
 
 def link_notes_to_osm_objects():

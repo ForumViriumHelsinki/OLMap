@@ -9,6 +9,7 @@ OLMap (Open Logistics Map) is a geospatial web application for collecting and ma
 ## Development Commands
 
 ### Backend (Django) - from `django_server/` directory:
+
 ```bash
 pipenv install          # Install dependencies
 pipenv shell           # Activate virtual environment
@@ -19,6 +20,7 @@ python manage.py test   # Run Django tests
 ```
 
 ### Frontend (React) - from `react_ui/` directory:
+
 ```bash
 npm install            # Install dependencies
 npm start              # Start dev server (port 3000)
@@ -27,6 +29,7 @@ npm test               # Run React tests
 ```
 
 ### Docker Development:
+
 ```bash
 docker-compose up      # Starts web (Django), db (Postgres), frontend (React)
 ```
@@ -34,17 +37,20 @@ docker-compose up      # Starts web (Django), db (Postgres), frontend (React)
 ## Architecture
 
 ### Backend (Django)
+
 - Django REST Framework with PostgreSQL
 - Core models: `OSMImageNote`, `MapFeature`, `OSMFeature`, `Address`
 - API in `django_server/olmap/rest/`
 
 ### Frontend (React + TypeScript)
+
 - Main routes: `/login/`, `/ww/`, `/Notes/`, `/note/:noteId`
 - Components organized by feature in `react_ui/src/components/`
 - Context-based state management
 - Leaflet + React-Leaflet for mapping
 
 ## Code Quality
+
 - **Backend**: flake8 with max-line-length 120
 - **Frontend**: TypeScript with strict type checking
 - Tests: Django test suite + React Testing Library

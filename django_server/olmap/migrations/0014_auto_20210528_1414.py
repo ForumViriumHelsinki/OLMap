@@ -4,45 +4,44 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0013_auto_20210526_1848'),
+        ("olmap", "0013_auto_20210526_1848"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='workplace',
-            name='url_name',
-            field=models.SlugField(blank=True, help_text='Use only letters, numbers and underscores', max_length=32),
+            model_name="workplace",
+            name="url_name",
+            field=models.SlugField(blank=True, help_text="Use only letters, numbers and underscores", max_length=32),
         ),
         migrations.AlterField(
-            model_name='entrance',
-            name='opening_hours',
-            field=models.CharField(blank=True, help_text='E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00', max_length=64),
+            model_name="entrance",
+            name="opening_hours",
+            field=models.CharField(blank=True, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00", max_length=64),
         ),
         migrations.AlterField(
-            model_name='gate',
-            name='opening_hours',
-            field=models.CharField(blank=True, help_text='E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00', max_length=64),
+            model_name="gate",
+            name="opening_hours",
+            field=models.CharField(blank=True, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00", max_length=64),
         ),
         migrations.AlterField(
-            model_name='unloadingplace',
-            name='opening_hours',
-            field=models.CharField(blank=True, help_text='E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00', max_length=64),
+            model_name="unloadingplace",
+            name="opening_hours",
+            field=models.CharField(blank=True, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00", max_length=64),
         ),
         migrations.AlterField(
-            model_name='workplace',
-            name='delivery_hours',
-            field=models.CharField(blank=True, help_text='E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00', max_length=64),
+            model_name="workplace",
+            name="delivery_hours",
+            field=models.CharField(blank=True, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00", max_length=64),
         ),
         migrations.AlterField(
-            model_name='workplace',
-            name='opening_hours',
-            field=models.CharField(blank=True, help_text='E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00', max_length=64),
+            model_name="workplace",
+            name="opening_hours",
+            field=models.CharField(blank=True, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00", max_length=64),
         ),
         migrations.AlterField(
-            model_name='workplaceentrance',
-            name='delivery_hours',
-            field=models.CharField(blank=True, help_text='E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00', max_length=64),
+            model_name="workplaceentrance",
+            name="delivery_hours",
+            field=models.CharField(blank=True, help_text="E.g. Mo-Fr 08:00-12:00; Sa 10:00-12:00", max_length=64),
         ),
     ]

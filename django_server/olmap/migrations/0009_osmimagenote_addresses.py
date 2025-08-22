@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0008_auto_20210507_1541'),
+        ("olmap", "0008_auto_20210507_1541"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='osmimagenote',
-            name='addresses',
-            field=models.ManyToManyField(blank=True, related_name='image_notes', to='olmap.Address'),
+            model_name="osmimagenote",
+            name="addresses",
+            field=models.ManyToManyField(blank=True, related_name="image_notes", to="olmap.Address"),
         ),
     ]

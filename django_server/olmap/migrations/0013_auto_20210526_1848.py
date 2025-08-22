@@ -4,25 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0012_auto_20210512_1307'),
+        ("olmap", "0012_auto_20210512_1307"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='entrance',
-            name='description',
+            model_name="entrance",
+            name="description",
             field=models.CharField(blank=True, max_length=96),
         ),
         migrations.AddField(
-            model_name='workplaceentrance',
-            name='deliveries',
-            field=models.CharField(blank=True, choices=[['no', 'no'], ['yes', 'yes'], ['main', 'main']], max_length=32),
+            model_name="workplaceentrance",
+            name="deliveries",
+            field=models.CharField(blank=True, choices=[["no", "no"], ["yes", "yes"], ["main", "main"]], max_length=32),
         ),
         migrations.AddField(
-            model_name='workplaceentrance',
-            name='description',
+            model_name="workplaceentrance",
+            name="description",
             field=models.CharField(blank=True, max_length=64),
         ),
     ]

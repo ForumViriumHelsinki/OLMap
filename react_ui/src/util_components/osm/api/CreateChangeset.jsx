@@ -1,11 +1,12 @@
-import React from 'react';
+import React from "react";
 
-const CreateChangeset = ({comment}) =>
+const CreateChangeset = ({ comment }) => (
   <osm>
-      <changeset>
-        <tag k="created_by" v="OLMap"/>
-        <tag k="comment" v={comment}/>
-      </changeset>
-    </osm>;
+    <changeset>
+      <tag k="created_by" v="OLMap" />
+      <tag k="comment" v={comment} />
+    </changeset>
+  </osm>
+);
 
 export default CreateChangeset;

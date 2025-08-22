@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0020_workplace_max_vehicle_height'),
+        ("olmap", "0020_workplace_max_vehicle_height"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='workplace',
-            name='url_name',
+            model_name="workplace",
+            name="url_name",
         ),
     ]

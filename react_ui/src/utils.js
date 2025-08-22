@@ -14,8 +14,8 @@ export function formatTime(timestamp) {
 }
 
 export function capitalize(str) {
-  return str && (str[0].toUpperCase() + str.slice(1));
+  return str && str[0].toUpperCase() + str.slice(1);
 }
 
 export const addressString = (feature) =>
-  _.filter([feature.street, feature.housenumber, feature.unit]).join(' ');
+  _.filter([feature.street, feature.housenumber, feature.unit]).join(" ");

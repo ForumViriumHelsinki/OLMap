@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0014_auto_20210528_1414'),
+        ("olmap", "0014_auto_20210528_1414"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='unloadingplace',
-            name='access_points',
+            model_name="unloadingplace",
+            name="access_points",
             field=models.JSONField(blank=True, default=list),
         ),
     ]
