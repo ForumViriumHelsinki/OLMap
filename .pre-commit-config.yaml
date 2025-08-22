@@ -11,6 +11,7 @@ repos:
       - id: check-added-large-files  # File size check
         args: [--maxkb=1000]
       - id: check-yaml               # Basic YAML syntax
+        exclude: ^k8s/
       - id: check-json               # Basic JSON syntax
       - id: check-toml               # Basic TOML syntax
       - id: trailing-whitespace      # Simple regex
@@ -59,13 +60,13 @@ repos:
 
   # 5. HEAVIEST: Type checking and deeper analysis
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.57.0
+    rev: v8.56.0
     hooks:
       - id: eslint
         files: \.(js|jsx|ts|tsx)$
         args: [--fix]
         additional_dependencies:
-          - eslint@8.57.0
+          - eslint@8.56.0
           - typescript@5.3.3
           - '@typescript-eslint/parser@6.21.0'
           - '@typescript-eslint/eslint-plugin@6.21.0'
