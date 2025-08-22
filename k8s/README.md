@@ -11,12 +11,14 @@ This directory contains Kubernetes manifests for deploying OLMap locally using S
 ## Quick Start
 
 ### 1. Verify Orbstack Context
+
 ```bash
 kubectl config current-context
 # Should show orbstack context
 ```
 
 ### 2. Run with Skaffold
+
 ```bash
 # From the project root
 skaffold dev
@@ -26,12 +28,14 @@ skaffold run
 ```
 
 ### 3. Access the Application
+
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **Admin Panel**: http://localhost:8000/admin/
 - **API Documentation**: http://localhost:8000/swagger-ui/
 
 ### 4. Optional: Use Ingress
+
 If you want to use the ingress (requires nginx-ingress-controller):
 
 ```bash
@@ -47,16 +51,19 @@ echo "127.0.0.1 olmap.local" | sudo tee -a /etc/hosts
 ## Development Workflow
 
 ### File Sync (Dev Profile)
+
 ```bash
 # Use dev profile for faster development iteration
 skaffold dev --profile=dev
 ```
 
 This enables file sync for:
+
 - Python files in the Django backend
 - React source files in the frontend
 
 ### Database Access
+
 ```bash
 # Connect to PostgreSQL
 kubectl port-forward svc/postgres 5432:5432
@@ -64,6 +71,7 @@ kubectl port-forward svc/postgres 5432:5432
 ```
 
 ### Logs
+
 ```bash
 # Backend logs
 kubectl logs -f deployment/olmap-backend
@@ -78,19 +86,25 @@ kubectl logs -f deployment/postgres
 ## Configuration
 
 ### Environment Variables
+
 Edit `k8s/local/config.yaml` to modify:
+
 - Django settings
 - React environment variables
 - API keys
 
 ### Secrets
+
 Edit `k8s/local/config.yaml` (Secret section) for:
+
 - Database credentials
 - API tokens
 - Django secret key
 
 ### Resources
+
 Adjust resource limits in the deployment files:
+
 - `k8s/local/backend.yaml`
 - `k8s/local/frontend.yaml`
 - `k8s/local/postgres.yaml`
@@ -104,6 +118,7 @@ Adjust resource limits in the deployment files:
 3. **Port conflicts**: Stop any local services on ports 3000, 8000, 5432
 
 ### Debugging Commands
+
 ```bash
 # Check pod status
 kubectl get pods
@@ -120,6 +135,7 @@ skaffold dev
 ```
 
 ### Health Checks
+
 - Backend health: http://localhost:8000/health/
 - Backend readiness: http://localhost:8000/ready/
 - Frontend health: http://localhost:3000/health

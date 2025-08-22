@@ -1,13 +1,15 @@
 # Open Logistics Map - OLMap
+
 App for collecting and discussing geospatial features important for last mile city logistics
 (entrances, steps, gates, barriers etc.) and modeling them for inclusion in OpenStreetMap.
 
 ## Installation
 
-**Prerequisites**: 
-* Python 3.9+ with uv
-* Node.js 18+ with npm
-* Postgres with a db available as configured in django_server/olmap_config/settings.py
+**Prerequisites**:
+
+- Python 3.9+ with uv
+- Node.js 18+ with npm
+- Postgres with a db available as configured in django_server/olmap_config/settings.py
 
 In project root:
 
