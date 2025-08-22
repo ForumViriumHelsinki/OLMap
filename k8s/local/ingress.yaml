@@ -8,58 +8,60 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
-    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization"
+    nginx.ingress.kubernetes.io/cors-allow-headers: >-
+      DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,
+      If-Modified-Since,Cache-Control,Content-Type,Authorization
 spec:
   rules:
-  - host: olmap.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: olmap-frontend
-            port:
-              number: 3000
-      - path: /api
-        pathType: Prefix
-        backend:
-          service:
-            name: olmap-backend
-            port:
-              number: 8000
-      - path: /admin
-        pathType: Prefix
-        backend:
-          service:
-            name: olmap-backend
-            port:
-              number: 8000
-      - path: /rest
-        pathType: Prefix
-        backend:
-          service:
-            name: olmap-backend
-            port:
-              number: 8000
-      - path: /rest-auth
-        pathType: Prefix
-        backend:
-          service:
-            name: olmap-backend
-            port:
-              number: 8000
-      - path: /health
-        pathType: Prefix
-        backend:
-          service:
-            name: olmap-backend
-            port:
-              number: 8000
-      - path: /ready
-        pathType: Prefix
-        backend:
-          service:
-            name: olmap-backend
-            port:
-              number: 8000
+    - host: olmap.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: olmap-frontend
+                port:
+                  number: 3000
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: olmap-backend
+                port:
+                  number: 8000
+          - path: /admin
+            pathType: Prefix
+            backend:
+              service:
+                name: olmap-backend
+                port:
+                  number: 8000
+          - path: /rest
+            pathType: Prefix
+            backend:
+              service:
+                name: olmap-backend
+                port:
+                  number: 8000
+          - path: /rest-auth
+            pathType: Prefix
+            backend:
+              service:
+                name: olmap-backend
+                port:
+                  number: 8000
+          - path: /health
+            pathType: Prefix
+            backend:
+              service:
+                name: olmap-backend
+                port:
+                  number: 8000
+          - path: /ready
+            pathType: Prefix
+            backend:
+              service:
+                name: olmap-backend
+                port:
+                  number: 8000

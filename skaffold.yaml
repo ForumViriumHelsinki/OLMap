@@ -4,25 +4,25 @@ metadata:
   name: olmap-local
 build:
   artifacts:
-  - image: olmap-backend
-    context: django_server
-    docker:
-      dockerfile: Dockerfile
-    sync:
-      manual:
-      - src: "**/*.py"
-        dest: "/app"
-  - image: olmap-frontend
-    context: react_ui
-    docker:
-      dockerfile: Dockerfile
-      target: production
-    sync:
-      manual:
-      - src: "src/**/*"
-        dest: "/app/src"
-      - src: "public/**/*"
-        dest: "/app/public"
+    - image: olmap-backend
+      context: django_server
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: "**/*.py"
+            dest: "/app"
+    - image: olmap-frontend
+      context: react_ui
+      docker:
+        dockerfile: Dockerfile
+        target: production
+      sync:
+        manual:
+          - src: "src/**/*"
+            dest: "/app/src"
+          - src: "public/**/*"
+            dest: "/app/public"
   local:
     push: false
 manifests:
@@ -31,15 +31,15 @@ manifests:
 deploy:
   kubectl: {}
 portForward:
-- resourceType: service
-  resourceName: olmap-backend
-  port: 8000
-  localPort: 8000
-- resourceType: service
-  resourceName: olmap-frontend
-  port: 3000
-  localPort: 3000
-- resourceType: service
-  resourceName: postgres
-  port: 5432
-  localPort: 5432
+  - resourceType: service
+    resourceName: olmap-backend
+    port: 8000
+    localPort: 8000
+  - resourceType: service
+    resourceName: olmap-frontend
+    port: 3000
+    localPort: 3000
+  - resourceType: service
+    resourceName: postgres
+    port: 5432
+    localPort: 5432

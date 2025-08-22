@@ -186,7 +186,10 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ matrix.service == 'backend' && env.IMAGE_NAME_BACKEND || env.IMAGE_NAME_FRONTEND }}
+          images: >-
+            ${{ env.REGISTRY }}/${{
+              matrix.service == 'backend' && env.IMAGE_NAME_BACKEND || env.IMAGE_NAME_FRONTEND
+            }}
           tags: |
             type=ref,event=branch
             type=sha,prefix={{branch}}-
