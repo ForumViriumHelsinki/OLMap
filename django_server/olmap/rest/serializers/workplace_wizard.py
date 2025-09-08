@@ -1,3 +1,5 @@
+import contextlib
+
 from rest_framework import serializers
 
 from olmap import models
@@ -68,7 +70,8 @@ mf_fields = MapFeatureSerializer.Meta.fields
 class UnloadingPlaceSerializer(MapFeatureSerializer):
     class Meta:
         model = models.UnloadingPlace
-        fields = mf_fields + [
+        fields = [
+            *mf_fields,
             "access_points",
             "layer",
             "length",
@@ -85,7 +88,8 @@ class EntranceSerializer(MapFeatureSerializer):
 
     class Meta:
         model = models.Entrance
-        fields = mf_fields + [
+        fields = [
+            *mf_fields,
             "street",
             "housenumber",
             "unit",
@@ -151,7 +155,7 @@ class WorkplaceEntranceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.WorkplaceEntrance
-        fields = mf_fields + ["entrance_id", "deliveries", "unloading_places", "description", "entrance_fields"]
+        fields = [*mf_fields, "entrance_id", "deliveries", "unloading_places", "description", "entrance_fields"]
 
     def is_valid(self, raise_exception=False):
         try:
@@ -228,7 +232,8 @@ class WorkplaceSerializer(MapFeatureSerializer):
 
     class Meta:
         model = models.Workplace
-        fields = mf_fields + [
+        fields = [
+            *mf_fields,
             "street",
             "housenumber",
             "unit",
@@ -241,10 +246,8 @@ class WorkplaceSerializer(MapFeatureSerializer):
 
     def is_valid(self, raise_exception=False):
         for e in self.initial_data.get("workplace_entrances", []):
-            try:
+            with contextlib.suppress(KeyError):
                 e["entrance_fields"]["unloading_places"] = e["unloading_places"]
-            except KeyError:
-                pass
         return super().is_valid(raise_exception)
 
     def update(self, instance, validated_data):

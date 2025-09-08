@@ -40,4 +40,5 @@ urlpatterns = [
     path("addresses_at/<str:lon>/<str:lat>/", NearbyAddressesView.as_view(), name="nearby_addresses"),
     path("osm_image_notes.geojson", OSMImageNotesGeoJSON.as_view(), name="osm_image_notes_geojson"),
     path("osm_image_notes_full.geojson", FullOSMImageNotesGeoJSON.as_view(), name="full_osm_image_notes_geojson"),
-] + router.urls
+    *router.urls,
+]

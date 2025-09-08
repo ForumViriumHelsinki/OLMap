@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import math
+from typing import ClassVar
 
 from rest_framework import permissions
 from rest_framework.generics import ListAPIView
@@ -17,7 +20,7 @@ class NearbyAddressesView(ListAPIView):
     schema = AutoSchema(tags=["Addresses"])
     serializer_class = AddressAsOSMNodeSerializer
     queryset = models.Address.objects.all()
-    permission_classes = [permissions.AllowAny]
+    permission_classes: ClassVar = [permissions.AllowAny]
 
     max_distance_meters = 100
     m_per_lat = 111200

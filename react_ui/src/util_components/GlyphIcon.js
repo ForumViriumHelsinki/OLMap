@@ -19,7 +19,7 @@ const GlyphIcon = L.Icon.extend({
   },
 
   createIcon: function () {
-    var div = document.createElement("div"),
+    const div = document.createElement("div"),
       options = this.options;
 
     if (options.glyph) {
@@ -31,14 +31,14 @@ const GlyphIcon = L.Icon.extend({
   },
 
   _createGlyph: function () {
-    var glyphClass,
+    let glyphClass,
       textContent,
       options = this.options;
 
     // This is edited for material icons:
     glyphClass = "material-icons";
     textContent = options.glyph;
-    var span = L.DomUtil.create("i", glyphClass);
+    const span = L.DomUtil.create("i", glyphClass);
 
     // Original:
     /*
@@ -79,7 +79,7 @@ const GlyphIcon = L.Icon.extend({
       return L.Icon.prototype._setIconStyles.call(this, div, name);
     }
 
-    var options = this.options,
+    let options = this.options,
       size = L.point(options["iconSize"]),
       anchor = L.point(options.iconAnchor);
 
@@ -88,7 +88,7 @@ const GlyphIcon = L.Icon.extend({
     }
 
     div.className = "leaflet-marker-icon leaflet-glyph-icon " + name;
-    var src = this._getIconUrl("icon");
+    const src = this._getIconUrl("icon");
     if (src) {
       div.style.backgroundImage = "url('" + src + "')";
     }

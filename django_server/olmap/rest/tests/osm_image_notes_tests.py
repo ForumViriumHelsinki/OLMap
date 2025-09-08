@@ -102,7 +102,7 @@ class OSMImageNotesTests(FVHAPITestCase):
 
     def test_save_osm_image_note_with_no_features(self):
         # Given that a user is signed in
-        user = self.create_and_login_user()
+        self.create_and_login_user()
 
         # When requesting to save an OSM image note over ReST, giving an empty list of features to which to link
         url = reverse("osmimagenote-list")
@@ -113,7 +113,7 @@ class OSMImageNotesTests(FVHAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # And a note is created in db:
-        note = models.OSMImageNote.objects.get()
+        models.OSMImageNote.objects.get()
 
     def test_update_osm_image_note_features(self):
         # Given that a user is signed in
@@ -262,7 +262,7 @@ class OSMImageNotesTests(FVHAPITestCase):
         # And the upvote is created:
         note = models.OSMImageNote.objects.get()
         #  self.assertSetEqual(set(response.json()['upvotes']), set([user.id]))
-        self.assertSetEqual(set(note.upvotes.values_list("user_id", flat=True)), set([user.id]))
+        self.assertSetEqual(set(note.upvotes.values_list("user_id", flat=True)), {user.id})
 
         # And when subsequently requesting to downvote the note
         url = reverse("osmimagenote-downvote", kwargs={"pk": note.id})
@@ -275,11 +275,11 @@ class OSMImageNotesTests(FVHAPITestCase):
         note = models.OSMImageNote.objects.get()
         self.assertSetEqual(set(note.upvotes.values_list("user_id", flat=True)), set())
         #  self.assertSetEqual(set(response.json()['downvotes']), set([user.id]))
-        self.assertSetEqual(set(note.downvotes.values_list("user_id", flat=True)), set([user.id]))
+        self.assertSetEqual(set(note.downvotes.values_list("user_id", flat=True)), {user.id})
 
     def test_comment_on_osm_image_note(self):
         # Given that a user is signed in
-        user = self.create_and_login_user()
+        self.create_and_login_user()
 
         # And given a successfully created OSM image note
         user2 = User.objects.create(username="other_user")
@@ -294,7 +294,7 @@ class OSMImageNotesTests(FVHAPITestCase):
 
         # And the comment is created:
         note = models.OSMImageNote.objects.get()
-        self.assertSetEqual(set(note.comments.values_list("comment", flat=True)), set(["nice!"]))
+        self.assertSetEqual(set(note.comments.values_list("comment", flat=True)), {"nice!"})
 
         # And it is included with the note when fetched over ReST
         url = reverse("osmimagenote-detail", kwargs={"pk": note.id})
@@ -313,7 +313,7 @@ class OSMImageNotesTests(FVHAPITestCase):
 
         # And the comment is deleted:
         note = models.OSMImageNote.objects.get()
-        self.assertSetEqual(set(note.comments.values_list("comment", flat=True)), set([]))
+        self.assertSetEqual(set(note.comments.values_list("comment", flat=True)), set())
 
     def test_osm_image_notes_as_geojson(self):
         # Given that there are some OSM image notes in the db
@@ -359,7 +359,7 @@ class OSMImageNotesTests(FVHAPITestCase):
 
     def test_rejected_image_notes_not_in_geojson(self):
         # And given that there are some OSM image notes in the db marked as not visible
-        note = models.OSMImageNote.objects.create(
+        models.OSMImageNote.objects.create(
             **{"lat": "60.16134701761975", "lon": "24.944593941327188", "comment": "Nice view", "visible": False}
         )
 

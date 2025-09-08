@@ -13,18 +13,16 @@ import olmap.models.osm_image_notes
 from olmap.rest.permissions import REVIEWER_GROUP
 
 
-def import_turku_addresses(apps, schema_editor):
+def import_turku_addresses(apps, schema_editor):  # noqa: ARG001
     if settings.TEST:
         return
 
     transformer = Transformer.from_crs("epsg:3067", "epsg:4326")
     Address = apps.get_model("olmap", "Address")
 
-    print("Loading address data...")
     response = requests.get(
         "https://www.avoindata.fi/data/dataset/cf9208dc-63a9-44a2-9312-bbd2c3952596/resource/986fbcd8-589f-460c-81a3-5efb8ab4b880/download/02_osoitteet_2020-08-14.opt"
     )
-    print("Finished loading.")
     content = response.content.decode("iso8859-15")
     address_lines = csv.reader(content.splitlines(), delimiter=";")
     addresses_out = []
@@ -54,7 +52,7 @@ def import_turku_addresses(apps, schema_editor):
     Address.objects.bulk_create(addresses_out)
 
 
-def import_helsinki_addresses(apps, schema_editor):
+def import_helsinki_addresses(apps, schema_editor):  # noqa: ARG001
     if settings.TEST:
         return
 
@@ -96,7 +94,7 @@ def import_helsinki_addresses(apps, schema_editor):
     Address.objects.bulk_create(addresses_out)
 
 
-def add_reviewer_group(apps, schema_editor):
+def add_reviewer_group(apps, schema_editor):  # noqa: ARG001
     Group = apps.get_model("auth", "Group")
     Group.objects.get_or_create(name=REVIEWER_GROUP)
 
@@ -106,7 +104,7 @@ street_address_regex = re.compile(
 )
 
 
-def sync_addresses(apps, schema_editor):
+def sync_addresses(apps, schema_editor):  # noqa: ARG001
     def sync_street_address(self):
         if self.street_address:
             match = re.fullmatch(street_address_regex, self.street_address)

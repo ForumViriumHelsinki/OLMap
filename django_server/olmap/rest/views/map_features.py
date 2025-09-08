@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import ClassVar
+
 import geopy.distance
 from django.http import HttpResponseBadRequest
 from rest_framework import mixins, pagination, permissions, viewsets
@@ -21,7 +25,7 @@ class WorkplaceTypeViewSet(viewsets.ReadOnlyModelViewSet):
 
     schema = AutoSchema(tags=["Workplaces"])
     queryset = models.WorkplaceType.objects.all().prefetch_related("parents").order_by("label")
-    permission_classes = [permissions.AllowAny]
+    permission_classes: ClassVar = [permissions.AllowAny]
     serializer_class = WorkplaceTypeSerializer
 
 
@@ -33,7 +37,7 @@ class WorkplaceEntrancesViewSet(viewsets.ModelViewSet):
 
     schema = AutoSchema(tags=["Workplace entrances"])
     queryset = models.WorkplaceEntrance.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes: ClassVar = [permissions.IsAuthenticated]
     serializer_class = WorkplaceEntranceSerializer
 
 
@@ -54,7 +58,7 @@ class MapFeatureViewSet(viewsets.ReadOnlyModelViewSet):
 
     @with_parameters(["lat", "lon"])
     @action(methods=["GET"], detail=False)
-    def near(self, request, *args, **kwargs):
+    def near(self, request, *args, **kwargs):  # noqa: ARG002
         """
         Return features within approximately 100m of the position passed as lat, lon in the query parameters.
         """
@@ -114,7 +118,7 @@ class WorkplaceViewSet(BaseWorkplaceViewSet, MapFeatureViewSet, viewsets.ModelVi
 
     @with_parameters(["name"])
     @action(methods=["GET"], detail=False)
-    def search(self, request, *args, **kwargs):
+    def search(self, request, *args, **kwargs):  # noqa: ARG002
         """
         Search for a particular workplace by name (case insensitive, but must match the start of the name as saved
         in OLMap). Returns a list of matching OLMap workplaces along with delivery instructions if available.

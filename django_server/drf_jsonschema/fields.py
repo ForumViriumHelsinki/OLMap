@@ -19,7 +19,7 @@ class JSONSchemaField(serializers.Field):
     """
 
     def __init__(self, schema, types=(), resolver=None, format_checker=_DEFAULT, *args, **kw):
-        super(JSONSchemaField, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
         Draft4Validator.check_schema(schema)
         self.schema = schema
         if format_checker is _DEFAULT:
@@ -33,7 +33,7 @@ class JSONSchemaField(serializers.Field):
         try:
             self.validator.validate(data)
         except JSONSchemaValidationError as e:
-            raise serializers.ValidationError(e.message)
+            raise serializers.ValidationError(e.message) from e
 
         return data
 
@@ -42,7 +42,7 @@ class SerializerJSONField(serializers.Field):
     """A field that stores JSON but uses a serializer to validate."""
 
     def __init__(self, serializer_class, *args, **kw):
-        super(SerializerJSONField, self).__init__(*args, **kw)
+        super().__init__(*args, **kw)
         self.serializer_class = serializer_class
         self.schema = to_jsonschema(serializer_class())
 

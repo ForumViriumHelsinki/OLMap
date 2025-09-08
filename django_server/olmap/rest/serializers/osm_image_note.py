@@ -54,7 +54,7 @@ class DictOSMImageNoteSerializer(BaseOSMImageNoteSerializer):
 
     class Meta:
         model = models.OSMImageNote
-        fields = BaseOSMImageNoteSerializer.Meta.fields + ["delivery_instructions", "height"]
+        fields = [*BaseOSMImageNoteSerializer.Meta.fields, "delivery_instructions", "height"]
 
     def to_representation(self, instance):
         result = super().to_representation(instance)
@@ -81,7 +81,7 @@ class OSMImageNoteSerializer(BaseOSMImageNoteSerializer):
 
     class Meta:
         model = models.OSMImageNote
-        fields = BaseOSMImageNoteSerializer.Meta.fields + ["osm_features", "addresses", "comments"]
+        fields = [*BaseOSMImageNoteSerializer.Meta.fields, "osm_features", "addresses", "comments"]
 
 
 class OSMImageNoteSerializerMeta(serializers.SerializerMetaclass):

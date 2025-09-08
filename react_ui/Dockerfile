@@ -20,6 +20,7 @@ RUN npm run build
 FROM nginx:alpine as production
 
 # Install curl for health checks
+# hadolint ignore=DL3018
 RUN apk add --no-cache curl
 
 # Create non-root user first

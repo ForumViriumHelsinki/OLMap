@@ -17,3 +17,21 @@ from .osm_image_note import (
     OSMImageNotesViewSet,
 )
 from .recent_mappers import RecentMappersViewSet
+
+__all__ = [
+    "EntranceViewSet",
+    "FullOSMImageNotesGeoJSON",
+    "NearbyAddressesView",
+    "OSMFeaturesViewSet",
+    "OSMImageNoteCommentNotificationsViewSet",
+    "OSMImageNoteCommentsViewSet",
+    "OSMImageNotesGeoJSON",
+    "OSMImageNotesViewSet",
+    "RecentMappersViewSet",
+    "UnloadingPlacesViewSet",
+    "WorkplaceByOSMIdViewSet",
+    "WorkplaceEntrancesViewSet",
+    "WorkplaceTypeViewSet",
+    "WorkplaceViewSet",
+    "WorkplaceWithNoteViewSet",
+]

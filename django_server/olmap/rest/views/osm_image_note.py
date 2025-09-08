@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import ClassVar
+
 from django.db.models import Count, Q
 from django.utils import timezone
 from rest_framework import permissions, viewsets
@@ -28,12 +32,12 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
     schema = SchemaWithParameters(
         tags=["Image notes"], tags_by_action={"list": ["Quick start"], "retrieve": ["Quick start"]}
     )
-    permission_classes = [permissions.AllowAny]
+    permission_classes: ClassVar = [permissions.AllowAny]
     serializer_class = OSMImageNoteWithMapFeaturesSerializer
     queryset = models.OSMImageNote.objects.filter(visible=True)
 
     # Use simple serializer for list to improve performance:
-    serializer_classes = {"list": DictOSMImageNoteSerializer}
+    serializer_classes: ClassVar = {"list": DictOSMImageNoteSerializer}
 
     def get_queryset(self):
         instructions_count = Count("workplace", filter=~Q(workplace__delivery_instructions=""))
@@ -92,7 +96,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         osm_image_note.save()
 
     @action(methods=["PUT"], detail=True)
-    def mark_reviewed(self, request, *args, **kwargs):
+    def mark_reviewed(self, request, *args, **kwargs):  # noqa: ARG002
         osm_image_note = self.get_object()
         osm_image_note.processed_by = osm_image_note.processed_by or request.user
         osm_image_note.accepted_by = osm_image_note.accepted_by or request.user
@@ -101,14 +105,14 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response("OK")
 
     @action(methods=["PUT"], detail=True)
-    def mark_accepted(self, request, *args, **kwargs):
+    def mark_accepted(self, request, *args, **kwargs):  # noqa: ARG002
         osm_image_note = self.get_object()
         osm_image_note.accepted_by = request.user
         osm_image_note.save()
         return Response("OK")
 
     @action(methods=["PUT"], detail=True)
-    def mark_processed(self, request, *args, **kwargs):
+    def mark_processed(self, request, *args, **kwargs):  # noqa: ARG002
         osm_image_note = self.get_object()
         osm_image_note.processed_by = request.user
         osm_image_note.accepted_by = osm_image_note.accepted_by or request.user
@@ -116,7 +120,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response("OK")
 
     @action(methods=["PUT"], detail=True)
-    def hide_note(self, request, *args, **kwargs):
+    def hide_note(self, request, *args, **kwargs):  # noqa: ARG002
         osm_image_note = self.get_object()
         osm_image_note.reviewed_by = request.user
         osm_image_note.visible = False
@@ -125,7 +129,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response("OK")
 
     @action(methods=["PUT"], detail=True)
-    def upvote(self, request, *args, **kwargs):
+    def upvote(self, request, *args, **kwargs):  # noqa: ARG002
         osm_image_note = self.get_object()
         osm_image_note.upvotes.get_or_create(user=request.user)
         osm_image_note.downvotes.filter(user=request.user).delete()
@@ -134,7 +138,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(methods=["PUT"], detail=True)
-    def downvote(self, request, *args, **kwargs):
+    def downvote(self, request, *args, **kwargs):  # noqa: ARG002
         osm_image_note = self.get_object()
         osm_image_note.downvotes.get_or_create(user=request.user)
         osm_image_note.upvotes.filter(user=request.user).delete()
@@ -143,7 +147,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=False, methods=["get"])
-    def map_feature_schemas(self, request, pk=None):
+    def map_feature_schemas(self, request, pk=None):  # noqa: ARG002
         serializer = self.get_serializer()
         schemas = {}
         for prop_type in models.map_feature_types:
@@ -167,7 +171,7 @@ class OSMImageNoteCommentsViewSet(viewsets.ModelViewSet):
 
     schema = AutoSchema(tags=["Image note comments"])
     queryset = models.OSMImageNoteComment.objects.all().select_related("user")
-    permission_classes = [permissions.AllowAny]
+    permission_classes: ClassVar = [permissions.AllowAny]
     serializer_class = OSMImageNoteCommentSerializer
 
     def get_queryset(self):
@@ -178,10 +182,7 @@ class OSMImageNoteCommentsViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        if self.request.user.is_anonymous:
-            comment = serializer.save()
-        else:
-            comment = serializer.save(user=self.request.user)
+        comment = serializer.save() if self.request.user.is_anonymous else serializer.save(user=self.request.user)
         comment.notify_users()
         return comment
 
@@ -198,7 +199,7 @@ class OSMImageNoteCommentNotificationsViewSet(viewsets.ReadOnlyModelViewSet):
         .select_related("comment__user")
         .order_by("-id")
     )
-    permission_classes = [permissions.AllowAny]
+    permission_classes: ClassVar = [permissions.AllowAny]
     serializer_class = OSMImageNoteCommentNotificationSerializer
 
     def get_queryset(self):
@@ -207,7 +208,7 @@ class OSMImageNoteCommentNotificationsViewSet(viewsets.ReadOnlyModelViewSet):
         return self.queryset.filter(user=self.request.user)
 
     @action(methods=["PUT"], detail=True)
-    def mark_seen(self, request, *args, **kwargs):
+    def mark_seen(self, request, *args, **kwargs):  # noqa: ARG002
         """
         Marks the notification as seen, i.e. removes it from the list of pending notifications for the authenticated
         user.
@@ -229,9 +230,9 @@ class OSMImageNotesGeoJSON(ListAPIView):
     schema = AutoSchema(tags=["Image notes", "Quick start"], operation_id_base="geojson_image_note")
     serializer_class = DictOSMImageNoteSerializer
     queryset = models.OSMImageNote.objects.filter(visible=True).values()
-    permission_classes = [permissions.AllowAny]
+    permission_classes: ClassVar = [permissions.AllowAny]
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):  # noqa: ARG002
         serializer = self.get_serializer()
         return Response(
             {
@@ -259,9 +260,9 @@ class FullOSMImageNotesGeoJSON(ListAPIView):
     schema = AutoSchema(tags=["Image notes"], operation_id_base="geojson_full_image_note")
     serializer_class = OSMImageNoteWithMapFeaturesSerializer
     queryset = models.OSMImageNote.objects.filter(visible=True)
-    permission_classes = [IsReviewer]
+    permission_classes: ClassVar = [IsReviewer]
 
-    def list(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):  # noqa: ARG002
         serializer = self.get_serializer()
         return Response(
             {

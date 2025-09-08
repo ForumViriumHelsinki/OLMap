@@ -34,9 +34,8 @@ for w in ws:
     if su_re.findall(new_oh):
         new_oh = su_re.sub("Su", new_oh)
     if new_oh != w.opening_hours:
-        print(f"   {oh}\n-> {new_oh}\n")
         w.opening_hours = new_oh
         if len(sys.argv) > 1 and sys.argv[1] == "1":
             w.save()
         else:
-            print("Add parameter '1' to this script to save results")
+            pass

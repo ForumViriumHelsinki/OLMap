@@ -8,13 +8,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy
 
+# Set shell with pipefail option for safer pipe operations
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Install system dependencies and uv
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     netcat-openbsd \
     curl \
-    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && curl -LsSf https://astral.sh/uv/install.sh | bash \
     && rm -rf /var/lib/apt/lists/*
 
 # Add uv to PATH

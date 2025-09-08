@@ -22,3 +22,26 @@ from .osm_image_notes import (
     OSMImageNoteCommentNotification,
     upload_osm_images_to,
 )
+
+__all__ = [
+    "Address",
+    "Barrier",
+    "BuildingPassage",
+    "DeliveryType",
+    "Entrance",
+    "Gate",
+    "ImageNoteDownvote",
+    "ImageNoteUpvote",
+    "MapFeature",
+    "OSMFeature",
+    "OSMImageNote",
+    "OSMImageNoteComment",
+    "OSMImageNoteCommentNotification",
+    "Steps",
+    "UnloadingPlace",
+    "Workplace",
+    "WorkplaceEntrance",
+    "WorkplaceType",
+    "map_feature_types",
+    "upload_osm_images_to",
+]

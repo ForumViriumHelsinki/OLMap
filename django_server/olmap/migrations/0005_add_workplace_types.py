@@ -917,15 +917,14 @@ def forwards(apps, schema_editor):
     def check_categories(t, p):
         for c in t.get("also_in", []):
             if not types_index.get(c):
-                print(f'Missing type {c} for child {t["label"]}')
+                pass
 
     recurse(types, check_categories)
 
     for mapping in [shop_mapping, amenity_mapping]:
-        for key, value in mapping.items():
+        for _key, value in mapping.items():
             t = types_index.get(value)
             if not t:
-                print(f"Missing type {value} for old type {key}")
                 continue
 
     WorkplaceType = apps.get_model("olmap", "WorkplaceType")
@@ -957,7 +956,6 @@ def forwards(apps, schema_editor):
             type_key = shop_mapping.get(i.type, amenity_mapping.get(i.type.lower(), i.type.capitalize()))
             t = t_model_index.get(type_key)
             if not t:
-                print(f"Type {type_key} missing, skipping {Model.__name__} {i.name}")
                 continue
 
             if "Workplace" not in i.image_note.tags:

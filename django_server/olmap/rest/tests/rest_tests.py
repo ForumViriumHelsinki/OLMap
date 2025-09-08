@@ -24,7 +24,7 @@ class RestAPITests(FVHAPITestCase):
 
     def test_get_current_user_when_signed_in(self):
         # Given that a user is signed in
-        user = self.create_and_login_user()
+        self.create_and_login_user()
 
         # When requesting the current user over ReST
         url = reverse("rest_user_details")

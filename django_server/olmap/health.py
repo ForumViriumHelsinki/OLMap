@@ -7,12 +7,12 @@ from django.http import JsonResponse
 logger = logging.getLogger(__name__)
 
 
-def health_check(request):
+def health_check(request):  # noqa: ARG001
     """Basic health check endpoint for Kubernetes liveness probe"""
     return JsonResponse({"status": "healthy", "service": "olmap-backend"})
 
 
-def ready_check(request):
+def ready_check(request):  # noqa: ARG001
     """Readiness check endpoint for Kubernetes readiness probe"""
     checks = {}
     all_healthy = True

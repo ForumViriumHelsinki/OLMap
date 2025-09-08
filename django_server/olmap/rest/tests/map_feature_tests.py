@@ -14,7 +14,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
 
     def test_save_osm_image_note_with_map_feature(self):
         # Given that a user is signed in
-        user = self.create_and_login_user()
+        self.create_and_login_user()
 
         # When requesting to save an OSM image note over ReST, supplying tags and map_features
         url = reverse("osmimagenote-list")
@@ -67,7 +67,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
 
     def test_save_osm_image_note_with_empty_map_feature_list(self):
         # Given that a user is signed in
-        user = self.create_and_login_user()
+        self.create_and_login_user()
 
         # When requesting to save an OSM image note over ReST, supplying an empty list of map_features
         url = reverse("osmimagenote-list")
@@ -78,7 +78,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         # And a note is created in db:
-        note = models.OSMImageNote.objects.get()
+        models.OSMImageNote.objects.get()
 
     def test_update_osm_image_note_map_features(self):
         # Given that a user is signed in
@@ -112,7 +112,7 @@ class OSMMapFeatureTests(FVHAPITestCase):
 
         # And the map_features have been changed:
         note = models.OSMImageNote.objects.get()
-        self.assertSetEqual(set(note.entrance_set.values_list("street", flat=True)), set(["Bulevardi"]))
+        self.assertSetEqual(set(note.entrance_set.values_list("street", flat=True)), {"Bulevardi"})
 
         # And any passed layer info is saved to the note:
         self.assertEqual(note.layer, -1)
@@ -346,7 +346,6 @@ class OSMMapFeatureTests(FVHAPITestCase):
             try:
                 self.assertDictEqual(data[k], v)
             except AssertionError:
-                print(json.dumps(data[k], indent=2))
                 raise
 
     def test_create_workplace(self):

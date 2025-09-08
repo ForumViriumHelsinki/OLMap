@@ -10,7 +10,7 @@ try:
     from shapely.geometry import Point
     from shapely.strtree import STRtree
 except (ImportError, OSError):
-    print("Shapely not found, feature - OSM linking will not be available.")
+    pass
 
 from django.db import models
 
@@ -45,13 +45,10 @@ class FeatureIndex:
     def __init__(self, features):
         if not len(features):
             self.index = {}
-        self.index = dict([(self.get_id(feature), feature) for feature in features])
+        self.index = {self.get_id(feature): feature for feature in features}
 
     def is_linked(self, image_note):
-        for node in self.note_features(image_note):
-            if self.index.get(node.id, None):
-                return True
-        return False
+        return any(self.index.get(node.id, None) for node in self.note_features(image_note))
 
 
 class OSMFeatureIndex(FeatureIndex):
@@ -96,13 +93,11 @@ class MapFeature(models.Model):
         node[{cls.osm_node_query}](area:3600034914)->.nodes;
         .nodes out;
         """
-        print(f"Fetching Helsinki {cls.__name__}s from OSM...")
         try:
             result = api.query(query)
         except OverpassTooManyRequests:
             sleep(30)
             result = api.query(query)
-        print(f"{len(result.nodes)} {cls.__name__}s found.")
 
         points = []
         for node in result.nodes:
@@ -112,7 +107,6 @@ class MapFeature(models.Model):
         tree = STRtree(points)
 
         instances = cls.objects.filter(osm_feature=None).prefetch_related("image_note__osm_features")
-        print(f"Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...")
         linked_count = 0
         for instance in instances:
             note_position = [instance.image_note.lat, instance.image_note.lon]
@@ -123,9 +117,6 @@ class MapFeature(models.Model):
             if matches and dst < cls.max_distance_to_osm_node:
                 instance.link_osm_id(nearest_osm.id)
                 linked_count += 1
-                print(
-                    f"Linked OSM {cls.__name__} {nearest_osm.id} to note {instance.image_note_id}; distance {str(dst)[:4]}m."
-                )
             else:
                 for point in tree.query(Point(*note_position).buffer(0.0003)):
                     node = point.node
@@ -135,12 +126,7 @@ class MapFeature(models.Model):
                     if matches and dst < cls.max_distance_to_osm_node:
                         instance.link_osm_id(node.id)
                         linked_count += 1
-                        print(
-                            f"Linked OSM {cls.__name__} {node.id} to note {instance.image_note_id}; distance {str(dst)[:4]}m."
-                        )
                         break
-
-        print(f"All done; {linked_count} new links created.")
 
     def link_osm_id(self, osm_id):
         feature = OSMFeature.objects.get_or_create(id=osm_id)[0]
@@ -176,12 +162,11 @@ class BaseAddress(MapFeature):
     def link_notes_to_official_address(cls):
         addresses = Address.objects.filter(city="Helsinki").values()
         address_id_index = AddressIndex(addresses)
-        address_index = dict([(f'{a["street"]} {a["housenumber"]}', a) for a in addresses])
+        address_index = {f'{a["street"]} {a["housenumber"]}': a for a in addresses}
 
         instances = cls.objects.prefetch_related("image_note__addresses").filter(
             housenumber__isnull=False, street__isnull=False
         )
-        print(f"Checking {len(instances)} OLMap {cls.__name__}s for unlinked matches...")
         linked_count = 0
         for instance in instances:
             housenumbers = [instance.housenumber]
@@ -198,10 +183,6 @@ class BaseAddress(MapFeature):
                     added = instance.image_note.addresses.add(address["id"])
                     if added:
                         linked_count += 1
-                        print(
-                            f"Linked address {street_address} to note {instance.image_note_id}; distance {str(dst)[:4]}m."
-                        )
-        print(f"All done; {linked_count} new links created.")
 
 
 class WithLayer(MapFeature):
@@ -284,14 +265,14 @@ class Steps(MapFeature):
         return dict(
             super().as_osm_tags(),
             **filter_dict(
-                dict(
-                    highway="steps",
-                    step_count=self.step_count,
-                    handrail=bool_to_osm(self.handrail),
-                    ramp=bool_to_osm(self.ramp),
-                    width=self.width,
-                    incline=self.incline,
-                )
+                {
+                    "highway": "steps",
+                    "step_count": self.step_count,
+                    "handrail": bool_to_osm(self.handrail),
+                    "ramp": bool_to_osm(self.ramp),
+                    "width": self.width,
+                    "incline": self.incline,
+                }
             ),
         )
 

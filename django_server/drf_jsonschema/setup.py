@@ -20,16 +20,16 @@ setup(
         "Programming Language :: Python :: 3.5",
     ],
     install_requires=["setuptools", "djangorestframework", "django", "jsonschema", "rfc3987", "strict-rfc3339"],
-    extras_require=dict(
-        test=["pytest >= 2.9.0", "pytest-remove-stale-bytecode", "pytest-django"],
-        pep8=[
+    extras_require={
+        "test": ["pytest >= 2.9.0", "pytest-remove-stale-bytecode", "pytest-django"],
+        "pep8": [
             "flake8",
         ],
-        coverage=[
+        "coverage": [
             "pytest-cov",
         ],
-        docs=[
+        "docs": [
             "sphinx",
         ],
-    ),
+    },
 )

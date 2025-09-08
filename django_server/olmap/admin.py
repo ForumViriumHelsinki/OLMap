@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import datetime
+from typing import ClassVar
 
 from django.conf import settings
 from django.contrib import admin
@@ -13,8 +16,8 @@ from olmap import models
 
 @admin.register(models.Address)
 class AddressAdmin(admin.ModelAdmin):
-    list_display = ["street", "housenumber", "lat", "lon"]
-    search_fields = ["street"]
+    list_display: ClassVar = ["street", "housenumber", "lat", "lon"]
+    search_fields: ClassVar = ["street"]
 
 
 admin.site.unregister(User)
@@ -22,7 +25,7 @@ admin.site.unregister(User)
 
 @admin.register(User)
 class UserWithNotesAdmin(UserAdmin):
-    list_display = UserAdmin.list_display + ("last_login", "notes", "notes_12h")
+    list_display: ClassVar = [*UserAdmin.list_display, "last_login", "notes", "notes_12h"]
 
     def get_queryset(self, request):
         _12_hours_ago = timezone.now() - datetime.timedelta(hours=12)
@@ -42,7 +45,7 @@ class UserWithNotesAdmin(UserAdmin):
 
 @admin.register(models.OSMImageNote)
 class OSMImageNoteAdmin(admin.ModelAdmin):
-    list_display = [
+    list_display: ClassVar = [
         "__str__",
         "image__",
         "lat",
@@ -55,10 +58,18 @@ class OSMImageNoteAdmin(admin.ModelAdmin):
         "visible",
         "osm",
     ]
-    search_fields = ["comment"]
-    raw_id_fields = ["osm_features", "addresses"]
-    readonly_fields = ["image_", "osm", "osm_edit", "created_by", "modified_by", "processed_by", "reviewed_by"]
-    list_filter = ["visible", "created_by", "reviewed_by"]
+    search_fields: ClassVar = ["comment"]
+    raw_id_fields: ClassVar = ["osm_features", "addresses"]
+    readonly_fields: ClassVar = [
+        "image_",
+        "osm",
+        "osm_edit",
+        "created_by",
+        "modified_by",
+        "processed_by",
+        "reviewed_by",
+    ]
+    list_filter: ClassVar = ["visible", "created_by", "reviewed_by"]
     date_hierarchy = "created_at"
 
     def get_queryset(self, request):
@@ -92,17 +103,17 @@ class OSMImageNoteAdmin(admin.ModelAdmin):
 
 @admin.register(models.OSMImageNoteComment)
 class OSMImageNoteCommentAdmin(admin.ModelAdmin):
-    list_display = ["comment", "image_note", "user", "created_at"]
-    search_fields = ["comment"]
-    list_filter = ["user"]
+    list_display: ClassVar = ["comment", "image_note", "user", "created_at"]
+    search_fields: ClassVar = ["comment"]
+    list_filter: ClassVar = ["user"]
     date_hierarchy = "created_at"
 
 
 @admin.register(models.WorkplaceType)
 class WorkplaceTypeAdmin(admin.ModelAdmin):
-    list_display = ["label", "_parents", "synonyms", "image_notes"]
-    search_fields = ["label", "synonyms", "parents__label", "parents__parents__label"]
-    filter_horizontal = ["parents"]
+    list_display: ClassVar = ["label", "_parents", "synonyms", "image_notes"]
+    search_fields: ClassVar = ["label", "synonyms", "parents__label", "parents__parents__label"]
+    filter_horizontal: ClassVar = ["parents"]
 
     def _parents(self, wp_type):
         return ", ".join([p.label for p in wp_type.parents.all()])

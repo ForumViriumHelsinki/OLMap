@@ -1,4 +1,8 @@
 # convert a serializer to a JSON Schema.
+from __future__ import annotations
+
+from typing import ClassVar
+
 from rest_framework import serializers
 from rest_framework.settings import api_settings
 
@@ -15,10 +19,7 @@ class Converter:
 
     def convert(self, field):
         assert self.type is not None
-        if field.allow_null:
-            type = [self.type, "null"]
-        else:
-            type = self.type
+        type = [self.type, "null"] if field.allow_null else self.type
         return {"type": type}
 
 
@@ -27,7 +28,7 @@ class FormatConverter(Converter):
     format = None
 
     def convert(self, field):
-        result = super(FormatConverter, self).convert(field)
+        result = super().convert(field)
         if self.format is not None:
             result["format"] = self.format
         return result
@@ -40,7 +41,7 @@ class CharFieldConverter(FormatConverter):
     field_class = serializers.CharField
 
     def convert(self, field):
-        result = super(CharFieldConverter, self).convert(field)
+        result = super().convert(field)
         if field.max_length is not None:
             result["maxLength"] = field.max_length
         min_length = field.min_length
@@ -59,10 +60,10 @@ class EmailFieldConverter(CharFieldConverter):
 
 @converter
 class RegexFieldConverter(CharFieldConverter):
-    field_class = [serializers.RegexField, serializers.SlugField]
+    field_class: ClassVar = [serializers.RegexField, serializers.SlugField]
 
     def convert(self, field):
-        result = super(RegexFieldConverter, self).convert(field)
+        result = super().convert(field)
         # rely on a lot of internal details...
         result["pattern"] = str(field.validators[-1].regex.pattern)
         return result
@@ -77,7 +78,7 @@ class URLFieldConverter(CharFieldConverter):
 @converter
 class BooleanFieldConverter(Converter):
     type = "boolean"
-    field_class = [serializers.BooleanField, serializers.NullBooleanField]
+    field_class: ClassVar = [serializers.BooleanField, serializers.NullBooleanField]
 
 
 @converter
@@ -86,7 +87,7 @@ class FloatFieldConverter(Converter):
     field_class = serializers.FloatField
 
     def convert(self, field):
-        result = super(FloatFieldConverter, self).convert(field)
+        result = super().convert(field)
         if field.min_value is not None:
             result["minimum"] = field.min_value
         if field.max_value is not None:
@@ -110,8 +111,8 @@ class DecimalFieldConverter(Converter):
     def convert(self, field):
         if not getattr(field, "coerce_to_string", True):
             raise Error("coerce_to_string must be True")
-        result = super(DecimalFieldConverter, self).convert(field)
-        result["pattern"] = "^\\-?[0-9]*(\\.[0-9]{1,%d})?$" % (field.decimal_places)
+        result = super().convert(field)
+        result["pattern"] = f"^\\-?[0-9]*(\\.[0-9]{{1,{field.decimal_places}}})?$"
         return result
 
 
@@ -133,7 +134,7 @@ class BaseDateTimeFieldConverter(FormatConverter):
         input_formats = getattr(self, "input_formats", self.settings_input_formats)
         if "iso-8601" not in input_formats:
             raise Error("formats beside iso-8601 not supported")
-        return super(BaseDateTimeFieldConverter, self).convert(field)
+        return super().convert(field)
 
 
 @converter
@@ -142,7 +143,7 @@ class DateTimeFieldConverter(BaseDateTimeFieldConverter):
     format = "date-time"
     field_class = serializers.DateTimeField
 
-    expected_input_formats = ["iso-8601", "date-time"]
+    expected_input_formats: ClassVar = ["iso-8601", "date-time"]
     settings_format = api_settings.DATETIME_FORMAT
     settings_input_formats = api_settings.DATETIME_INPUT_FORMATS
 
@@ -153,7 +154,7 @@ class DateFieldConverter(BaseDateTimeFieldConverter):
     format = "date"
     field_class = serializers.DateField
 
-    expected_input_formats = ["iso-8601", "date"]
+    expected_input_formats: ClassVar = ["iso-8601", "date"]
     settings_format = api_settings.DATE_FORMAT
     settings_input_formats = api_settings.DATE_INPUT_FORMATS
 
@@ -196,11 +197,8 @@ class ChoiceField:
                 enumNames.insert(0, "")
             has_display_names = True
 
-        types = sorted(list(types))
-        if len(types) == 1:
-            type = types[0]
-        else:
-            type = types
+        types = sorted(types)
+        type = types[0] if len(types) == 1 else types
         result = {"type": type, "enum": enum}
         if has_display_names:
             result["enumNames"] = enumNames
@@ -256,7 +254,7 @@ class ManyRelatedFieldConverter:
 class PrimaryKeyRelatedFieldConverter:
     field_class = serializers.PrimaryKeyRelatedField
 
-    def convert(self, field):
+    def convert(self, field):  # noqa: ARG002
         return {"type": "integer"}
 
 
@@ -264,7 +262,7 @@ class PrimaryKeyRelatedFieldConverter:
 class StringRelatedFieldConverter:
     field_class = serializers.StringRelatedField
 
-    def convert(self, field):
+    def convert(self, field):  # noqa: ARG002
         return {"type": "string"}
 
 
@@ -272,7 +270,7 @@ class StringRelatedFieldConverter:
 class HyperlinkedRelatedFieldConverter:
     field_class = serializers.HyperlinkedRelatedField
 
-    def convert(self, field):
+    def convert(self, field):  # noqa: ARG002
         return {"type": "string", "format": "uri"}
 
 
@@ -280,7 +278,7 @@ class HyperlinkedRelatedFieldConverter:
 class SlugRelatedFieldConverter:
     field_class = serializers.SlugRelatedField
 
-    def convert(self, field):
+    def convert(self, field):  # noqa: ARG002
         # FIXME: hardcoded slug regex
         return {"type": "string", "pattern": "^[-a-zA-Z0-9_]+$"}
 

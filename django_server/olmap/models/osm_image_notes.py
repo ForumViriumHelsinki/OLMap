@@ -70,7 +70,7 @@ class OSMImageNote(TimestampedModel):
         except (UnidentifiedImageError, FileNotFoundError):
             return super().save(*args, **kwargs)
 
-        for orientation in ExifTags.TAGS.keys():
+        for orientation in ExifTags.TAGS:
             if ExifTags.TAGS[orientation] == "Orientation":
                 break
 
@@ -79,7 +79,7 @@ class OSMImageNote(TimestampedModel):
             return super().save(*args, **kwargs)
 
         exif = dict(exif.items())
-        orientation = exif.get(orientation, None)
+        orientation = exif.get(orientation)
         if not orientation:
             return super().save(*args, **kwargs)
 

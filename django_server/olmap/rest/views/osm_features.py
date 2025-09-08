@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import ClassVar
+
 from rest_framework import permissions, viewsets
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.schemas.openapi import AutoSchema
@@ -19,5 +23,5 @@ class OSMFeaturesViewSet(RetrieveModelMixin, viewsets.GenericViewSet):
         "workplace_set__workplace_entrances__entrance__image_note",
         "workplace_set__workplace_entrances__entrance__unloading_places__image_note",
     )
-    permission_classes = [permissions.AllowAny]
+    permission_classes: ClassVar = [permissions.AllowAny]
     serializer_class = OSMFeatureSerializer

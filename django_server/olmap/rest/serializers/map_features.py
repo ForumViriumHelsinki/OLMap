@@ -114,10 +114,9 @@ class WorkplaceEntranceSerializer(TranslationSerializerMixin, serializers.ModelS
         ]
 
     def __init__(self, instance=None, data=None, **kwargs):
-        if data:
-            if data.get("delivery_types", None):
-                for t in data["delivery_types"]:
-                    models.DeliveryType.objects.get_or_create(name=t)
+        if data and data.get("delivery_types", None):
+            for t in data["delivery_types"]:
+                models.DeliveryType.objects.get_or_create(name=t)
         return super().__init__(instance, data, **kwargs)
 
 
