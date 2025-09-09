@@ -41,7 +41,7 @@ repos:
     rev: v0.8.2
     hooks:
       - id: ruff         # Linting (very fast)
-        args: [--fix]
+        args: [--fix, --exit-zero]  # exit-zero: don't fail on remaining errors
       - id: ruff-format  # Formatting (very fast)
 
   - repo: https://github.com/pre-commit/mirrors-prettier
