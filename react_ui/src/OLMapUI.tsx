@@ -74,9 +74,16 @@ class OLMapUI extends React.Component<{}, UIState> {
     const { user, dataFetched } = this.state;
 
     // @ts-ignore
-    const ImageNote = () => (
-      <OSMImageNoteModal note={{ id: useParams().noteId }} fullScreen />
-    );
+    const ImageNote = () => {
+      const { noteId } = useParams<{ noteId: string }>();
+      return (
+        <OSMImageNoteModal 
+          note={{ id: noteId ? parseInt(noteId, 10) : undefined }} 
+          onClose={() => window.history.back()}
+          fullScreen 
+        />
+      );
+    };
 
     const ResetPassword = () => {
       const params = useParams() as any;

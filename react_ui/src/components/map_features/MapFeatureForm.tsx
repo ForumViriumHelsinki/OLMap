@@ -101,27 +101,24 @@ export default class MapFeatureForm extends React.Component<
     const { schema, featureTypeName } = this.props;
     const radioFields = Object.entries(schema.properties)
       .filter(
-        ([field, spec]) =>
-          // @ts-ignore
+        ([field, spec]: [string, any]) =>
           String(spec.type) == String(["boolean", "null"]),
       )
       .map(([field, spec]) => {
-        // @ts-ignore
         return [field, { "ui:widget": "radio" }];
       });
     const customWidgetsForSchema = customWidgets[featureTypeName] || {};
     const customFields = Object.entries(schema.properties)
-      .filter(([field, spec]) => customWidgetsForSchema[field])
-      .map(([field, spec]) => {
+      .filter(([field, spec]: [string, any]) => customWidgetsForSchema[field])
+      .map(([field, spec]: [string, any]) => {
         return [field, { "ui:widget": customWidgetsForSchema[field] }];
       });
     const textFields = Object.entries(schema.properties)
-      // @ts-ignore
       .filter(
-        ([field, spec]) =>
-          spec.type == "string" && !spec.maxLength && !spec.enum,
+        ([field, spec]: [string, any]) =>
+          spec.type === "string" && !spec.maxLength && !spec.enum,
       )
-      .map(([field, spec]) => {
+      .map(([field, spec]: [string, any]) => {
         return [field, { "ui:widget": "textarea" }];
       });
     return Object.fromEntries(

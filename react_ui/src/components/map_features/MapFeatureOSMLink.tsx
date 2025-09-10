@@ -63,8 +63,7 @@ export default class MapFeatureOSMLink extends React.Component<
       osmFeature &&
       mapFeature.as_osm_tags &&
       Object.keys({ ...mapFeature.as_osm_tags, ...osmFeature.tags })
-        // @ts-ignore
-        .filter((k) => osmFeature.tags[k] != mapFeature.as_osm_tags[k]);
+        .filter((k) => osmFeature.tags[k] !== mapFeature.as_osm_tags?.[k]);
 
     const isWp = featureTypeName == "Workplace";
     const isEntrance = featureTypeName == "Entrance";
@@ -124,10 +123,10 @@ export default class MapFeatureOSMLink extends React.Component<
                       <>
                         {" "}
                         (
-                        {getDistance(
-                          osmFeature,
-                          osmImageNote as GeolibInputCoordinates,
-                        )}
+                        {osmImageNote.lat && osmImageNote.lon ? getDistance(
+                          osmFeature as GeolibInputCoordinates,
+                          { lat: osmImageNote.lat, lon: osmImageNote.lon },
+                        ) : 0}
                         m)
                       </>
                     )}
@@ -153,10 +152,9 @@ export default class MapFeatureOSMLink extends React.Component<
                       <th>OSM</th>
                     </tr>
                     {discrepantTags.map((tag) => (
-                      // @ts-ignore
                       <tr key={tag}>
                         <th>{tag}</th>
-                        <td>{mapFeature.as_osm_tags[tag]}</td>
+                        <td>{mapFeature.as_osm_tags?.[tag]}</td>
                         <td>{osmFeature.tags[tag]}</td>
                       </tr>
                     ))}
@@ -232,13 +230,15 @@ export default class MapFeatureOSMLink extends React.Component<
       let gates = nearbyFeatures.filter(
         (f) =>
           f.tags.barrier == "gate" &&
-          // @ts-ignore
-          getDistance(osmImageNote, f) < 5,
+          osmImageNote.lat && osmImageNote.lon && getDistance(
+            { lat: osmImageNote.lat, lon: osmImageNote.lon }, f as GeolibInputCoordinates
+          ) < 5,
       );
       if (gates.length) {
-        // @ts-ignore
         gates.sort(
-          (a, b) => getDistance(osmImageNote, a) - getDistance(osmImageNote, b),
+          (a, b) => osmImageNote.lat && osmImageNote.lon ? 
+            getDistance({ lat: osmImageNote.lat, lon: osmImageNote.lon }, a as GeolibInputCoordinates) - 
+            getDistance({ lat: osmImageNote.lat, lon: osmImageNote.lon }, b as GeolibInputCoordinates) : 0,
         );
         osmFeature = gates[0];
       }
@@ -253,21 +253,24 @@ export default class MapFeatureOSMLink extends React.Component<
           (!f.tags["addr:housenumber"] ||
             f.tags["addr:housenumber"] == mapFeature.housenumber) &&
           (f.tags["addr:unit"] || "") == mapFeature.unit &&
-          // @ts-ignore
-          getDistance(osmImageNote, f) < 5,
+          osmImageNote.lat && osmImageNote.lon && getDistance(
+            { lat: osmImageNote.lat, lon: osmImageNote.lon }, f as GeolibInputCoordinates
+          ) < 5,
       );
 
       if (!entrances.length) {
-        // @ts-ignore
         entrances = nearbyFeatures.filter(
-          (f) => f.tags.entrance && getDistance(osmImageNote, f) < 2,
+          (f) => f.tags.entrance && osmImageNote.lat && osmImageNote.lon && getDistance(
+            { lat: osmImageNote.lat, lon: osmImageNote.lon }, f as GeolibInputCoordinates
+          ) < 2,
         );
       }
 
       if (entrances.length) {
-        // @ts-ignore
         entrances.sort(
-          (a, b) => getDistance(osmImageNote, a) - getDistance(osmImageNote, b),
+          (a, b) => osmImageNote.lat && osmImageNote.lon ? 
+            getDistance({ lat: osmImageNote.lat, lon: osmImageNote.lon }, a as GeolibInputCoordinates) - 
+            getDistance({ lat: osmImageNote.lat, lon: osmImageNote.lon }, b as GeolibInputCoordinates) : 0,
         );
         osmFeature = entrances[0];
       }

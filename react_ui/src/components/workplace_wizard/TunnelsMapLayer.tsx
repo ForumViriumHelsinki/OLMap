@@ -34,7 +34,7 @@ const options = {
   },
   label: {
     permanent: true,
-    direction: "bottom",
+    direction: "bottom" as const,
     className: "osmMapLabel",
     pane: "markerPane",
   },
@@ -68,17 +68,15 @@ export default class TunnelsMapLayer extends React.Component<
 
   pointToLayer = (p: any, latlng: LatLng) =>
     L.circleMarker(latlng, options.nodes)
-      // @ts-ignore
       .bindTooltip(
         p.properties.name || p.properties.description || p.properties.ref || "",
         options.label,
       );
 
   wayStyle = (w: any) => {
-    // @ts-ignore
     return {
       ...options.ways,
-      color: options.layerColors[w.properties.layer] || "#000",
+      color: (options.layerColors as Record<string, string>)[w.properties.layer] || "#000",
     };
   };
 }

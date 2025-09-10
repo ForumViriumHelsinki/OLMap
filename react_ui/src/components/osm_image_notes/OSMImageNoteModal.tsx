@@ -94,9 +94,10 @@ export default class OSMImageNoteModal extends React.Component<
     const adjustPosition =
       canEdit && requestLocation ? this.adjustPosition : undefined;
 
-    // @ts-ignore
     const credit = `${
-      note.created_by ? note.created_by.username : "Anonymous"
+      note.created_by ? (
+        typeof note.created_by === 'object' ? note.created_by.username : note.created_by
+      ) : "Anonymous"
     } on ${formatTimestamp(note.created_at)}`;
 
     const title = (

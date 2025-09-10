@@ -7,6 +7,7 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownToggle,
+  // @ts-ignore
 } from "reactstrap";
 import {
   AppContext,

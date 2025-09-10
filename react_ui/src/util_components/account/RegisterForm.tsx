@@ -52,10 +52,9 @@ export default class RegisterForm extends React.Component<
         schema={this.schema}
         uiSchema={uiSchema}
         onSubmit={this.onSubmit}
-        // @ts-ignore
         formData={formData}
         showErrorList={false}
-        extraErrors={this.extraErrors()}
+        {...{ extraErrors: this.extraErrors() } as any}
       >
         {errors && errors.non_field_errors && (
           <ErrorAlert message={errors.non_field_errors} status />

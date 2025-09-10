@@ -25,8 +25,8 @@ export type OSMImageNote = {
   lat?: number;
   lon?: number;
   comment?: string;
-  osm_features: number[];
-  addresses: number[];
+  osm_features?: number[];
+  addresses?: number[];
   is_accepted?: boolean;
   is_processed?: boolean;
   is_reviewed?: boolean;
@@ -59,7 +59,7 @@ export type MapFeatureTypes = {
 };
 
 export type MapFeature = {
-  as_osm_tags?: object;
+  as_osm_tags?: Record<string, string>;
   id?: number;
   osm_feature?: number;
   [field: string]: any;

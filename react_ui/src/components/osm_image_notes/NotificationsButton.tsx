@@ -1,10 +1,10 @@
 import React from "react";
-// @ts-ignore
 import {
   ButtonDropdown,
   DropdownItem,
   DropdownMenu,
   DropdownToggle,
+  // @ts-ignore
 } from "reactstrap";
 import { AppContext, Notification } from "components/types";
 import sessionRequest from "sessionRequest";
