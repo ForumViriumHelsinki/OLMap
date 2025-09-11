@@ -5,11 +5,11 @@ export const userCanEditNote = (
   osmImageNote: OSMImageNote,
 ) => {
   const is_creator =
-    user && osmImageNote.created_by && (
-      typeof osmImageNote.created_by === 'object' 
-        ? user.id === osmImageNote.created_by.id
-        : user.id === osmImageNote.created_by
-    );
+    user &&
+    osmImageNote.created_by &&
+    (typeof osmImageNote.created_by === "object"
+      ? user.id === osmImageNote.created_by.id
+      : user.id === osmImageNote.created_by);
   return (user && (user.is_reviewer || is_creator)) || !osmImageNote.id;
 };
 

@@ -67,16 +67,17 @@ export default class TunnelsMapLayer extends React.Component<
   }
 
   pointToLayer = (p: any, latlng: LatLng) =>
-    L.circleMarker(latlng, options.nodes)
-      .bindTooltip(
-        p.properties.name || p.properties.description || p.properties.ref || "",
-        options.label,
-      );
+    L.circleMarker(latlng, options.nodes).bindTooltip(
+      p.properties.name || p.properties.description || p.properties.ref || "",
+      options.label,
+    );
 
   wayStyle = (w: any) => {
     return {
       ...options.ways,
-      color: (options.layerColors as Record<string, string>)[w.properties.layer] || "#000",
+      color:
+        (options.layerColors as Record<string, string>)[w.properties.layer] ||
+        "#000",
     };
   };
 }

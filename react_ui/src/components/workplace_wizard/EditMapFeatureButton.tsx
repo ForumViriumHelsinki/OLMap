@@ -24,7 +24,9 @@ export class EditMapFeatureButton extends React.Component<
     const { editing } = this.state;
     const { schema, featureTypeName, mapFeature } = this.props;
     const fields =
-      featureTypeName === "Entrance" ? (mapFeature as any).entrance_fields : mapFeature;
+      featureTypeName === "Entrance"
+        ? (mapFeature as any).entrance_fields
+        : mapFeature;
     return (
       <button
         className={popupBtn}

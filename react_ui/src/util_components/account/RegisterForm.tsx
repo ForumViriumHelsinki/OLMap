@@ -54,7 +54,7 @@ export default class RegisterForm extends React.Component<
         onSubmit={this.onSubmit}
         formData={formData}
         showErrorList={false}
-        {...{ extraErrors: this.extraErrors() } as any}
+        {...({ extraErrors: this.extraErrors() } as any)}
       >
         {errors && errors.non_field_errors && (
           <ErrorAlert message={errors.non_field_errors} status />

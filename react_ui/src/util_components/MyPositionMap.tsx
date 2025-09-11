@@ -113,10 +113,9 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
     const { currentPosition } = this.state;
     const { location } = this.props;
     const positionFromUrl = urlMapPosition.read();
-    const currentLatLng = currentPosition ? [
-      (currentPosition as any).lat,
-      (currentPosition as any).lon,
-    ] : null;
+    const currentLatLng = currentPosition
+      ? [(currentPosition as any).lat, (currentPosition as any).lon]
+      : null;
     return location
       ? [location.lat, location.lon]
       : positionFromUrl || currentLatLng || settings.defaultLocation;
@@ -126,10 +125,9 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
     if (!this.leafletMap) return;
     const { onLocationSelected, zoom } = this.props;
     const { currentPosition } = this.state;
-    const currentLatLng = currentPosition ? [
-      (currentPosition as any).lat,
-      (currentPosition as any).lon,
-    ] : null;
+    const currentLatLng = currentPosition
+      ? [(currentPosition as any).lat, (currentPosition as any).lon]
+      : null;
     const position = this.getInitialPosition();
     if (!this.state.userMovedMap) {
       const defaultZoom = onLocationSelected ? 21 : 18;
@@ -152,10 +150,14 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
       const marker = this.markers.currentPosition;
       if (marker) marker.setLatLng(currentLatLng);
       else {
-        const icon = new (GlyphIcon as any)({ glyph: "my_location", glyphSize: 20 });
-        this.markers.currentPosition = L.marker(currentLatLng as [number, number], { icon }).addTo(
-          this.leafletMap,
-        );
+        const icon = new (GlyphIcon as any)({
+          glyph: "my_location",
+          glyphSize: 20,
+        });
+        this.markers.currentPosition = L.marker(
+          currentLatLng as [number, number],
+          { icon },
+        ).addTo(this.leafletMap);
       }
     }
   }
@@ -201,7 +203,10 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
   gotoMyLocation = () => {
     const { currentPosition } = this.state;
     if (!currentPosition) return;
-    const currentLatLng = [(currentPosition as any).lat, (currentPosition as any).lon] as [number, number];
+    const currentLatLng = [
+      (currentPosition as any).lat,
+      (currentPosition as any).lon,
+    ] as [number, number];
     this.leafletMap.setView(currentLatLng, 18);
   };
 

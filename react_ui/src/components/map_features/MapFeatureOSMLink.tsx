@@ -62,8 +62,9 @@ export default class MapFeatureOSMLink extends React.Component<
     const discrepantTags =
       osmFeature &&
       mapFeature.as_osm_tags &&
-      Object.keys({ ...mapFeature.as_osm_tags, ...osmFeature.tags })
-        .filter((k) => osmFeature.tags[k] !== mapFeature.as_osm_tags?.[k]);
+      Object.keys({ ...mapFeature.as_osm_tags, ...osmFeature.tags }).filter(
+        (k) => osmFeature.tags[k] !== mapFeature.as_osm_tags?.[k],
+      );
 
     const isWp = featureTypeName == "Workplace";
     const isEntrance = featureTypeName == "Entrance";
@@ -123,10 +124,12 @@ export default class MapFeatureOSMLink extends React.Component<
                       <>
                         {" "}
                         (
-                        {osmImageNote.lat && osmImageNote.lon ? getDistance(
-                          osmFeature as GeolibInputCoordinates,
-                          { lat: osmImageNote.lat, lon: osmImageNote.lon },
-                        ) : 0}
+                        {osmImageNote.lat && osmImageNote.lon
+                          ? getDistance(osmFeature as GeolibInputCoordinates, {
+                              lat: osmImageNote.lat,
+                              lon: osmImageNote.lon,
+                            })
+                          : 0}
                         m)
                       </>
                     )}
@@ -230,15 +233,25 @@ export default class MapFeatureOSMLink extends React.Component<
       let gates = nearbyFeatures.filter(
         (f) =>
           f.tags.barrier == "gate" &&
-          osmImageNote.lat && osmImageNote.lon && getDistance(
-            { lat: osmImageNote.lat, lon: osmImageNote.lon }, f as GeolibInputCoordinates
+          osmImageNote.lat &&
+          osmImageNote.lon &&
+          getDistance(
+            { lat: osmImageNote.lat, lon: osmImageNote.lon },
+            f as GeolibInputCoordinates,
           ) < 5,
       );
       if (gates.length) {
-        gates.sort(
-          (a, b) => osmImageNote.lat && osmImageNote.lon ? 
-            getDistance({ lat: osmImageNote.lat, lon: osmImageNote.lon }, a as GeolibInputCoordinates) - 
-            getDistance({ lat: osmImageNote.lat, lon: osmImageNote.lon }, b as GeolibInputCoordinates) : 0,
+        gates.sort((a, b) =>
+          osmImageNote.lat && osmImageNote.lon
+            ? getDistance(
+                { lat: osmImageNote.lat, lon: osmImageNote.lon },
+                a as GeolibInputCoordinates,
+              ) -
+              getDistance(
+                { lat: osmImageNote.lat, lon: osmImageNote.lon },
+                b as GeolibInputCoordinates,
+              )
+            : 0,
         );
         osmFeature = gates[0];
       }
@@ -253,24 +266,39 @@ export default class MapFeatureOSMLink extends React.Component<
           (!f.tags["addr:housenumber"] ||
             f.tags["addr:housenumber"] == mapFeature.housenumber) &&
           (f.tags["addr:unit"] || "") == mapFeature.unit &&
-          osmImageNote.lat && osmImageNote.lon && getDistance(
-            { lat: osmImageNote.lat, lon: osmImageNote.lon }, f as GeolibInputCoordinates
+          osmImageNote.lat &&
+          osmImageNote.lon &&
+          getDistance(
+            { lat: osmImageNote.lat, lon: osmImageNote.lon },
+            f as GeolibInputCoordinates,
           ) < 5,
       );
 
       if (!entrances.length) {
         entrances = nearbyFeatures.filter(
-          (f) => f.tags.entrance && osmImageNote.lat && osmImageNote.lon && getDistance(
-            { lat: osmImageNote.lat, lon: osmImageNote.lon }, f as GeolibInputCoordinates
-          ) < 2,
+          (f) =>
+            f.tags.entrance &&
+            osmImageNote.lat &&
+            osmImageNote.lon &&
+            getDistance(
+              { lat: osmImageNote.lat, lon: osmImageNote.lon },
+              f as GeolibInputCoordinates,
+            ) < 2,
         );
       }
 
       if (entrances.length) {
-        entrances.sort(
-          (a, b) => osmImageNote.lat && osmImageNote.lon ? 
-            getDistance({ lat: osmImageNote.lat, lon: osmImageNote.lon }, a as GeolibInputCoordinates) - 
-            getDistance({ lat: osmImageNote.lat, lon: osmImageNote.lon }, b as GeolibInputCoordinates) : 0,
+        entrances.sort((a, b) =>
+          osmImageNote.lat && osmImageNote.lon
+            ? getDistance(
+                { lat: osmImageNote.lat, lon: osmImageNote.lon },
+                a as GeolibInputCoordinates,
+              ) -
+              getDistance(
+                { lat: osmImageNote.lat, lon: osmImageNote.lon },
+                b as GeolibInputCoordinates,
+              )
+            : 0,
         );
         osmFeature = entrances[0];
       }

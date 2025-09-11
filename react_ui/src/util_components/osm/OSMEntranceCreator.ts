@@ -61,10 +61,15 @@ export default class OSMEntranceCreator {
     let nearestFeature: OSMFeature;
     filtered.forEach((feature) => {
       const n = nearestPointOnLine(
-        lineString((feature as any).geometry.map(({ lat, lon }: any) => [lon, lat])),
+        lineString(
+          (feature as any).geometry.map(({ lat, lon }: any) => [lon, lat]),
+        ),
         p,
       );
-      if (!nearest || (n.properties?.dist || 0) < (nearest.properties?.dist || 0)) {
+      if (
+        !nearest ||
+        (n.properties?.dist || 0) < (nearest.properties?.dist || 0)
+      ) {
         nearest = n;
         nearestFeature = feature;
       }
@@ -77,7 +82,9 @@ export default class OSMEntranceCreator {
       (elements: OSMFeature[]) => {
         const freshElems = elements.map((f) => {
           const cached = osmCache[(f as any).id as number];
-          return cached && (cached as any).version > (f as any).version ? cached : f;
+          return cached && (cached as any).version > (f as any).version
+            ? cached
+            : f;
         });
         [this.building, this.entrancePoint] = this.findNearestFeature(
           freshElems,
@@ -199,7 +206,11 @@ export default class OSMEntranceCreator {
   }
 
   newBuildingGeometry() {
-    if (!this.building || !(this.building as any).geometry || !this.entrancePoint)
+    if (
+      !this.building ||
+      !(this.building as any).geometry ||
+      !this.entrancePoint
+    )
       return;
     const index = this.entrancePoint.properties?.index;
     if (index === undefined) return;

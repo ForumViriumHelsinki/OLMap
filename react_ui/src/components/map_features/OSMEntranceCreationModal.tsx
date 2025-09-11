@@ -39,7 +39,8 @@ export default class OSMEntranceCreationModal extends React.Component<
     const { onClose } = this.props;
     const { error, entranceCreator, createWay } = this.state;
     // @ts-ignore
-    const [lon, lat] = entranceCreator?.entrancePoint.geometry.coordinates || [];
+    const [lon, lat] =
+      entranceCreator?.entrancePoint.geometry.coordinates || [];
     const { accessPoint } = entranceCreator || {};
     const accessLatLng =
       accessPoint &&

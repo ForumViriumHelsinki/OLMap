@@ -77,10 +77,10 @@ class OLMapUI extends React.Component<{}, UIState> {
     const ImageNote = () => {
       const { noteId } = useParams<{ noteId: string }>();
       return (
-        <OSMImageNoteModal 
-          note={{ id: noteId ? parseInt(noteId, 10) : undefined }} 
+        <OSMImageNoteModal
+          note={{ id: noteId ? parseInt(noteId, 10) : undefined }}
           onClose={() => window.history.back()}
-          fullScreen 
+          fullScreen
         />
       );
     };
