@@ -51,8 +51,8 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "rest_auth",
-    "rest_auth.registration",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
     "olmap_config.apps.AdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -161,7 +161,7 @@ REST_FRAMEWORK = {
     ]
 }
 
-REST_AUTH_SERIALIZERS = {
+REST_AUTH = {
     "USER_DETAILS_SERIALIZER": "olmap.rest.serializers.UserSerializer",
     "PASSWORD_RESET_SERIALIZER": "olmap.rest.serializers.PasswordResetSerializer",
 }
