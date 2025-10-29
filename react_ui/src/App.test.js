@@ -2,8 +2,8 @@ import React from "react";
 import { render } from "@testing-library/react";
 import App from "./OLMapUI";
 
-test("renders learn react link", () => {
+test("renders Open Logistics Map", () => {
   const { getByText } = render(<App />);
-  const linkElement = getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const heading = getByText(/open logistics map/i);
+  expect(heading).toBeInTheDocument();
 });
