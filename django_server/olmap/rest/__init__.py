@@ -32,7 +32,7 @@ router.register("recent_mappers", RecentMappersViewSet)
 
 router.register("workplaces", WorkplaceViewSet)
 router.register("workplaces_with_note", WorkplaceWithNoteViewSet, "workplace_with_note")
-router.register("workplaces_by_osm", WorkplaceByOSMIdViewSet)
+router.register("workplaces_by_osm", WorkplaceByOSMIdViewSet, "workplace_by_osm")
 router.register("entrances", EntranceViewSet)
 
 urlpatterns = [

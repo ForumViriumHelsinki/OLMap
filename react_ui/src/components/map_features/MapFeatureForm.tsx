@@ -102,7 +102,7 @@ export default class MapFeatureForm extends React.Component<
     const radioFields = Object.entries(schema.properties)
       .filter(
         ([field, spec]: [string, any]) =>
-          String(spec.type) == String(["boolean", "null"]),
+          String(spec.type) === String(["boolean", "null"]),
       )
       .map(([field, spec]) => {
         return [field, { "ui:widget": "radio" }];

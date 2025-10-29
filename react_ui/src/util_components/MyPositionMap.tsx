@@ -98,7 +98,7 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
 
   componentDidUpdate(prevProps: MapProps) {
     const location = this.props.location;
-    if (location && location != prevProps.location) {
+    if (location && location !== prevProps.location) {
       urlMapPosition.write(
         location.lat,
         location.lon,

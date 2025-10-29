@@ -7,7 +7,7 @@ import CenteredSpinner from "util_components/bootstrap/CenteredSpinner";
 // @ts-ignore
 import { Button, ListGroup, ListGroupItem } from "reactstrap";
 import OSMFeatureList from "util_components/osm/OSMFeatureList";
-import { OSMFeature, osmFeatureTypes } from "util_components/osm/types";
+import { OSMFeature } from "util_components/osm/types";
 
 import { overpassQuery } from "util_components/osm/utils";
 
@@ -120,10 +120,10 @@ export default class OSMFeaturesSelection extends React.Component<
   };
 
   componentDidUpdate(prevProps: OSMFSProps) {
-    if (String(prevProps.location) != String(this.props.location))
+    if (String(prevProps.location) !== String(this.props.location))
       this.reloadFeatures();
     if (
-      String(prevProps.preselectedFeatureIds) !=
+      String(prevProps.preselectedFeatureIds) !==
       String(this.props.preselectedFeatureIds)
     )
       this.preselectFeatures();
