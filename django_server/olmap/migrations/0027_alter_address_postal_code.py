@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("olmap", "0009_osmimagenote_addresses"),
+        ("olmap", "0026_auto_20220308_1304"),
     ]
 
     operations = [
