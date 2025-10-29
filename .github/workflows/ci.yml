@@ -96,12 +96,14 @@ jobs:
         run: pipenv run python manage.py migrate
         env:
           DATABASE_URL: postgres://citylogistiikka:citylogistiikka@localhost:5432/citylogistiikka_dev
+          DJANGO_DEBUG: 'True'
 
       - name: Run Django tests
         working-directory: ./django_server
         run: pipenv run python manage.py test
         env:
           DATABASE_URL: postgres://citylogistiikka:citylogistiikka@localhost:5432/citylogistiikka_dev
+          DJANGO_DEBUG: 'True'
 
       - name: Run flake8 linting
         working-directory: ./django_server
