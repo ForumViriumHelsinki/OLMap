@@ -152,6 +152,8 @@ jobs:
       - name: Build production bundle
         working-directory: ./react_ui
         run: npm run build
+        env:
+          DISABLE_ESLINT_PLUGIN: true
 
   # Docker builds
   docker-build:

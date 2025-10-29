@@ -24,7 +24,7 @@ class Address(TimestampedModel):
     street = models.CharField(max_length=64, blank=True)
     housenumber = models.CharField(max_length=8, blank=True, null=True, help_text="E.g. 3-5")
 
-    postal_code = models.CharField(verbose_name=_("postal code"), max_length=16)
+    postal_code = models.CharField(verbose_name=_("postal code"), max_length=16, blank=True, null=True)
     city = models.CharField(verbose_name=_("city"), max_length=64)
     country = models.CharField(verbose_name=_("country"), max_length=64)
 
