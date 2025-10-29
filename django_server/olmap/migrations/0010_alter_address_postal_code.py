@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0009_osmimagenote_addresses'),
+        ("olmap", "0009_osmimagenote_addresses"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='address',
-            name='postal_code',
-            field=models.CharField(blank=True, max_length=16, null=True, verbose_name='postal code'),
+            model_name="address",
+            name="postal_code",
+            field=models.CharField(blank=True, max_length=16, null=True, verbose_name="postal code"),
         ),
     ]
