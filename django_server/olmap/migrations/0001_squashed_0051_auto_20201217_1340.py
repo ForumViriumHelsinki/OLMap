@@ -190,7 +190,7 @@ class Migration(migrations.Migration):
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("modified_at", models.DateTimeField(auto_now=True)),
                 ("street_address", models.CharField(max_length=128, verbose_name="street address")),
-                ("postal_code", models.CharField(max_length=16, verbose_name="postal code")),
+                ("postal_code", models.CharField(max_length=16, verbose_name="postal code", blank=True, null=True)),
                 ("city", models.CharField(max_length=64, verbose_name="city")),
                 ("country", models.CharField(max_length=64, verbose_name="country")),
                 ("lat", models.DecimalField(decimal_places=8, max_digits=11)),
