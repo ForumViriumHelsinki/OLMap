@@ -56,7 +56,7 @@ class MapFeatureSerializer(serializers.ModelSerializer):
 
     def is_valid(self, raise_exception=False):
         self.ensure_osm_feature(self.initial_data)
-        return super().is_valid(raise_exception)
+        return super().is_valid(raise_exception=raise_exception)
 
     def ensure_osm_feature(self, data):
         id = data.get("osm_feature", None)
@@ -248,7 +248,7 @@ class WorkplaceSerializer(MapFeatureSerializer):
         for e in self.initial_data.get("workplace_entrances", []):
             with contextlib.suppress(KeyError):
                 e["entrance_fields"]["unloading_places"] = e["unloading_places"]
-        return super().is_valid(raise_exception)
+        return super().is_valid(raise_exception=raise_exception)
 
     def update(self, instance, validated_data):
         entrances = validated_data.pop("workplace_entrances", [])
