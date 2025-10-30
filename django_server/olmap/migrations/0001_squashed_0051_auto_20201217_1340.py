@@ -17,81 +17,96 @@ def import_turku_addresses(apps, schema_editor):  # noqa: ARG001
     if settings.TEST:
         return
 
-    transformer = Transformer.from_crs("epsg:3067", "epsg:4326")
-    Address = apps.get_model("olmap", "Address")
+    try:
+        transformer = Transformer.from_crs("epsg:3067", "epsg:4326")
+        Address = apps.get_model("olmap", "Address")
 
-    response = requests.get(
-        "https://www.avoindata.fi/data/dataset/cf9208dc-63a9-44a2-9312-bbd2c3952596/resource/986fbcd8-589f-460c-81a3-5efb8ab4b880/download/02_osoitteet_2020-08-14.opt"
-    )
-    content = response.content.decode("iso8859-15")
-    address_lines = csv.reader(content.splitlines(), delimiter=";")
-    addresses_out = []
-    for line in address_lines:
-        n = line[4]
-        e = line[5]
-        street = line[7]
-        housenumber = line[9]
-        if not (street and housenumber):
-            continue
-        if re.fullmatch(r"\d+-\d+", housenumber):
-            parts = housenumber.split("-")
-            nrs = list(range(int(parts[0]), int(parts[1]) + 1, 2))
-        else:
-            nrs = [housenumber]
-        coord = transformer.transform(e, n)
-        for nr in nrs:
-            props = {
-                "street": street,
-                "housenumber": str(nr),
-                "country": "Finland",
-                "official": True,
-                "lat": coord[0],
-                "lon": coord[1],
-            }
-            addresses_out.append(Address(**props))
-    Address.objects.bulk_create(addresses_out)
+        response = requests.get(
+            "https://www.avoindata.fi/data/dataset/cf9208dc-63a9-44a2-9312-bbd2c3952596/resource/986fbcd8-589f-460c-81a3-5efb8ab4b880/download/02_osoitteet_2020-08-14.opt",
+            timeout=30,
+        )
+        response.raise_for_status()
+        content = response.content.decode("iso8859-15")
+        address_lines = csv.reader(content.splitlines(), delimiter=";")
+        addresses_out = []
+        for line in address_lines:
+            # Skip lines that don't have enough columns
+            if len(line) < 10:
+                continue
+            n = line[4]
+            e = line[5]
+            street = line[7]
+            housenumber = line[9]
+            if not (street and housenumber):
+                continue
+            if re.fullmatch(r"\d+-\d+", housenumber):
+                parts = housenumber.split("-")
+                nrs = list(range(int(parts[0]), int(parts[1]) + 1, 2))
+            else:
+                nrs = [housenumber]
+            coord = transformer.transform(e, n)
+            for nr in nrs:
+                props = {
+                    "street": street,
+                    "housenumber": str(nr),
+                    "country": "Finland",
+                    "official": True,
+                    "lat": coord[0],
+                    "lon": coord[1],
+                }
+                addresses_out.append(Address(**props))
+        Address.objects.bulk_create(addresses_out)
+    except Exception as e:
+        # Log but don't fail the migration if address import fails
+        print(f"Warning: Failed to import Turku addresses: {e}")
 
 
 def import_helsinki_addresses(apps, schema_editor):  # noqa: ARG001
     if settings.TEST:
         return
 
-    transformer = Transformer.from_crs("epsg:3879", "epsg:4326")
-    Address = apps.get_model("olmap", "Address")
+    try:
+        transformer = Transformer.from_crs("epsg:3879", "epsg:4326")
+        Address = apps.get_model("olmap", "Address")
 
-    response = requests.get(
-        "https://kartta.hel.fi/ws/geoserver/avoindata/wfs?version=1.1.0&request=GetFeature&typeName=avoindata:Osoiteluettelo_piste_rekisteritiedot&outputformat=json"
-    )
-    addresses = response.json()
+        response = requests.get(
+            "https://kartta.hel.fi/ws/geoserver/avoindata/wfs?version=1.1.0&request=GetFeature&typeName=avoindata:Osoiteluettelo_piste_rekisteritiedot&outputformat=json",
+            timeout=30,
+        )
+        response.raise_for_status()
+        addresses = response.json()
 
-    addresses_out = []
-    for f in addresses["features"]:
-        props = f["properties"]
-        if props["osoitenumero"]:
-            if re.fullmatch(r"\d+-\d+", props["osoitenumero"]):
-                parts = props["osoitenumero"].split("-")
-                nrs = list(range(int(parts[0]), int(parts[1]) + 1, 2))
-            else:
-                nrs = [props["osoitenumero"]]
-            coord = transformer.transform(props["n"], props["e"])
-            for nr in nrs:
-                addresses_out.append(
-                    Address(
-                        **{
-                            "street": props["katunimi"],
-                            "housenumber": str(nr),
-                            "street_address": props["katuosoite"],
-                            "postal_code": props["postinumero"],
-                            "city": "Helsinki",
-                            "country": "Finland",
-                            "official": True,
-                            "lat": coord[0],
-                            "lon": coord[1],
-                        }
+        addresses_out = []
+        for f in addresses["features"]:
+            props = f["properties"]
+            if props["osoitenumero"]:
+                if re.fullmatch(r"\d+-\d+", props["osoitenumero"]):
+                    parts = props["osoitenumero"].split("-")
+                    nrs = list(range(int(parts[0]), int(parts[1]) + 1, 2))
+                else:
+                    nrs = [props["osoitenumero"]]
+                coord = transformer.transform(props["n"], props["e"])
+                for nr in nrs:
+                    addresses_out.append(
+                        Address(
+                            **{
+                                "street": props["katunimi"],
+                                "housenumber": str(nr),
+                                "street_address": props["katuosoite"],
+                                "postal_code": props["postinumero"],
+                                "city": "Helsinki",
+                                "country": "Finland",
+                                "official": True,
+                                "lat": coord[0],
+                                "lon": coord[1],
+                            }
+                        )
                     )
-                )
 
-    Address.objects.bulk_create(addresses_out)
+        Address.objects.bulk_create(addresses_out)
+    except Exception as e:
+        # Log but don't fail the migration if address import fails
+        print(f"Warning: Failed to import Helsinki addresses: {e}")
 
 
 def add_reviewer_group(apps, schema_editor):  # noqa: ARG001
