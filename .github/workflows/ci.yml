@@ -101,9 +101,13 @@ jobs:
           DATABASE_URL: postgres://citylogistiikka:citylogistiikka@localhost:5432/citylogistiikka_dev
           DJANGO_DEBUG: 'True'
 
-      - name: Run flake8 linting
+      - name: Run ruff linting
         working-directory: ./django_server
-        run: uv run flake8
+        run: uv run ruff check .
+
+      - name: Run ruff formatting check
+        working-directory: ./django_server
+        run: uv run ruff format --check .
 
 
   # Frontend testing with enhanced Node.js setup

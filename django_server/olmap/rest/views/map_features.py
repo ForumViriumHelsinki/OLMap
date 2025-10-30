@@ -141,8 +141,9 @@ class WorkplaceViewSet(BaseWorkplaceViewSet, MapFeatureViewSet, viewsets.ModelVi
 class WorkplaceByOSMIdViewSet(BaseWorkplaceViewSet, mixins.RetrieveModelMixin):
     """
     This endpoint makes it possible to query if a particular workplace found in OpenStreetMap exists in the OLMap
-    database, and if so load any delivery instructions attached to it. This may be especially convenient in combination
-    with e.g. the DigiTransit geocoder (see <https://digitransit.fi/en/developers/apis/2-geocoding-api/address-search/> )
+    database, and if so load any delivery instructions attached to it. This may be especially convenient in
+    combination with e.g. the DigiTransit geocoder
+    (see <https://digitransit.fi/en/developers/apis/2-geocoding-api/address-search/> )
     which may return OSM nodes along with their ID as results to geocoding searches.
     """
 

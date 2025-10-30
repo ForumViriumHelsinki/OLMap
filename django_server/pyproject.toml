@@ -57,7 +57,7 @@ dependencies = [
     "django-rename-app",
     "shapely",
     "google-cloud-translate",
-    "flake8>=3.7",
+    "ruff>=0.8.0",
     "coverage>=5.0",
     "inflection",
 ]
@@ -66,19 +66,32 @@ dependencies = [
 where = ["."]
 include = ["olmap*"]
 
-[tool.flake8]
-max-line-length = 120
-exclude = [
-    "migrations",
-    "__pycache__",
-    "*.pyc",
-    ".git",
-    ".tox",
-    "build",
-    "dist",
-    ".eggs",
-    "*.egg-info",
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
 ]
+ignore = [
+    "N806",  # Allow non-lowercase variable names (common in Django migrations, PIL usage)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"migrations/*.py" = ["E501", "N806", "F401"]
+"__init__.py" = ["F401"]
+"**/tests/__init__.py" = ["F403"]
+"fix_*.py" = ["E402"]
+"update_*.py" = ["E402"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 [tool.coverage.run]
 source = ["."]

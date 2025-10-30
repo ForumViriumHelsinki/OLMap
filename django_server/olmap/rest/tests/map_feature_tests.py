@@ -374,7 +374,9 @@ class OSMMapFeatureTests(FVHAPITestCase):
                 }
             ],
             "name": "Zucchini",
-            "delivery_instructions": "Pienet toimitukset voi tuoda pääovesta, isommat kannattaa tuoda sisäpihan kautta.",
+            "delivery_instructions": (
+                "Pienet toimitukset voi tuoda pääovesta, isommat kannattaa tuoda sisäpihan kautta."
+            ),
         }
 
         # When POSTing data for a new workplace, along with entrances, unloading places and access points:
@@ -394,7 +396,9 @@ class OSMMapFeatureTests(FVHAPITestCase):
                 "housenumber": "4",
                 "osm_feature": 4692013476,
                 "name": "Zucchini",
-                "delivery_instructions": "Pienet toimitukset voi tuoda pääovesta, isommat kannattaa tuoda sisäpihan kautta.",
+                "delivery_instructions": (
+                    "Pienet toimitukset voi tuoda pääovesta, isommat kannattaa tuoda sisäpihan kautta."
+                ),
             },
         )
 

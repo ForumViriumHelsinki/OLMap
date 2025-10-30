@@ -48,7 +48,9 @@ tags = [
     {"name": "Addresses", "description": "Official address points from public data sources (not OSM)."},
     {
         "name": "OSM Features",
-        "description": """Links between OLMap data points and OpenStreetMap features, identified by the feature ID in OSM).""",
+        "description": (
+            "Links between OLMap data points and OpenStreetMap features, identified by the feature ID in OSM)."
+        ),
     },
     {
         "name": "Unloading places",
@@ -60,7 +62,9 @@ tags = [
     },
     {
         "name": "Mappers",
-        "description": "Users who have created new notes lately; intended to allow filtering by note creator in the OLMap UI.",
+        "description": (
+            "Users who have created new notes lately; intended to allow filtering by note creator in the OLMap UI."
+        ),
     },
 ]
 

@@ -162,7 +162,7 @@ class BaseAddress(MapFeature):
     def link_notes_to_official_address(cls):
         addresses = Address.objects.filter(city="Helsinki").values()
         address_id_index = AddressIndex(addresses)
-        address_index = {f'{a["street"]} {a["housenumber"]}': a for a in addresses}
+        address_index = {f"{a['street']} {a['housenumber']}": a for a in addresses}
 
         instances = cls.objects.prefetch_related("image_note__addresses").filter(
             housenumber__isnull=False, street__isnull=False

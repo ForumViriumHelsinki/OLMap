@@ -128,7 +128,7 @@ def sync_addresses(apps, schema_editor):  # noqa: ARG001
                 self.housenumber = match.group("housenumber")
                 self.unit = match.group("unit") or ""
         elif self.street and self.housenumber:
-            self.street_address = f'{self.street} {self.housenumber} {self.unit or ""}'.strip()
+            self.street_address = f"{self.street} {self.housenumber} {self.unit or ''}".strip()
 
     Address = apps.get_model("olmap", "Address")
     for address in Address.objects.all():

@@ -88,7 +88,8 @@ class OSMImageNoteAdmin(admin.ModelAdmin):
         if not image_note.image:
             return "No image."
         return mark_safe(
-            f'<img src="{settings.MEDIA_URL}{image_note.image}" style="max-width: calc(100vw-260px); max-height: 60vh"/>'
+            f'<img src="{settings.MEDIA_URL}{image_note.image}" '
+            f'style="max-width: calc(100vw-260px); max-height: 60vh"/>'
         )
 
     def image__(self, image_note):
