@@ -11,12 +11,11 @@ OLMap (Open Logistics Map) is a geospatial web application for collecting and ma
 ### Backend (Django) - from `django_server/` directory:
 
 ```bash
-pipenv install          # Install dependencies
-pipenv shell           # Activate virtual environment
-python manage.py migrate              # Run migrations
-python manage.py runserver           # Start dev server (port 8000)
-flake8                  # Lint Python code (configured in tox.ini)
-python manage.py test   # Run Django tests
+uv sync                # Install dependencies
+uv run python manage.py migrate      # Run migrations
+uv run python manage.py runserver   # Start dev server (port 8000)
+uv run flake8          # Lint Python code (configured in pyproject.toml)
+uv run python manage.py test        # Run Django tests
 ```
 
 ### Frontend (React) - from `react_ui/` directory:

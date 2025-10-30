@@ -33,6 +33,7 @@ overpy = "*"
 django-rename-app = "*"
 shapely = "*"
 google-cloud-translate = "*"
+inflection = "*"
 
 [requires]
 python_version = "3.11"
