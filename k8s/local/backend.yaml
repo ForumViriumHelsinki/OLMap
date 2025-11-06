@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: olmap-backend
+  namespace: olmap
   labels:
     app: olmap-backend
 spec:
@@ -22,7 +23,7 @@ spec:
             - -c
             - |
               echo "Waiting for PostgreSQL to be ready..."
-              until pg_isready -h postgres -p 5432 -U postgres; do
+              until pg_isready -h postgres -p 5432 -U olmap_user; do
                 echo "PostgreSQL is not ready yet. Waiting..."
                 sleep 2
               done
@@ -41,7 +42,7 @@ spec:
             httpGet:
               path: /health/
               port: 8000
-            initialDelaySeconds: 30
+            initialDelaySeconds: 45
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
@@ -49,10 +50,10 @@ spec:
             httpGet:
               path: /ready/
               port: 8000
-            initialDelaySeconds: 15
-            periodSeconds: 5
-            timeoutSeconds: 5
-            failureThreshold: 3
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 10
+            failureThreshold: 5
           resources:
             requests:
               memory: "512Mi"
@@ -75,6 +76,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: olmap-backend
+  namespace: olmap
   labels:
     app: olmap-backend
 spec:

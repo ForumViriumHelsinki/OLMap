@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: olmap-frontend
+  namespace: olmap
   labels:
     app: olmap-frontend
 spec:
@@ -20,10 +21,8 @@ spec:
           ports:
             - containerPort: 3000
           envFrom:
-            - configMapRef:
-                name: olmap-config
             - secretRef:
-                name: olmap-secret
+                name: olmap-api-keys
           livenessProbe:
             httpGet:
               path: /health
@@ -52,6 +51,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: olmap-frontend
+  namespace: olmap
   labels:
     app: olmap-frontend
 spec:

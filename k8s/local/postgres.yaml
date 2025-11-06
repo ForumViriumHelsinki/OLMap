@@ -2,6 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
+  namespace: olmap
   labels:
     app: postgres
 spec:
@@ -15,6 +16,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-secret
+  namespace: olmap
 type: Opaque
 stringData:
   POSTGRES_DB: olmap_dev
@@ -25,6 +27,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
+  namespace: olmap
   labels:
     app: postgres
 spec:
@@ -79,11 +82,11 @@ spec:
             periodSeconds: 5
           resources:
             requests:
-              memory: "256Mi"
+              memory: "512Mi"
               cpu: "250m"
             limits:
-              memory: "512Mi"
-              cpu: "500m"
+              memory: "2Gi"
+              cpu: "1000m"
       volumes:
         - name: postgres-storage
           persistentVolumeClaim:
@@ -93,6 +96,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres
+  namespace: olmap
   labels:
     app: postgres
 spec:

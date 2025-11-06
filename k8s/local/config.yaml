@@ -2,12 +2,14 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: olmap-config
+  namespace: olmap
 data:
   # Django Configuration
   DJANGO_DEBUG: "true"
-  DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,olmap-backend,olmap-backend.default.svc.cluster.local"
+  DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,olmap-backend,olmap-backend.k8s.orb.local,olmap-backend.default.svc.cluster.local,*"
   DJANGO_MIGRATE: "true"
-  DJANGO_CORS_ALLOW_ALL: "true"
+  DJANGO_CORS_ALLOWED_ORIGINS: "https://olmap-frontend.k8s.orb.local,http://localhost:3000"
+  SKIP_ADDRESS_IMPORT: "true"
 
   # Database Configuration
   SQL_ENGINE: "django.db.backends.postgresql"
@@ -15,7 +17,7 @@ data:
   SQL_PORT: "5432"
 
   # Frontend Configuration
-  FRONTEND_ROOT: "http://localhost:3000/"
+  FRONTEND_ROOT: "https://olmap-frontend.k8s.orb.local/"
 
   # Email Configuration (development)
   EMAIL_HOST: "localhost"
@@ -24,20 +26,12 @@ data:
 
   # SMS Configuration (disabled for local)
   SMS_PLATFORM: "None"
-
-  # React Environment Variables
-  REACT_APP_SERVER_ROOT: "http://localhost:8000"
-  REACT_APP_OVERPASS_URL: "https://overpass.fvh.io/api/interpreter"
-  REACT_APP_DEFAULT_LAT: "60.17012"
-  REACT_APP_DEFAULT_LON: "24.94290"
-  REACT_APP_USE_MOCK_LOCATION: "true"
-  REACT_APP_MOCK_LAT: "60.161687"
-  REACT_APP_MOCK_LON: "24.944368"
 ---
 apiVersion: v1
 kind: Secret
 metadata:
   name: olmap-secret
+  namespace: olmap
 type: Opaque
 stringData:
   # Django Secret Key (generate a new one for production)
@@ -48,9 +42,10 @@ stringData:
   POSTGRES_USER: "olmap_user"
   POSTGRES_PASSWORD: "olmap_password"
 
-  # API Keys (add your own values)
-  REACT_APP_MAPBOX_TOKEN: "pk.eyJ1Ijoiam9oYW4tZnZoIiwiYSI6ImNrNDJtOGh5cDAxczIzb3FpdHg1Z3c5MGwifQ.bp9ubCm67HLIorEUb21K3A"
-  REACT_APP_DIGITRANSIT_KEY: "d253c31db9ab41c195f7ef36fc250da4"
+  # Default superuser credentials (for local development only)
+  DJANGO_SUPERUSER_USERNAME: "admin"
+  DJANGO_SUPERUSER_PASSWORD: "admin"
+  DJANGO_SUPERUSER_EMAIL: "admin@localhost"
 
   # Optional service credentials (empty for local development)
   TWILIO_ACCOUNT_SID: ""

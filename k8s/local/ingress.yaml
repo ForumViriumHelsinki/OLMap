@@ -2,6 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: olmap-ingress
+  namespace: olmap
   labels:
     app: olmap
   annotations:
@@ -13,7 +14,7 @@ metadata:
       If-Modified-Since,Cache-Control,Content-Type,Authorization
 spec:
   rules:
-    - host: olmap.local
+    - host: olmap-frontend.k8s.orb.local
       http:
         paths:
           - path: /
@@ -23,42 +24,10 @@ spec:
                 name: olmap-frontend
                 port:
                   number: 3000
-          - path: /api
-            pathType: Prefix
-            backend:
-              service:
-                name: olmap-backend
-                port:
-                  number: 8000
-          - path: /admin
-            pathType: Prefix
-            backend:
-              service:
-                name: olmap-backend
-                port:
-                  number: 8000
-          - path: /rest
-            pathType: Prefix
-            backend:
-              service:
-                name: olmap-backend
-                port:
-                  number: 8000
-          - path: /rest-auth
-            pathType: Prefix
-            backend:
-              service:
-                name: olmap-backend
-                port:
-                  number: 8000
-          - path: /health
-            pathType: Prefix
-            backend:
-              service:
-                name: olmap-backend
-                port:
-                  number: 8000
-          - path: /ready
+    - host: olmap-backend.k8s.orb.local
+      http:
+        paths:
+          - path: /
             pathType: Prefix
             backend:
               service:
