@@ -134,6 +134,7 @@ class OLMapUI extends React.Component<{}, UIState> {
             <Route
               path="/ww/osm/:osmType/:osmId"
               render={(props: any) => {
+                if (!user) return <Redirect to="/login/" />;
                 const { osmType, osmId } = props.match.params;
                 return (
                   <WithNavBar>
@@ -145,6 +146,7 @@ class OLMapUI extends React.Component<{}, UIState> {
             <Route
               path="/ww/id/:olmapId"
               render={(props: any) => {
+                if (!user) return <Redirect to="/login/" />;
                 const { olmapId } = props.match.params;
                 return (
                   <WithNavBar>
@@ -156,6 +158,7 @@ class OLMapUI extends React.Component<{}, UIState> {
             <Route
               path="/ww/osm/:osmType/:osmId"
               render={(props: any) => {
+                if (!user) return <Redirect to="/login/" />;
                 const { osmType, osmId } = props.match.params;
                 return (
                   <WithNavBar>
@@ -165,30 +168,38 @@ class OLMapUI extends React.Component<{}, UIState> {
               }}
             />
             <Route path="/ww/">
-              <WithNavBar>
-                <WorkplaceWizard />
-              </WithNavBar>
+              {!user ? (
+                <Redirect to="/login/" />
+              ) : (
+                <WithNavBar>
+                  <WorkplaceWizard />
+                </WithNavBar>
+              )}
             </Route>
             <Route path="/note/:noteId">
-              <ImageNote />
+              {!user ? <Redirect to="/login/" /> : <ImageNote />}
             </Route>
             <Route
               path="/Notes/new/:osmId(\d+)?/"
               render={(props: any) => {
+                if (!user) return <Redirect to="/login/" />;
                 const { osmId } = props.match.params;
                 return <MapUI newNote osmFeatures={osmId && [Number(osmId)]} />;
               }}
             />
             <Route
               path="/Notes/:noteId(\d+)?"
-              render={(props: any) => (
-                <MapUI
-                  selectedNoteId={
-                    props.match.params.noteId &&
-                    Number(props.match.params.noteId)
-                  }
-                />
-              )}
+              render={(props: any) => {
+                if (!user) return <Redirect to="/login/" />;
+                return (
+                  <MapUI
+                    selectedNoteId={
+                      props.match.params.noteId &&
+                      Number(props.match.params.noteId)
+                    }
+                  />
+                );
+              }}
             />
             <Route>
               <Redirect to="/Notes/" />

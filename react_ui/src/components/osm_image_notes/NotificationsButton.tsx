@@ -30,6 +30,7 @@ export default class NotificationsButton extends React.Component<
   state: NotificationsButtonState = initialState();
   static contextType = AppContext;
   private notificationsInterval: any;
+  private isLoadingNotifications: boolean = false;
 
   render() {
     const { open, notifications } = this.state;
@@ -83,12 +84,20 @@ export default class NotificationsButton extends React.Component<
   }
 
   loadNotifications = () => {
-    sessionRequest(notificationsUrl).then((response: any) => {
-      if (response.status < 300)
-        response.json().then((notifications: Notification[]) => {
-          this.setState({ notifications });
-        });
-    });
+    // Prevent concurrent requests
+    if (this.isLoadingNotifications) return;
+
+    this.isLoadingNotifications = true;
+    sessionRequest(notificationsUrl)
+      .then((response: any) => {
+        if (response.status < 300)
+          return response.json().then((notifications: Notification[]) => {
+            this.setState({ notifications });
+          });
+      })
+      .finally(() => {
+        this.isLoadingNotifications = false;
+      });
   };
 
   markSeen(notificationId: number) {

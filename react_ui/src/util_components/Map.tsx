@@ -126,6 +126,9 @@ export default class Map extends React.Component<MapProps, MapState> {
   }
 
   initBgLayer(background: bgType) {
+    // Safety check: ensure map is initialized before adding layers
+    if (!this.leafletMap) return;
+
     const { showAttribution } = this.props;
     const attribution =
       'Data &copy; <a href="https://www.openstreetmap.org/">OSM</a> contribs, ' +
@@ -137,17 +140,23 @@ export default class Map extends React.Component<MapProps, MapState> {
 
     if (["osm", "tunnels"].includes(background))
       // @ts-ignore
+      // Use proxy path to avoid CORS issues and API key management
       this.bgLayer = L.tileLayer(
-        "https://cdn.digitransit.fi/map/v2/hsl-map-256/{z}/{x}/{y}.png?digitransit-subscription-key=" +
-          settings.digitransitKey,
-        { attribution: showAttribution ? attribution : "", maxZoom: 21 },
+        "/digitransit-api/map/v2/hsl-map-256/{z}/{x}/{y}.png",
+        {
+          attribution: showAttribution ? attribution : "",
+          maxZoom: 21,
+          crossOrigin: false, // No CORS needed with proxy
+        },
       ).addTo(this.leafletMap);
     // @ts-ignore
+    // Use proxy for HSY WMS services
     else
       this.bgLayer = L.tileLayer
-        .wms("https://kartta.hsy.fi/geoserver/ows?", {
+        .wms("/hsy-proxy/geoserver/ows?", {
           layers: "taustakartat_ja_aluejaot:Ortoilmakuva_2019",
           maxZoom: 19,
+          crossOrigin: false, // No CORS needed with proxy
         })
         .addTo(this.leafletMap);
   }

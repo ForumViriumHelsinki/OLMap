@@ -192,7 +192,7 @@ export default class WorkplaceAutofill extends React.Component<
       text: value,
       "focus.point.lat": geocoderFocus.lat,
       "focus.point.lon": geocoderFocus.lon,
-      "digitransit-subscription-key": settings.digitransitKey,
+      // API key is now handled by nginx proxy
     };
     const urlParams = Object.entries(params)
       .map(([k, v]) => `${k}=${v}`)
