@@ -16,6 +16,12 @@ fi
 if [ "${DJANGO_MIGRATE:-false}" = "true" ]; then
     echo "Running database migrations..."
     python manage.py migrate
+
+    # Create superuser if credentials are provided and user doesn't exist
+    if [ -n "${DJANGO_SUPERUSER_USERNAME:-}" ] && [ -n "${DJANGO_SUPERUSER_PASSWORD:-}" ]; then
+        echo "Creating superuser if it doesn't exist..."
+        python manage.py createsuperuser --noinput || echo "Superuser already exists or creation failed"
+    fi
 fi
 
 # Execute the main command

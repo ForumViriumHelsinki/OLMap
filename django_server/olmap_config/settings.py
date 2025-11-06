@@ -14,9 +14,17 @@ import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import sys
+import warnings
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
+
+# Suppress deprecation warnings from dj-rest-auth for django-allauth 65.5.0+ compatibility
+warnings.filterwarnings(
+    "ignore",
+    message=r"app_settings\.(USERNAME_REQUIRED|EMAIL_REQUIRED) is deprecated",
+    module="dj_rest_auth.registration.serializers",
+)
 
 CONFIG_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DIR = os.path.dirname(CONFIG_DIR)
@@ -106,6 +114,11 @@ DATABASES = {
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "citylogistiikka"),
         "HOST": os.environ.get("SQL_HOST", "localhost"),
         "PORT": os.environ.get("SQL_PORT", "5432"),
+        "OPTIONS": {
+            "connect_timeout": 60,
+            "options": "-c statement_timeout=300000",  # 5 minutes for long-running migrations
+        },
+        "CONN_MAX_AGE": 60,
     }
 }
 
@@ -147,6 +160,7 @@ CORS_ALLOWED_ORIGINS = (
     if os.environ.get("DJANGO_CORS_ALLOWED_ORIGINS")
     else []
 )
+CORS_ALLOW_CREDENTIALS = True
 
 STATIC_URL = "/staticfiles/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
