@@ -1,0 +1,130 @@
+worker_processes auto;
+pid /tmp/nginx.pid;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    # Temporary directories for non-root user
+    client_body_temp_path /tmp/client_temp;
+    proxy_temp_path       /tmp/proxy_temp_path;
+    fastcgi_temp_path     /tmp/fastcgi_temp;
+    uwsgi_temp_path       /tmp/uwsgi_temp;
+    scgi_temp_path        /tmp/scgi_temp;
+
+    # Cache settings - using /tmp for non-root user permissions
+    proxy_cache_path /tmp/nginx_cache levels=1:2 keys_zone=tile_cache:10m max_size=1g inactive=60m use_temp_path=off;
+
+    server {
+        listen 3000;
+        server_name localhost;
+        root /usr/share/nginx/html;
+        index index.html;
+
+        # DNS resolver for service discovery
+        # Primary: kube-dns for K8s services
+        # Fallback: 127.0.0.11 for Docker Compose local development
+        resolver kube-dns.kube-system.svc.cluster.local valid=30s 127.0.0.11 valid=30s ipv6=off;
+
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+        # Gzip compression
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 1024;
+        gzip_proxied expired no-cache no-store private auth;
+        gzip_types
+            text/plain
+            text/css
+            text/xml
+            text/javascript
+            application/x-javascript
+            application/xml+rss
+            application/javascript
+            application/json;
+
+        # Handle React Router
+        location / {
+            try_files $uri $uri/ /index.html;
+
+            # Cache static assets
+            location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+                expires 1y;
+                add_header Cache-Control "public, immutable";
+            }
+        }
+
+        # Health check endpoint
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+
+        # Proxy for Digitransit map tiles
+        location /digitransit-api/map/ {
+            set $digitransit_key "${REACT_APP_DIGITRANSIT_KEY}";
+
+            proxy_set_header digitransit-subscription-key $digitransit_key;
+            proxy_set_header Host cdn.digitransit.fi;
+            proxy_pass https://cdn.digitransit.fi/map/;
+
+            # Use cache for tiles
+            proxy_cache tile_cache;
+            proxy_cache_valid 200 1d;
+            proxy_cache_valid 404 1h;
+            proxy_cache_use_stale error timeout http_500 http_502 http_503 http_504;
+            add_header X-Cache-Status $upstream_cache_status;
+        }
+
+        # Proxy for Digitransit geocoding API
+        location /digitransit-api/geocoding/ {
+            set $digitransit_key "${REACT_APP_DIGITRANSIT_KEY}";
+
+            proxy_set_header digitransit-subscription-key $digitransit_key;
+            proxy_set_header Host api.digitransit.fi;
+            proxy_pass https://api.digitransit.fi/geocoding/;
+
+            # Shorter cache for geocoding
+            proxy_cache tile_cache;
+            proxy_cache_valid 200 10m;
+            proxy_cache_valid 404 1m;
+            add_header X-Cache-Status $upstream_cache_status;
+        }
+
+        # Proxy for HSY WMS services
+        location /hsy-proxy/ {
+            proxy_set_header Host kartta.hsy.fi;
+            proxy_pass https://kartta.hsy.fi/;
+
+            # Use cache
+            proxy_cache tile_cache;
+            proxy_cache_valid 200 7d;
+            proxy_cache_valid 404 1h;
+            proxy_cache_use_stale error timeout http_500 http_502 http_503 http_504;
+            add_header X-Cache-Status $upstream_cache_status;
+        }
+
+        # Proxy for Overpass API
+        location /overpass-proxy/ {
+            proxy_set_header Host overpass.fvh.io;
+            proxy_pass https://overpass.fvh.io/;
+
+            # Longer timeout for Overpass queries
+            proxy_read_timeout 60s;
+        }
+
+        # Security - deny access to dotfiles
+        location ~ /\. {
+            deny all;
+        }
+    }
+}
