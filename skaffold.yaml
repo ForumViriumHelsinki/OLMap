@@ -17,6 +17,16 @@ build:
       docker:
         dockerfile: Dockerfile
         target: production
+        buildArgs:
+          REACT_APP_SERVER_ROOT: "https://olmap-backend.k8s.orb.local"
+          REACT_APP_MAPBOX_TOKEN: "pk.eyJ1Ijoiam9oYW4tZnZoIiwiYSI6ImNrNDJtOGh5cDAxczIzb3FpdHg1Z3c5MGwifQ.bp9ubCm67HLIorEUb21K3A"
+          REACT_APP_DIGITRANSIT_KEY: "d253c31db9ab41c195f7ef36fc250da4"
+          REACT_APP_OVERPASS_URL: "https://overpass.fvh.io/api/interpreter"
+          REACT_APP_DEFAULT_LAT: "60.17012"
+          REACT_APP_DEFAULT_LON: "24.94290"
+          REACT_APP_USE_MOCK_LOCATION: "true"
+          REACT_APP_MOCK_LAT: "60.161687"
+          REACT_APP_MOCK_LON: "24.944368"
       sync:
         manual:
           - src: "src/**/*"
@@ -29,7 +39,8 @@ manifests:
   rawYaml:
     - k8s/local/*.yaml
 deploy:
-  kubectl: {}
+  kubectl:
+    defaultNamespace: olmap
 portForward:
   - resourceType: service
     resourceName: olmap-backend
@@ -43,3 +54,19 @@ portForward:
     resourceName: postgres
     port: 5432
     localPort: 5432
+# Note: Playwright e2e tests run after deployment via 'make test-e2e'
+# or by running 'cd react_ui && ./run-e2e-tests.sh' after 'skaffold dev' is running
+profiles:
+  - name: with-tests
+    verify:
+      - name: e2e-tests
+        container:
+          name: playwright-runner
+          image: mcr.microsoft.com/playwright:v1.56.1-focal
+          command: ["sh"]
+          args:
+            - -c
+            - |
+              cd /tests
+              npm install --legacy-peer-deps
+              BASE_URL=http://host.docker.internal:3000 npx playwright test --reporter=list
