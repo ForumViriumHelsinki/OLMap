@@ -48,8 +48,25 @@ docker-compose up      # Starts web (Django), db (Postgres), frontend (React)
 - Context-based state management
 - Leaflet + React-Leaflet for mapping
 
+## Testing
+
+See [TESTING.md](TESTING.md) for comprehensive testing guide including:
+
+- Frontend unit tests (Jest + React Testing Library)
+- Frontend e2e tests (Playwright)
+- Backend tests (Django TestCase)
+- Skaffold integration for automated testing
+
+Quick test commands:
+
+```bash
+make test-frontend    # Jest unit tests
+make test-backend     # Django tests (requires PostgreSQL)
+make test-e2e         # Playwright e2e (requires full stack)
+```
+
 ## Code Quality
 
-- **Backend**: flake8 with max-line-length 120
+- **Backend**: Ruff with max-line-length 120 (see `pyproject.toml`)
 - **Frontend**: TypeScript with strict type checking
-- Tests: Django test suite + React Testing Library
+- **E2E Testing**: Playwright for end-to-end tests
