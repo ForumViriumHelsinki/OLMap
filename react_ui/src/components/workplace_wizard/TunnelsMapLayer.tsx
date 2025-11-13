@@ -1,19 +1,19 @@
-import React from 'react';
-import {overpassQuery} from "util_components/osm/utils";
-import {geocoderFocus} from "components/workplace_wizard/settings";
-import {GeoJSON} from 'react-leaflet';
-import {GeoJsonObject} from "geojson";
+import React from "react";
+import { overpassQuery } from "util_components/osm/utils";
+import { geocoderFocus } from "components/workplace_wizard/settings";
+import { GeoJSON } from "react-leaflet";
+import { GeoJsonObject } from "geojson";
 import osmtogeojson from "osmtogeojson";
-import * as L from 'leaflet';
-import {LatLng} from "leaflet";
+import * as L from "leaflet";
+import { LatLng } from "leaflet";
 
-import './TunnelsMapLayer.scss';
+import "./TunnelsMapLayer.scss";
 
-type TunnelsMapLayerProps = {}
+type TunnelsMapLayerProps = {};
 
 type TunnelsMapLayerState = {
-  tunnelFeatures?: GeoJsonObject
-}
+  tunnelFeatures?: GeoJsonObject;
+};
 
 const initialState: TunnelsMapLayerState = {};
 
@@ -24,35 +24,60 @@ const query = `
   node[layer~"^-[123456789]"]["parking:condition"=loading];)->.result;`;
 
 const options = {
-  nodes: {radius: 4, stroke: false, fillOpacity: 1, fillColor: '#000'},
-  ways: {width: 3, opacity: 0.8},
-  layerColors: {'-4': "#770000", '-3': "#ff0000", '-2': "#ff7700", '-1': "#ffff00"},
-  label: {permanent: true, direction: 'bottom', className: 'osmMapLabel', pane: 'markerPane'}
+  nodes: { radius: 4, stroke: false, fillOpacity: 1, fillColor: "#000" },
+  ways: { width: 3, opacity: 0.8 },
+  layerColors: {
+    "-4": "#770000",
+    "-3": "#ff0000",
+    "-2": "#ff7700",
+    "-1": "#ffff00",
+  },
+  label: {
+    permanent: true,
+    direction: "bottom" as const,
+    className: "osmMapLabel",
+    pane: "markerPane",
+  },
 };
 
-export default class TunnelsMapLayer extends React.Component<TunnelsMapLayerProps, TunnelsMapLayerState> {
+export default class TunnelsMapLayer extends React.Component<
+  TunnelsMapLayerProps,
+  TunnelsMapLayerState
+> {
   state = initialState;
 
   render() {
     const {} = this.props;
-    const {tunnelFeatures} = this.state;
-    return !tunnelFeatures ? null :
-      <GeoJSON data={tunnelFeatures} pointToLayer={this.pointToLayer} style={this.wayStyle}/>;
+    const { tunnelFeatures } = this.state;
+    return !tunnelFeatures ? null : (
+      <GeoJSON
+        data={tunnelFeatures}
+        pointToLayer={this.pointToLayer}
+        style={this.wayStyle}
+      />
+    );
   }
 
   componentDidMount() {
     overpassQuery(query, geocoderFocus, 5000).then((elements) => {
-      this.setState({tunnelFeatures: osmtogeojson({elements}) as GeoJsonObject});
-    })
+      this.setState({
+        tunnelFeatures: osmtogeojson({ elements }) as GeoJsonObject,
+      });
+    });
   }
 
   pointToLayer = (p: any, latlng: LatLng) =>
-    L.circleMarker(latlng, options.nodes)
-      // @ts-ignore
-      .bindTooltip(p.properties.name || p.properties.description || p.properties.ref || '', options.label);
+    L.circleMarker(latlng, options.nodes).bindTooltip(
+      p.properties.name || p.properties.description || p.properties.ref || "",
+      options.label,
+    );
 
   wayStyle = (w: any) => {
-    // @ts-ignore
-    return {...options.ways, color: options.layerColors[w.properties.layer] || '#000'}
-  }
+    return {
+      ...options.ways,
+      color:
+        (options.layerColors as Record<string, string>)[w.properties.layer] ||
+        "#000",
+    };
+  };
 }

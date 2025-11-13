@@ -1,8 +1,47 @@
-from .osm_image_notes import (
-    OSMFeature, OSMImageNote, upload_osm_images_to,
-    ImageNoteUpvote, ImageNoteDownvote, OSMImageNoteComment, OSMImageNoteCommentNotification)
 from .base import Address
 from .map_features import (
-    Entrance, Steps, Gate, Barrier, BuildingPassage, Workplace, WorkplaceType, WorkplaceEntrance,
-    UnloadingPlace, DeliveryType, map_feature_types, MapFeature
+    Barrier,
+    BuildingPassage,
+    DeliveryType,
+    Entrance,
+    Gate,
+    MapFeature,
+    Steps,
+    UnloadingPlace,
+    Workplace,
+    WorkplaceEntrance,
+    WorkplaceType,
+    map_feature_types,
 )
+from .osm_image_notes import (
+    ImageNoteDownvote,
+    ImageNoteUpvote,
+    OSMFeature,
+    OSMImageNote,
+    OSMImageNoteComment,
+    OSMImageNoteCommentNotification,
+    upload_osm_images_to,
+)
+
+__all__ = [
+    "Address",
+    "Barrier",
+    "BuildingPassage",
+    "DeliveryType",
+    "Entrance",
+    "Gate",
+    "ImageNoteDownvote",
+    "ImageNoteUpvote",
+    "MapFeature",
+    "OSMFeature",
+    "OSMImageNote",
+    "OSMImageNoteComment",
+    "OSMImageNoteCommentNotification",
+    "Steps",
+    "UnloadingPlace",
+    "Workplace",
+    "WorkplaceEntrance",
+    "WorkplaceType",
+    "map_feature_types",
+    "upload_osm_images_to",
+]

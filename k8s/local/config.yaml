@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: olmap-config
+  namespace: olmap
+data:
+  # Django Configuration
+  DJANGO_DEBUG: "true"
+  DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,olmap-backend,olmap-backend.k8s.orb.local,olmap-backend.default.svc.cluster.local,*"
+  DJANGO_MIGRATE: "true"
+  DJANGO_CORS_ALLOWED_ORIGINS: "https://olmap-frontend.k8s.orb.local,http://localhost:3000"
+  SKIP_ADDRESS_IMPORT: "true"
+
+  # Database Configuration
+  SQL_ENGINE: "django.db.backends.postgresql"
+  SQL_HOST: "postgres"
+  SQL_PORT: "5432"
+
+  # Frontend Configuration
+  FRONTEND_ROOT: "https://olmap-frontend.k8s.orb.local/"
+
+  # Email Configuration (development)
+  EMAIL_HOST: "localhost"
+  EMAIL_PORT: "25"
+  ADMIN_EMAIL: "admin@localhost"
+
+  # SMS Configuration (disabled for local)
+  SMS_PLATFORM: "None"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: olmap-secret
+  namespace: olmap
+type: Opaque
+stringData:
+  # Django Secret Key (generate a new one for production)
+  DJANGO_SECRET_KEY: "dev-secret-key-change-in-production-(*z-ann&51^6l361#ymu0y9tbdk=_g*=3cy8)p%vcizdc0%_qv"
+
+  # Database credentials (matches postgres-secret)
+  POSTGRES_DB: "olmap_dev"
+  POSTGRES_USER: "olmap_user"
+  POSTGRES_PASSWORD: "olmap_password"
+
+  # Default superuser credentials (for local development only)
+  DJANGO_SUPERUSER_USERNAME: "admin"
+  DJANGO_SUPERUSER_PASSWORD: "admin"
+  DJANGO_SUPERUSER_EMAIL: "admin@localhost"
+
+  # Optional service credentials (empty for local development)
+  TWILIO_ACCOUNT_SID: ""
+  TWILIO_AUTH_TOKEN: ""
+  TWILIO_SENDER_NR: ""
+  GATEWAY_API_KEY: ""
+  GATEWAY_API_SECRET: ""
+  GATEWAY_API_TOKEN: ""
+  EMAIL_HOST_USER: ""
+  EMAIL_HOST_PASSWORD: ""
+  SENTRY_DSN: ""

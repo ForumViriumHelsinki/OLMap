@@ -1,5 +1,7 @@
-import math
+from __future__ import annotations
+
 from datetime import timedelta
+from typing import ClassVar
 
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -15,10 +17,11 @@ class RecentMappersViewSet(ReadOnlyModelViewSet):
     Return users who have created notes in the last 60 days; intended to allow filtering by note creator in the
     OLMap UI.
     """
-    schema = AutoSchema(tags=["Mappers"], operation_id_base='mapper')
+
+    schema = AutoSchema(tags=["Mappers"], operation_id_base="mapper")
     serializer_class = BaseUserSerializer
     queryset = User.objects.filter(created_notes__created_at__gt=timezone.now() - timedelta(days=60)).distinct()
-    permission_classes = [permissions.AllowAny]
+    permission_classes: ClassVar = [permissions.AllowAny]
 
     def get_queryset(self):
         return User.objects.filter(created_notes__created_at__gt=timezone.now() - timedelta(days=60)).distinct()

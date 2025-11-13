@@ -1,36 +1,36 @@
-version: '3.7'
-
 services:
   web:
     build: ./django_server
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - ./django_server/:/usr/src/app/
     ports:
-      - 8000:8000
+      - "8000:8000"
+    environment:
+      - DJANGO_MIGRATE=true
     env_file:
-      - ./.env.dev
+      - .env
     depends_on:
       - db
+    restart: unless-stopped
 
   db:
-    image: postgres:12.1
+    image: postgres:14-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
-      - ./.env.dev
-    ports:
-      - 5432:5432
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-olmap_user}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   frontend:
-      build: ./react_ui
-      command: yarn start
-      ports:
-        - "3000:3000"
-      volumes:
-        - ./react_ui:/app/frontend
-        - node-modules:/app/react_ui/node_modules
+    build: ./react_ui
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
 
 volumes:
   postgres_data:
-  node-modules:

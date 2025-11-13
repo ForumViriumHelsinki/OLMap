@@ -1,6 +1,6 @@
 // Define FVH color palette to override default Bootstrap colors:
 
-$white:    #fff;
+$white: #fff;
 $gray-100: #f8f9fa;
 $gray-200: #e9ecef;
 $gray-300: #dee2e6;
@@ -10,62 +10,62 @@ $gray-600: #6c757d;
 $gray-700: #495057;
 $gray-800: #343a40;
 $gray-900: #212529;
-$black:    #000;
+$black: #000;
 
-$blue:    #007bff;
-$indigo:  #6610f2;
-$purple:  #6f42c1;
-$pink:    #e83e8c;
-$red:     #d70074;
-$orange:  #FF5000;
-$yellow:  #Ffd650;
-$green:   #28a745;
-$teal:    #009E92;
-$cyan:    #00a4cc;
+$blue: #007bff;
+$indigo: #6610f2;
+$purple: #6f42c1;
+$pink: #e83e8c;
+$red: #d70074;
+$orange: #ff5000;
+$yellow: #ffd650;
+$green: #28a745;
+$teal: #009e92;
+$cyan: #00a4cc;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $colors: (
-    "blue":       $blue,
-    "indigo":     $indigo,
-    "purple":     $purple,
-    "pink":       $pink,
-    "red":        $red,
-    "orange":     $orange,
-    "yellow":     $yellow,
-    "green":      $green,
-    "teal":       $teal,
-    "cyan":       $cyan,
-    "white":      $white,
-    "gray":       $gray-600,
-    "gray-dark":  $gray-800
+  "blue": $blue,
+  "indigo": $indigo,
+  "purple": $purple,
+  "pink": $pink,
+  "red": $red,
+  "orange": $orange,
+  "yellow": $yellow,
+  "green": $green,
+  "teal": $teal,
+  "cyan": $cyan,
+  "white": $white,
+  "gray": $gray-600,
+  "gray-dark": $gray-800,
 );
 
-$primary:       $orange;
-$secondary:     $teal;
-$success:       $green;
-$info:          $cyan;
-$warning:       $yellow;
-$danger:        $red;
-$light:         $white;
-$dark:          $black;
+$primary: $orange;
+$secondary: $teal;
+$success: $green;
+$info: $cyan;
+$warning: $yellow;
+$danger: $red;
+$light: $white;
+$dark: $black;
 
 // stylelint-disable-next-line scss/dollar-variable-default
 $theme-colors: (
-    "primary":    $primary,
-    "secondary":  $secondary,
-    "success":    $success,
-    "info":       $info,
-    "warning":    $warning,
-    "danger":     $danger,
-    "light":      $light,
-    "dark":       $dark
+  "primary": $primary,
+  "secondary": $secondary,
+  "success": $success,
+  "info": $info,
+  "warning": $warning,
+  "danger": $danger,
+  "light": $light,
+  "dark": $dark,
 );
 
 @import "../node_modules/bootstrap/scss/bootstrap";
 
-
 // Misc style corrections for our use cases:
-a, button {
+a,
+button {
   background: none;
   border: none;
   cursor: pointer;
@@ -88,7 +88,7 @@ button.nav-link:focus {
 }
 
 .modal {
-  display: block
+  display: block;
 }
 
 .modal-header-actions {
@@ -105,21 +105,27 @@ button.nav-link:focus {
   font-size: 20px;
 }
 
-.btn-outline-primary:active, .btn-outline-primary:hover,
-.btn-outline-dark:active, .btn-outline-dark:hover,
-.btn-outline-secondary:active, .btn-outline-secondary:hover {
+.btn-outline-primary:active,
+.btn-outline-primary:hover,
+.btn-outline-dark:active,
+.btn-outline-dark:hover,
+.btn-outline-secondary:active,
+.btn-outline-secondary:hover {
   background-color: white !important;
 }
 
-.btn-outline-primary:active, .btn-outline-primary:hover {
+.btn-outline-primary:active,
+.btn-outline-primary:hover {
   color: $primary !important;
 }
 
-.btn-outline-secondary:active, .btn-outline-secondary:hover {
+.btn-outline-secondary:active,
+.btn-outline-secondary:hover {
   color: $secondary !important;
 }
 
-.btn-outline-dark:active, .btn-outline-dark:hover {
+.btn-outline-dark:active,
+.btn-outline-dark:hover {
   color: $dark !important;
 }
 
@@ -127,9 +133,10 @@ button.nav-link:focus {
   line-height: 0.8;
 }
 
-.btn-outline-primary:hover, .btn-outline-primary:active {
-    color: $primary;
-    background-color: rgba(255, 80, 0, 0.1);
+.btn-outline-primary:hover,
+.btn-outline-primary:active {
+  color: $primary;
+  background-color: rgba(255, 80, 0, 0.1);
 }
 
 form.compact {
@@ -138,9 +145,10 @@ form.compact {
     margin-bottom: 0.5rem;
 
     .control-label {
-      width: 40%
+      width: 40%;
     }
-    .form-control, .checkbox {
+    .form-control,
+    .checkbox {
       display: inline-block;
       width: 55%;
     }
@@ -180,14 +188,15 @@ form.compact {
   opacity: 1;
 }
 
-div.leaflet-top, div.leaflet-bottom {
+div.leaflet-top,
+div.leaflet-bottom {
   z-index: 400;
 }
 
 .map-tools {
   z-index: 500;
   right: 0;
-  background: rgba(255, 255, 255, 0.4)
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .text-ellipsis {

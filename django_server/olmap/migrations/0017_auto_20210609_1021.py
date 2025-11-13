@@ -5,20 +5,42 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0016_osmimagenote_accepted_by'),
+        ("olmap", "0016_osmimagenote_accepted_by"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='entrance',
-            name='type',
-            field=models.CharField(blank=True, choices=[['workplace', 'workplace'], ['main', 'main'], ['secondary', 'secondary'], ['service', 'service'], ['staircase', 'staircase'], ['garage', 'garage'], ['other', 'other']], max_length=32),
+            model_name="entrance",
+            name="type",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ["workplace", "workplace"],
+                    ["main", "main"],
+                    ["secondary", "secondary"],
+                    ["service", "service"],
+                    ["staircase", "staircase"],
+                    ["garage", "garage"],
+                    ["other", "other"],
+                ],
+                max_length=32,
+            ),
         ),
         migrations.AlterField(
-            model_name='workplace',
-            name='url_name',
-            field=models.CharField(blank=True, help_text='Use only letters, numbers and underscores', max_length=32, validators=[django.core.validators.RegexValidator('^[-a-zA-Z0-9_]*\\Z', 'Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.', 'invalid')]),
+            model_name="workplace",
+            name="url_name",
+            field=models.CharField(
+                blank=True,
+                help_text="Use only letters, numbers and underscores",
+                max_length=32,
+                validators=[
+                    django.core.validators.RegexValidator(
+                        "^[-a-zA-Z0-9_]*\\Z",
+                        "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens.",
+                        "invalid",
+                    )
+                ],
+            ),
         ),
     ]

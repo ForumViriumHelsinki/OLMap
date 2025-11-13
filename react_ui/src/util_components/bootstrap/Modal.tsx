@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export class ModalBody extends React.Component {
   render() {
@@ -7,70 +7,103 @@ export class ModalBody extends React.Component {
 }
 
 type Action = {
-  label: string,
-  action: () => any,
-  color: 'primary' | 'secondary' | 'light' | 'outline-primary' | 'outline-secondary'
-}
+  label: string;
+  action: () => any;
+  color:
+    | "primary"
+    | "secondary"
+    | "light"
+    | "outline-primary"
+    | "outline-secondary";
+};
 
-export class ModalActions extends React.Component<{actions: Action[]}> {
+export class ModalActions extends React.Component<{ actions: Action[] }> {
   render() {
-    return <div className="modal-footer">
-      {this.props.actions.map(({label, action, color}) =>
-        <button key={label} type="button" className={"btn btn-" + color} onClick={action}>{label}</button>
-      )}
-    </div>;
+    return (
+      <div className="modal-footer">
+        {this.props.actions.map(({ label, action, color }) => (
+          <button
+            key={label}
+            type="button"
+            className={"btn btn-" + color}
+            onClick={action}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    );
   }
 }
 
 type ModalProps = {
-  title?: any,
-  onClose: () => any,
-  children?: any,
-  className: string,
-  headerContent?: any,
-  headerCls: string
-}
+  title?: any;
+  onClose: () => any;
+  children?: any;
+  className: string;
+  headerContent?: any;
+  headerCls: string;
+};
 
 export default class Modal extends React.Component<ModalProps> {
-  static defaultProps = {className: '', headerCls: ''};
+  static defaultProps = { className: "", headerCls: "" };
 
   escFunction = (event: any) => {
-    if(event.keyCode === 27) this.props.onClose();
+    if (event.keyCode === 27) this.props.onClose();
   };
 
-  componentDidMount(){
+  componentDidMount() {
     document.addEventListener("keydown", this.escFunction, false);
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     document.removeEventListener("keydown", this.escFunction, false);
   }
 
   render() {
-    const {title, onClose, children, className, headerContent, headerCls} = this.props;
+    const { title, onClose, children, className, headerContent, headerCls } =
+      this.props;
 
-    return (<>
-      <div className="modal-backdrop show"> </div>
-      <div className="modal show" tabIndex={-1} role="dialog" onClick={onClose}>
-        <div className={`modal-dialog ${className}`}
-             role="document"
-             onClick={(e) => e.stopPropagation()}>
-          <div className="modal-content">
-            {(title || headerContent) &&
-              <div className={"modal-header " + headerCls}>
-                {title && <h6 className="modal-title">{title}</h6>}
-                {headerContent}
-                {onClose &&
-                <button type="button" className="close" aria-label="Close" onClick={onClose}>
-                  <span aria-hidden="true">&times;</span>
-                </button>
-                }
+    return (
+      <>
+        <div className="modal-backdrop show"> </div>
+        <div
+          className="modal show"
+          tabIndex={-1}
+          role="dialog"
+          onClick={onClose}
+        >
+          <div
+            className={`modal-dialog ${className}`}
+            role="document"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content">
+              {(title || headerContent) && (
+                <div className={"modal-header " + headerCls}>
+                  {title && <h6 className="modal-title">{title}</h6>}
+                  {headerContent}
+                  {onClose && (
+                    <button
+                      type="button"
+                      className="close"
+                      aria-label="Close"
+                      onClick={onClose}
+                    >
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  )}
+                </div>
+              )}
+              <div
+                style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}
+              >
+                {children}
               </div>
-            }
-            <div style={{maxHeight: 'calc(100vh - 200px)', overflowY: 'auto'}}>{children}</div>
+            </div>
           </div>
         </div>
-      </div>
-    </>);
+      </>
+    );
   }
 }

@@ -1,0 +1,210 @@
+---
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [master, main, develop]
+  pull_request:
+    branches: [master, main, develop]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME_BACKEND: ${{ github.repository }}-backend
+  IMAGE_NAME_FRONTEND: ${{ github.repository }}-frontend
+  DOCKER_BUILDKIT: 1
+  BUILDX_NO_DEFAULT_ATTESTATIONS: 1
+
+jobs:
+  # Pre-commit hooks validation
+  pre-commit:
+    name: Pre-commit Hooks & Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install pre-commit
+        run: |
+          python -m pip install --upgrade pip
+          pip install pre-commit
+
+      - name: Cache pre-commit hooks
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pre-commit-
+
+      - name: Run pre-commit hooks
+        run: pre-commit run --all-files --show-diff-on-failure
+
+  # Backend testing with enhanced caching
+  backend:
+    name: Backend (Django) Tests
+    runs-on: ubuntu-latest
+    needs: pre-commit
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: citylogistiikka_dev
+          POSTGRES_USER: citylogistiikka
+          POSTGRES_PASSWORD: citylogistiikka
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: "django_server/uv.lock"
+
+      - name: Install Python dependencies with uv
+        working-directory: ./django_server
+        run: uv sync
+
+      - name: Run Django migrations
+        working-directory: ./django_server
+        run: uv run python manage.py migrate
+        env:
+          DATABASE_URL: postgres://citylogistiikka:citylogistiikka@localhost:5432/citylogistiikka_dev
+          DJANGO_DEBUG: 'True'
+
+      - name: Run Django tests
+        working-directory: ./django_server
+        run: uv run python manage.py test
+        env:
+          DATABASE_URL: postgres://citylogistiikka:citylogistiikka@localhost:5432/citylogistiikka_dev
+          DJANGO_DEBUG: 'True'
+
+      - name: Run ruff linting
+        working-directory: ./django_server
+        run: uv run ruff check .
+
+      - name: Run ruff formatting check
+        working-directory: ./django_server
+        run: uv run ruff format --check .
+
+
+  # Frontend testing with enhanced Node.js setup
+  frontend:
+    name: Frontend (React) Tests
+    runs-on: ubuntu-latest
+    needs: pre-commit
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'react_ui/package-lock.json'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: react_ui/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('react_ui/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: ./react_ui
+        run: npm ci
+
+      - name: Run TypeScript check
+        working-directory: ./react_ui
+        run: npx tsc --noEmit
+
+      - name: Run tests
+        working-directory: ./react_ui
+        run: npm test -- --watchAll=false
+        env:
+          CI: true
+
+      - name: Build production bundle
+        working-directory: ./react_ui
+        run: npm run build
+        env:
+          CI: false
+
+  # Docker builds
+  docker-build:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    if: github.event_name == 'push'
+
+    strategy:
+      matrix:
+        include:
+          - service: backend
+            dockerfile: django_server/Dockerfile
+            context: django_server
+          - service: frontend
+            dockerfile: react_ui/Dockerfile
+            context: react_ui
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: >-
+            ${{ env.REGISTRY }}/${{
+              matrix.service == 'backend' && env.IMAGE_NAME_BACKEND || env.IMAGE_NAME_FRONTEND
+            }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix={{branch}}-
+
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

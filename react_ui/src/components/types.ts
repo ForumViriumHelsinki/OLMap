@@ -1,106 +1,110 @@
 import React from "react";
 
 export type User = {
-    id: number,
-    is_reviewer: boolean,
-    username: string,
-    first_name: string,
-    last_name: string,
-    phone_number: string
+  id: number;
+  is_reviewer: boolean;
+  username: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
 };
 
-type userId = number
+type userId = number;
 
 export type OSMImageNoteComment = {
-    created_at: string,
-    comment: string,
-    user: string,
-    id: number,
-    image_note: number
-}
+  created_at: string;
+  comment: string;
+  user: string;
+  id: number;
+  image_note: number;
+};
 
 export type OSMImageNote = {
-    id?: number,
-    image?: any,
-    lat?: number,
-    lon?: number,
-    comment?: string,
-    osm_features: number[],
-    addresses: number[],
-    is_accepted?: boolean,
-    is_processed?: boolean,
-    is_reviewed?: boolean,
-    tags?: string[],
-    modified_at?: string,
-    created_at?: string,
-    created_by?: number | {
-        id: number,
-        username: string
-    },
-    upvotes?: userId[],
-    downvotes?: userId[],
-    comments?: OSMImageNoteComment[],
-    delivery_instructions?: boolean,
-    height?: number,
-    layer?: number
+  id?: number;
+  image?: any;
+  lat?: number;
+  lon?: number;
+  comment?: string;
+  osm_features?: number[];
+  addresses?: number[];
+  is_accepted?: boolean;
+  is_processed?: boolean;
+  is_reviewed?: boolean;
+  tags?: string[];
+  modified_at?: string;
+  created_at?: string;
+  created_by?:
+    | number
+    | {
+        id: number;
+        username: string;
+      };
+  upvotes?: userId[];
+  downvotes?: userId[];
+  comments?: OSMImageNoteComment[];
+  delivery_instructions?: boolean;
+  height?: number;
+  layer?: number;
 };
 
 export type Notification = {
-    id: number,
-    comment: OSMImageNoteComment
-}
+  id: number;
+  comment: OSMImageNoteComment;
+};
 
-export type JSONSchema = any
+export type JSONSchema = any;
 
 export type MapFeatureTypes = {
-  [featureType: string]: JSONSchema
+  [featureType: string]: JSONSchema;
 };
 
 export type MapFeature = {
-  as_osm_tags?: object,
-  id?: number,
-  osm_feature?: number,
-  [field: string]: any
-}
+  as_osm_tags?: Record<string, string>;
+  id?: number;
+  osm_feature?: number;
+  [field: string]: any;
+};
 
 export type WorkplaceEntrance = {
-  description?: string,
-  id?: number,
-  image_note?: OSMImageNote,
-  entrance_data?: MapFeature,
-  workplace: number,
-  entrance?: number,
-  deliveries?: 'yes' | 'no' | 'main',
-  delivery_types?: string[],
-  delivery_hours?: string,
-  delivery_instructions?: string
-  unloading_places?: MapFeature[]
-}
+  description?: string;
+  id?: number;
+  image_note?: OSMImageNote;
+  entrance_data?: MapFeature;
+  workplace: number;
+  entrance?: number;
+  deliveries?: "yes" | "no" | "main";
+  delivery_types?: string[];
+  delivery_hours?: string;
+  delivery_instructions?: string;
+  unloading_places?: MapFeature[];
+};
 
 export type OpenOSMChangeset = {
-  id?: number,
-  comment: string
-}
+  id?: number;
+  comment: string;
+};
 
 export type OSMEditContextType = {
-  username: string,
-  password: string,
-  changeset?: OpenOSMChangeset
-}
+  username: string;
+  password: string;
+  changeset?: OpenOSMChangeset;
+};
 
 export type AppContextType = {
-  user?: User
-}
+  user?: User;
+};
 
 export const AppContext = React.createContext({} as AppContextType);
 
 export type ImageNotesContextType = {
-  osmImageNotes?: OSMImageNote[],
-  mapFeatureTypes?: MapFeatureTypes,
-  addNote: (note: OSMImageNote) => any,
-  refreshNote: (note: OSMImageNote) => any,
-  loadImageNotes: () => any,
-  user?: User
-}
+  osmImageNotes?: OSMImageNote[];
+  mapFeatureTypes?: MapFeatureTypes;
+  addNote: (note: OSMImageNote) => any;
+  refreshNote: (note: OSMImageNote) => any;
+  loadImageNotes: () => any;
+  user?: User;
+};
 
-export const ImageNotesContext = React.createContext({} as ImageNotesContextType);
+export const ImageNotesContext = React.createContext(
+  {} as ImageNotesContextType,
+);

@@ -5,8 +5,12 @@
   "description": "UI for the Open Logistics Map application",
   "scripts": {
     "start": "react-scripts --openssl-legacy-provider start --no-cache",
-    "build": "react-scripts build",
+    "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test --no-cache",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
     "eject": "react-scripts eject"
   },
   "author": "Johan Lindqvist / Forum Virium Helsinki",
@@ -21,6 +25,7 @@
     "@types/react-jsonschema-form": "^1.7.6",
     "bootstrap": "^4.4.1",
     "geolib": "^3.2.0",
+    "http-proxy-middleware": "^1.3.1",
     "leaflet": "^1.6.0",
     "lodash": "^4.17.19",
     "mapbox-gl": "^1.12.0",
@@ -31,7 +36,7 @@
     "react-bootstrap": "^1.6.0",
     "react-dom": "^16.12.0",
     "react-jsonschema-form": "^2.0.0-alpha.1",
-    "react-leaflet": "^3.2.5",
+    "react-leaflet": "^2.8.0",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.4",
     "reactstrap": "^8.4.0",
@@ -47,8 +52,11 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "@playwright/test": "^1.56.1",
     "@types/leaflet": "^1.7.8",
     "@types/lodash": "^4.14.169",
-    "@types/react-router-dom": "^5.1.7"
+    "@types/react-leaflet": "^2.8.3",
+    "@types/react-router-dom": "^5.1.7",
+    "@types/reactstrap": "^8.7.1"
   }
 }

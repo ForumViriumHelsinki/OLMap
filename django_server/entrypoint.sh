@@ -1,8 +1,9 @@
 #!/bin/sh
+set -e
 
-if [ "$DATABASE" = "postgres" ]
-then
-    echo "Waiting for postgres..."
+# Wait for PostgreSQL to be ready
+if [ "${SQL_HOST:-}" ]; then
+    echo "Waiting for PostgreSQL at $SQL_HOST:$SQL_PORT..."
 
     while ! nc -z $SQL_HOST $SQL_PORT; do
       sleep 0.1
@@ -11,6 +12,17 @@ then
     echo "PostgreSQL started"
 fi
 
-python manage.py migrate
+# Run migrations only if DJANGO_MIGRATE is set to true
+if [ "${DJANGO_MIGRATE:-false}" = "true" ]; then
+    echo "Running database migrations..."
+    python manage.py migrate
 
+    # Create superuser if credentials are provided and user doesn't exist
+    if [ -n "${DJANGO_SUPERUSER_USERNAME:-}" ] && [ -n "${DJANGO_SUPERUSER_PASSWORD:-}" ]; then
+        echo "Creating superuser if it doesn't exist..."
+        python manage.py createsuperuser --noinput || echo "Superuser already exists or creation failed"
+    fi
+fi
+
+# Execute the main command
 exec "$@"

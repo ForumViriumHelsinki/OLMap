@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0023_gate_ref'),
+        ("olmap", "0023_gate_ref"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='osmimagenote',
-            name='layer',
-            field=models.IntegerField(blank=True, help_text='Map layer, e.g. -1 if underground', null=True),
+            model_name="osmimagenote",
+            name="layer",
+            field=models.IntegerField(blank=True, help_text="Map layer, e.g. -1 if underground", null=True),
         ),
     ]

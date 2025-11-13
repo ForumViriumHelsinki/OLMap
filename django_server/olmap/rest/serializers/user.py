@@ -7,7 +7,7 @@ from olmap.rest.permissions import REVIEWER_GROUP
 class BaseUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'username']
+        fields = ["id", "first_name", "last_name", "username"]
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -15,13 +15,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name', 'username', 'is_reviewer']
+        fields = ["id", "first_name", "last_name", "username", "is_reviewer"]
 
     def user_in_group(self, user, group_name):
-        for group in user.groups.all():
-            if group.name == group_name:
-                return True
-        return False
+        return any(group.name == group_name for group in user.groups.all())
 
     def get_is_reviewer(self, user):
         return self.user_in_group(user, REVIEWER_GROUP)

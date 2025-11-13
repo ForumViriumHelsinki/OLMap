@@ -1,1 +1,1 @@
-export const geocoderFocus = {lat: 60.17012, lon: 24.94290};
+export const geocoderFocus = { lat: 60.17012, lon: 24.9429 };

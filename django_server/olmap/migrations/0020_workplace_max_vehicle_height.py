@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0019_auto_20211020_1226'),
+        ("olmap", "0019_auto_20211020_1226"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='workplace',
-            name='max_vehicle_height',
-            field=models.DecimalField(blank=True, decimal_places=2, help_text='In meters', max_digits=4, null=True),
+            model_name="workplace",
+            name="max_vehicle_height",
+            field=models.DecimalField(blank=True, decimal_places=2, help_text="In meters", max_digits=4, null=True),
         ),
     ]

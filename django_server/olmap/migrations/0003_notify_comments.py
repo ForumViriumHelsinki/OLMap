@@ -4,16 +4,16 @@ from django.db import migrations, models
 
 
 def forwards(apps, schema_editor):
-    User = apps.get_model('auth', 'User')
-    Comment = apps.get_model('olmap', 'OSMImageNoteComment')
+    User = apps.get_model("auth", "User")
+    Comment = apps.get_model("olmap", "OSMImageNoteComment")
 
     def interested_users(self):
         from olmap.rest.permissions import REVIEWER_GROUP
 
         return User.objects.filter(
-            models.Q(id__in=[self.created_by_id, self.modified_by_id, self.processed_by_id, self.reviewed_by_id]) |
-            models.Q(image_note_comments__image_note=self) |
-            models.Q(groups__name=REVIEWER_GROUP)
+            models.Q(id__in=[self.created_by_id, self.modified_by_id, self.processed_by_id, self.reviewed_by_id])
+            | models.Q(image_note_comments__image_note=self)
+            | models.Q(groups__name=REVIEWER_GROUP)
         ).distinct()
 
     def notify_users(self):
@@ -30,9 +30,8 @@ def forwards(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0002_osmimagenotecommentnotification'),
+        ("olmap", "0002_osmimagenotecommentnotification"),
     ]
 
     operations = [

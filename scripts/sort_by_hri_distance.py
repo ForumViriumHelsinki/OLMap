@@ -20,13 +20,14 @@ from geopy import distance
 
 # Files omitted from git due to large size.
 
-addresses_file = open('./hki_osoiteluettelo_cleaned.json', encoding='utf8')
+addresses_file = open("./hki_osoiteluettelo_cleaned.json", encoding="utf8")
 addresses = json.load(addresses_file)
 addresses_file.close()
 
-entrances_file = open('./entrances_with_address.geojson', encoding='utf8')
-entrances = list(dict(f['properties'], coord=f['geometry']['coordinates'])
-             for f in json.load(entrances_file)['features'])
+entrances_file = open("./entrances_with_address.geojson", encoding="utf8")
+entrances = list(
+    dict(f["properties"], coord=f["geometry"]["coordinates"]) for f in json.load(entrances_file)["features"]
+)
 entrances_file.close()
 
 address_index = {}
@@ -40,16 +41,14 @@ for e in entrances:
     nr = e["addr:housenumber"]
     nr_numeric = re.match(r"\d*", nr).group()  # If nr is e.g. 7a or 7-9, nr_numeric will be 7
     street = e.get("addr:street", None)
-    address = address_index.get(
-        f'{street} {nr}',
-        address_index.get(f'{street} {nr_numeric}', None))
+    address = address_index.get(f"{street} {nr}", address_index.get(f"{street} {nr_numeric}", None))
     if address:
-        e['distance'] = distance.distance(e['coord'], reversed(address['coord'])).meters
+        e["distance"] = distance.distance(e["coord"], reversed(address["coord"])).meters
     else:
-        e['distance'] = 0
+        e["distance"] = 0
 
-entrances.sort(key=lambda e: e['distance'], reverse=True)
+entrances.sort(key=lambda e: e["distance"], reverse=True)
 
-out = open('./entrances_with_distance.json', 'w', encoding='utf8')
+out = open("./entrances_with_distance.json", "w", encoding="utf8")
 json.dump(entrances, out, indent=1, ensure_ascii=False)
 out.close()

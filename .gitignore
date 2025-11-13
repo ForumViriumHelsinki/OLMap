@@ -24,3 +24,11 @@ __pycache__
 /scripts/entrances_with_distance.json
 /scripts/temp/
 /scripts/osm_building_entrance_addresses.json
+*.egg-info/
+.venv/
+
+# Playwright
+/react_ui/test-results/
+/react_ui/playwright-report/
+/react_ui/playwright/.cache/
+/react_ui/.playwright/

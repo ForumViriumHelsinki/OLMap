@@ -4,22 +4,21 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0006_remove_unofficial_addresses'),
+        ("olmap", "0006_remove_unofficial_addresses"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='address',
-            name='official',
+            model_name="address",
+            name="official",
         ),
         migrations.RemoveField(
-            model_name='address',
-            name='street_address',
+            model_name="address",
+            name="street_address",
         ),
         migrations.RemoveField(
-            model_name='address',
-            name='unit',
+            model_name="address",
+            name="unit",
         ),
     ]

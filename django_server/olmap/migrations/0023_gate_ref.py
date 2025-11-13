@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0022_auto_20211220_1132'),
+        ("olmap", "0022_auto_20211220_1132"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='gate',
-            name='ref',
+            model_name="gate",
+            name="ref",
             field=models.CharField(blank=True, max_length=8),
         ),
     ]

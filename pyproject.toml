@@ -1,0 +1,45 @@
+[tool.ruff]
+# Ruff configuration for Python linting and formatting
+target-version = "py311"
+line-length = 120
+src = ["django_server"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "ARG",  # flake8-unused-arguments
+    "SIM",  # flake8-simplify
+    "S",    # flake8-bandit (security)
+    "T20",  # flake8-print
+    "DJ",   # flake8-django
+    "RUF",  # Ruff-specific rules
+]
+ignore = [
+    "E501",  # Line too long (handled by formatter)
+    "S101",  # Use of assert (common in tests)
+    "S106",  # Hardcoded password (often false positives in tests)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"*/tests/*.py" = ["S101", "S106", "ARG001"]
+"*/migrations/*.py" = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.11"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "olmap_config.settings"

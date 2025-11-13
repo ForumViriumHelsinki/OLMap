@@ -4,25 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('olmap', '0021_remove_workplace_url_name'),
+        ("olmap", "0021_remove_workplace_url_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='entrance',
-            name='layer',
-            field=models.IntegerField(blank=True, help_text='Map layer, e.g. -1 if underground', null=True),
+            model_name="entrance",
+            name="layer",
+            field=models.IntegerField(blank=True, help_text="Map layer, e.g. -1 if underground", null=True),
         ),
         migrations.AddField(
-            model_name='gate',
-            name='layer',
-            field=models.IntegerField(blank=True, help_text='Map layer, e.g. -1 if underground', null=True),
+            model_name="gate",
+            name="layer",
+            field=models.IntegerField(blank=True, help_text="Map layer, e.g. -1 if underground", null=True),
         ),
         migrations.AddField(
-            model_name='unloadingplace',
-            name='layer',
-            field=models.IntegerField(blank=True, help_text='Map layer, e.g. -1 if underground', null=True),
+            model_name="unloadingplace",
+            name="layer",
+            field=models.IntegerField(blank=True, help_text="Map layer, e.g. -1 if underground", null=True),
         ),
     ]

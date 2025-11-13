@@ -1,79 +1,94 @@
-import React from 'react';
+import React from "react";
 
-import * as L from 'leaflet';
+import * as L from "leaflet";
 
 import Icon from "util_components/bootstrap/Icon";
 import Map from "util_components/Map";
-import {getCenter, getDistance} from "geolib";
-import {OSMFeature} from "util_components/osm/types";
-import GlyphIcon from 'util_components/GlyphIcon';
+import { getCenter, getDistance } from "geolib";
+import { OSMFeature } from "util_components/osm/types";
+import GlyphIcon from "util_components/GlyphIcon";
 
 type OSMFeatureMapPopupProps = {
-  osmFeature: OSMFeature,
-  location: any // location in some form recognized by geolib
-}
+  osmFeature: OSMFeature;
+  location: any; // location in some form recognized by geolib
+};
 
 type OSMFeatureMapPopupState = {
-  open: boolean
-}
+  open: boolean;
+};
 
 const initialState: OSMFeatureMapPopupState = {
-  open: false
+  open: false,
 };
 
 function latLng(location: any) {
   return [location.latitude, location.longitude];
 }
 
-export default class OSMFeatureMapPopup extends React.Component<OSMFeatureMapPopupProps, OSMFeatureMapPopupState> {
+export default class OSMFeatureMapPopup extends React.Component<
+  OSMFeatureMapPopupProps,
+  OSMFeatureMapPopupState
+> {
   state = initialState;
 
   render() {
-    const {osmFeature, location} = this.props;
-    const {open} = this.state;
+    const { osmFeature, location } = this.props;
+    const { open } = this.state;
 
-    if (!(osmFeature.lat && osmFeature.lon)) return '';
+    if (!(osmFeature.lat && osmFeature.lon)) return "";
 
-    return <div className="position-relative d-inline-block mr-1">
-      <button className="btn btn-mini btn-outline-primary p-1"
-              onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                this.setState({open: !open})
-              }}>
-        <Icon icon='place'/>
-      </button>
-      {open &&
-        <div className="position-absolute p-2 rounded clickable bg-light shadow"
-             style={{top: -48, left: 32, width: 128, height: 128, zIndex: 10}}
-             onClick={(e: React.MouseEvent) => {
-                e.stopPropagation();
-                this.setState({open: false})
-             }}>
-          <Map latLng={latLng(getCenter([osmFeature, location]))}
-               zoom={18 - getDistance(osmFeature, location) / 40}
-               zoomControl={false}
-               extraLayers={[this.getMapLayer()]}
-               showAttribution={false}/>
-        </div>
-      }
-    </div>;
+    return (
+      <div className="position-relative d-inline-block mr-1">
+        <button
+          className="btn btn-mini btn-outline-primary p-1"
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            this.setState({ open: !open });
+          }}
+        >
+          <Icon icon="place" />
+        </button>
+        {open && (
+          <div
+            className="position-absolute p-2 rounded clickable bg-light shadow"
+            style={{ top: -48, left: 32, width: 128, height: 128, zIndex: 10 }}
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              this.setState({ open: false });
+            }}
+          >
+            <Map
+              latLng={latLng(getCenter([osmFeature, location]))}
+              zoom={18 - getDistance(osmFeature, location) / 40}
+              zoomControl={false}
+              extraLayers={[this.getMapLayer()]}
+              showAttribution={false}
+            />
+          </div>
+        )}
+      </div>
+    );
   }
 
   private getMapLayer() {
-    const {location, osmFeature} = this.props;
+    const { location, osmFeature } = this.props;
     const mapLayer = L.layerGroup();
     const style = {
       radius: 2,
-      color: '#28a745',
+      color: "#28a745",
       opacity: 0.05,
       weight: 20,
-      fillColor: '#28a745',
-      fillOpacity: 1
+      fillColor: "#28a745",
+      fillOpacity: 1,
     };
-    L.circleMarker({lng: location[0], lat: location[1]}, style).addTo(mapLayer);
+    L.circleMarker({ lng: location[0], lat: location[1] }, style).addTo(
+      mapLayer,
+    );
     // @ts-ignore
-    const icon = new GlyphIcon({glyph: 'star'});
-    L.marker({lng: osmFeature.lon, lat: osmFeature.lat}, {icon}).addTo(mapLayer);
+    const icon = new GlyphIcon({ glyph: "star" });
+    L.marker({ lng: osmFeature.lon, lat: osmFeature.lat }, { icon }).addTo(
+      mapLayer,
+    );
     return mapLayer;
   }
 }
