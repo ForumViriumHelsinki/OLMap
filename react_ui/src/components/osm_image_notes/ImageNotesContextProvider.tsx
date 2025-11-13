@@ -27,6 +27,7 @@ export default class ImageNotesContextProvider extends React.Component<
 > {
   state = initialState;
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
 
   render() {
     const { children } = this.props;

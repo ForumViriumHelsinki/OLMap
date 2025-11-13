@@ -24,6 +24,7 @@ const initialState: OSMImageNoteCommentsState = {
 export default class OSMImageNoteComments extends React.Component<OSMImageNoteCommentsProps> {
   state = initialState;
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
 
   render() {
     const { osmImageNote, refreshNote } = this.props;

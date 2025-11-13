@@ -54,6 +54,7 @@ export default class WorkplaceAutofill extends React.Component<
   state = initialState;
   private blurred?: any;
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
 
   render() {
     const { user } = this.context;

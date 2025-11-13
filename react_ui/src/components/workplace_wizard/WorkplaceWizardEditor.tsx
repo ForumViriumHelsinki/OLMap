@@ -62,6 +62,7 @@ export default class WorkplaceWizardEditor extends React.Component<
 > {
   state = initialState;
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
 
   map?: L.Map = undefined;
 

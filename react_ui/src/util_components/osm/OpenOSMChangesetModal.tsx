@@ -43,6 +43,7 @@ export default class OpenOSMChangesetModal extends React.Component<
 > {
   state = initialState;
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
 
   render() {
     const { onClose } = this.props;
