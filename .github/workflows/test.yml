@@ -1,12 +1,10 @@
----
-name: CI/CD Pipeline
+name: Tests
 
 on:
   push:
     branches: [master, main, develop]
   pull_request:
     branches: [master, main, develop]
-
 
 jobs:
   # Pre-commit hooks validation
