@@ -186,28 +186,25 @@ export default class WorkplaceWizardEditor extends React.Component<
                   </React.Fragment>
                 ))}
 
-              {entrances.map(
-                (entrance) =>
-                  entrance.unloading_places?.map((up, i) => (
-                    <React.Fragment key={i}>
-                      <UPMarker
-                        up={up}
-                        entrance={entrance}
-                        editor={this}
-                        schema={
-                          mapFeatureTypes && mapFeatureTypes.UnloadingPlace
-                        }
-                      />
-                      <Line f1={entrance} f2={up} />
+              {entrances.map((entrance) =>
+                entrance.unloading_places?.map((up, i) => (
+                  <React.Fragment key={i}>
+                    <UPMarker
+                      up={up}
+                      entrance={entrance}
+                      editor={this}
+                      schema={mapFeatureTypes && mapFeatureTypes.UnloadingPlace}
+                    />
+                    <Line f1={entrance} f2={up} />
 
-                      {up.access_points?.map((ap: AccessPoint, i) => (
-                        <React.Fragment key={i}>
-                          <APMarker ap={ap} editor={this} up={up} />
-                          <Line f1={up} f2={ap} />
-                        </React.Fragment>
-                      ))}
-                    </React.Fragment>
-                  )),
+                    {up.access_points?.map((ap: AccessPoint, i) => (
+                      <React.Fragment key={i}>
+                        <APMarker ap={ap} editor={this} up={up} />
+                        <Line f1={up} f2={ap} />
+                      </React.Fragment>
+                    ))}
+                  </React.Fragment>
+                )),
               )}
             </MyPositionMap>
           </div>
