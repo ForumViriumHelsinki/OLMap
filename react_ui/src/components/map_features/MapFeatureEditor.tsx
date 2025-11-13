@@ -157,6 +157,7 @@ export default class MapFeatureEditor extends React.Component<
   state: MapFeatureEditorState = initialState;
 
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
 
   static defaultProps = {
     osmImageNote: {},

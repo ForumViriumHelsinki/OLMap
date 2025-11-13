@@ -62,6 +62,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<
 > {
   state: OSMImageNoteFiltersButtonState = initialState();
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
 
   componentDidMount() {
     sessionRequest(recentMappersUrl)

@@ -53,6 +53,7 @@ export default class OSMImageNoteModal extends React.Component<
   OSMImageNoteModalState
 > {
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
   state: OSMImageNoteModalState = initialState;
 
   componentDidMount() {

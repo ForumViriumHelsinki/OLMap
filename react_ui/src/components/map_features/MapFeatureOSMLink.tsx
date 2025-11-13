@@ -46,6 +46,7 @@ export default class MapFeatureOSMLink extends React.Component<
   state: MapFeatureOSMLinkState = initialState;
 
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
 
   static defaultProps = {
     osmImageNote: {},

@@ -34,6 +34,7 @@ export default class MapFeatureSet extends React.Component<
   state: MapFeatureSetState = initialState;
 
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
 
   static defaultProps = {
     osmImageNote: {},

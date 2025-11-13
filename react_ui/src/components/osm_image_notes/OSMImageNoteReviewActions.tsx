@@ -34,6 +34,7 @@ export default class OSMImageNoteReviewActions extends React.Component<
   ReviewActionsState
 > {
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
   state = initialState;
 
   render() {

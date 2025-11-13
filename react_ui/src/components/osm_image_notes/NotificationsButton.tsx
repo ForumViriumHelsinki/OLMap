@@ -29,6 +29,7 @@ export default class NotificationsButton extends React.Component<
 > {
   state: NotificationsButtonState = initialState();
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
   private notificationsInterval: any;
   private isLoadingNotifications: boolean = false;
 

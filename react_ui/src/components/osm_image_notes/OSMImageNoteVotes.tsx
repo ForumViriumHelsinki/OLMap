@@ -13,6 +13,7 @@ type OSMImageNoteVotesProps = {
 
 export default class OSMImageNoteVotes extends React.Component<OSMImageNoteVotesProps> {
   static contextType = AppContext;
+  context!: React.ContextType<typeof AppContext>;
 
   buttonProps = {
     outline: true,
