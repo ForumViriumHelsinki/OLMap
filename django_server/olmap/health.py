@@ -19,7 +19,6 @@ def ready_check(request):  # noqa: ARG001
     all_healthy = True
 
     # Database check with retry logic for startup
-    db_healthy = False
     max_retries = 3
     retry_delay = 0.5
 
@@ -28,7 +27,6 @@ def ready_check(request):  # noqa: ARG001
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
                 cursor.fetchone()
-            db_healthy = True
             checks["database"] = "healthy"
             break
         except Exception as e:
