@@ -1,9 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Page Load', () => {
-  test('should load the home page successfully', async ({ page }) => {
+test.describe("Page Load", () => {
+  test("should load the home page successfully", async ({ page }) => {
     // Navigate to the home page (will redirect to login for unauthenticated users)
-    await page.goto('/');
+    await page.goto("/");
 
     // Wait for redirect to login page
     await page.waitForURL(/.*#\/login\//);
@@ -20,17 +20,17 @@ test.describe('Page Load', () => {
     await expect(heading).toBeVisible();
 
     // Verify the login form is present
-    const signInText = page.locator('text=Sign in');
+    const signInText = page.locator("text=Sign in");
     await expect(signInText).toBeVisible();
   });
 
-  test('should show login and register options', async ({ page }) => {
+  test("should show login and register options", async ({ page }) => {
     // Navigate and wait for redirect to login page
-    await page.goto('/');
+    await page.goto("/");
     await page.waitForURL(/.*#\/login\//);
 
     // Verify Sign in text is visible
-    await expect(page.locator('text=Sign in')).toBeVisible();
+    await expect(page.locator("text=Sign in")).toBeVisible();
 
     // Verify Register button is visible
     const registerButton = page.locator('button:has-text("Register")');

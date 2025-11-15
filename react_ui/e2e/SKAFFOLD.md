@@ -31,6 +31,7 @@ skaffold dev -p with-tests
 ### Skaffold Port-Forwarding
 
 When you run `skaffold dev`, it automatically forwards these ports:
+
 - `localhost:3000` → `olmap-frontend` service
 - `localhost:8000` → `olmap-backend` service
 - `localhost:5432` → `postgres` service
@@ -47,6 +48,7 @@ This allows Playwright tests to access the Kubernetes-deployed app via localhost
 ### Verify Profile
 
 The `with-tests` profile adds a verify stage that:
+
 1. Runs tests in a Playwright Docker container
 2. Accesses the app via `host.docker.internal:3000`
 3. Reports test results
@@ -60,6 +62,7 @@ The `with-tests` profile adds a verify stage that:
 - `ADMIN_PASSWORD` - Admin password (default: 'admin')
 
 Example:
+
 ```bash
 BASE_URL=http://custom-host:8080 make test-e2e
 ```
@@ -86,6 +89,7 @@ profiles:
 **Problem:** Backend API not accessible
 
 **Solution:** Ensure all services are ready:
+
 ```bash
 # Check Skaffold status
 kubectl get pods -n olmap
@@ -100,6 +104,7 @@ kubectl wait --for=condition=ready pod -l app=olmap-frontend -n olmap --timeout=
 **Problem:** Frontend not responding on localhost:3000
 
 **Solution:** Verify port-forward:
+
 ```bash
 # Check if port 3000 is forwarded
 lsof -i :3000
@@ -113,6 +118,7 @@ skaffold delete && skaffold dev
 **Problem:** Container can't access services
 
 **Solution:** The verify profile uses `host.docker.internal` which may not work on all systems. Use Method 1 (Make) instead:
+
 ```bash
 # Use the reliable method
 skaffold dev

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
 /**
  * Login test for OLMap
@@ -11,12 +11,12 @@ import { test, expect } from '@playwright/test';
  * ADMIN_USERNAME=admin ADMIN_PASSWORD=password npx playwright test e2e/login.spec.ts
  */
 
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "admin";
 
-test.describe('Login', () => {
-  test('should display login form elements', async ({ page }) => {
-    await page.goto('/');
+test.describe("Login", () => {
+  test("should display login form elements", async ({ page }) => {
+    await page.goto("/");
     await page.waitForURL(/.*#\/login\//);
 
     // Verify username field is present
@@ -30,15 +30,15 @@ test.describe('Login', () => {
     // Verify submit button is present
     const submitButton = page.locator('button[type="submit"]');
     await expect(submitButton).toBeVisible();
-    await expect(submitButton).toHaveText('Submit');
+    await expect(submitButton).toHaveText("Submit");
 
     // Verify forgot password link is present
-    const forgotPasswordLink = page.locator('text=Forgot password?');
+    const forgotPasswordLink = page.locator("text=Forgot password?");
     await expect(forgotPasswordLink).toBeVisible();
   });
 
-  test('should login with admin credentials', async ({ page }) => {
-    await page.goto('/');
+  test("should login with admin credentials", async ({ page }) => {
+    await page.goto("/");
     await page.waitForURL(/.*#\/login\//);
 
     // Fill in the username
@@ -56,20 +56,22 @@ test.describe('Login', () => {
     // Wait for navigation or success indicator
     // This will need to be adjusted based on actual post-login behavior
     // For now, we'll check that we're no longer on the login page
-    await page.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
+    await page.waitForURL((url) => !url.pathname.includes("/login"), {
+      timeout: 10000,
+    });
 
     // Verify we're logged in by checking for elements that only appear when authenticated
     // This assertion will need to be customized based on your app's post-login UI
     await expect(page).not.toHaveURL(/.*login.*/);
   });
 
-  test('should show error message on invalid credentials', async ({ page }) => {
-    await page.goto('/');
+  test("should show error message on invalid credentials", async ({ page }) => {
+    await page.goto("/");
     await page.waitForURL(/.*#\/login\//);
 
     // Fill in invalid credentials
-    await page.locator('input[name="username"]').fill('invalid_user');
-    await page.locator('input[name="password"]').fill('invalid_password');
+    await page.locator('input[name="username"]').fill("invalid_user");
+    await page.locator('input[name="password"]').fill("invalid_password");
 
     // Click submit
     await page.locator('button[type="submit"]').click();
@@ -78,29 +80,29 @@ test.describe('Login', () => {
     await page.waitForTimeout(1000);
 
     // Verify error message is displayed
-    const errorAlert = page.locator('text=Login failed. Please try again.');
+    const errorAlert = page.locator("text=Login failed. Please try again.");
     await expect(errorAlert).toBeVisible();
   });
 
-  test('should toggle between login and register modes', async ({ page }) => {
-    await page.goto('/');
+  test("should toggle between login and register modes", async ({ page }) => {
+    await page.goto("/");
     await page.waitForURL(/.*#\/login\//);
 
     // Initially should be in login mode
-    await expect(page.locator('text=Sign in').first()).toBeVisible();
+    await expect(page.locator("text=Sign in").first()).toBeVisible();
 
     // Click Register button to switch modes
     const registerButton = page.locator('button:has-text("Register")');
     await registerButton.click();
 
     // Verify we're now in register mode
-    await expect(page.locator('text=Register').first()).toBeVisible();
+    await expect(page.locator("text=Register").first()).toBeVisible();
 
     // Click Sign in button to switch back
     const signInButton = page.locator('button:has-text("Sign in")');
     await signInButton.click();
 
     // Verify we're back in login mode
-    await expect(page.locator('text=Sign in').first()).toBeVisible();
+    await expect(page.locator("text=Sign in").first()).toBeVisible();
   });
 });

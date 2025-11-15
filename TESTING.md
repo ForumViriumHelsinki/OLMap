@@ -5,6 +5,7 @@ This document describes how to run tests for the OLMap project across different 
 ## Test Types
 
 ### 1. Frontend Unit Tests (Jest)
+
 **Location:** `react_ui/src/**/*.test.js`
 **Framework:** Jest + React Testing Library
 **Dependencies:** None (runs standalone)
@@ -18,6 +19,7 @@ make test-frontend
 ```
 
 ### 2. Frontend E2E Tests (Playwright)
+
 **Location:** `react_ui/e2e/**/*.spec.ts`
 **Framework:** Playwright
 **Dependencies:** Requires full stack running (frontend + backend)
@@ -41,6 +43,7 @@ cd react_ui && npm run test:e2e:ui
 ```
 
 ### 3. Backend Tests (Django)
+
 **Location:** `django_server/olmap/**/*.py`
 **Framework:** Django TestCase
 **Dependencies:** Requires PostgreSQL running
@@ -165,6 +168,7 @@ npm run test:e2e:report
 ```
 
 Reports are generated in:
+
 - `react_ui/playwright-report/` - HTML report
 - `react_ui/test-results/` - Screenshots and traces
 - Test failures include automatic screenshots
@@ -221,7 +225,7 @@ psql -U postgres -c "SELECT version();"
 ```typescript
 // In playwright.config.ts
 export default defineConfig({
-  timeout: 60000,  // Increase from 30000
+  timeout: 60000, // Increase from 30000
   // ...
 });
 ```
