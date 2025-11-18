@@ -16,7 +16,7 @@ import {
 import { osmFeatureLabel } from "util_components/osm/utils";
 import { OSMFeature } from "util_components/osm/types";
 // @ts-ignore
-import Form from "react-jsonschema-form";
+import Form from "@rjsf/core";
 
 type WorkplaceEntranceEditorProps = {
   workplace: MapFeature;

@@ -1,5 +1,5 @@
 import React from "react";
-import Form from "react-jsonschema-form";
+import Form from "@rjsf/core";
 import { JSONSchema6 } from "json-schema";
 import Modal, { ModalBody } from "util_components/bootstrap/Modal";
 import CreateChangeset from "util_components/osm/api/CreateChangeset";
