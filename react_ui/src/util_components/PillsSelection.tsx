@@ -21,7 +21,9 @@ export default class PillsSelection extends React.Component<PillsSelectionProps>
         color={color}
         className="rounded-pill mr-1 mb-1"
         key={tag}
-        onClick={(e: React.MouseEvent<HTMLButtonElement>) => this.onClick(e, tag)}
+        onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+          this.onClick(e, tag)
+        }
       >
         {tag}
       </Button>
