@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/ForumViriumHelsinki/OLMap/compare/olmap-frontend-v0.2.0...olmap-frontend-v0.2.1) (2025-11-18)
+
+
+### Miscellaneous Chores
+
+* **olmap-frontend:** Synchronize olmap-containers versions
+
 ## [0.2.0](https://github.com/ForumViriumHelsinki/OLMap/compare/olmap-frontend-v0.1.0...olmap-frontend-v0.2.0) (2025-11-13)
 
 ### Features
