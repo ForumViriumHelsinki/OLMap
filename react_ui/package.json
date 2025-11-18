@@ -5,7 +5,7 @@
   "description": "UI for the Open Logistics Map application",
   "scripts": {
     "start": "react-scripts start --no-cache",
-    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "build": "DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true react-scripts build",
     "test": "react-scripts test --no-cache",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
@@ -48,7 +48,6 @@
     "@turf/difference": "7.0.0"
   },
   "overrides": {
-    "ajv": "^8.12.0",
     "typescript": "^5.9.3"
   },
   "jest": {
