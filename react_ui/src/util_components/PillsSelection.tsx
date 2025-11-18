@@ -21,14 +21,14 @@ export default class PillsSelection extends React.Component<PillsSelectionProps>
         color={color}
         className="rounded-pill mr-1 mb-1"
         key={tag}
-        onClick={(e: Event) => this.onClick(e, tag)}
+        onClick={(e: React.MouseEvent<HTMLButtonElement>) => this.onClick(e, tag)}
       >
         {tag}
       </Button>
     ));
   }
 
-  private onClick(e: Event, tag: string) {
+  private onClick(e: React.MouseEvent<HTMLButtonElement>, tag: string) {
     const { onClick } = this.props;
     const target = e.target as HTMLElement;
     target.classList.remove("hasactive");

@@ -41,6 +41,7 @@ class OSMImageNotesEditor extends React.Component<
   state: OSMImageNotesEditorState = initialState();
 
   static contextType = ImageNotesContext;
+  context!: React.ContextType<typeof ImageNotesContext>;
 
   render() {
     const { newNote, osmFeatures, selectedNoteId, history } = this.props;
@@ -101,7 +102,9 @@ class OSMImageNotesEditor extends React.Component<
               history.push("/Notes/");
             }}
             showOnMap={() => {
-              this.setState({ location: note });
+              if (note.lat !== undefined && note.lon !== undefined) {
+                this.setState({ location: { lat: note.lat, lon: note.lon } });
+              }
               history.push("/Notes/");
             }}
             requestLocation={this.requestLocation}

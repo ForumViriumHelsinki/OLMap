@@ -90,7 +90,7 @@ class OLMapUI extends React.Component<{}, UIState> {
       return <ResetPasswordScreen uid={params.uid} token={params.token} />;
     };
 
-    const WithNavBar: React.FC = (props) => (
+    const WithNavBar: React.FC<{ children?: React.ReactNode }> = (props) => (
       <div
         style={{ height: window.innerHeight }}
         className="flex-column d-flex"

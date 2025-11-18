@@ -6,6 +6,7 @@ import Confirm from "util_components/bootstrap/Confirm";
 type NavBarProps = {
   user?: User;
   logout: () => any;
+  children?: React.ReactNode;
 };
 
 type NavBarState = {

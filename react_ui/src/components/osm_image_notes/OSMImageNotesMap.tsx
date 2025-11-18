@@ -43,6 +43,7 @@ export default class OSMImageNotesMap extends React.Component<
   state: OSMImageNotesMapState = initialState();
 
   static contextType = ImageNotesContext;
+  context!: React.ContextType<typeof ImageNotesContext>;
 
   private mapLayer?: any;
   private dotMarkers: { [id: string]: any } = {};

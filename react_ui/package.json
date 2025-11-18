@@ -37,7 +37,7 @@
     "react-bootstrap": "^1.6.8",
     "react-dom": "^18.3.1",
     "react-jsonschema-form": "^1.8.1",
-    "react-leaflet": "^4.2.1",
+    "react-leaflet": "^3.2.5",
     "react-router-dom": "^5.3.4",
     "react-scripts": "^5.0.1",
     "reactstrap": "^8.10.1",
@@ -49,7 +49,11 @@
   },
   "overrides": {
     "ajv": "^8.12.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "react-leaflet": {
+      "react": "^18.3.1",
+      "react-dom": "^18.3.1"
+    }
   },
   "browserslist": [
     ">0.2%",
@@ -61,7 +65,7 @@
     "@types/leaflet": "^1.9.15",
     "@types/lodash": "^4.17.14",
     "@types/react-jsonschema-form": "^1.7.13",
-    "@types/react-leaflet": "^3.0.0",
+    "@types/react-leaflet": "^2.8.3",
     "@types/react-router-dom": "^5.3.3",
     "@types/reactstrap": "^8.7.2"
   }
