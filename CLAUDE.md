@@ -50,7 +50,7 @@ docker-compose up      # Starts web (Django), db (Postgres), frontend (React)
 
 ## Testing
 
-See [TESTING.md](TESTING.md) for comprehensive testing guide including:
+See [TESTING.md](docs/TESTING.md) for comprehensive testing guide including:
 
 - Frontend unit tests (Jest + React Testing Library)
 - Frontend e2e tests (Playwright)
