@@ -3,6 +3,7 @@ import React from "react";
 type ToggleProps = {
   on: any;
   off: any;
+  children?: React.ReactNode;
 };
 
 type ToggleState = {

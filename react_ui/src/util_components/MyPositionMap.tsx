@@ -20,6 +20,7 @@ type MapProps = {
   location?: Location;
   zoom?: number;
   onMapInitialized?: (leafletMap: any) => any;
+  children?: React.ReactNode;
 };
 
 type MapState = { currentPosition?: Location; userMovedMap: boolean };

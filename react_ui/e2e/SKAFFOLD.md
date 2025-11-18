@@ -145,6 +145,6 @@ For GitHub Actions or other CI systems:
 
 ## See Also
 
-- [TESTING.md](../../TESTING.md) - Complete testing guide
+- [TESTING.md](../../docs/TESTING.md) - Complete testing guide
 - [README.md](../e2e/README.md) - Playwright test documentation
 - `Makefile` - Available test targets

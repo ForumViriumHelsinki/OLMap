@@ -1,6 +1,6 @@
 import React from "react";
 
-export class ModalBody extends React.Component {
+export class ModalBody extends React.Component<{ children?: React.ReactNode }> {
   render() {
     return <div className="modal-body">{this.props.children}</div>;
   }
