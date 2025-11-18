@@ -68,9 +68,14 @@ export default class Map extends React.Component<MapProps, MapState> {
           style={{ height }}
           center={latLng as LatLngTuple}
           zoom={zoom}
-          whenCreated={(map: L.Map) => {
-            this.leafletMap = map;
-            this.refreshMap();
+          whenReady={() => {
+            // whenReady is called but we need to get the map ref differently in v4
+          }}
+          ref={(mapInstance: any) => {
+            if (mapInstance) {
+              this.leafletMap = mapInstance;
+              this.refreshMap();
+            }
           }}
           attributionControl={showAttribution}
           zoomControl={zoomControl}
