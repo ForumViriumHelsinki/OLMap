@@ -4,6 +4,7 @@ import Icon from 'util_components/bootstrap/Icon';
 type MapToolButtonProps = {
   icon?: string;
   onClick?: () => any;
+  children?: React.ReactNode;
 };
 
 type MapToolButtonState = {};

@@ -1,5 +1,6 @@
 import React from 'react';
-import Form from 'react-jsonschema-form';
+import Form from '@rjsf/core';
+import validator from '@rjsf/validator-ajv8';
 
 import { JSONSchema, MapFeature } from 'components/types';
 // @ts-ignore
@@ -58,6 +59,7 @@ export default class MapFeatureForm extends React.Component<
         className="compact"
         formData={mapFeature}
         onSubmit={onSubmit}
+        validator={validator}
       >
         <Button size="sm" color="primary" type="submit" className="btn-compact pl-4 pr-4 mr-2">
           Done

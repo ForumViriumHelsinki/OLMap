@@ -1,5 +1,6 @@
 import React from 'react';
-import Form from 'react-jsonschema-form';
+import Form from '@rjsf/core';
+import validator from '@rjsf/validator-ajv8';
 import { JSONSchema6 } from 'json-schema';
 // @ts-ignore
 import { Button } from 'reactstrap';
@@ -51,6 +52,7 @@ export default class RegisterForm extends React.Component<RegisterFormProps, Reg
         onSubmit={this.onSubmit}
         formData={formData}
         showErrorList={false}
+        validator={validator}
         {...({ extraErrors: this.extraErrors() } as any)}
       >
         {errors && errors.non_field_errors && (

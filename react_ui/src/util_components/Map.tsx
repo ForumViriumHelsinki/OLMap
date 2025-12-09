@@ -7,7 +7,7 @@ import settings from '../settings.js';
 import 'leaflet/dist/leaflet.css';
 import { LocationTuple } from 'util_components/types';
 import Icon from 'util_components/bootstrap/Icon';
-import { Map as LeafletMap } from 'react-leaflet';
+import { MapContainer as LeafletMap } from 'react-leaflet';
 import { LatLngTuple } from 'leaflet';
 import TunnelsMapLayer from 'components/workplace_wizard/TunnelsMapLayer';
 
@@ -21,6 +21,7 @@ type MapProps = {
   onClick?: (latLng: LocationTuple) => any;
   backgroundChangeable: boolean;
   height: any;
+  children?: React.ReactNode;
 };
 
 let idCounter = 0;
@@ -60,9 +61,14 @@ export default class Map extends React.Component<MapProps, MapState> {
           style={{ height }}
           center={latLng as LatLngTuple}
           zoom={zoom}
-          whenCreated={(map: L.Map) => {
-            this.leafletMap = map;
-            this.refreshMap();
+          whenReady={() => {
+            // whenReady is called but we need to get the map ref differently in v4
+          }}
+          ref={(mapInstance: any) => {
+            if (mapInstance) {
+              this.leafletMap = mapInstance;
+              this.refreshMap();
+            }
           }}
           attributionControl={showAttribution}
           zoomControl={zoomControl}

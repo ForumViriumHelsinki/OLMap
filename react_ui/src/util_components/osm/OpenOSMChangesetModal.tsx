@@ -1,13 +1,14 @@
 import React from 'react';
-import Form from 'react-jsonschema-form';
-import { JSONSchema6 } from 'json-schema';
+import Form from '@rjsf/core';
+import validator from '@rjsf/validator-ajv8';
+import { JSONSchema7 } from 'json-schema';
 import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
 import CreateChangeset from 'util_components/osm/api/CreateChangeset';
 import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
 import { AppContext, OSMEditContextType } from 'components/types';
 import { osmApiCall, osmEditContext, setOSMContext } from 'util_components/osm/utils';
 
-const schema: JSONSchema6 = {
+const schema: JSONSchema7 = {
   type: 'object',
   properties: {
     username: { type: 'string', title: 'OSM Username', default: '' },
@@ -65,6 +66,7 @@ export default class OpenOSMChangesetModal extends React.Component<
             onSubmit={this.onSubmit}
             formData={{ ...fields, ...formData }}
             className="m-0"
+            validator={validator}
           >
             <button className="btn btn-primary btn-block" type="submit">
               Create changeset

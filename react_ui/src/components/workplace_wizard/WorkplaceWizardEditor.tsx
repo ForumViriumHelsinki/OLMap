@@ -14,7 +14,7 @@ import _ from 'lodash';
 
 import './WorkplaceWizard.scss';
 import sessionRequest from 'sessionRequest';
-import { useLeaflet } from 'react-leaflet';
+import { useMap } from 'react-leaflet';
 import MyPositionMap from 'util_components/MyPositionMap';
 import EntrancesMapLayer from 'components/workplace_wizard/EntrancesMapLayer';
 import UnloadingPlacesMapLayer from 'components/workplace_wizard/UnloadingPlacesMapLayer';
@@ -80,7 +80,7 @@ export default class WorkplaceWizardEditor extends React.Component<
     } = this.state;
 
     const DetectClick = () => {
-      const map = useLeaflet().map;
+      const map = useMap();
       React.useEffect(() => {
         if (map) {
           map.on('click', this.positionChosen);
@@ -261,7 +261,7 @@ export default class WorkplaceWizardEditor extends React.Component<
             </p>
           )}
           <p>
-            Voit lisätä myös muita sisäänkäyntejä (myös pääovi on “muu sisäänkäynti”, jos se ei ole
+            Voit lisätä myös muita sisäänkäyntejä (myös pääovi on "muu sisäänkäynti", jos se ei ole
             tavarankuljetuksiin). Klikkaamalla näitä lisättyjä ikoneita aukeaa valikko, jossa
             kutakin ikonia pystyy muokkaamaan tai lisäämään valokuvan paikasta.
           </p>

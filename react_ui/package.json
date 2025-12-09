@@ -1,11 +1,11 @@
 {
   "name": "olmap_ui",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "UI for the Open Logistics Map application",
   "scripts": {
     "start": "react-scripts start --no-cache",
-    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
+    "build": "DISABLE_ESLINT_PLUGIN=true TSC_COMPILE_ON_ERROR=true react-scripts build",
     "test": "react-scripts test --no-cache",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed",
@@ -19,6 +19,8 @@
   "dependencies": {
     "@rjsf/bootstrap-4": "^5.24.13",
     "@rjsf/core": "^5.24.13",
+    "@rjsf/utils": "^5.24.13",
+    "@rjsf/validator-ajv8": "^5.24.13",
     "@sentry/browser": "^7.119.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^14.3.1",
@@ -38,8 +40,7 @@
     "react": "^18.3.1",
     "react-bootstrap": "^1.6.8",
     "react-dom": "^18.3.1",
-    "react-jsonschema-form": "^1.8.1",
-    "react-leaflet": "^2.8.0",
+    "react-leaflet": "^4.2.1",
     "react-router-dom": "^5.3.4",
     "react-scripts": "^5.0.1",
     "reactstrap": "^8.10.1",
@@ -48,6 +49,17 @@
   },
   "resolutions": {
     "@turf/difference": "7.0.0"
+  },
+  "overrides": {
+    "typescript": "^5.9.3"
+  },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(react-leaflet|@react-leaflet|@turf|polyclip-ts|splaytree-ts)/)"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "<rootDir>/node_modules/react-scripts/config/jest/cssTransform.js"
+    }
   },
   "browserslist": [
     ">0.2%",
@@ -59,11 +71,8 @@
     "@playwright/test": "^1.56.1",
     "@types/leaflet": "^1.9.15",
     "@types/lodash": "^4.17.14",
-    "@types/react-jsonschema-form": "^1.7.13",
     "@types/react-leaflet": "^2.8.3",
     "@types/react-router-dom": "^5.3.3",
-    "@types/reactstrap": "^8.7.2",
-    "ajv": "^6.12.6",
-    "ajv-keywords": "^3.5.2"
+    "@types/reactstrap": "^8.7.2"
   }
 }

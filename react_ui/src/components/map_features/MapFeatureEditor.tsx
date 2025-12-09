@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import Form from 'react-jsonschema-form';
+import Form from '@rjsf/core';
 
 import {
   AppContext,

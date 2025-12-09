@@ -7,7 +7,8 @@ import { osmImageNoteUrl, workplaceEntrancesUrl, workplaceEntranceUrl } from 'ur
 import { osmFeatureLabel } from 'util_components/osm/utils';
 import { OSMFeature } from 'util_components/osm/types';
 // @ts-ignore
-import Form from 'react-jsonschema-form';
+import Form from '@rjsf/core';
+import validator from '@rjsf/validator-ajv8';
 
 type WorkplaceEntranceEditorProps = {
   workplace: MapFeature;
@@ -66,6 +67,7 @@ export default class WorkplaceEntranceEditor extends React.Component<
               className="compact"
               formData={formData}
               onSubmit={this.onSubmit}
+              validator={validator}
             />
           </div>
         ) : (

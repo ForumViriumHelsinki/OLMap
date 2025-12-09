@@ -65,6 +65,7 @@ export default class NewOSMImageNote extends React.Component<
 > {
   state: NewOSMImageNoteState = initialState();
   static contextType = ImageNotesContext;
+  context!: React.ContextType<typeof ImageNotesContext>;
 
   render() {
     const { mapFeatureTypes } = this.context;

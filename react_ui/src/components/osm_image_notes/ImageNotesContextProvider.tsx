@@ -9,7 +9,9 @@ import {
   ImageNotesContext,
 } from 'components/types';
 
-type ImageNotesContextProps = {};
+type ImageNotesContextProps = {
+  children?: React.ReactNode;
+};
 
 type ImageNotesContextState = {
   osmImageNotes?: OSMImageNote[];
