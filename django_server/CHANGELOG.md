@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/ForumViriumHelsinki/OLMap/compare/olmap-backend-v0.2.0...olmap-backend-v0.2.1) (2025-11-18)
+
+
+### Bug Fixes
+
+* remove unused db_healthy variable in health check ([1a8031a](https://github.com/ForumViriumHelsinki/OLMap/commit/1a8031a764b04f59e38d887d8d53cefd32a57e88))
+
 ## [0.2.0](https://github.com/ForumViriumHelsinki/OLMap/compare/olmap-backend-v0.1.0...olmap-backend-v0.2.0) (2025-11-13)
 
 ### Features
