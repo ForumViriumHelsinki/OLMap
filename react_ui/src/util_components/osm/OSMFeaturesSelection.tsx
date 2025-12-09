@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 // @ts-ignore
-import _ from "lodash";
+import _ from 'lodash';
 
-import { LocationTuple } from "util_components/types";
-import CenteredSpinner from "util_components/bootstrap/CenteredSpinner";
+import { LocationTuple } from 'util_components/types';
+import CenteredSpinner from 'util_components/bootstrap/CenteredSpinner';
 // @ts-ignore
-import { Button, ListGroup, ListGroupItem } from "reactstrap";
-import OSMFeatureList from "util_components/osm/OSMFeatureList";
-import { OSMFeature } from "util_components/osm/types";
+import { Button, ListGroup, ListGroupItem } from 'reactstrap';
+import OSMFeatureList from 'util_components/osm/OSMFeatureList';
+import { OSMFeature } from 'util_components/osm/types';
 
-import { overpassQuery } from "util_components/osm/utils";
+import { overpassQuery } from 'util_components/osm/utils';
 
 type OSMFSState = {
   nearbyOSMFeatures: OSMFeature[];
@@ -36,36 +36,25 @@ type OSMFSProps = {
   extraFeatures: OSMFeature[];
 };
 
-export default class OSMFeaturesSelection extends React.Component<
-  OSMFSProps,
-  OSMFSState
-> {
+export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OSMFSState> {
   state: OSMFSState = initialState;
 
   static defaultProps = {
     distance: 30,
     preselectedFeatureIds: [],
     readOnly: false,
-    maxHeight: "calc(100vh - 248px)",
+    maxHeight: 'calc(100vh - 248px)',
     onFeaturesLoaded: () => null,
     extraFeatures: [],
   };
 
   render() {
-    const { selectedFeatureIds, featuresLoading, nearbyOSMFeatures } =
-      this.state;
-    const {
-      onSelect,
-      readOnly,
-      maxHeight,
-      featureActions,
-      location,
-      extraFeatures,
-    } = this.props;
+    const { selectedFeatureIds, featuresLoading, nearbyOSMFeatures } = this.state;
+    const { onSelect, readOnly, maxHeight, featureActions, location, extraFeatures } = this.props;
 
     return (
       <>
-        <div style={maxHeight ? { maxHeight, overflowY: "auto" } : {}}>
+        <div style={maxHeight ? { maxHeight, overflowY: 'auto' } : {}}>
           {featuresLoading ? (
             <ListGroup>
               <ListGroupItem>
@@ -82,12 +71,7 @@ export default class OSMFeaturesSelection extends React.Component<
         </div>
 
         {!readOnly && onSelect && (
-          <Button
-            block
-            color="primary"
-            onClick={this.onSelect}
-            className="mt-2"
-          >
+          <Button block color="primary" onClick={this.onSelect} className="mt-2">
             Done
           </Button>
         )}
@@ -120,12 +104,8 @@ export default class OSMFeaturesSelection extends React.Component<
   };
 
   componentDidUpdate(prevProps: OSMFSProps) {
-    if (String(prevProps.location) !== String(this.props.location))
-      this.reloadFeatures();
-    if (
-      String(prevProps.preselectedFeatureIds) !==
-      String(this.props.preselectedFeatureIds)
-    )
+    if (String(prevProps.location) !== String(this.props.location)) this.reloadFeatures();
+    if (String(prevProps.preselectedFeatureIds) !== String(this.props.preselectedFeatureIds))
       this.preselectFeatures();
   }
 
@@ -141,14 +121,14 @@ export default class OSMFeaturesSelection extends React.Component<
   reloadFeatures() {
     const { location, distance, onSelect, onFeaturesLoaded } = this.props;
     const query =
-      "(node[name];way[name];relation[name][building];relation[name][tourism];node[entrance];node[barrier];)->.result;";
+      '(node[name];way[name];relation[name][building];relation[name][tourism];node[entrance];node[barrier];)->.result;';
     // @ts-ignore
     overpassQuery(query, location, distance).then((features: OSMFeature[]) => {
       if (!_.isEqual(location, this.props.location)) return;
       const nearbyOSMFeatures: OSMFeature[] = [];
       const wayNames: string[] = [];
       features.forEach((f) => {
-        if (f.type == "way") {
+        if (f.type == 'way') {
           const duplicate = wayNames.find((n) => n == f.tags.name);
           if (duplicate) return;
           else wayNames.push(f.tags.name);

@@ -1,8 +1,8 @@
-import React from "react";
-import sessionRequest from "sessionRequest";
-import { workplaceTypesUrl } from "urls";
-import Modal from "util_components/bootstrap/Modal";
-import Icon from "util_components/bootstrap/Icon";
+import React from 'react';
+import sessionRequest from 'sessionRequest';
+import { workplaceTypesUrl } from 'urls';
+import Modal from 'util_components/bootstrap/Modal';
+import Icon from 'util_components/bootstrap/Icon';
 
 type WorkplaceType = {
   id: number;
@@ -27,8 +27,8 @@ class TypeLabel extends React.Component<{ type: WorkplaceType }> {
           style={{ height: 16, width: 0 }}
           src={this.iconUrl(type)}
           onError={(e) => (e.target as Element).remove()}
-          onLoad={(e) => ((e.target as HTMLElement).style.width = "16px")}
-        />{" "}
+          onLoad={(e) => ((e.target as HTMLElement).style.width = '16px')}
+        />{' '}
         {type.label}
       </>
     );
@@ -55,13 +55,10 @@ class TypeItem extends React.Component<TypeItemProps> {
           className="list-group-item list-group-item-action"
           style={{ paddingLeft: 16 * level }}
         >
-          <span style={{ width: 32, display: "inline-block" }}>
+          <span style={{ width: 32, display: 'inline-block' }}>
             {type.children.length > 0 && !expandAll && (
-              <span
-                className="clickable"
-                onClick={() => this.setState({ expanded: !expanded })}
-              >
-                <Icon icon={expanded ? "expand_less" : "expand_more"} />
+              <span className="clickable" onClick={() => this.setState({ expanded: !expanded })}>
+                <Icon icon={expanded ? 'expand_less' : 'expand_more'} />
               </span>
             )}
           </span>
@@ -71,12 +68,7 @@ class TypeItem extends React.Component<TypeItemProps> {
         </span>
         {(expanded || expandAll) &&
           type.children.map((t) => (
-            <TypeItem
-              expandAll={expandAll}
-              type={t}
-              level={level + 1}
-              onSelect={onSelect}
-            />
+            <TypeItem expandAll={expandAll} type={t} level={level + 1} onSelect={onSelect} />
           ))}
       </div>
     );
@@ -107,8 +99,7 @@ export default class WorkplaceTypeWidget extends React.Component<
   state = initialState;
 
   componentDidMount() {
-    if (workplaceTypesCache)
-      this.setState({ workplaceTypes: workplaceTypesCache });
+    if (workplaceTypesCache) this.setState({ workplaceTypes: workplaceTypesCache });
     else this.fetchWorkplaceTypes();
   }
 
@@ -121,22 +112,16 @@ export default class WorkplaceTypeWidget extends React.Component<
 
     return (
       <div className="form-control">
-        <span
-          className="clickable"
-          onClick={() => this.setState({ expanded: true })}
-        >
-          {currentType ? <TypeLabel type={currentType} /> : "Select"}
+        <span className="clickable" onClick={() => this.setState({ expanded: true })}>
+          {currentType ? <TypeLabel type={currentType} /> : 'Select'}
         </span>
         {expanded && (
-          <Modal
-            onClose={() => this.setState({ expanded: false })}
-            title="Select workplace type"
-          >
+          <Modal onClose={() => this.setState({ expanded: false })} title="Select workplace type">
             <input
               className="form-control"
               placeholder="Filter..."
               value={filter}
-              style={{ width: "100%" }}
+              style={{ width: '100%' }}
               onChange={(e) => this.setState({ filter: e.target.value })}
             />
             <div className="list-group">
@@ -144,7 +129,7 @@ export default class WorkplaceTypeWidget extends React.Component<
                 <TypeItem
                   type={t}
                   level={1}
-                  expandAll={(filter || "").length > 2}
+                  expandAll={(filter || '').length > 2}
                   onSelect={(t) => {
                     this.setState({ expanded: false });
                     onChange(t.id);
@@ -181,7 +166,7 @@ export default class WorkplaceTypeWidget extends React.Component<
     if (!workplaceTypes) return [];
     if (!filter || filter.length < 3) return workplaceTypes;
 
-    const regexp = new RegExp(filter, "i");
+    const regexp = new RegExp(filter, 'i');
     const filterIndex: { [k: string]: any } = {};
     const recordMatch = (t: WorkplaceType) => {
       filterIndex[t.id] = t;
@@ -189,7 +174,7 @@ export default class WorkplaceTypeWidget extends React.Component<
     };
 
     Object.values(typesIndex)
-      .filter((t) => [t.label].concat(t.synonyms).join(" ").search(regexp) > -1)
+      .filter((t) => [t.label].concat(t.synonyms).join(' ').search(regexp) > -1)
       .forEach(recordMatch);
 
     const filterTypes = (types: WorkplaceType[]) =>

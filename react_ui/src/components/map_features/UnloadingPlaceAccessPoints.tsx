@@ -1,21 +1,21 @@
-import React from "react";
-import _ from "lodash";
-import { MapFeature, OSMImageNote } from "components/types";
+import React from 'react';
+import _ from 'lodash';
+import { MapFeature, OSMImageNote } from 'components/types';
 // @ts-ignore
-import { Button } from "reactstrap";
-import Modal from "util_components/bootstrap/Modal";
-import { SimpleOSMImageNotesMap } from "components/osm_image_notes/OSMImageNotesMap";
-import { Location, LocationTuple } from "util_components/types";
-import sessionRequest from "sessionRequest";
+import { Button } from 'reactstrap';
+import Modal from 'util_components/bootstrap/Modal';
+import { SimpleOSMImageNotesMap } from 'components/osm_image_notes/OSMImageNotesMap';
+import { Location, LocationTuple } from 'util_components/types';
+import sessionRequest from 'sessionRequest';
 import {
   osmImageNoteUrl,
   unloadingPlaceUrl,
   workplaceEntrancesUrl,
   workplaceEntranceUrl,
-} from "urls";
-import Map from "util_components/Map";
-import * as L from "leaflet";
-import { LatLngLiteral } from "leaflet";
+} from 'urls';
+import Map from 'util_components/Map';
+import * as L from 'leaflet';
+import { LatLngLiteral } from 'leaflet';
 // @ts-ignore
 
 type UnloadingPlaceAccessPointsProps = {
@@ -31,7 +31,7 @@ const initialState: UnloadingPlaceAccessPointsState = {
   open: false,
 };
 
-const markerColor = "#007bff";
+const markerColor = '#007bff';
 const markerStyle = {
   radius: 2,
   color: markerColor,
@@ -63,7 +63,7 @@ export default class UnloadingPlaceAccessPoints extends React.Component<
 
     return (
       <div className="mt-1">
-        {nrOfPoints > 0 ? `${nrOfPoints} access points. ` : ""}
+        {nrOfPoints > 0 ? `${nrOfPoints} access points. ` : ''}
         <Button
           size="sm"
           color="primary"
@@ -78,9 +78,7 @@ export default class UnloadingPlaceAccessPoints extends React.Component<
             onClose={() => this.setState({ open: false })}
             title="Edit unloading place access points"
           >
-            <div className="p-2">
-              Tap to add / remove points ({nrOfPoints} active):
-            </div>
+            <div className="p-2">Tap to add / remove points ({nrOfPoints} active):</div>
             <div style={{ height: 400 }}>
               <Map
                 latLng={latLng}
@@ -109,19 +107,17 @@ export default class UnloadingPlaceAccessPoints extends React.Component<
 
     if (!unloadingPlace.access_points) unloadingPlace.access_points = [];
 
-    unloadingPlace.access_points.forEach(
-      (accessPoint: Location, index: number) => {
-        const latLng = {
-          lng: accessPoint.lon,
-          lat: accessPoint.lat,
-        } as LatLngLiteral;
-        const marker = L.circleMarker(latLng, markerStyle);
-        marker.on("click", (e: any) => {
-          this.removePoint(index);
-        });
-        marker.addTo(mapLayer);
-      },
-    );
+    unloadingPlace.access_points.forEach((accessPoint: Location, index: number) => {
+      const latLng = {
+        lng: accessPoint.lon,
+        lat: accessPoint.lat,
+      } as LatLngLiteral;
+      const marker = L.circleMarker(latLng, markerStyle);
+      marker.on('click', (e: any) => {
+        this.removePoint(index);
+      });
+      marker.addTo(mapLayer);
+    });
 
     return mapLayer;
   }
@@ -136,7 +132,7 @@ export default class UnloadingPlaceAccessPoints extends React.Component<
     const { unloadingPlace } = this.props;
     const url = unloadingPlaceUrl(unloadingPlace.id as number);
     sessionRequest(url, {
-      method: "PATCH",
+      method: 'PATCH',
       data: { access_points: unloadingPlace.access_points },
     }).then((response) => {
       if (response.status < 300) {

@@ -1,17 +1,17 @@
-import React from "react";
-import { withRouter } from "react-router-dom";
-import _ from "lodash";
+import React from 'react';
+import { withRouter } from 'react-router-dom';
+import _ from 'lodash';
 
-import { ImageNotesContext, OSMImageNote } from "components/types";
-import { OSMChangeset } from "util_components/osm/types";
-import { Location } from "util_components/types";
-import OSMImageNoteFiltersButton from "components/osm_image_notes/OSMImageNoteFiltersButton";
-import NotificationsButton from "components/osm_image_notes/NotificationsButton";
-import NewOSMImageNote from "components/osm_image_notes/NewOSMImageNote";
-import OSMImageNoteModal from "components/osm_image_notes/OSMImageNoteModal";
-import OSMImageNotesMap from "components/osm_image_notes/OSMImageNotesMap";
-import MapToolButton from "components/osm_image_notes/MapToolButton";
-import OSMChangesetSelectionButton from "components/osm_image_notes/OSMChangesetSelectionButton";
+import { ImageNotesContext, OSMImageNote } from 'components/types';
+import { OSMChangeset } from 'util_components/osm/types';
+import { Location } from 'util_components/types';
+import OSMImageNoteFiltersButton from 'components/osm_image_notes/OSMImageNoteFiltersButton';
+import NotificationsButton from 'components/osm_image_notes/NotificationsButton';
+import NewOSMImageNote from 'components/osm_image_notes/NewOSMImageNote';
+import OSMImageNoteModal from 'components/osm_image_notes/OSMImageNoteModal';
+import OSMImageNotesMap from 'components/osm_image_notes/OSMImageNotesMap';
+import MapToolButton from 'components/osm_image_notes/MapToolButton';
+import OSMChangesetSelectionButton from 'components/osm_image_notes/OSMChangesetSelectionButton';
 
 type OSMImageNotesEditorProps = {
   history: any; // from withRouter
@@ -44,15 +44,13 @@ class OSMImageNotesEditor extends React.Component<
 
   render() {
     const { newNote, osmFeatures, selectedNoteId, history } = this.props;
-    const { osmImageNotes, mapFeatureTypes, refreshNote, loadImageNotes } =
-      this.context;
+    const { osmImageNotes, mapFeatureTypes, refreshNote, loadImageNotes } = this.context;
     const { filters, selectedChangeset, selectLocation, location } = this.state;
 
     const note =
       osmImageNotes &&
       selectedNoteId &&
-      (_.find(osmImageNotes, { id: selectedNoteId }) ||
-        ({ id: selectedNoteId } as OSMImageNote));
+      (_.find(osmImageNotes, { id: selectedNoteId }) || ({ id: selectedNoteId } as OSMImageNote));
 
     return (
       <div className="flex-grow-1">
@@ -77,9 +75,7 @@ class OSMImageNotesEditor extends React.Component<
               </a>
               <OSMChangesetSelectionButton
                 selectedChangeset={selectedChangeset}
-                onChangesetSelected={(selectedChangeset) =>
-                  this.setState({ selectedChangeset })
-                }
+                onChangesetSelected={(selectedChangeset) => this.setState({ selectedChangeset })}
               />
               <NotificationsButton />
             </>
@@ -98,11 +94,11 @@ class OSMImageNotesEditor extends React.Component<
             note={note}
             onClose={() => {
               refreshNote(note);
-              history.push("/Notes/");
+              history.push('/Notes/');
             }}
             showOnMap={() => {
               this.setState({ location: note });
-              history.push("/Notes/");
+              history.push('/Notes/');
             }}
             requestLocation={this.requestLocation}
             cancelLocationRequest={this.cancelLocationRequest}
@@ -112,17 +108,12 @@ class OSMImageNotesEditor extends React.Component<
     );
   }
 
-  requestLocation = (
-    onLocationSelected: (l: Location) => any,
-    initial?: Location,
-  ) => {
+  requestLocation = (onLocationSelected: (l: Location) => any, initial?: Location) => {
     const selectLocation = (l: Location) => {
       onLocationSelected(l);
       this.setState({ selectLocation: undefined });
     };
-    this.setState(
-      initial ? { selectLocation, location: initial } : { selectLocation },
-    );
+    this.setState(initial ? { selectLocation, location: initial } : { selectLocation });
   };
 
   cancelLocationRequest = () => {

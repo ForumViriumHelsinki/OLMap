@@ -1,24 +1,18 @@
-import React from "react";
+import React from 'react';
 // @ts-ignore
-import {
-  HashRouter as Router,
-  Route,
-  Switch,
-  useParams,
-  Redirect,
-} from "react-router-dom";
+import { HashRouter as Router, Route, Switch, useParams, Redirect } from 'react-router-dom';
 
-import sessionRequest, { logout } from "sessionRequest";
+import sessionRequest, { logout } from 'sessionRequest';
 
-import LoginScreen from "components/LoginScreen";
-import LoadScreen from "components/LoadScreen";
-import { AppContext, User } from "components/types";
-import ResetPasswordScreen from "components/ResetPasswordScreen";
-import OSMImageNoteModal from "components/osm_image_notes/OSMImageNoteModal";
-import NavBar from "util_components/bootstrap/NavBar";
-import OSMImageNotesEditor from "components/osm_image_notes/OSMImageNotesEditor";
-import ImageNotesContextProvider from "components/osm_image_notes/ImageNotesContextProvider";
-import WorkplaceWizard from "components/workplace_wizard/WorkplaceWizard";
+import LoginScreen from 'components/LoginScreen';
+import LoadScreen from 'components/LoadScreen';
+import { AppContext, User } from 'components/types';
+import ResetPasswordScreen from 'components/ResetPasswordScreen';
+import OSMImageNoteModal from 'components/osm_image_notes/OSMImageNoteModal';
+import NavBar from 'util_components/bootstrap/NavBar';
+import OSMImageNotesEditor from 'components/osm_image_notes/OSMImageNotesEditor';
+import ImageNotesContextProvider from 'components/osm_image_notes/ImageNotesContextProvider';
+import WorkplaceWizard from 'components/workplace_wizard/WorkplaceWizard';
 
 type UIState = {
   user?: User;
@@ -37,37 +31,31 @@ class OLMapUI extends React.Component<{}, UIState> {
 
   componentDidMount() {
     this.refreshUser();
-    window.addEventListener("resize", this.onResize);
+    window.addEventListener('resize', this.onResize);
   }
 
   refreshUser() {
-    sessionRequest("/rest-auth/user/").then((response) => {
-      if (response.status == 401)
-        this.setState({ user: undefined, dataFetched: true });
-      else
-        response
-          .json()
-          .then((user) => this.setState({ user, dataFetched: true }));
+    sessionRequest('/rest-auth/user/').then((response) => {
+      if (response.status == 401) this.setState({ user: undefined, dataFetched: true });
+      else response.json().then((user) => this.setState({ user, dataFetched: true }));
     });
   }
 
   logout = () => {
-    sessionRequest("/rest-auth/logout/", { method: "POST" }).then(
-      (response) => {
-        logout();
-        this.setState({ user: undefined });
-      },
-    );
+    sessionRequest('/rest-auth/logout/', { method: 'POST' }).then((response) => {
+      logout();
+      this.setState({ user: undefined });
+    });
   };
 
   onResize = () => {
-    const el = document.getElementById("OLMapUI");
+    const el = document.getElementById('OLMapUI');
     // @ts-ignore
     if (el) el.style.height = window.innerHeight;
   };
 
   componentWillUnmount() {
-    window.removeEventListener("resize", this.onResize);
+    window.removeEventListener('resize', this.onResize);
   }
 
   render() {
@@ -91,17 +79,11 @@ class OLMapUI extends React.Component<{}, UIState> {
     };
 
     const WithNavBar: React.FC = (props) => (
-      <div
-        style={{ height: window.innerHeight }}
-        className="flex-column d-flex"
-        id="OLMapUI"
-      >
+      <div style={{ height: window.innerHeight }} className="flex-column d-flex" id="OLMapUI">
         <NavBar user={user} logout={this.logout}>
           <h5 className="m-2">OLMap</h5>
         </NavBar>
-        <div className="flex-grow-1 flex-shrink-1 overflow-auto">
-          {props.children}
-        </div>
+        <div className="flex-grow-1 flex-shrink-1 overflow-auto">{props.children}</div>
       </div>
     );
 
@@ -122,11 +104,7 @@ class OLMapUI extends React.Component<{}, UIState> {
         <Router>
           <Switch>
             <Route path="/login/">
-              {user ? (
-                <Redirect to="" />
-              ) : (
-                <LoginScreen onLogin={() => this.refreshUser()} />
-              )}
+              {user ? <Redirect to="" /> : <LoginScreen onLogin={() => this.refreshUser()} />}
             </Route>
             <Route path="/resetPassword/:uid/:token">
               <ResetPassword />
@@ -176,9 +154,7 @@ class OLMapUI extends React.Component<{}, UIState> {
                 </WithNavBar>
               )}
             </Route>
-            <Route path="/note/:noteId">
-              {!user ? <Redirect to="/login/" /> : <ImageNote />}
-            </Route>
+            <Route path="/note/:noteId">{!user ? <Redirect to="/login/" /> : <ImageNote />}</Route>
             <Route
               path="/Notes/new/:osmId(\d+)?/"
               render={(props: any) => {
@@ -193,10 +169,7 @@ class OLMapUI extends React.Component<{}, UIState> {
                 if (!user) return <Redirect to="/login/" />;
                 return (
                   <MapUI
-                    selectedNoteId={
-                      props.match.params.noteId &&
-                      Number(props.match.params.noteId)
-                    }
+                    selectedNoteId={props.match.params.noteId && Number(props.match.params.noteId)}
                   />
                 );
               }}

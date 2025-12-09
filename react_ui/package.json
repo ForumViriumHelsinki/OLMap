@@ -11,7 +11,9 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "format": "biome format --write .",
+    "format:check": "biome format ."
   },
   "author": "Johan Lindqvist / Forum Virium Helsinki",
   "dependencies": {
@@ -53,6 +55,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "@biomejs/biome": "^2.3.8",
     "@playwright/test": "^1.56.1",
     "@types/leaflet": "^1.9.15",
     "@types/lodash": "^4.17.14",

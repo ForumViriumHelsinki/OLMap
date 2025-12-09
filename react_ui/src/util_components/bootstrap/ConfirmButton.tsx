@@ -1,5 +1,5 @@
-import React from "react";
-import Confirm from "util_components/bootstrap/Confirm";
+import React from 'react';
+import Confirm from 'util_components/bootstrap/Confirm';
 
 type ButtonProps = {
   onClick: () => any;
@@ -13,7 +13,7 @@ export default class ConfirmButton extends React.Component<ButtonProps> {
     showConfirmation: false,
   };
 
-  static defaultProps = { className: "btn-secondary" };
+  static defaultProps = { className: 'btn-secondary' };
 
   render() {
     const { onClick, children, confirm, className } = this.props;
@@ -32,7 +32,7 @@ export default class ConfirmButton extends React.Component<ButtonProps> {
         </button>
         {showConfirmation && (
           <Confirm
-            title={confirm || children + "?"}
+            title={confirm || children + '?'}
             onClose={() => this.setState({ showConfirmation: false })}
             onConfirm={onClick}
           />

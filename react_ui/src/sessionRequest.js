@@ -1,7 +1,7 @@
-import settings from "./settings";
+import settings from './settings';
 
 export function login(token) {
-  localStorage.setItem("olmap-token", token);
+  localStorage.setItem('olmap-token', token);
 }
 
 export function logout() {
@@ -10,17 +10,17 @@ export function logout() {
 
 export function sessionRequest(url, options = {}) {
   options.headers = options.headers || {};
-  if (options && options.data && typeof options.data == "object") {
-    options.headers["Content-Type"] = "application/json";
+  if (options && options.data && typeof options.data == 'object') {
+    options.headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(options.data);
   }
   try {
-    const token = localStorage.getItem("olmap-token");
+    const token = localStorage.getItem('olmap-token');
     if (token) {
-      options.headers.Authorization = "Token " + token;
+      options.headers.Authorization = 'Token ' + token;
     }
   } catch (DOMException) {
-    console.log("Local storage not accessible, proceeding as anonymous user.");
+    console.log('Local storage not accessible, proceeding as anonymous user.');
   }
   return fetch(settings.serverRoot + url, options);
 }

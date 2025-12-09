@@ -1,18 +1,15 @@
-import React from "react";
-import { MapFeature } from "components/workplace_wizard/types";
-import ReactDOM from "react-dom";
-import Modal from "util_components/bootstrap/Modal";
-import ZoomableImage from "util_components/ZoomableImage";
-import sessionRequest from "sessionRequest";
-import { osmImageNoteUrl } from "urls";
-import { popupBtn, WWIcon } from "components/workplace_wizard/util_components";
+import React from 'react';
+import { MapFeature } from 'components/workplace_wizard/types';
+import ReactDOM from 'react-dom';
+import Modal from 'util_components/bootstrap/Modal';
+import ZoomableImage from 'util_components/ZoomableImage';
+import sessionRequest from 'sessionRequest';
+import { osmImageNoteUrl } from 'urls';
+import { popupBtn, WWIcon } from 'components/workplace_wizard/util_components';
 
 type ImageButtonProps = { f: MapFeature; editor?: any };
 
-export class ImageButton extends React.Component<
-  ImageButtonProps,
-  { visible: boolean }
-> {
+export class ImageButton extends React.Component<ImageButtonProps, { visible: boolean }> {
   state = { visible: false };
   formData?: FormData;
   saving?: boolean;
@@ -23,18 +20,14 @@ export class ImageButton extends React.Component<
     return (
       <>
         {f.image && (
-          <button
-            className={popupBtn}
-            onClick={() => this.setState({ visible: true })}
-          >
+          <button className={popupBtn} onClick={() => this.setState({ visible: true })}>
             <WWIcon icon="photo_camera" outline /> Näytä kuva
           </button>
         )}
         {editor && (
           <>
             <button className={popupBtn} onClick={this.onImageClick}>
-              <WWIcon icon="add_a_photo" outline />{" "}
-              {f.image ? "Vaihda" : "Lisää"} kuva
+              <WWIcon icon="add_a_photo" outline /> {f.image ? 'Vaihda' : 'Lisää'} kuva
             </button>
             <input
               name="image"
@@ -50,10 +43,7 @@ export class ImageButton extends React.Component<
         {f.image &&
           visible &&
           ReactDOM.createPortal(
-            <Modal
-              onClose={() => this.setState({ visible: false })}
-              title="Kuva"
-            >
+            <Modal onClose={() => this.setState({ visible: false })} title="Kuva">
               <ZoomableImage src={f.image} className="wwModalImg" />
             </Modal>,
             document.body,
@@ -63,7 +53,7 @@ export class ImageButton extends React.Component<
   }
 
   private imageEl() {
-    return document.getElementById("image_btn_image") as HTMLInputElement;
+    return document.getElementById('image_btn_image') as HTMLInputElement;
   }
 
   onImageClick = () => {
@@ -76,7 +66,7 @@ export class ImageButton extends React.Component<
     const image = files[0];
 
     this.formData = new FormData();
-    this.formData.append("image", image);
+    this.formData.append('image', image);
 
     if (f.image_note_id) this.saveImage(f);
     else editor.save().then(() => this.saveImage(f));
@@ -84,7 +74,7 @@ export class ImageButton extends React.Component<
 
   saveImage(f: MapFeature) {
     sessionRequest(osmImageNoteUrl(f.image_note_id as number), {
-      method: "PATCH",
+      method: 'PATCH',
       body: this.formData,
     }).then((response: any) => {
       if (response.status < 300) {

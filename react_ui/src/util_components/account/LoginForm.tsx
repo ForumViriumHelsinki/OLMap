@@ -1,7 +1,7 @@
-import React, { FormEvent } from "react";
-import sessionRequest, { login, logout } from "sessionRequest";
-import ErrorAlert from "util_components/bootstrap/ErrorAlert";
-import Modal, { ModalBody } from "util_components/bootstrap/Modal";
+import React, { FormEvent } from 'react';
+import sessionRequest, { login, logout } from 'sessionRequest';
+import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
+import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
 
 type Props = {
   onLogin: () => any;
@@ -18,8 +18,8 @@ type State = {
 };
 
 const initialState: State = {
-  username: "",
-  password: "",
+  username: '',
+  password: '',
   error: false,
   showPasswordReset: false,
   resetEmailSent: false,
@@ -34,10 +34,7 @@ export default class LoginForm extends React.Component<Props, State> {
     return (
       <>
         <form onSubmit={this.submit}>
-          <ErrorAlert
-            status={this.state.error}
-            message="Login failed. Please try again."
-          />
+          <ErrorAlert status={this.state.error} message="Login failed. Please try again." />
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <input
@@ -72,16 +69,11 @@ export default class LoginForm extends React.Component<Props, State> {
         </form>
 
         {showPasswordReset && (
-          <Modal
-            onClose={() => this.setState({ showPasswordReset: false })}
-            title="Reset password"
-          >
+          <Modal onClose={() => this.setState({ showPasswordReset: false })} title="Reset password">
             <ModalBody>
               {resetEmailSent ? (
                 <>
-                  <p>
-                    Password reset instruction have been sent to your email.
-                  </p>
+                  <p>Password reset instruction have been sent to your email.</p>
                   <button
                     className="btn btn-primary"
                     onClick={() =>
@@ -122,7 +114,7 @@ export default class LoginForm extends React.Component<Props, State> {
   }
 
   focusPassword() {
-    const input = document.getElementById("password");
+    const input = document.getElementById('password');
     if (input) input.focus();
   }
 
@@ -135,29 +127,24 @@ export default class LoginForm extends React.Component<Props, State> {
     formData.forEach((value: any, key: string) => (data[key] = value));
     this.setState({ error: false, ...data });
     logout();
-    sessionRequest(loginUrl, { method: "POST", data: data }).then(
-      (response) => {
-        if (response.status == 200)
-          response.json().then((data) => {
-            login(data.key);
-            onLogin();
-          });
-        else this.setState({ error: true });
-      },
-    );
+    sessionRequest(loginUrl, { method: 'POST', data: data }).then((response) => {
+      if (response.status == 200)
+        response.json().then((data) => {
+          login(data.key);
+          onLogin();
+        });
+      else this.setState({ error: true });
+    });
   };
 
   resetPassword = (e: FormEvent) => {
     const { passwordResetUrl } = this.props;
-    const email = (document.getElementById("reset-email") as HTMLInputElement)
-      .value;
+    const email = (document.getElementById('reset-email') as HTMLInputElement).value;
 
     e.preventDefault();
-    sessionRequest(passwordResetUrl, { method: "POST", data: { email } }).then(
-      (response) => {
-        if (response.status == 200) this.setState({ resetEmailSent: true });
-        else this.setState({ error: true });
-      },
-    );
+    sessionRequest(passwordResetUrl, { method: 'POST', data: { email } }).then((response) => {
+      if (response.status == 200) this.setState({ resetEmailSent: true });
+      else this.setState({ error: true });
+    });
   };
 }

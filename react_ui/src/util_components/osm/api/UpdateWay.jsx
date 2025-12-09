@@ -1,13 +1,8 @@
-import React from "react";
+import React from 'react';
 
 const UpdateWay = ({ changesetId, way }) => (
   <osm>
-    <way
-      changeset={changesetId}
-      id={way.id}
-      version={way.version}
-      visible="true"
-    >
+    <way changeset={changesetId} id={way.id} version={way.version} visible="true">
       {Object.entries(way.tags || {}).map(([k, v]) => (
         <tag k={k} v={v} key={k} />
       ))}

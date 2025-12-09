@@ -1,7 +1,7 @@
-import React from "react";
-import Modal, { ModalBody } from "util_components/bootstrap/Modal";
-import settings from "../settings.js";
-import { LocationTuple } from "./types";
+import React from 'react';
+import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
+import settings from '../settings.js';
+import { LocationTuple } from './types';
 
 export default class Geolocator extends React.Component<{
   onLocation: (location: LocationTuple) => any;
@@ -17,10 +17,7 @@ export default class Geolocator extends React.Component<{
     const { geolocationError } = this.state;
 
     return geolocationError ? (
-      <Modal
-        title="Location error"
-        onClose={() => this.setState({ geolocationError: null })}
-      >
+      <Modal title="Location error" onClose={() => this.setState({ geolocationError: null })}>
         <ModalBody>
           <small>
             <p>Could not access your position:</p>
@@ -29,7 +26,7 @@ export default class Geolocator extends React.Component<{
         </ModalBody>
       </Modal>
     ) : (
-      ""
+      ''
     );
   }
 
@@ -38,25 +35,18 @@ export default class Geolocator extends React.Component<{
     const useMockGeolocation = settings.useMockGeolocation;
     if (useMockGeolocation && Array.isArray(useMockGeolocation)) {
       setTimeout(() => this.props.onLocation(useMockGeolocation), 500);
-      this.mockInterval = setInterval(
-        () => this.props.onLocation(useMockGeolocation),
-        10000,
-      );
+      this.mockInterval = setInterval(() => this.props.onLocation(useMockGeolocation), 10000);
     } else
       this.geolocationWatcher = navigator.geolocation.watchPosition(
         (position) => {
-          this.props.onLocation([
-            position.coords.longitude,
-            position.coords.latitude,
-          ]);
+          this.props.onLocation([position.coords.longitude, position.coords.latitude]);
         },
         (error) => this.setState({ geolocationError: error.message }),
       );
   }
 
   componentWillUnmount() {
-    if (this.geolocationWatcher)
-      navigator.geolocation.clearWatch(this.geolocationWatcher);
+    if (this.geolocationWatcher) navigator.geolocation.clearWatch(this.geolocationWatcher);
     if (this.mockInterval) clearInterval(this.mockInterval);
     this.geolocationWatcher = null;
     this.mockInterval = null;

@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 // @ts-ignore
-import _ from "lodash";
+import _ from 'lodash';
 
-import ErrorAlert from "util_components/bootstrap/ErrorAlert";
-import { OSMChangeset } from "./types";
+import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
+import { OSMChangeset } from './types';
 
 const changesetUrl = (id: string) =>
   `https://www.openstreetmap.org/api/0.6/changeset/${id}/download`;
@@ -33,10 +33,7 @@ export default class OSMChangesetSelection extends React.Component<
     const { error } = this.state;
     return (
       <>
-        <ErrorAlert
-          message="Changeset fetching failed. Check the ID."
-          status={error}
-        />
+        <ErrorAlert message="Changeset fetching failed. Check the ID." status={error} />
         Input changeset ID:
         <input
           className="form-control"
@@ -47,7 +44,7 @@ export default class OSMChangesetSelection extends React.Component<
         <div className="mt-2 flex-fill">
           <button className="btn btn-primary" onClick={this.loadChangeset}>
             Load changeset
-          </button>{" "}
+          </button>{' '}
           {onCancel && (
             <button className="btn btn-light" onClick={onCancel}>
               Cancel
@@ -60,23 +57,19 @@ export default class OSMChangesetSelection extends React.Component<
 
   loadChangeset = () => {
     const { onSelect } = this.props;
-    const id = (document.getElementById("changesetId") as HTMLInputElement)
-      .value;
+    const id = (document.getElementById('changesetId') as HTMLInputElement).value;
     if (!id) return onSelect(undefined);
     this.setState({ error: false });
     fetch(changesetUrl(id)).then((response) => {
       if (response.status >= 400) this.setState({ error: true });
       else
         response.text().then((xmlCode) => {
-          const dom = new DOMParser().parseFromString(
-            xmlCode,
-            "application/xml",
-          );
+          const dom = new DOMParser().parseFromString(xmlCode, 'application/xml');
           const changeset = {
             id: id,
-            created: this.extractNodes(dom.querySelectorAll("create node")),
-            modified: this.extractNodes(dom.querySelectorAll("modify node")),
-            deleted: this.extractNodes(dom.querySelectorAll("delete node")),
+            created: this.extractNodes(dom.querySelectorAll('create node')),
+            modified: this.extractNodes(dom.querySelectorAll('modify node')),
+            deleted: this.extractNodes(dom.querySelectorAll('delete node')),
           } as OSMChangeset;
           onSelect(changeset);
         });
@@ -90,12 +83,12 @@ export default class OSMChangesetSelection extends React.Component<
         const { id, lat, lon } = node.attributes;
         if (!(lat && lon)) return;
         return {
-          type: "node",
+          type: 'node',
           id: id && id.value,
           lat: lat.value,
           lon: lon.value,
           tags: Object.fromEntries(
-            _.map(node.querySelectorAll("tag"), (tag: Element) => {
+            _.map(node.querySelectorAll('tag'), (tag: Element) => {
               // @ts-ignore
               const { k, v } = tag.attributes;
               return [k.value, v.value];

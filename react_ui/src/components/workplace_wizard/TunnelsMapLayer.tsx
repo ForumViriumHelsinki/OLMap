@@ -1,13 +1,13 @@
-import React from "react";
-import { overpassQuery } from "util_components/osm/utils";
-import { geocoderFocus } from "components/workplace_wizard/settings";
-import { GeoJSON } from "react-leaflet";
-import { GeoJsonObject } from "geojson";
-import osmtogeojson from "osmtogeojson";
-import * as L from "leaflet";
-import { LatLng } from "leaflet";
+import React from 'react';
+import { overpassQuery } from 'util_components/osm/utils';
+import { geocoderFocus } from 'components/workplace_wizard/settings';
+import { GeoJSON } from 'react-leaflet';
+import { GeoJsonObject } from 'geojson';
+import osmtogeojson from 'osmtogeojson';
+import * as L from 'leaflet';
+import { LatLng } from 'leaflet';
 
-import "./TunnelsMapLayer.scss";
+import './TunnelsMapLayer.scss';
 
 type TunnelsMapLayerProps = {};
 
@@ -24,19 +24,19 @@ const query = `
   node[layer~"^-[123456789]"]["parking:condition"=loading];)->.result;`;
 
 const options = {
-  nodes: { radius: 4, stroke: false, fillOpacity: 1, fillColor: "#000" },
+  nodes: { radius: 4, stroke: false, fillOpacity: 1, fillColor: '#000' },
   ways: { width: 3, opacity: 0.8 },
   layerColors: {
-    "-4": "#770000",
-    "-3": "#ff0000",
-    "-2": "#ff7700",
-    "-1": "#ffff00",
+    '-4': '#770000',
+    '-3': '#ff0000',
+    '-2': '#ff7700',
+    '-1': '#ffff00',
   },
   label: {
     permanent: true,
-    direction: "bottom" as const,
-    className: "osmMapLabel",
-    pane: "markerPane",
+    direction: 'bottom' as const,
+    className: 'osmMapLabel',
+    pane: 'markerPane',
   },
 };
 
@@ -50,11 +50,7 @@ export default class TunnelsMapLayer extends React.Component<
     const {} = this.props;
     const { tunnelFeatures } = this.state;
     return !tunnelFeatures ? null : (
-      <GeoJSON
-        data={tunnelFeatures}
-        pointToLayer={this.pointToLayer}
-        style={this.wayStyle}
-      />
+      <GeoJSON data={tunnelFeatures} pointToLayer={this.pointToLayer} style={this.wayStyle} />
     );
   }
 
@@ -68,16 +64,14 @@ export default class TunnelsMapLayer extends React.Component<
 
   pointToLayer = (p: any, latlng: LatLng) =>
     L.circleMarker(latlng, options.nodes).bindTooltip(
-      p.properties.name || p.properties.description || p.properties.ref || "",
+      p.properties.name || p.properties.description || p.properties.ref || '',
       options.label,
     );
 
   wayStyle = (w: any) => {
     return {
       ...options.ways,
-      color:
-        (options.layerColors as Record<string, string>)[w.properties.layer] ||
-        "#000",
+      color: (options.layerColors as Record<string, string>)[w.properties.layer] || '#000',
     };
   };
 }

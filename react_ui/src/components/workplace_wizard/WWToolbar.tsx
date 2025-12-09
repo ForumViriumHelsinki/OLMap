@@ -1,12 +1,6 @@
-import React from "react";
-import {
-  positioningOptions,
-  WWIcon,
-} from "components/workplace_wizard/util_components";
-import {
-  UnloadingPlace,
-  WorkplaceEntrance,
-} from "components/workplace_wizard/types";
+import React from 'react';
+import { positioningOptions, WWIcon } from 'components/workplace_wizard/util_components';
+import { UnloadingPlace, WorkplaceEntrance } from 'components/workplace_wizard/types';
 
 type WWToolbarProps = {
   activeEntrance?: WorkplaceEntrance;
@@ -18,12 +12,9 @@ type WWToolbarState = {};
 
 const initialState: WWToolbarState = {};
 
-const toolbarBtn = "btn btn-outline-primary mr-2 btn-compact";
+const toolbarBtn = 'btn btn-outline-primary mr-2 btn-compact';
 
-export default class WWToolbar extends React.Component<
-  WWToolbarProps,
-  WWToolbarState
-> {
+export default class WWToolbar extends React.Component<WWToolbarProps, WWToolbarState> {
   state = initialState;
 
   render() {
@@ -31,10 +22,7 @@ export default class WWToolbar extends React.Component<
     const {} = this.state;
     return (
       <div className="mt-2">
-        <button
-          className={toolbarBtn}
-          onClick={() => addFeature("newDeliveryEntrance")}
-        >
+        <button className={toolbarBtn} onClick={() => addFeature('newDeliveryEntrance')}>
           <WWIcon
             icon="door_front"
             outline
@@ -47,10 +35,7 @@ export default class WWToolbar extends React.Component<
             }
           />
         </button>
-        <button
-          className={toolbarBtn}
-          onClick={() => addFeature("newEntrance")}
-        >
+        <button className={toolbarBtn} onClick={() => addFeature('newEntrance')}>
           <WWIcon
             icon="door_front"
             className="discrete"
@@ -66,7 +51,7 @@ export default class WWToolbar extends React.Component<
         </button>
 
         {activeEntrance && (
-          <button className={toolbarBtn} onClick={() => addFeature("newUP")}>
+          <button className={toolbarBtn} onClick={() => addFeature('newUP')}>
             <WWIcon
               icon="local_shipping"
               outline
@@ -81,7 +66,7 @@ export default class WWToolbar extends React.Component<
           </button>
         )}
         {activeUP && (
-          <button className={toolbarBtn} onClick={() => addFeature("newAP")}>
+          <button className={toolbarBtn} onClick={() => addFeature('newAP')}>
             <WWIcon
               icon="directions"
               outline

@@ -1,7 +1,7 @@
-import React from "react";
-import MapFeatureSet from "components/map_features/MapFeatureSet";
-import { MapFeatureTypes, OSMImageNote } from "components/types";
-import { OSMFeature } from "util_components/osm/types";
+import React from 'react';
+import MapFeatureSet from 'components/map_features/MapFeatureSet';
+import { MapFeatureTypes, OSMImageNote } from 'components/types';
+import { OSMFeature } from 'util_components/osm/types';
 
 type OSMImageNoteMapFeaturesProps = {
   mapFeatureTypes: MapFeatureTypes;

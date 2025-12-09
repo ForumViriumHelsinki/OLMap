@@ -1,22 +1,13 @@
-import React from "react";
-import {
-  JSONSchema,
-  MapFeature,
-  OSMImageNote,
-  WorkplaceEntrance,
-} from "components/types";
-import { SimpleOSMImageNotesMap } from "components/osm_image_notes/OSMImageNotesMap";
-import { Location } from "util_components/types";
-import sessionRequest from "sessionRequest";
-import {
-  osmImageNoteUrl,
-  workplaceEntrancesUrl,
-  workplaceEntranceUrl,
-} from "urls";
-import { osmFeatureLabel } from "util_components/osm/utils";
-import { OSMFeature } from "util_components/osm/types";
+import React from 'react';
+import { JSONSchema, MapFeature, OSMImageNote, WorkplaceEntrance } from 'components/types';
+import { SimpleOSMImageNotesMap } from 'components/osm_image_notes/OSMImageNotesMap';
+import { Location } from 'util_components/types';
+import sessionRequest from 'sessionRequest';
+import { osmImageNoteUrl, workplaceEntrancesUrl, workplaceEntranceUrl } from 'urls';
+import { osmFeatureLabel } from 'util_components/osm/utils';
+import { OSMFeature } from 'util_components/osm/types';
 // @ts-ignore
-import Form from "react-jsonschema-form";
+import Form from 'react-jsonschema-form';
 
 type WorkplaceEntranceEditorProps = {
   workplace: MapFeature;
@@ -33,8 +24,8 @@ type WorkplaceEntranceEditorState = {
 const initialState: WorkplaceEntranceEditorState = {};
 
 const uiSchema = {
-  delivery_instructions: { "ui:widget": "textarea" },
-  delivery_types: { "ui:widget": "text" },
+  delivery_instructions: { 'ui:widget': 'textarea' },
+  delivery_types: { 'ui:widget': 'text' },
 };
 
 export default class WorkplaceEntranceEditor extends React.Component<
@@ -54,7 +45,7 @@ export default class WorkplaceEntranceEditor extends React.Component<
 
     const formData = {
       ...workplaceEntrance,
-      delivery_types: (workplaceEntrance.delivery_types || []).join(", "),
+      delivery_types: (workplaceEntrance.delivery_types || []).join(', '),
     };
 
     return (
@@ -67,8 +58,7 @@ export default class WorkplaceEntranceEditor extends React.Component<
               </div>
             )}
             <div className="font-weight-bold mb-2">
-              {entrance &&
-                osmFeatureLabel({ tags: entrance.as_osm_tags } as OSMFeature)}
+              {entrance && osmFeatureLabel({ tags: entrance.as_osm_tags } as OSMFeature)}
             </div>
             <Form
               schema={this.getSchema()}
@@ -83,7 +73,7 @@ export default class WorkplaceEntranceEditor extends React.Component<
             <div className="p-2">Select entrance to link:</div>
             <div style={{ height: 400 }}>
               <SimpleOSMImageNotesMap
-                filters={{ tags: ["Entrance"] }}
+                filters={{ tags: ['Entrance'] }}
                 onNoteSelected={this.onNoteSelected}
                 location={imageNote as Location}
                 zoom={20}
@@ -100,7 +90,7 @@ export default class WorkplaceEntranceEditor extends React.Component<
     const { workplace, entrance, ...filteredProperties } = schema.properties;
     filteredProperties.delivery_types = {
       ...filteredProperties.delivery_types,
-      type: "string",
+      type: 'string',
     };
     return { ...schema, properties: filteredProperties, required: [] };
   }
@@ -115,8 +105,7 @@ export default class WorkplaceEntranceEditor extends React.Component<
       .then((response) => response.json())
       .then((entranceNote) => {
         const { workplace } = this.props;
-        const entrance =
-          entranceNote.entrance_set && entranceNote.entrance_set[0];
+        const entrance = entranceNote.entrance_set && entranceNote.entrance_set[0];
         if (!entrance) return;
         const workplaceEntrance: WorkplaceEntrance = {
           workplace: workplace.id as number,
@@ -124,8 +113,8 @@ export default class WorkplaceEntranceEditor extends React.Component<
           description: entrance.description,
           entrance_data: entrance,
           image_note: entranceNote,
-          delivery_hours: "",
-          delivery_instructions: "",
+          delivery_hours: '',
+          delivery_instructions: '',
           delivery_types: [],
         };
         this.setState({ workplaceEntrance });
@@ -139,17 +128,15 @@ export default class WorkplaceEntranceEditor extends React.Component<
 
     let request;
 
-    formData.delivery_types = formData.delivery_types
-      ? formData.delivery_types.split(/, ?/)
-      : [];
+    formData.delivery_types = formData.delivery_types ? formData.delivery_types.split(/, ?/) : [];
 
     if (workplaceEntrance.id) {
       const url = workplaceEntranceUrl(workplaceEntrance.id);
-      request = sessionRequest(url, { method: "PATCH", data: formData });
+      request = sessionRequest(url, { method: 'PATCH', data: formData });
     } else {
       const url = workplaceEntrancesUrl;
       const data = Object.assign(workplaceEntrance, formData);
-      request = sessionRequest(url, { method: "POST", data });
+      request = sessionRequest(url, { method: 'POST', data });
     }
 
     request.then((response) => {

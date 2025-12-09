@@ -1,9 +1,9 @@
-import React from "react";
-import Icon from "util_components/bootstrap/Icon";
-import { OSMImageNote } from "components/types";
-import OSMImageNoteReviewActions from "components/osm_image_notes/OSMImageNoteReviewActions";
-import sessionRequest from "sessionRequest";
-import { osmImageNoteUrl } from "urls";
+import React from 'react';
+import Icon from 'util_components/bootstrap/Icon';
+import { OSMImageNote } from 'components/types';
+import OSMImageNoteReviewActions from 'components/osm_image_notes/OSMImageNoteReviewActions';
+import sessionRequest from 'sessionRequest';
+import { osmImageNoteUrl } from 'urls';
 
 type OSMImageNoteActionsMenuProps = {
   note: OSMImageNote;
@@ -33,7 +33,7 @@ export default class OSMImageNoteActionsMenu extends React.Component<
     const { lon, lat } = note;
 
     const { show } = this.state;
-    const showCls = show ? " show" : "";
+    const showCls = show ? ' show' : '';
 
     const noteUrl = `https://app.olmap.org/#/Notes/@${lat},${lon},20`;
     const googleUrl = `https://maps.google.com/?layer=c&cbll=${note?.lat},${note.lon}`;
@@ -47,14 +47,11 @@ export default class OSMImageNoteActionsMenu extends React.Component<
     const hel3dUrl = `https://kartta.hel.fi/3d/?startingmap=Cesium%20Map&lang=en&${hel3dLayers}&${hel3dPosition}/`;
 
     return (
-      <div className={"dropdown d-inline-block" + showCls}>
-        <button
-          className="btn btn-light p-1"
-          onClick={() => this.setState({ show: !show })}
-        >
+      <div className={'dropdown d-inline-block' + showCls}>
+        <button className="btn btn-light p-1" onClick={() => this.setState({ show: !show })}>
           <Icon icon="menu"></Icon>
         </button>
-        <div className={"dropdown-menu" + showCls}>
+        <div className={'dropdown-menu' + showCls}>
           <button className="dropdown-item" onClick={this.copyPermalink}>
             <Icon icon="link" /> Copy link to this note
           </button>
@@ -76,8 +73,7 @@ export default class OSMImageNoteActionsMenu extends React.Component<
 
           {canEdit && (
             <button className="dropdown-item" onClick={this.onImageClick}>
-              <Icon icon="camera_alt" />{" "}
-              {note.image ? "Update picture" : "Add picture"}
+              <Icon icon="camera_alt" /> {note.image ? 'Update picture' : 'Add picture'}
             </button>
           )}
 
@@ -117,12 +113,12 @@ export default class OSMImageNoteActionsMenu extends React.Component<
   }
 
   copyPermalink = () => {
-    (document.getElementById("permalink") as HTMLInputElement).select();
-    document.execCommand("copy");
+    (document.getElementById('permalink') as HTMLInputElement).select();
+    document.execCommand('copy');
   };
 
   private imageEl() {
-    return document.getElementById("image_note_image") as HTMLInputElement;
+    return document.getElementById('image_note_image') as HTMLInputElement;
   }
 
   onImageClick = () => {
@@ -134,9 +130,9 @@ export default class OSMImageNoteActionsMenu extends React.Component<
     const files = this.imageEl().files as FileList;
     const image = files[0];
     let formData = new FormData();
-    formData.append("image", image);
+    formData.append('image', image);
     sessionRequest(osmImageNoteUrl(note.id as number), {
-      method: "PATCH",
+      method: 'PATCH',
       body: formData,
     }).then((response: any) => {
       if (response.status < 300) {

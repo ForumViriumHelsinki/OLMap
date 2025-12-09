@@ -1,11 +1,11 @@
-import React from "react";
-import Form from "react-jsonschema-form";
+import React from 'react';
+import Form from 'react-jsonschema-form';
 
-import { JSONSchema, MapFeature } from "components/types";
+import { JSONSchema, MapFeature } from 'components/types';
 // @ts-ignore
-import { Button } from "reactstrap";
-import ConfirmButton from "util_components/bootstrap/ConfirmButton";
-import WorkplaceTypeWidget from "components/map_features/WorkplaceTypeWidget";
+import { Button } from 'reactstrap';
+import ConfirmButton from 'util_components/bootstrap/ConfirmButton';
+import WorkplaceTypeWidget from 'components/map_features/WorkplaceTypeWidget';
 
 type MapFeatureFormProps = {
   schema: JSONSchema;
@@ -27,8 +27,8 @@ const customWidgets: AnyObject = {
 };
 
 export const omitFields: AnyObject = {
-  UnloadingPlace: ["entrances"],
-  Workplace: ["workplace_entrances"],
+  UnloadingPlace: ['entrances'],
+  Workplace: ['workplace_entrances'],
 };
 
 export default class MapFeatureForm extends React.Component<
@@ -38,14 +38,7 @@ export default class MapFeatureForm extends React.Component<
   state: MapFeatureFormState = initialState;
 
   render() {
-    const {
-      schema,
-      featureTypeName,
-      mapFeature,
-      onSubmit,
-      onCancel,
-      onDelete,
-    } = this.props;
+    const { schema, featureTypeName, mapFeature, onSubmit, onCancel, onDelete } = this.props;
 
     const filteredSchema = { ...schema };
     // Don't show OSM Feature as a silly integer input field in the form:
@@ -66,12 +59,7 @@ export default class MapFeatureForm extends React.Component<
         formData={mapFeature}
         onSubmit={onSubmit}
       >
-        <Button
-          size="sm"
-          color="primary"
-          type="submit"
-          className="btn-compact pl-4 pr-4 mr-2"
-        >
+        <Button size="sm" color="primary" type="submit" className="btn-compact pl-4 pr-4 mr-2">
           Done
         </Button>
         <Button
@@ -100,29 +88,23 @@ export default class MapFeatureForm extends React.Component<
   private getUISchema() {
     const { schema, featureTypeName } = this.props;
     const radioFields = Object.entries(schema.properties)
-      .filter(
-        ([field, spec]: [string, any]) =>
-          String(spec.type) === String(["boolean", "null"]),
-      )
+      .filter(([field, spec]: [string, any]) => String(spec.type) === String(['boolean', 'null']))
       .map(([field, spec]) => {
-        return [field, { "ui:widget": "radio" }];
+        return [field, { 'ui:widget': 'radio' }];
       });
     const customWidgetsForSchema = customWidgets[featureTypeName] || {};
     const customFields = Object.entries(schema.properties)
       .filter(([field, spec]: [string, any]) => customWidgetsForSchema[field])
       .map(([field, spec]: [string, any]) => {
-        return [field, { "ui:widget": customWidgetsForSchema[field] }];
+        return [field, { 'ui:widget': customWidgetsForSchema[field] }];
       });
     const textFields = Object.entries(schema.properties)
       .filter(
-        ([field, spec]: [string, any]) =>
-          spec.type === "string" && !spec.maxLength && !spec.enum,
+        ([field, spec]: [string, any]) => spec.type === 'string' && !spec.maxLength && !spec.enum,
       )
       .map(([field, spec]: [string, any]) => {
-        return [field, { "ui:widget": "textarea" }];
+        return [field, { 'ui:widget': 'textarea' }];
       });
-    return Object.fromEntries(
-      radioFields.concat(customFields).concat(textFields),
-    );
+    return Object.fromEntries(radioFields.concat(customFields).concat(textFields));
   }
 }

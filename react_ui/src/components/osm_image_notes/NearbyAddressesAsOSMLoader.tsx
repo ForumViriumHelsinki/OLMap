@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 // @ts-ignore
-import _ from "lodash";
-import { LocationTuple } from "util_components/types";
-import { OSMFeature } from "util_components/osm/types";
-import sessionRequest from "sessionRequest";
-import { nearbyAddressesUrl } from "urls";
+import _ from 'lodash';
+import { LocationTuple } from 'util_components/types';
+import { OSMFeature } from 'util_components/osm/types';
+import sessionRequest from 'sessionRequest';
+import { nearbyAddressesUrl } from 'urls';
 
 type NearbyAddressesAsOSMLoaderProps = {
   location: LocationTuple;
@@ -26,7 +26,7 @@ export default class NearbyAddressesAsOSMLoader extends React.Component<
   }
 
   render() {
-    return "";
+    return '';
   }
 
   fetchAddresses = () => {
@@ -34,9 +34,7 @@ export default class NearbyAddressesAsOSMLoader extends React.Component<
     return sessionRequest(nearbyAddressesUrl(location))
       .then((response) => response.json())
       .then((addresses) =>
-        onLoad(
-          addresses.map((a: any) => _.merge(a, { tags: { source: "OLMap" } })),
-        ),
+        onLoad(addresses.map((a: any) => _.merge(a, { tags: { source: 'OLMap' } }))),
       );
   };
 }

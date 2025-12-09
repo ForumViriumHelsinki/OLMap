@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 // @ts-ignore
-import Modal, { ModalBody } from "util_components/bootstrap/Modal";
-import { OSMChangeset } from "util_components/osm/types";
-import OSMChangesetSelection from "util_components/osm/OSMChangesetSelection";
-import MapToolButton from "components/osm_image_notes/MapToolButton";
+import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
+import { OSMChangeset } from 'util_components/osm/types';
+import OSMChangesetSelection from 'util_components/osm/OSMChangesetSelection';
+import MapToolButton from 'components/osm_image_notes/MapToolButton';
 
 type OSMChangesetSelectionButtonProps = {
   selectedChangeset?: OSMChangeset;

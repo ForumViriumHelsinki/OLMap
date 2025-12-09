@@ -1,23 +1,23 @@
-import React from "react";
-import _ from "lodash";
-import * as L from "leaflet";
+import React from 'react';
+import _ from 'lodash';
+import * as L from 'leaflet';
 
-import MyPositionMap from "util_components/MyPositionMap";
-import Map from "util_components/Map";
-import { Location } from "util_components/types";
+import MyPositionMap from 'util_components/MyPositionMap';
+import Map from 'util_components/Map';
+import { Location } from 'util_components/types';
 
-import { ImageNotesContext, OSMImageNote } from "components/types";
-import { OSMChangeset } from "util_components/osm/types";
-import OSMChangesetMapLayer from "util_components/osm/OSMChangesetMapLayer";
-import { LatLngLiteral } from "leaflet";
-import { filterNotes } from "components/osm_image_notes/utils";
+import { ImageNotesContext, OSMImageNote } from 'components/types';
+import { OSMChangeset } from 'util_components/osm/types';
+import OSMChangesetMapLayer from 'util_components/osm/OSMChangesetMapLayer';
+import { LatLngLiteral } from 'leaflet';
+import { filterNotes } from 'components/osm_image_notes/utils';
 
 const markerColors = {
-  problem: "#ff0000",
-  new: "#ff5000",
-  accepted: "#b700ff",
-  processed: "#007bff",
-  reviewed: "#28a745",
+  problem: '#ff0000',
+  new: '#ff5000',
+  accepted: '#b700ff',
+  processed: '#007bff',
+  reviewed: '#28a745',
 };
 
 type OSMImageNotesMapProps = {
@@ -79,22 +79,19 @@ export default class OSMImageNotesMap extends React.Component<
 
     filteredImageNotes.forEach((osmImageNote: OSMImageNote) => {
       const id = String(osmImageNote.id);
-      const category = (osmImageNote.tags || []).includes("Problem")
-        ? "problem"
+      const category = (osmImageNote.tags || []).includes('Problem')
+        ? 'problem'
         : osmImageNote.is_reviewed
-          ? "reviewed"
+          ? 'reviewed'
           : osmImageNote.is_processed
-            ? "processed"
+            ? 'processed'
             : osmImageNote.is_accepted
-              ? "accepted"
-              : "new";
+              ? 'accepted'
+              : 'new';
       const style = {
         radius: 2,
         color: markerColors[category],
-        opacity:
-          selectedNotes && selectedNotes.includes(osmImageNote.id as number)
-            ? 0.4
-            : 0.05,
+        opacity: selectedNotes && selectedNotes.includes(osmImageNote.id as number) ? 0.4 : 0.05,
         weight: 20,
         fillColor: markerColors[category],
         fillOpacity: 1,
@@ -103,16 +100,15 @@ export default class OSMImageNotesMap extends React.Component<
         lng: osmImageNote.lon,
         lat: osmImageNote.lat,
       } as LatLngLiteral;
-      if (this.dotMarkers[id])
-        return this.dotMarkers[id].setStyle(style).setLatLng(latLng);
+      if (this.dotMarkers[id]) return this.dotMarkers[id].setStyle(style).setLatLng(latLng);
 
       const marker = L.circleMarker(latLng, style);
-      marker.on("click", () => onNoteSelected(osmImageNote));
+      marker.on('click', () => onNoteSelected(osmImageNote));
       marker.addTo(this.mapLayer);
       this.dotMarkers[id] = marker;
     });
 
-    const index = _.keyBy(filteredImageNotes, "id");
+    const index = _.keyBy(filteredImageNotes, 'id');
     Object.entries(this.dotMarkers)
       .filter(([id]) => !index[id])
       .forEach(([id, marker]) => {
@@ -129,11 +125,7 @@ export class SimpleOSMImageNotesMap extends OSMImageNotesMap {
     if (!location) return <></>;
 
     return (
-      <Map
-        latLng={[location.lat, location.lon]}
-        extraLayers={[this.getMapLayer()]}
-        zoom={zoom}
-      />
+      <Map latLng={[location.lat, location.lon]} extraLayers={[this.getMapLayer()]} zoom={zoom} />
     );
   }
 }

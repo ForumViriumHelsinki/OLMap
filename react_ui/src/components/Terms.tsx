@@ -1,5 +1,5 @@
-import React from "react";
-import Modal from "util_components/bootstrap/Modal";
+import React from 'react';
+import Modal from 'util_components/bootstrap/Modal';
 
 type TermsProps = {};
 
@@ -15,19 +15,16 @@ export default class Terms extends React.Component<TermsProps, TermsState> {
     return (
       <>
         <p>
-          By using this website, you agree to our{" "}
+          By using this website, you agree to our{' '}
           <a
-            onClick={() => this.setState({ showTerms: "terms" })}
+            onClick={() => this.setState({ showTerms: 'terms' })}
             className="clickable text-primary"
           >
             Usage terms & privacy policy
           </a>
-          , and that any map notes and images published here are placed in the
-          public domain under the{" "}
-          <a
-            onClick={() => this.setState({ showTerms: "cc0" })}
-            className="clickable text-primary"
-          >
+          , and that any map notes and images published here are placed in the public domain under
+          the{' '}
+          <a onClick={() => this.setState({ showTerms: 'cc0' })} className="clickable text-primary">
             CC0 License
           </a>
           .
@@ -36,9 +33,9 @@ export default class Terms extends React.Component<TermsProps, TermsState> {
           <Modal onClose={() => this.setState({ showTerms: false })} title="">
             <iframe
               style={{
-                height: "calc(100vh - 270px)",
-                width: "100%",
-                border: "none",
+                height: 'calc(100vh - 270px)',
+                width: '100%',
+                border: 'none',
               }}
               className="mt-2"
               src={`/${showTerms}.html`}

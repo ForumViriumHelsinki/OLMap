@@ -1,13 +1,13 @@
-import React from "react";
-import Modal, { ModalBody } from "util_components/bootstrap/Modal";
-import OSMEntranceCreator from "util_components/osm/OSMEntranceCreator";
-import { Location } from "util_components/types";
-import { MapFeature, OSMEditContextType, OSMImageNote } from "components/types";
-import { OSMFeature } from "util_components/osm/types";
-import ErrorAlert from "util_components/bootstrap/ErrorAlert";
-import Map from "util_components/Map";
-import { CircleMarker, Polyline } from "react-leaflet";
-import { LatLngExpression } from "leaflet";
+import React from 'react';
+import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
+import OSMEntranceCreator from 'util_components/osm/OSMEntranceCreator';
+import { Location } from 'util_components/types';
+import { MapFeature, OSMEditContextType, OSMImageNote } from 'components/types';
+import { OSMFeature } from 'util_components/osm/types';
+import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
+import Map from 'util_components/Map';
+import { CircleMarker, Polyline } from 'react-leaflet';
+import { LatLngExpression } from 'leaflet';
 
 type OSMEntranceCreationModalProps = {
   onClose: () => any;
@@ -27,7 +27,7 @@ const initialState: OSMEntranceCreationModalState = {
   createWay: true,
 };
 
-const green = "#28a745";
+const green = '#28a745';
 
 export default class OSMEntranceCreationModal extends React.Component<
   OSMEntranceCreationModalProps,
@@ -38,12 +38,10 @@ export default class OSMEntranceCreationModal extends React.Component<
   render() {
     const { onClose } = this.props;
     const { error, entranceCreator, createWay } = this.state;
-    const [lon, lat] =
-      entranceCreator?.entrancePoint?.geometry?.coordinates || [];
+    const [lon, lat] = entranceCreator?.entrancePoint?.geometry?.coordinates || [];
     const { accessPoint } = entranceCreator || {};
     const accessLatLng =
-      accessPoint &&
-      ([...accessPoint.geometry.coordinates].reverse() as LatLngExpression);
+      accessPoint && ([...accessPoint.geometry.coordinates].reverse() as LatLngExpression);
 
     const road = entranceCreator && entranceCreator.newRoadGeometry();
     const building = entranceCreator && entranceCreator.newBuildingGeometry();
@@ -54,7 +52,7 @@ export default class OSMEntranceCreationModal extends React.Component<
         <ModalBody>
           {error && <ErrorAlert message={error} status />}
           {!entranceCreator ? (
-            "Loading..."
+            'Loading...'
           ) : (
             <>
               <Map latLng={[lat, lon]} height="50vh" zoom={21}>
@@ -65,13 +63,7 @@ export default class OSMEntranceCreationModal extends React.Component<
                     <Polyline positions={road} color="#fff" weight={3} />
                   </>
                 )}
-                <CircleMarker
-                  center={[lat, lon]}
-                  radius={4}
-                  fill
-                  fillOpacity={1}
-                  color={green}
-                />
+                <CircleMarker center={[lat, lon]} radius={4} fill fillOpacity={1} color={green} />
                 {accessLatLng && createWay && (
                   <>
                     <CircleMarker
@@ -81,10 +73,7 @@ export default class OSMEntranceCreationModal extends React.Component<
                       fillOpacity={1}
                       color={green}
                     />
-                    <Polyline
-                      positions={[[lat, lon], accessLatLng]}
-                      color={green}
-                    />
+                    <Polyline positions={[[lat, lon], accessLatLng]} color={green} />
                   </>
                 )}
               </Map>
@@ -93,13 +82,9 @@ export default class OSMEntranceCreationModal extends React.Component<
                   className="btn btn-outline-primary btn-sm"
                   onClick={() => this.setState({ createWay: !createWay })}
                 >
-                  {createWay ? "Omit" : "Create"} {wayType}{" "}
-                  {wayType == "service" ? "road" : ""}
+                  {createWay ? 'Omit' : 'Create'} {wayType} {wayType == 'service' ? 'road' : ''}
                 </button>
-                <button
-                  className="btn btn-primary btn-sm ml-2"
-                  onClick={this.createOSMEntrance}
-                >
+                <button className="btn btn-primary btn-sm ml-2" onClick={this.createOSMEntrance}>
                   Save to OSM
                 </button>
               </div>
@@ -124,15 +109,10 @@ export default class OSMEntranceCreationModal extends React.Component<
   createOSMEntrance = () => {
     const { osmContext, entrance, onCreated } = this.props;
     const { entranceCreator, createWay } = this.state;
-    if (!osmContext.changeset || !entrance.as_osm_tags || !entranceCreator)
-      return;
+    if (!osmContext.changeset || !entrance.as_osm_tags || !entranceCreator) return;
 
     entranceCreator
-      .createEntrance(
-        osmContext,
-        entrance.as_osm_tags,
-        createWay && this.getEntrancePathTags(),
-      )
+      .createEntrance(osmContext, entrance.as_osm_tags, createWay && this.getEntrancePathTags())
       .then(onCreated)
       .catch((error) => this.setState({ error: error.message || error }));
   };
@@ -141,9 +121,9 @@ export default class OSMEntranceCreationModal extends React.Component<
     const { osmImageNote, entrance } = this.props;
     // @ts-ignore
     const steps = (osmImageNote.steps_set || [])[0];
-    const pathType = entrance.type == "garage" ? "service" : "footway";
+    const pathType = entrance.type == 'garage' ? 'service' : 'footway';
 
     if (steps) return steps.as_osm_tags;
-    return { highway: pathType, access: entrance.access || "destination" };
+    return { highway: pathType, access: entrance.access || 'destination' };
   }
 }

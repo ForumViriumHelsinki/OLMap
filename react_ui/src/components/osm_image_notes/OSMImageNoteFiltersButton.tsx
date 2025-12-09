@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 // @ts-ignore
-import _ from "lodash";
+import _ from 'lodash';
 // @ts-ignore
 import {
   ButtonDropdown,
@@ -8,17 +8,12 @@ import {
   DropdownMenu,
   DropdownToggle,
   // @ts-ignore
-} from "reactstrap";
-import {
-  AppContext,
-  MapFeatureTypes,
-  OSMImageNote,
-  User,
-} from "components/types";
-import MapToolButton from "components/osm_image_notes/MapToolButton";
-import sessionRequest from "sessionRequest";
-import { recentMappersUrl } from "urls";
-import { filterNotes } from "components/osm_image_notes/utils";
+} from 'reactstrap';
+import { AppContext, MapFeatureTypes, OSMImageNote, User } from 'components/types';
+import MapToolButton from 'components/osm_image_notes/MapToolButton';
+import sessionRequest from 'sessionRequest';
+import { recentMappersUrl } from 'urls';
+import { filterNotes } from 'components/osm_image_notes/utils';
 
 type OSMImageNoteFiltersButtonProps = {
   mapFeatureTypes?: MapFeatureTypes;
@@ -45,13 +40,11 @@ const _90d = 90 * _24h;
 
 const filter24h = (note: OSMImageNote) =>
   // @ts-ignore
-  new Date(note.modified_at || note.created_at).valueOf() >
-  new Date().valueOf() - _24h;
+  new Date(note.modified_at || note.created_at).valueOf() > new Date().valueOf() - _24h;
 
 const filter90d = (note: OSMImageNote) =>
   // @ts-ignore
-  new Date(note.modified_at || note.created_at).valueOf() >
-  new Date().valueOf() - _90d;
+  new Date(note.modified_at || note.created_at).valueOf() > new Date().valueOf() - _90d;
 
 const checkHeight = (note: OSMImageNote) => note.height;
 const underground = (note: OSMImageNote) => note.layer && note.layer < 0;
@@ -85,37 +78,33 @@ export default class OSMImageNoteFiltersButton extends React.Component<
     const { recentMappers } = this.state;
 
     return {
-      "24h": { newer_than: filter24h },
-      "90 days": { newer_than: filter90d },
-      "My notes": { created_by: user && user.id },
+      '24h': { newer_than: filter24h },
+      '90 days': { newer_than: filter90d },
+      'My notes': { created_by: user && user.id },
 
       New: { is_processed: false, is_reviewed: false, is_accepted: false },
-      "Ready for OSM": {
+      'Ready for OSM': {
         is_processed: false,
         is_reviewed: false,
         is_accepted: true,
       },
-      "In OSM": { is_processed: true, is_accepted: true, is_reviewed: false },
+      'In OSM': { is_processed: true, is_accepted: true, is_reviewed: false },
       Reviewed: { is_processed: true, is_reviewed: true, is_accepted: true },
 
-      "Delivery instructions": { delivery_instructions: true },
-      "Height limitation": { height: checkHeight },
+      'Delivery instructions': { delivery_instructions: true },
+      'Height limitation': { height: checkHeight },
       Underground: { layer: underground },
       ...Object.fromEntries(
         Object.keys(mapFeatureTypes || {}).map((tag) => [tag, { tags: [tag] }]),
       ),
       ...Object.fromEntries(
-        (recentMappers || []).map((mapper) => [
-          mapper.username,
-          { created_by: mapper.id },
-        ]),
+        (recentMappers || []).map((mapper) => [mapper.username, { created_by: mapper.id }]),
       ),
     };
   }
 
   render() {
-    const { filters, filtersOpen, recentMappers, mappersOpen, counts } =
-      this.state;
+    const { filters, filtersOpen, recentMappers, mappersOpen, counts } = this.state;
     const { mapFeatureTypes } = this.props;
     const filterOptions = this.filterOptions();
 
@@ -127,12 +116,10 @@ export default class OSMImageNoteFiltersButton extends React.Component<
         (filter.tags && (filters.tags || []).includes(filter.tags[0]));
       return (
         <DropdownItem
-          className={active ? "text-primary pr-1" : "pr-1"}
+          className={active ? 'text-primary pr-1' : 'pr-1'}
           onClick={() => this.toggleFilter(filter)}
         >
-          <span className="float-right small position-relative">
-            {counts[label] || ""}
-          </span>
+          <span className="float-right small position-relative">{counts[label] || ''}</span>
           <span className="mr-4">{label}</span>
         </DropdownItem>
       );
@@ -148,9 +135,9 @@ export default class OSMImageNoteFiltersButton extends React.Component<
         </DropdownToggle>
         <DropdownMenu>
           <DropdownItem header>Filter</DropdownItem>
-          <FilterItem label={"24h"} />
-          <FilterItem label={"90 days"} />
-          <FilterItem label={"My notes"} />
+          <FilterItem label={'24h'} />
+          <FilterItem label={'90 days'} />
+          <FilterItem label={'My notes'} />
           {recentMappers && (
             <div className="dropleft btn-group">
               <button
@@ -169,18 +156,16 @@ export default class OSMImageNoteFiltersButton extends React.Component<
             </div>
           )}
           <DropdownItem divider />
-          <FilterItem label={"New"} />
-          <FilterItem label={"Ready for OSM"} />
-          <FilterItem label={"In OSM"} />
-          <FilterItem label={"Reviewed"} />
+          <FilterItem label={'New'} />
+          <FilterItem label={'Ready for OSM'} />
+          <FilterItem label={'In OSM'} />
+          <FilterItem label={'Reviewed'} />
           <DropdownItem divider />
-          <FilterItem label={"Underground"} />
+          <FilterItem label={'Underground'} />
           <FilterItem label="Delivery instructions" />
           <FilterItem label="Height limitation" />
           {mapFeatureTypes &&
-            Object.keys(mapFeatureTypes).map((tag) => (
-              <FilterItem key={tag} label={tag} />
-            ))}
+            Object.keys(mapFeatureTypes).map((tag) => <FilterItem key={tag} label={tag} />)}
         </DropdownMenu>
       </ButtonDropdown>
     );
@@ -195,8 +180,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<
         filters.tags = _.without(filters.tags, tag);
         if (!filters.tags.length) delete filters.tags;
       } else filters.tags = (filters.tags || []).concat(filter.tags);
-    } else if (_.isMatch(filters, filter))
-      Object.keys(filter).forEach((k) => delete filters[k]);
+    } else if (_.isMatch(filters, filter)) Object.keys(filter).forEach((k) => delete filters[k]);
     else Object.assign(filters, filter);
     this.setFilters(filters);
   }

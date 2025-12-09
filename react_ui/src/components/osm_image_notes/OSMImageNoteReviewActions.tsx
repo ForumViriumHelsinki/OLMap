@@ -1,16 +1,16 @@
-import React from "react";
-import { AppContext, OSMImageNote } from "components/types";
-import Icon from "util_components/bootstrap/Icon";
+import React from 'react';
+import { AppContext, OSMImageNote } from 'components/types';
+import Icon from 'util_components/bootstrap/Icon';
 
-import Confirm from "util_components/bootstrap/Confirm";
-import sessionRequest from "sessionRequest";
+import Confirm from 'util_components/bootstrap/Confirm';
+import sessionRequest from 'sessionRequest';
 import {
   acceptOSMImageNoteUrl,
   rejectOSMImageNoteUrl,
   processedOSMImageNoteUrl,
   reviewedOSMImageNoteUrl,
-} from "urls";
-import { userCanEditNote } from "components/osm_image_notes/utils";
+} from 'urls';
+import { userCanEditNote } from 'components/osm_image_notes/utils';
 
 type ReviewActionsProps = {
   imageNote: OSMImageNote;
@@ -47,14 +47,11 @@ export default class OSMImageNoteReviewActions extends React.Component<
       canEdit && (
         <>
           <h6 className="dropdown-header">Mark note as:</h6>
-          {!imageNote.is_accepted &&
-            !imageNote.is_processed &&
-            user &&
-            user.is_reviewer && (
-              <button className="dropdown-item" onClick={this.onAccept}>
-                <Icon icon="map" /> Ready for OSM
-              </button>
-            )}
+          {!imageNote.is_accepted && !imageNote.is_processed && user && user.is_reviewer && (
+            <button className="dropdown-item" onClick={this.onAccept}>
+              <Icon icon="map" /> Ready for OSM
+            </button>
+          )}
 
           {imageNote.is_accepted && !imageNote.is_processed && user && (
             <button
@@ -114,7 +111,7 @@ export default class OSMImageNoteReviewActions extends React.Component<
 
   registerAction = (url: string, data?: any) => {
     const { imageNote, onReviewed } = this.props;
-    sessionRequest(url, { method: "PUT", data }).then((response) => {
+    sessionRequest(url, { method: 'PUT', data }).then((response) => {
       if (response.status < 300) {
         imageNote.is_reviewed = true; // Modifying the props directly, because we operate on the dark side here.
         onReviewed();
@@ -123,27 +120,20 @@ export default class OSMImageNoteReviewActions extends React.Component<
   };
 
   onAccept = () => {
-    this.registerAction(
-      acceptOSMImageNoteUrl(this.props.imageNote.id as number),
-    );
+    this.registerAction(acceptOSMImageNoteUrl(this.props.imageNote.id as number));
   };
 
   onProcessed = () => {
-    this.registerAction(
-      processedOSMImageNoteUrl(this.props.imageNote.id as number),
-    );
+    this.registerAction(processedOSMImageNoteUrl(this.props.imageNote.id as number));
   };
 
   onReviewed = () => {
-    this.registerAction(
-      reviewedOSMImageNoteUrl(this.props.imageNote.id as number),
-    );
+    this.registerAction(reviewedOSMImageNoteUrl(this.props.imageNote.id as number));
   };
 
   onReject = (hidden_reason?: string) => {
-    this.registerAction(
-      rejectOSMImageNoteUrl(this.props.imageNote.id as number),
-      { hidden_reason },
-    );
+    this.registerAction(rejectOSMImageNoteUrl(this.props.imageNote.id as number), {
+      hidden_reason,
+    });
   };
 }

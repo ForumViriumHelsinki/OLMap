@@ -6,7 +6,8 @@ on:
       - "main"
       - "master"
     tags:
-      - "olmap-v*.*.*"
+      - "olmap-backend-v*.*.*"
+      - "olmap-frontend-v*.*.*"
 
 env:
   REGISTRY: ghcr.io
