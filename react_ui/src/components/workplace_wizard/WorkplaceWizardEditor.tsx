@@ -1,37 +1,37 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent } from 'react';
 import {
   AccessPoint,
   MapFeature,
   UnloadingPlace,
   Workplace,
   WorkplaceEntrance,
-} from "components/workplace_wizard/types";
-import { Location } from "util_components/types";
-import { workplacesUrl, workplaceUrl } from "components/workplace_wizard/urls";
-import * as L from "leaflet";
-import { LatLngLiteral, LeafletMouseEvent } from "leaflet";
-import _ from "lodash";
+} from 'components/workplace_wizard/types';
+import { Location } from 'util_components/types';
+import { workplacesUrl, workplaceUrl } from 'components/workplace_wizard/urls';
+import * as L from 'leaflet';
+import { LatLngLiteral, LeafletMouseEvent } from 'leaflet';
+import _ from 'lodash';
 
-import "./WorkplaceWizard.scss";
-import sessionRequest from "sessionRequest";
-import { useMap } from "react-leaflet";
-import MyPositionMap from "util_components/MyPositionMap";
-import EntrancesMapLayer from "components/workplace_wizard/EntrancesMapLayer";
-import UnloadingPlacesMapLayer from "components/workplace_wizard/UnloadingPlacesMapLayer";
+import './WorkplaceWizard.scss';
+import sessionRequest from 'sessionRequest';
+import { useMap } from 'react-leaflet';
+import MyPositionMap from 'util_components/MyPositionMap';
+import EntrancesMapLayer from 'components/workplace_wizard/EntrancesMapLayer';
+import UnloadingPlacesMapLayer from 'components/workplace_wizard/UnloadingPlacesMapLayer';
 import {
   Line,
   MapClickedPopup,
   positioningOptions,
-} from "components/workplace_wizard/util_components";
-import WWToolbar from "components/workplace_wizard/WWToolbar";
-import { loadMapFeatureTypes } from "components/osm_image_notes/ImageNotesContextProvider";
-import { AppContext, MapFeatureTypes } from "components/types";
+} from 'components/workplace_wizard/util_components';
+import WWToolbar from 'components/workplace_wizard/WWToolbar';
+import { loadMapFeatureTypes } from 'components/osm_image_notes/ImageNotesContextProvider';
+import { AppContext, MapFeatureTypes } from 'components/types';
 import {
   APMarker,
   EntranceMarker,
   UPMarker,
   WorkplaceMarker,
-} from "components/workplace_wizard/map_markers";
+} from 'components/workplace_wizard/map_markers';
 
 type WorkplaceWizardEditorProps = {
   workplace: Workplace;
@@ -50,9 +50,9 @@ type WorkplaceWizardEditorState = {
 
 const initialState: WorkplaceWizardEditorState = {
   workplace: {
-    street: "",
-    housenumber: "",
-    name: "",
+    street: '',
+    housenumber: '',
+    name: '',
   },
 };
 
@@ -83,9 +83,9 @@ export default class WorkplaceWizardEditor extends React.Component<
       const map = useMap();
       React.useEffect(() => {
         if (map) {
-          map.on("click", this.positionChosen);
+          map.on('click', this.positionChosen);
           return () => {
-            map.off("click", this.positionChosen);
+            map.off('click', this.positionChosen);
           };
         }
       }, [map]);
@@ -95,25 +95,21 @@ export default class WorkplaceWizardEditor extends React.Component<
     const entrances = workplace.workplace_entrances || [];
     const delivery_entrance = this.getDeliveryEntrance();
     const isNew =
-      !workplace.created_at ||
-      Date.now() - Date.parse(workplace.created_at) < 30 * 60 * 1000;
+      !workplace.created_at || Date.now() - Date.parse(workplace.created_at) < 30 * 60 * 1000;
     const canEdit = user || (!workplace.created_by && isNew);
 
     const gatesolveUrl =
-      workplace &&
-      workplace.id &&
-      `https://app.gatesolve.com/olmap/workplace/${workplace.id}`;
+      workplace && workplace.id && `https://app.gatesolve.com/olmap/workplace/${workplace.id}`;
 
     return !workplace.lat ? null : (
       <>
         <p>
-          {workplace.street} {workplace.housenumber} {workplace.unit || ""}
+          {workplace.street} {workplace.housenumber} {workplace.unit || ''}
         </p>
         {!canEdit && (
           <div className="alert alert-danger">
-            Et voi muuttaa tätä toimipistettä kirjautumatta.{" "}
-            <a href="#/login/">Kirjaudu ensin</a> jos haluat tehdä
-            tallennettavia muutoksia.
+            Et voi muuttaa tätä toimipistettä kirjautumatta. <a href="#/login/">Kirjaudu ensin</a>{' '}
+            jos haluat tehdä tallennettavia muutoksia.
           </div>
         )}
         <div className="card d-block position-relative">
@@ -128,7 +124,7 @@ export default class WorkplaceWizardEditor extends React.Component<
               </button>
             </div>
           )}
-          <div style={{ height: "40vh" }}>
+          <div style={{ height: '40vh' }}>
             <MyPositionMap
               zoom={18}
               location={workplace as Location}
@@ -145,10 +141,7 @@ export default class WorkplaceWizardEditor extends React.Component<
                   activeUP={activeUP}
                 />
               )}
-              <WorkplaceMarker
-                workplace={workplace}
-                onMove={() => this.move(workplace)}
-              />
+              <WorkplaceMarker workplace={workplace} onMove={() => this.move(workplace)} />
               <EntrancesMapLayer
                 location={{ lat: workplace.lat, lon: workplace.lon }}
                 addEntrance={this.addEntrance}
@@ -186,28 +179,25 @@ export default class WorkplaceWizardEditor extends React.Component<
                   </React.Fragment>
                 ))}
 
-              {entrances.map(
-                (entrance) =>
-                  entrance.unloading_places?.map((up, i) => (
-                    <React.Fragment key={i}>
-                      <UPMarker
-                        up={up}
-                        entrance={entrance}
-                        editor={this}
-                        schema={
-                          mapFeatureTypes && mapFeatureTypes.UnloadingPlace
-                        }
-                      />
-                      <Line f1={entrance} f2={up} />
+              {entrances.map((entrance) =>
+                entrance.unloading_places?.map((up, i) => (
+                  <React.Fragment key={i}>
+                    <UPMarker
+                      up={up}
+                      entrance={entrance}
+                      editor={this}
+                      schema={mapFeatureTypes && mapFeatureTypes.UnloadingPlace}
+                    />
+                    <Line f1={entrance} f2={up} />
 
-                      {up.access_points?.map((ap: AccessPoint, i) => (
-                        <React.Fragment key={i}>
-                          <APMarker ap={ap} editor={this} up={up} />
-                          <Line f1={up} f2={ap} />
-                        </React.Fragment>
-                      ))}
-                    </React.Fragment>
-                  )),
+                    {up.access_points?.map((ap: AccessPoint, i) => (
+                      <React.Fragment key={i}>
+                        <APMarker ap={ap} editor={this} up={up} />
+                        <Line f1={up} f2={ap} />
+                      </React.Fragment>
+                    ))}
+                  </React.Fragment>
+                )),
               )}
             </MyPositionMap>
           </div>
@@ -228,26 +218,20 @@ export default class WorkplaceWizardEditor extends React.Component<
         />
         {changed && canEdit && (
           <div className="btn-group mt-2 d-flex">
-            <button
-              className="btn btn-sm btn-compact btn-outline-primary"
-              onClick={this.save}
-            >
+            <button className="btn btn-sm btn-compact btn-outline-primary" onClick={this.save}>
               Tallenna
             </button>
-            <button
-              className="btn btn-sm btn-compact btn-outline-danger"
-              onClick={onClose}
-            >
+            <button className="btn btn-sm btn-compact btn-outline-danger" onClick={onClose}>
               Sulje
             </button>
           </div>
         )}
         <p>
           {changed || !gatesolveUrl ? (
-            "Katsellaksesi ohjeita Gatesolvella, tallenna ensin."
+            'Katsellaksesi ohjeita Gatesolvella, tallenna ensin.'
           ) : (
             <>
-              Esikatsele ohjeet Gatesolvella ja jaa linkki:{" "}
+              Esikatsele ohjeet Gatesolvella ja jaa linkki:{' '}
               <a target="_blank" href={gatesolveUrl}>
                 {gatesolveUrl}
               </a>
@@ -263,32 +247,28 @@ export default class WorkplaceWizardEditor extends React.Component<
           </p>
           {!delivery_entrance && (
             <p>
-              Klikkaa ensin Uusi toimitus-sisäänkäynti ja lisää se kartalle
-              oikeaan kohtaan (tärkein, kun tätä tehdään tavarankuljetuksiin).
+              Klikkaa ensin Uusi toimitus-sisäänkäynti ja lisää se kartalle oikeaan kohtaan
+              (tärkein, kun tätä tehdään tavarankuljetuksiin).
             </p>
           )}
           {activeEntrance && !activeUP && (
-            <p>
-              Lisää seuraavaksi lastauspaikka, mihin auton voi jättää
-              kuormauksen ajaksi.
-            </p>
+            <p>Lisää seuraavaksi lastauspaikka, mihin auton voi jättää kuormauksen ajaksi.</p>
           )}
           {activeUP && !(activeUP.access_points || []).length && (
             <p>
-              Jos ajoreitti ei ole itsestään selvä kannattaa lisätä reittipiste,
-              mitä kautta lastauspaikalle käännytään katuverkosta.
+              Jos ajoreitti ei ole itsestään selvä kannattaa lisätä reittipiste, mitä kautta
+              lastauspaikalle käännytään katuverkosta.
             </p>
           )}
           <p>
-            Voit lisätä myös muita sisäänkäyntejä (myös pääovi on “muu
-            sisäänkäynti”, jos se ei ole tavarankuljetuksiin). Klikkaamalla
-            näitä lisättyjä ikoneita aukeaa valikko, jossa kutakin ikonia pystyy
-            muokkaamaan tai lisäämään valokuvan paikasta.
+            Voit lisätä myös muita sisäänkäyntejä (myös pääovi on "muu sisäänkäynti", jos se ei ole
+            tavarankuljetuksiin). Klikkaamalla näitä lisättyjä ikoneita aukeaa valikko, jossa
+            kutakin ikonia pystyy muokkaamaan tai lisäämään valokuvan paikasta.
           </p>
           <p>
-            Toimitusohjeet-tekstikenttään kannattaa kirjoittaa lyhyesti, mitä
-            paikassa on huomioitava (esim. korkeusrajoitus, yksisuuntaisuus,
-            paikalle johtavan kyltin teksti tms.)
+            Toimitusohjeet-tekstikenttään kannattaa kirjoittaa lyhyesti, mitä paikassa on
+            huomioitava (esim. korkeusrajoitus, yksisuuntaisuus, paikalle johtavan kyltin teksti
+            tms.)
           </p>
           <p>Paina lopuksi Tallenna. ;)</p>
         </div>
@@ -298,12 +278,12 @@ export default class WorkplaceWizardEditor extends React.Component<
 
   positionNewUP(e: WorkplaceEntrance) {
     this.closePopup();
-    this.setState({ positioning: "newUP", activeEntrance: e });
+    this.setState({ positioning: 'newUP', activeEntrance: e });
   }
 
   positionNewAP(up: UnloadingPlace) {
     this.closePopup();
-    this.setState({ positioning: "newAP", activeUP: up });
+    this.setState({ positioning: 'newAP', activeUP: up });
   }
 
   move(f: MapFeature) {
@@ -315,16 +295,13 @@ export default class WorkplaceWizardEditor extends React.Component<
     const workplace = wp || this.state.workplace;
     const entrances = workplace.workplace_entrances || [];
     return (
-      entrances.find((e) => e.deliveries == "main") ||
-      entrances.find((e) => e.deliveries == "yes")
+      entrances.find((e) => e.deliveries == 'main') || entrances.find((e) => e.deliveries == 'yes')
     );
   }
 
   componentDidMount() {
     this.initWPFromProps();
-    loadMapFeatureTypes().then((mapFeatureTypes) =>
-      this.setState({ mapFeatureTypes }),
-    );
+    loadMapFeatureTypes().then((mapFeatureTypes) => this.setState({ mapFeatureTypes }));
   }
 
   private initWPFromProps() {
@@ -332,8 +309,7 @@ export default class WorkplaceWizardEditor extends React.Component<
     this.setState({
       workplace: workplace,
       activeEntrance:
-        this.getDeliveryEntrance(workplace) ||
-        (workplace.workplace_entrances || [])[0],
+        this.getDeliveryEntrance(workplace) || (workplace.workplace_entrances || [])[0],
     });
   }
 
@@ -350,11 +326,9 @@ export default class WorkplaceWizardEditor extends React.Component<
       newState.activeEntrance =
         this.getDeliveryEntrance() || (workplace.workplace_entrances || [])[0];
       if (activeUP && activeEntrance.unloading_places?.includes(activeUP))
-        newState.activeUP = ((newState.activeEntrance || {}).unloading_places ||
-          [])[0];
+        newState.activeUP = ((newState.activeEntrance || {}).unloading_places || [])[0];
     }
-    if (item == activeUP)
-      newState.activeUP = ((activeEntrance || {}).unloading_places || [])[0];
+    if (item == activeUP) newState.activeUP = ((activeEntrance || {}).unloading_places || [])[0];
     this.setState(newState);
     this.forceUpdate();
   };
@@ -372,12 +346,12 @@ export default class WorkplaceWizardEditor extends React.Component<
       entrance_id: id,
       unloading_places: [],
       entrance_fields: entrance,
-      deliveries: deliveries ? "main" : undefined,
+      deliveries: deliveries ? 'main' : undefined,
     };
     const entrances = workplace.workplace_entrances || [];
     if (deliveries)
       entrances.forEach((e) => {
-        e.deliveries = "";
+        e.deliveries = '';
       });
     entrances.push(wpEntrance);
     const newWp: Workplace = { ...workplace, workplace_entrances: entrances };
@@ -431,24 +405,21 @@ export default class WorkplaceWizardEditor extends React.Component<
     const { lat, lng } = e.latlng;
     const { positioning, workplace, mapClicked } = this.state;
 
-    if (document.getElementsByClassName("wwPopup").length) {
+    if (document.getElementsByClassName('wwPopup').length) {
       this.setState({ mapClicked: undefined });
       // @ts-ignore
       return this.map.closePopup();
     }
 
-    if (!positioning)
-      return this.setState({ mapClicked: mapClicked ? undefined : e.latlng });
+    if (!positioning) return this.setState({ mapClicked: mapClicked ? undefined : e.latlng });
 
-    if (positioning == "newUP") return this.addUP({ lat, lon: lng });
+    if (positioning == 'newUP') return this.addUP({ lat, lon: lng });
 
-    if (positioning == "newAP") return this.addAP({ lat, lng });
+    if (positioning == 'newAP') return this.addAP({ lat, lng });
 
-    if (positioning == "newEntrance")
-      return this.addEntrance({ lat, lon: lng }, false);
+    if (positioning == 'newEntrance') return this.addEntrance({ lat, lon: lng }, false);
 
-    if (positioning == "newDeliveryEntrance")
-      return this.addEntrance({ lat, lon: lng }, true);
+    if (positioning == 'newDeliveryEntrance') return this.addEntrance({ lat, lon: lng }, true);
 
     positioning.lat = lat;
     positioning.lon = lng;
@@ -461,14 +432,13 @@ export default class WorkplaceWizardEditor extends React.Component<
     const { workplace } = this.state;
 
     const [url, method] = workplace.id
-      ? [workplaceUrl(workplace.id), "PATCH"]
-      : [workplacesUrl, "POST"];
+      ? [workplaceUrl(workplace.id), 'PATCH']
+      : [workplacesUrl, 'POST'];
 
     return sessionRequest(url, { method, data: workplace }).then((response) => {
       if (response.status < 300)
         return response.json().then((newWorkplace) => {
-          for (const e of newWorkplace.workplace_entrances)
-            e.deliveries = e.deliveries || "";
+          for (const e of newWorkplace.workplace_entrances) e.deliveries = e.deliveries || '';
           _.merge(workplace, newWorkplace);
           this.setState({ workplace, changed: false });
           return workplace;
@@ -486,9 +456,6 @@ export default class WorkplaceWizardEditor extends React.Component<
 
   storeState(state: WorkplaceWizardEditorState) {
     this.setState(state);
-    localStorage.setItem(
-      "wwState",
-      JSON.stringify({ workplace: this.state.workplace }),
-    );
+    localStorage.setItem('wwState', JSON.stringify({ workplace: this.state.workplace }));
   }
 }

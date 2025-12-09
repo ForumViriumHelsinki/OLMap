@@ -1,5 +1,5 @@
-import React from "react";
-import IFrameModal from "util_components/IFrameModal";
+import React from 'react';
+import IFrameModal from 'util_components/IFrameModal';
 
 type SearchModalProps = {
   searchUrl: (term: string) => string;
@@ -12,10 +12,7 @@ type SearchModalState = {
 
 const initialState: SearchModalState = {};
 
-export default class SearchModal extends React.Component<
-  SearchModalProps,
-  SearchModalState
-> {
+export default class SearchModal extends React.Component<SearchModalProps, SearchModalState> {
   state = initialState;
 
   render() {
@@ -26,9 +23,9 @@ export default class SearchModal extends React.Component<
         <input
           className="form-control rounded-pill"
           type="text"
-          placeholder={placeholder || "Search"}
+          placeholder={placeholder || 'Search'}
           onBlur={this.onSearch}
-          onKeyPress={(e) => e.key == "Enter" && this.onSearch(e)}
+          onKeyPress={(e) => e.key == 'Enter' && this.onSearch(e)}
         />
         {searchTerm && (
           <IFrameModal

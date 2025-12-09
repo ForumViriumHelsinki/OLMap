@@ -1,12 +1,12 @@
-import { Location } from "util_components/types";
-import { osmApiCall, overpassQuery } from "util_components/osm/utils";
-import { OSMFeature } from "util_components/osm/types";
-import { nearestPointOnLine, point, lineString } from "@turf/turf";
-import { Point, Feature } from "geojson";
-import CreateNode from "util_components/osm/api/CreateNode";
-import UpdateWay from "util_components/osm/api/UpdateWay";
-import CreateWay from "util_components/osm/api/CreateWay";
-import { OSMEditContextType } from "components/types";
+import { Location } from 'util_components/types';
+import { osmApiCall, overpassQuery } from 'util_components/osm/utils';
+import { OSMFeature } from 'util_components/osm/types';
+import { nearestPointOnLine, point, lineString } from '@turf/turf';
+import { Point, Feature } from 'geojson';
+import CreateNode from 'util_components/osm/api/CreateNode';
+import UpdateWay from 'util_components/osm/api/UpdateWay';
+import CreateWay from 'util_components/osm/api/CreateWay';
+import { OSMEditContextType } from 'components/types';
 
 type GeoJSONPoint = any;
 type GeoJSONPolygon = any;
@@ -45,7 +45,7 @@ export default class OSMEntranceCreator {
 
   query() {
     return `relation[building]; (way(r);way[building];way[highway][layer${
-      this.layer ? "=" + this.layer : '!~".*"'
+      this.layer ? '=' + this.layer : '!~".*"'
     }];)->.result;`;
   }
 
@@ -61,15 +61,10 @@ export default class OSMEntranceCreator {
     let nearestFeature: OSMFeature;
     filtered.forEach((feature) => {
       const n = nearestPointOnLine(
-        lineString(
-          (feature as any).geometry.map(({ lat, lon }: any) => [lon, lat]),
-        ),
+        lineString((feature as any).geometry.map(({ lat, lon }: any) => [lon, lat])),
         p,
       );
-      if (
-        !nearest ||
-        (n.properties?.dist || 0) < (nearest.properties?.dist || 0)
-      ) {
+      if (!nearest || (n.properties?.dist || 0) < (nearest.properties?.dist || 0)) {
         nearest = n;
         nearestFeature = feature;
       }
@@ -82,9 +77,7 @@ export default class OSMEntranceCreator {
       (elements: OSMFeature[]) => {
         const freshElems = elements.map((f) => {
           const cached = osmCache[(f as any).id as number];
-          return cached && (cached as any).version > (f as any).version
-            ? cached
-            : f;
+          return cached && (cached as any).version > (f as any).version ? cached : f;
         });
         [this.building, this.entrancePoint] = this.findNearestFeature(
           freshElems,
@@ -114,33 +107,28 @@ export default class OSMEntranceCreator {
     pathTags: any,
   ): Promise<OSMFeature> {
     if (!this.entrancePoint)
-      return Promise.reject(new Error("Could not determine entrance point."));
-    if (!osmEditContext.changeset)
-      return Promise.reject(new Error("No active changeset."));
+      return Promise.reject(new Error('Could not determine entrance point.'));
+    if (!osmEditContext.changeset) return Promise.reject(new Error('No active changeset.'));
 
     const tags = { ...entranceTags };
 
     // If entrance address is the same as building address, do not duplicate the address information in the
     // entrance node; if building address is not set, set it based on entrance:
-    if (tags["addr:housenumber"] || tags["addr:street"])
+    if (tags['addr:housenumber'] || tags['addr:street'])
       if (this.building && this.building.tags)
-        if (
-          this.building.tags["addr:housenumber"] ||
-          this.building.tags["addr:street"]
-        ) {
+        if (this.building.tags['addr:housenumber'] || this.building.tags['addr:street']) {
           if (
-            tags["addr:housenumber"] ==
-              this.building.tags["addr:housenumber"] &&
-            tags["addr:street"] == this.building.tags["addr:street"]
+            tags['addr:housenumber'] == this.building.tags['addr:housenumber'] &&
+            tags['addr:street'] == this.building.tags['addr:street']
           ) {
-            delete tags["addr:housenumber"];
-            delete tags["addr:street"];
+            delete tags['addr:housenumber'];
+            delete tags['addr:street'];
           }
         } else {
-          this.building.tags["addr:housenumber"] = tags["addr:housenumber"];
-          this.building.tags["addr:street"] = tags["addr:street"];
-          delete tags["addr:housenumber"];
-          delete tags["addr:street"];
+          this.building.tags['addr:housenumber'] = tags['addr:housenumber'];
+          this.building.tags['addr:street'] = tags['addr:street'];
+          delete tags['addr:housenumber'];
+          delete tags['addr:street'];
         }
 
     const [lon, lat] = this.entrancePoint.geometry.coordinates;
@@ -154,14 +142,11 @@ export default class OSMEntranceCreator {
           id: osmId,
           lat,
           lon,
-          type: "node",
+          type: 'node',
           tags,
         };
         return this.addToBuilding(osmEditContext, entrance)
-          .then(
-            () =>
-              pathTags && this.connectRoad(osmEditContext, entrance, pathTags),
-          )
+          .then(() => pathTags && this.connectRoad(osmEditContext, entrance, pathTags))
           .then(() => entrance);
       },
     );
@@ -172,14 +157,10 @@ export default class OSMEntranceCreator {
    *
    * Return a promise for the entrance.
    */
-  addToBuilding(
-    osmEditContext: OSMEditContextType,
-    entrance: OSMFeature,
-  ): Promise<any> {
+  addToBuilding(osmEditContext: OSMEditContextType, entrance: OSMFeature): Promise<any> {
     if (!this.entrancePoint)
-      return Promise.reject(new Error("Could not determine entrance point."));
-    if (!osmEditContext.changeset)
-      return Promise.reject(new Error("No active changeset."));
+      return Promise.reject(new Error('Could not determine entrance point.'));
+    if (!osmEditContext.changeset) return Promise.reject(new Error('No active changeset.'));
     if (!this.building) return Promise.resolve(entrance);
 
     const index = this.entrancePoint.properties?.index;
@@ -192,26 +173,18 @@ export default class OSMEntranceCreator {
       way: this.building,
     };
 
-    return osmApiCall(
-      `way/${this.building.id}`,
-      UpdateWay,
-      props,
-      osmEditContext,
-    ).then(({ response, text }) => {
-      if (!response.ok) throw new Error(text);
-      osmCache[(this.building as any).id] = this.building;
-      (this.building as any).version += 1;
-      return entrance;
-    });
+    return osmApiCall(`way/${this.building.id}`, UpdateWay, props, osmEditContext).then(
+      ({ response, text }) => {
+        if (!response.ok) throw new Error(text);
+        osmCache[(this.building as any).id] = this.building;
+        (this.building as any).version += 1;
+        return entrance;
+      },
+    );
   }
 
   newBuildingGeometry() {
-    if (
-      !this.building ||
-      !(this.building as any).geometry ||
-      !this.entrancePoint
-    )
-      return;
+    if (!this.building || !(this.building as any).geometry || !this.entrancePoint) return;
     const index = this.entrancePoint.properties?.index;
     if (index === undefined) return;
     const [lon, lat] = this.entrancePoint.geometry.coordinates;
@@ -225,13 +198,8 @@ export default class OSMEntranceCreator {
    *
    * Return a promise for the entrance.
    */
-  connectRoad(
-    osmEditContext: OSMEditContextType,
-    entrance: OSMFeature,
-    tags: any,
-  ) {
-    if (!osmEditContext.changeset)
-      return Promise.reject(new Error("No active changeset."));
+  connectRoad(osmEditContext: OSMEditContextType, entrance: OSMFeature, tags: any) {
+    if (!osmEditContext.changeset) return Promise.reject(new Error('No active changeset.'));
     if (!this.road || !this.accessPoint) return Promise.resolve(entrance);
 
     const { properties, geometry } = this.accessPoint;
@@ -255,21 +223,18 @@ export default class OSMEntranceCreator {
           changesetId: osmEditContext.changeset?.id,
           way: this.road,
         };
-        return osmApiCall(
-          `way/${this.road?.id}`,
-          UpdateWay,
-          props,
-          osmEditContext,
-        ).then(({ response, text }) => {
-          if (!response.ok) throw new Error(text);
-          osmCache[(this.road as any).id] = this.road;
-          (this.road as any).version += 1;
-          const props = {
-            changesetId: osmEditContext.changeset?.id,
-            way: { nodes: [osmId, entrance.id], tags },
-          };
-          return osmApiCall(`way/create`, CreateWay, props, osmEditContext);
-        });
+        return osmApiCall(`way/${this.road?.id}`, UpdateWay, props, osmEditContext).then(
+          ({ response, text }) => {
+            if (!response.ok) throw new Error(text);
+            osmCache[(this.road as any).id] = this.road;
+            (this.road as any).version += 1;
+            const props = {
+              changesetId: osmEditContext.changeset?.id,
+              way: { nodes: [osmId, entrance.id], tags },
+            };
+            return osmApiCall(`way/create`, CreateWay, props, osmEditContext);
+          },
+        );
       })
       .then(({ response, text }) => {
         if (!response.ok) throw new Error(text);

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type ToggleProps = {
   on: any;
@@ -25,10 +25,7 @@ export default class Toggle extends React.Component<ToggleProps, ToggleState> {
       </>
     ) : (
       <>
-        <a
-          className="btn btn-outline-dark btn-sm btn-compact"
-          onClick={this.toggleState}
-        >
+        <a className="btn btn-outline-dark btn-sm btn-compact" onClick={this.toggleState}>
           {off}
         </a>
       </>

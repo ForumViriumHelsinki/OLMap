@@ -1,13 +1,10 @@
-import React from "react";
-import { Workplace } from "components/workplace_wizard/types";
-import { geocoderFocus } from "components/workplace_wizard/settings";
-import {
-  geocoderUrl,
-  workplaceSearchUrl,
-} from "components/workplace_wizard/urls";
-import sessionRequest from "sessionRequest";
-import { AppContext } from "components/types";
-import settings from "../../settings.js";
+import React from 'react';
+import { Workplace } from 'components/workplace_wizard/types';
+import { geocoderFocus } from 'components/workplace_wizard/settings';
+import { geocoderUrl, workplaceSearchUrl } from 'components/workplace_wizard/urls';
+import sessionRequest from 'sessionRequest';
+import { AppContext } from 'components/types';
+import settings from '../../settings.js';
 
 type WorkplaceAutofillProps = {
   onSelected: (wp: Workplace) => any;
@@ -23,7 +20,7 @@ type Suggestion = {
   properties: {
     id: string;
     source: string;
-    layer: "street" | "address" | "venue";
+    layer: 'street' | 'address' | 'venue';
     name: string;
     housenumber: string;
     street: string;
@@ -72,64 +69,52 @@ export default class WorkplaceAutofill extends React.Component<
               placeholder="Toimipiste"
               className="form-control col-12"
               value={name}
-              onChange={(e) => this.onChange("name", e)}
+              onChange={(e) => this.onChange('name', e)}
             />
             <input
               type="text"
               placeholder="Katu"
               className="form-control col-8"
               value={street}
-              onChange={(e) => this.onChange("street", e)}
+              onChange={(e) => this.onChange('street', e)}
             />
             <input
               type="text"
               placeholder="Numero"
               className="form-control col-2"
               value={housenumber}
-              onChange={(e) => this.onChange("housenumber", e)}
+              onChange={(e) => this.onChange('housenumber', e)}
             />
             <input
               type="text"
               placeholder="Rappu"
               className="form-control col-2"
               value={unit}
-              onChange={(e) => this.onChange("unit", e)}
+              onChange={(e) => this.onChange('unit', e)}
             />
           </form>
 
-          {(suggestions.length > 0 || olmapWorkplaces.length > 0) &&
-            !closed && (
-              <div className="dropdown-menu show">
-                {olmapWorkplaces.map((wp) => (
-                  <button
-                    className="dropdown-item"
-                    key={wp.id}
-                    onClick={() => onSelected(wp)}
-                  >
-                    {wp.name}, {wp.street} {wp.housenumber}
-                  </button>
-                ))}
+          {(suggestions.length > 0 || olmapWorkplaces.length > 0) && !closed && (
+            <div className="dropdown-menu show">
+              {olmapWorkplaces.map((wp) => (
+                <button className="dropdown-item" key={wp.id} onClick={() => onSelected(wp)}>
+                  {wp.name}, {wp.street} {wp.housenumber}
+                </button>
+              ))}
 
-                {suggestions.map((s) => {
-                  const { label, id } = s.properties;
-                  return (
-                    <button
-                      className="dropdown-item"
-                      key={id}
-                      onClick={() => this.onSelect(s)}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+              {suggestions.map((s) => {
+                const { label, id } = s.properties;
+                return (
+                  <button className="dropdown-item" key={id} onClick={() => this.onSelect(s)}>
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
         {name && street && housenumber && (
-          <button
-            className="btn btn-outline-primary btn-block"
-            onClick={this.onSelectBtn}
-          >
+          <button className="btn btn-outline-primary btn-block" onClick={this.onSelectBtn}>
             Valitse
           </button>
         )}
@@ -141,34 +126,30 @@ export default class WorkplaceAutofill extends React.Component<
             </a>
           </p>
           <p>
-            OLMap on helppo nettityökalu tavarantoimituspaikkojen tarkan
-            sijainnin tallentamiseen ja jakamiseen.
+            OLMap on helppo nettityökalu tavarantoimituspaikkojen tarkan sijainnin tallentamiseen ja
+            jakamiseen.
           </p>
           <p>
-            Laite kysyy sijainnin jakoa, sen voi sallia tai estää. Salliminen
-            voi sujuvoittaa käyttöä, jos tekee tallennusta paikan päällä.
+            Laite kysyy sijainnin jakoa, sen voi sallia tai estää. Salliminen voi sujuvoittaa
+            käyttöä, jos tekee tallennusta paikan päällä.
           </p>
           {!user && (
             <p>
-              Yksinkertaisia ohjeita voi luoda ilman käyttäjätiliä, mutta jotta
-              voi palata myöhemmin ja muokata ohjeita{" "}
-              <b>suositellaan tilin luomista</b>. Käyttäjätilin luonti onnistuu
-              yläkulman valikosta {"->"} Log in {"->"} Register.
+              Yksinkertaisia ohjeita voi luoda ilman käyttäjätiliä, mutta jotta voi palata myöhemmin
+              ja muokata ohjeita <b>suositellaan tilin luomista</b>. Käyttäjätilin luonti onnistuu
+              yläkulman valikosta {'->'} Log in {'->'} Register.
             </p>
           )}
           <h6 className="text-primary mt-5">Toimipisteen toimitusohjeet</h6>
           <p>
-            Tällä työkalulla voi tällä hetkellä tallentaa vain yrityksiä ym.
-            toimipisteitä (ei asuintaloja).
+            Tällä työkalulla voi tällä hetkellä tallentaa vain yrityksiä ym. toimipisteitä (ei
+            asuintaloja).
             <ul>
               <li>Kirjoita toimipisteen nimi ja osoite.</li>
+              <li>Jos kirjoittamisen aikana pudotusvalikkoon tulee sopiva ehdotus, valitse se.</li>
               <li>
-                Jos kirjoittamisen aikana pudotusvalikkoon tulee sopiva ehdotus,
-                valitse se.
-              </li>
-              <li>
-                Jos sopivaa ehdotusta ei tule, kirjoita loppuun asti.
-                Kirjoittamastasi tulee toimipisteen nimi.
+                Jos sopivaa ehdotusta ei tule, kirjoita loppuun asti. Kirjoittamastasi tulee
+                toimipisteen nimi.
               </li>
             </ul>
           </p>
@@ -191,13 +172,13 @@ export default class WorkplaceAutofill extends React.Component<
   fetchSuggestions(value: string) {
     const params = {
       text: value,
-      "focus.point.lat": geocoderFocus.lat,
-      "focus.point.lon": geocoderFocus.lon,
+      'focus.point.lat': geocoderFocus.lat,
+      'focus.point.lon': geocoderFocus.lon,
       // API key is now handled by nginx proxy
     };
     const urlParams = Object.entries(params)
       .map(([k, v]) => `${k}=${v}`)
-      .join("&");
+      .join('&');
     const url = `${geocoderUrl}?${urlParams}`;
     return fetch(url)
       .then((response) => response.json())
@@ -207,13 +188,12 @@ export default class WorkplaceAutofill extends React.Component<
   onChange(field: string, e: any) {
     const value = e.target.value;
     this.setState({ [field]: value });
-    if (["name", "street"].includes(field) && value.length > 2)
+    if (['name', 'street'].includes(field) && value.length > 2)
       this.fetchSuggestions(value).then((suggestions) => {
         // @ts-ignore
-        if (this.state[field] == value)
-          this.setState({ suggestions, closed: false });
+        if (this.state[field] == value) this.setState({ suggestions, closed: false });
       });
-    if (field == "name" && value.length > 2)
+    if (field == 'name' && value.length > 2)
       sessionRequest(workplaceSearchUrl(value))
         .then((r) => r.json())
         .then((olmapWorkplaces) => {
@@ -225,24 +205,22 @@ export default class WorkplaceAutofill extends React.Component<
     const { name, street, housenumber, unit } = this.state;
     const { onSelected } = this.props;
     if (!(name && street && housenumber)) return;
-    this.fetchSuggestions(
-      `${street} ${housenumber}${unit ? " " + unit : ""}`,
-    ).then((suggestions) => {
-      const [lon, lat] = suggestions[0].geometry.coordinates;
-      return onSelected({ street, housenumber, unit, name, lon, lat });
-    });
+    this.fetchSuggestions(`${street} ${housenumber}${unit ? ' ' + unit : ''}`).then(
+      (suggestions) => {
+        const [lon, lat] = suggestions[0].geometry.coordinates;
+        return onSelected({ street, housenumber, unit, name, lon, lat });
+      },
+    );
   };
 
   onSelect(suggestion: Suggestion) {
-    const { layer, street, housenumber, name, source, id } =
-      suggestion.properties;
+    const { layer, street, housenumber, name, source, id } = suggestion.properties;
     const [lon, lat] = suggestion.geometry.coordinates;
     const { onSelected } = this.props;
-    const [nr, unit] = (housenumber || "").split(" ");
+    const [nr, unit] = (housenumber || '').split(' ');
 
-    if (layer == "venue") {
-      const osm_feature =
-        source == "openstreetmap" ? id.split(":")[1] : undefined;
+    if (layer == 'venue') {
+      const osm_feature = source == 'openstreetmap' ? id.split(':')[1] : undefined;
       return onSelected({
         street,
         housenumber: nr,
@@ -255,10 +233,10 @@ export default class WorkplaceAutofill extends React.Component<
     }
 
     let state = {};
-    if (layer == "address") {
+    if (layer == 'address') {
       state = { street, housenumber: nr, unit };
     }
-    if (layer == "street") state = { street: name };
+    if (layer == 'street') state = { street: name };
     this.setState({ ...state, suggestions: [] });
   }
 }

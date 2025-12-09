@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 // @ts-ignore
-import * as L from "leaflet";
-import { OSMChangeset, OSMFeature } from "./types";
-import Modal, { ModalBody } from "util_components/bootstrap/Modal";
-import { osmFeatureLabel } from "util_components/osm/utils";
-import { capitalize } from "utils";
+import * as L from 'leaflet';
+import { OSMChangeset, OSMFeature } from './types';
+import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
+import { osmFeatureLabel } from 'util_components/osm/utils';
+import { capitalize } from 'utils';
 
 const markerColors = {
-  deleted: "#ff0000",
-  created: "#28a745",
-  modified: "#007bff",
+  deleted: '#ff0000',
+  created: '#28a745',
+  modified: '#007bff',
 };
 
 type OSMChangesetMapLayerProps = {
@@ -43,19 +43,17 @@ export default class OSMChangesetMapLayer extends React.Component<
     return (
       <Modal
         onClose={() => this.setState({ selectedNode: undefined })}
-        title={osmFeatureLabel(selectedNode) || "OSM node"}
+        title={osmFeatureLabel(selectedNode) || 'OSM node'}
       >
         <ModalBody>
-          {[["id", selectedNode.id]]
-            .concat(Object.entries(selectedNode.tags))
-            .map(([k, v]) => (
-              <div key={k}>
-                <span className="d-inline-block mr-2" style={{ minWidth: 100 }}>
-                  <strong>{capitalize(k)}:</strong>
-                </span>
-                {v}
-              </div>
-            ))}
+          {[['id', selectedNode.id]].concat(Object.entries(selectedNode.tags)).map(([k, v]) => (
+            <div key={k}>
+              <span className="d-inline-block mr-2" style={{ minWidth: 100 }}>
+                <strong>{capitalize(k)}:</strong>
+              </span>
+              {v}
+            </div>
+          ))}
         </ModalBody>
       </Modal>
     );
@@ -65,7 +63,7 @@ export default class OSMChangesetMapLayer extends React.Component<
     const { changeset, onLayerReady } = this.props;
     if (!changeset) return;
     const mapLayer = L.featureGroup();
-    ["created", "modified", "deleted"].forEach((status) => {
+    ['created', 'modified', 'deleted'].forEach((status) => {
       // @ts-ignore
       changeset[status].forEach((node: OSMFeature) => {
         const style = {
@@ -74,11 +72,11 @@ export default class OSMChangesetMapLayer extends React.Component<
           color: markerColors[status],
           opacity: 1,
           weight: 2,
-          fillColor: "#ffffff",
+          fillColor: '#ffffff',
           fillOpacity: 1,
         };
         const marker = L.circleMarker({ lng: node.lon, lat: node.lat }, style);
-        marker.on("click", () => this.setState({ selectedNode: node }));
+        marker.on('click', () => this.setState({ selectedNode: node }));
         marker.addTo(mapLayer);
       });
     });

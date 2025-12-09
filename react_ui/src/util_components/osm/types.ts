@@ -1,10 +1,10 @@
 // @ts-ignore
-import _ from "lodash";
+import _ from 'lodash';
 
 export type OSMFeature = {
   geometry?: any[];
   nodes?: number[];
-  type: "node" | "way" | "relation";
+  type: 'node' | 'way' | 'relation';
   id: number;
   lat: number;
   lon: number;
@@ -20,36 +20,30 @@ type OSMFeatureType = {
 };
 
 export const osmAddressString = (tags: OSMTags) =>
-  _.filter([
-    tags["addr:street"],
-    tags["addr:housenumber"],
-    tags["addr:unit"],
-  ]).join(" ");
+  _.filter([tags['addr:street'], tags['addr:housenumber'], tags['addr:unit']]).join(' ');
 
 // These are searched, in order, to present OSM features as strings:
 export const osmFeatureTypes: OSMFeatureType[] = [
   {
-    name: "entrance",
-    requiredTag: "entrance",
+    name: 'entrance',
+    requiredTag: 'entrance',
     label: (tags) => {
       const { entrance } = tags;
       const address = osmAddressString(tags);
-      return `${address && `${address} `} ${
-        entrance == "yes" ? "" : entrance
-      } entrance`;
+      return `${address && `${address} `} ${entrance == 'yes' ? '' : entrance} entrance`;
     },
   },
   {
-    name: "street or other named feature",
-    requiredTag: "name",
+    name: 'street or other named feature',
+    requiredTag: 'name',
     label: (tags) => {
       const { highway, name } = tags;
-      return `${name}${highway ? ` (${highway} road)` : ""}`;
+      return `${name}${highway ? ` (${highway} road)` : ''}`;
     },
   },
   {
-    name: "address",
-    requiredTag: "addr:housenumber",
+    name: 'address',
+    requiredTag: 'addr:housenumber',
     label: (tags) => {
       const { name } = tags;
       const address = osmAddressString(tags);
@@ -57,8 +51,8 @@ export const osmFeatureTypes: OSMFeatureType[] = [
     },
   },
   {
-    name: "barrier",
-    requiredTag: "barrier",
+    name: 'barrier',
+    requiredTag: 'barrier',
     label: (tags) => `barrier: ${tags.barrier}`,
   },
 ];

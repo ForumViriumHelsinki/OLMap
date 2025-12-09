@@ -1,13 +1,13 @@
-import React from "react";
-import _ from "lodash";
-import { MapFeature, OSMImageNote } from "components/types";
+import React from 'react';
+import _ from 'lodash';
+import { MapFeature, OSMImageNote } from 'components/types';
 // @ts-ignore
-import { Button } from "reactstrap";
-import Modal from "util_components/bootstrap/Modal";
-import { SimpleOSMImageNotesMap } from "components/osm_image_notes/OSMImageNotesMap";
-import { Location } from "util_components/types";
-import sessionRequest from "sessionRequest";
-import { osmImageNoteUrl, unloadingPlaceUrl } from "urls";
+import { Button } from 'reactstrap';
+import Modal from 'util_components/bootstrap/Modal';
+import { SimpleOSMImageNotesMap } from 'components/osm_image_notes/OSMImageNotesMap';
+import { Location } from 'util_components/types';
+import sessionRequest from 'sessionRequest';
+import { osmImageNoteUrl, unloadingPlaceUrl } from 'urls';
 // @ts-ignore
 
 type UnloadingPlaceEntrancesProps = {
@@ -41,7 +41,7 @@ export default class UnloadingPlaceEntrances extends React.Component<
 
     return (
       <div>
-        {unloadingPlace.entrances.length} entrances linked.{" "}
+        {unloadingPlace.entrances.length} entrances linked.{' '}
         <Button
           size="sm"
           color="primary"
@@ -57,12 +57,11 @@ export default class UnloadingPlaceEntrances extends React.Component<
             title="Link unloading place entrances"
           >
             <div className="p-2">
-              Select entrances to link ({unloadingPlace.entrances.length}{" "}
-              linked):
+              Select entrances to link ({unloadingPlace.entrances.length} linked):
             </div>
             <div style={{ height: 400 }}>
               <SimpleOSMImageNotesMap
-                filters={{ tags: ["Entrance"] }}
+                filters={{ tags: ['Entrance'] }}
                 onNoteSelected={this.onNoteSelected}
                 location={osmImageNote as Location}
                 zoom={19}
@@ -88,23 +87,20 @@ export default class UnloadingPlaceEntrances extends React.Component<
       .then((response) => response.json())
       .then((entranceNote) => {
         const { unloadingPlace } = this.props;
-        const entrance =
-          entranceNote.entrance_set && entranceNote.entrance_set[0];
+        const entrance = entranceNote.entrance_set && entranceNote.entrance_set[0];
         if (!entrance) return;
         const entrances = unloadingPlace.entrances.includes(entrance.id)
           ? _.without(unloadingPlace.entrances, entrance.id)
           : unloadingPlace.entrances.concat([entrance.id]);
         const url = unloadingPlaceUrl(unloadingPlace.id as number);
-        sessionRequest(url, { method: "PATCH", data: { entrances } }).then(
-          (response) => {
-            if (response.status < 300) {
-              response.json().then((data) => {
-                Object.assign(unloadingPlace, data);
-                this.forceUpdate();
-              });
-            }
-          },
-        );
+        sessionRequest(url, { method: 'PATCH', data: { entrances } }).then((response) => {
+          if (response.status < 300) {
+            response.json().then((data) => {
+              Object.assign(unloadingPlace, data);
+              this.forceUpdate();
+            });
+          }
+        });
       });
   };
 }

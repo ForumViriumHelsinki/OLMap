@@ -1,9 +1,9 @@
-import React from "react";
-import { osmAddressString, OSMFeature } from "util_components/osm/types";
-import { OSMImageNote } from "components/types";
-import Icon from "util_components/bootstrap/Icon";
-import OSMFeatureList from "util_components/osm/OSMFeatureList";
-import { LocationTuple } from "util_components/types";
+import React from 'react';
+import { osmAddressString, OSMFeature } from 'util_components/osm/types';
+import { OSMImageNote } from 'components/types';
+import Icon from 'util_components/bootstrap/Icon';
+import OSMFeatureList from 'util_components/osm/OSMFeatureList';
+import { LocationTuple } from 'util_components/types';
 
 type OSMImageNoteAddressProps = {
   note: OSMImageNote;
@@ -40,23 +40,21 @@ export default class OSMImageNoteAddress extends React.Component<
               className="btn btn-light btn-sm rounded-pill float-right"
               onClick={() => this.setState({ editing: !editing })}
             >
-              <Icon icon={editing ? "close" : "edit"} />
+              <Icon icon={editing ? 'close' : 'edit'} />
             </button>
           )}
           <strong>Address: </strong>
           {!editing &&
             (!addresses.length
-              ? "-"
+              ? '-'
               : !nearbyAddresses.length
-                ? "Loading..."
+                ? 'Loading...'
                 : addresses.map((addressId) => {
-                    const address = nearbyAddresses.find(
-                      (a) => a.id == addressId,
-                    );
+                    const address = nearbyAddresses.find((a) => a.id == addressId);
                     return (
                       address && (
                         <span key={addressId}>
-                          {addressId != addresses[0] && ", "}
+                          {addressId != addresses[0] && ', '}
                           {osmAddressString(address.tags)}
                         </span>
                       )

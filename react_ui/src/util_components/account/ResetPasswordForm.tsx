@@ -1,6 +1,6 @@
-import React, { FormEvent } from "react";
-import sessionRequest, { login, logout } from "sessionRequest";
-import ErrorAlert from "util_components/bootstrap/ErrorAlert";
+import React, { FormEvent } from 'react';
+import sessionRequest, { login, logout } from 'sessionRequest';
+import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
 
 type Props = {
   changePasswordUrl: string;
@@ -16,9 +16,9 @@ type State = {
 };
 
 const initialState: State = {
-  new_password1: "",
-  new_password2: "",
-  error: "",
+  new_password1: '',
+  new_password2: '',
+  error: '',
   success: false,
 };
 
@@ -34,10 +34,7 @@ export default class ResetPasswordForm extends React.Component<Props, State> {
       </p>
     ) : (
       <form onSubmit={this.submit}>
-        <ErrorAlert
-          status={Boolean(this.state.error)}
-          message={this.state.error}
-        />
+        <ErrorAlert status={Boolean(this.state.error)} message={this.state.error} />
         <div className="form-group">
           <label htmlFor="password">Password</label>
           <input
@@ -66,7 +63,7 @@ export default class ResetPasswordForm extends React.Component<Props, State> {
   }
 
   focusPassword() {
-    const input = document.getElementById("password");
+    const input = document.getElementById('password');
     if (input) input.focus();
   }
 
@@ -80,7 +77,7 @@ export default class ResetPasswordForm extends React.Component<Props, State> {
     this.setState({ error: false, ...data });
     logout();
     sessionRequest(changePasswordUrl, {
-      method: "POST",
+      method: 'POST',
       data: { ...data, uid, token },
     }).then((response) => {
       if (response.status == 200) this.setState({ success: true });
@@ -90,7 +87,7 @@ export default class ResetPasswordForm extends React.Component<Props, State> {
             this.setState({
               error: (
                 <>
-                  Invalid token. You may need to request a new reset from the{" "}
+                  Invalid token. You may need to request a new reset from the{' '}
                   <a href="/#/">login screen</a>.
                 </>
               ),
@@ -98,7 +95,7 @@ export default class ResetPasswordForm extends React.Component<Props, State> {
           const field_error = resp.new_password1 || resp.new_password2;
           if (field_error) this.setState({ error: field_error });
         });
-      else this.setState({ error: "Reset failed. Please try again." });
+      else this.setState({ error: 'Reset failed. Please try again.' });
     });
   };
 }

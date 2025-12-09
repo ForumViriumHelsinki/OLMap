@@ -1,22 +1,22 @@
-import React from "react";
+import React from 'react';
 
 // @ts-ignore
-import { Button, Spinner } from "reactstrap";
-import Icon from "util_components/bootstrap/Icon";
-import { LocationTuple, Location } from "util_components/types";
-import Modal from "util_components/bootstrap/Modal";
-import ErrorAlert from "util_components/bootstrap/ErrorAlert";
+import { Button, Spinner } from 'reactstrap';
+import Icon from 'util_components/bootstrap/Icon';
+import { LocationTuple, Location } from 'util_components/types';
+import Modal from 'util_components/bootstrap/Modal';
+import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
 
-import sessionRequest from "sessionRequest";
-import { osmImageNotesUrl, osmImageNoteUrl } from "urls";
-import { ImageNotesContext, OSMImageNote } from "components/types";
-import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
-import MapFeatureSet from "components/map_features/MapFeatureSet";
-import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
-import { OSMFeature } from "util_components/osm/types";
-import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
-import Confirm from "util_components/bootstrap/Confirm";
-import MapToolButton from "components/osm_image_notes/MapToolButton";
+import sessionRequest from 'sessionRequest';
+import { osmImageNotesUrl, osmImageNoteUrl } from 'urls';
+import { ImageNotesContext, OSMImageNote } from 'components/types';
+import OSMFeaturesSelection from 'util_components/osm/OSMFeaturesSelection';
+import MapFeatureSet from 'components/map_features/MapFeatureSet';
+import OSMImageNoteTags from 'components/osm_image_notes/OSMImageNoteTags';
+import { OSMFeature } from 'util_components/osm/types';
+import NearbyAddressesAsOSMLoader from 'components/osm_image_notes/NearbyAddressesAsOSMLoader';
+import Confirm from 'util_components/bootstrap/Confirm';
+import MapToolButton from 'components/osm_image_notes/MapToolButton';
 
 type NewOSMImageNoteProps = {
   requestNoteType?: boolean;
@@ -26,7 +26,7 @@ type NewOSMImageNoteProps = {
 };
 
 type NewOSMImageNoteState = OSMImageNote & {
-  status: "initial" | "locating" | "relating" | "commenting" | "thanks";
+  status: 'initial' | 'locating' | 'relating' | 'commenting' | 'thanks';
   submitting: boolean;
   error: boolean;
   imageError: boolean;
@@ -40,11 +40,11 @@ type NewOSMImageNoteState = OSMImageNote & {
 };
 
 const initialState: () => NewOSMImageNoteState = () => ({
-  status: "initial",
+  status: 'initial',
   lat: undefined,
   lon: undefined,
   image: undefined,
-  comment: "",
+  comment: '',
   osm_features: [],
   addresses: [],
   error: false,
@@ -102,10 +102,7 @@ export default class NewOSMImageNote extends React.Component<
         />
 
         {imageError && (
-          <Modal
-            title="Image error"
-            onClose={() => this.setState({ imageError: false })}
-          >
+          <Modal title="Image error" onClose={() => this.setState({ imageError: false })}>
             There was an error uploading the image. Try again maybe?
           </Modal>
         )}
@@ -116,8 +113,7 @@ export default class NewOSMImageNote extends React.Component<
               <>
                 {imagesUploading.length > 0 && (
                   <Button outline disabled size="sm">
-                    <Icon icon="cloud_upload" /> {imagesUploading.length}{" "}
-                    <Spinner size="sm" />
+                    <Icon icon="cloud_upload" /> {imagesUploading.length} <Spinner size="sm" />
                   </Button>
                 )}
                 <MapToolButton icon="camera_alt" onClick={this.onImageClick} />
@@ -127,33 +123,26 @@ export default class NewOSMImageNote extends React.Component<
 
             locating: (
               <div className="mt-4 text-right">
-                Scroll map to select position{" "}
+                Scroll map to select position{' '}
                 <MapToolButton onClick={this.onCancel}>Cancel</MapToolButton>
               </div>
             ),
             relating: (
-              <Modal
-                title="Choose related places (optional)"
-                onClose={this.onCancel}
-              >
+              <Modal title="Choose related places (optional)" onClose={this.onCancel}>
                 <NearbyAddressesAsOSMLoader
                   location={location}
-                  onLoad={(nearbyAddresses) =>
-                    this.setState({ nearbyAddresses })
-                  }
+                  onLoad={(nearbyAddresses) => this.setState({ nearbyAddresses })}
                 />
                 <OSMFeaturesSelection
                   location={location}
                   extraFeatures={nearbyAddresses}
                   preselectedFeatureIds={this.props.osmFeatures}
-                  onFeaturesLoaded={(nearbyFeatures) =>
-                    this.setState({ nearbyFeatures })
-                  }
+                  onFeaturesLoaded={(nearbyFeatures) => this.setState({ nearbyFeatures })}
                   onSelect={(osm_features, addresses) =>
                     this.setState({
                       osm_features,
                       addresses: addresses || [],
-                      status: "commenting",
+                      status: 'commenting',
                     })
                   }
                 />
@@ -161,10 +150,7 @@ export default class NewOSMImageNote extends React.Component<
             ),
             commenting: (
               <Modal title="Add comment" onClose={this.onCancel}>
-                <ErrorAlert
-                  status={error}
-                  message="Submit failed. Try again maybe?"
-                />
+                <ErrorAlert status={error} message="Submit failed. Try again maybe?" />
                 <textarea
                   className="form-control"
                   rows={5}
@@ -192,9 +178,7 @@ export default class NewOSMImageNote extends React.Component<
                               ...mapFeatureSets,
                             }}
                             onSubmit={(data) => this.addMapFeatureSets(data)}
-                            nearbyFeatures={nearbyFeatures.concat(
-                              nearbyAddresses,
-                            )}
+                            nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}
                             addNearbyFeature={(f) =>
                               this.setState({
                                 nearbyFeatures: [f].concat(nearbyFeatures),
@@ -212,7 +196,7 @@ export default class NewOSMImageNote extends React.Component<
                   size="sm"
                   onClick={submitting ? undefined : this.onSubmit}
                 >
-                  {submitting ? "Submitting..." : "Done"}
+                  {submitting ? 'Submitting...' : 'Done'}
                 </Button>
               </Modal>
             ),
@@ -277,29 +261,29 @@ export default class NewOSMImageNote extends React.Component<
 
   onCommentClick = () => {
     this.props.requestLocation(this.onLocationSelected);
-    this.setState({ status: "locating", chooseNoteType: false });
+    this.setState({ status: 'locating', chooseNoteType: false });
   };
 
   private imageEl() {
-    return document.getElementById("image") as HTMLInputElement;
+    return document.getElementById('image') as HTMLInputElement;
   }
 
   onImageCaptured = () => {
     const files = this.imageEl().files as FileList;
     this.props.requestLocation(this.onLocationSelected);
-    this.setState({ status: "locating", image: files[0] });
+    this.setState({ status: 'locating', image: files[0] });
   };
 
   onLocationSelected = (location?: Location) => {
-    if (location) this.setState({ status: "relating", ...location });
+    if (location) this.setState({ status: 'relating', ...location });
     else this.setState(resetState);
   };
 
   onCancel = () => {
     const status = this.state.status;
-    if (status == "commenting") this.setState({ confirmCancel: true });
+    if (status == 'commenting') this.setState({ confirmCancel: true });
     else {
-      if (status == "locating") this.props.cancelLocationRequest();
+      if (status == 'locating') this.props.cancelLocationRequest();
       this.setState(resetState);
     }
   };
@@ -333,34 +317,31 @@ export default class NewOSMImageNote extends React.Component<
 
     this.setState({ submitting: true });
 
-    sessionRequest(osmImageNotesUrl, { method: "POST", data: fields }).then(
-      (response: any) => {
-        if (response.status >= 300)
-          return this.setState({ error: true, submitting: false });
-        response.json().then((data: OSMImageNote) => {
-          this.setState({ ...resetState, status: "thanks" });
+    sessionRequest(osmImageNotesUrl, { method: 'POST', data: fields }).then((response: any) => {
+      if (response.status >= 300) return this.setState({ error: true, submitting: false });
+      response.json().then((data: OSMImageNote) => {
+        this.setState({ ...resetState, status: 'thanks' });
 
-          if (!image) {
-            addNote(data);
-            return;
-          }
+        if (!image) {
+          addNote(data);
+          return;
+        }
 
-          let formData = new FormData();
-          formData.append("image", image);
-          this.setState({ imagesUploading: imagesUploading.concat([data]) });
-          sessionRequest(osmImageNoteUrl(data.id as number), {
-            method: "PATCH",
-            body: formData,
-          }).then((response: any) => {
-            const uploading = this.state.imagesUploading.slice();
-            uploading.splice(uploading.indexOf(data, 1));
-            this.setState({ imagesUploading: uploading });
+        let formData = new FormData();
+        formData.append('image', image);
+        this.setState({ imagesUploading: imagesUploading.concat([data]) });
+        sessionRequest(osmImageNoteUrl(data.id as number), {
+          method: 'PATCH',
+          body: formData,
+        }).then((response: any) => {
+          const uploading = this.state.imagesUploading.slice();
+          uploading.splice(uploading.indexOf(data, 1));
+          this.setState({ imagesUploading: uploading });
 
-            if (response.status >= 300) this.setState({ imageError: true });
-            addNote(data);
-          });
+          if (response.status >= 300) this.setState({ imageError: true });
+          addNote(data);
         });
-      },
-    );
+      });
+    });
   };
 }

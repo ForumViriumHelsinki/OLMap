@@ -1,5 +1,5 @@
-import React from "react";
-import "./ZoomableImage.css";
+import React from 'react';
+import './ZoomableImage.css';
 
 type ZoomableImageProps = {
   src: string;
@@ -14,12 +14,9 @@ const initialState: ZoomableImageState = {
   imageZoom: false,
 };
 
-export default class ZoomableImage extends React.Component<
-  ZoomableImageProps,
-  ZoomableImageState
-> {
+export default class ZoomableImage extends React.Component<ZoomableImageProps, ZoomableImageState> {
   static defaultProps = {
-    className: "",
+    className: '',
   };
 
   state = initialState;
@@ -29,7 +26,7 @@ export default class ZoomableImage extends React.Component<
     return (
       <img
         src={src}
-        className={"zoomableImage " + className}
+        className={'zoomableImage ' + className}
         onMouseMove={this.positionImage}
         onMouseOut={this.restoreImage}
         onClick={this.toggleImgZoom}
@@ -42,15 +39,12 @@ export default class ZoomableImage extends React.Component<
     const target = e.target as HTMLElement;
     this.setState({ imageZoom });
     if (imageZoom) {
-      target.classList.add("zoom");
+      target.classList.add('zoom');
       this.positionImage(e, true);
     } else this.restoreImage(e);
   };
 
-  positionImage = (
-    e: React.MouseEvent<HTMLImageElement, MouseEvent>,
-    force?: boolean,
-  ) => {
+  positionImage = (e: React.MouseEvent<HTMLImageElement, MouseEvent>, force?: boolean) => {
     if (!(force || this.state.imageZoom)) return;
 
     const target = e.target as HTMLImageElement;
@@ -59,9 +53,7 @@ export default class ZoomableImage extends React.Component<
     const imgRatio = naturalWidth / naturalHeight;
     const xScale = imgRatio / imgAreaRatio;
     const [shownWidth, offset] =
-      imgAreaRatio > imgRatio
-        ? [width * xScale, (width * (1 - xScale)) / 2]
-        : [width, 0];
+      imgAreaRatio > imgRatio ? [width * xScale, (width * (1 - xScale)) / 2] : [width, 0];
     const { offsetX, offsetY } = e.nativeEvent;
     const scaledX = offsetX - offset;
     const posX = -(scaledX / shownWidth) * naturalWidth + width / 2;
@@ -71,8 +63,8 @@ export default class ZoomableImage extends React.Component<
 
   restoreImage = (e: React.MouseEvent<HTMLImageElement, MouseEvent>) => {
     const target = e.target as HTMLElement;
-    target.classList.remove("zoom");
-    target.style.objectPosition = "";
+    target.classList.remove('zoom');
+    target.style.objectPosition = '';
     this.setState({ imageZoom: false });
   };
 }

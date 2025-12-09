@@ -1,7 +1,7 @@
-import React from "react";
-import PillsSelection from "util_components/PillsSelection";
-import { MapFeatureTypes } from "components/types";
-import Icon from "util_components/bootstrap/Icon";
+import React from 'react';
+import PillsSelection from 'util_components/PillsSelection';
+import { MapFeatureTypes } from 'components/types';
+import Icon from 'util_components/bootstrap/Icon';
 
 type OSMImageNoteTagsProps = {
   mapFeatureTypes?: MapFeatureTypes;
@@ -19,7 +19,7 @@ const initialState: OSMImageNoteTagsState = {
   editing: false,
 };
 
-const defaultTags = ["Problem"];
+const defaultTags = ['Problem'];
 
 export default class OSMImageNoteTags extends React.Component<OSMImageNoteTagsProps> {
   state = initialState;
@@ -28,9 +28,7 @@ export default class OSMImageNoteTags extends React.Component<OSMImageNoteTagsPr
     const { mapFeatureTypes, tags, readOnly, expanded } = this.props;
     const { editing } = this.state;
     const tagOptions =
-      editing && mapFeatureTypes
-        ? defaultTags.concat(Object.keys(mapFeatureTypes))
-        : tags;
+      editing && mapFeatureTypes ? defaultTags.concat(Object.keys(mapFeatureTypes)) : tags;
     return (
       <div className="list-group-item">
         <strong>Tags: </strong>
@@ -38,7 +36,7 @@ export default class OSMImageNoteTags extends React.Component<OSMImageNoteTagsPr
           tags.length > 0 ? (
             <PillsSelection options={tags} selected={tags} />
           ) : (
-            "No tags selected."
+            'No tags selected.'
           )
         ) : (
           <>
@@ -47,14 +45,10 @@ export default class OSMImageNoteTags extends React.Component<OSMImageNoteTagsPr
                 className="btn btn-light btn-sm rounded-pill float-right"
                 onClick={() => this.setState({ editing: !editing })}
               >
-                <Icon icon={editing ? "close" : "edit"} />
+                <Icon icon={editing ? 'close' : 'edit'} />
               </button>
             )}
-            <PillsSelection
-              options={tagOptions}
-              selected={tags}
-              onClick={this.toggleTag}
-            />
+            <PillsSelection options={tagOptions} selected={tags} onClick={this.toggleTag} />
           </>
         )}
       </div>

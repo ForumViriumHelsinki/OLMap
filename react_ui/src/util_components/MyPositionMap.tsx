@@ -1,18 +1,18 @@
-import React from "react";
-import { getBounds } from "geolib";
+import React from 'react';
+import { getBounds } from 'geolib';
 // @ts-ignore
-import * as L from "leaflet";
-import settings from "../settings.js";
+import * as L from 'leaflet';
+import settings from '../settings.js';
 
-import "leaflet/dist/leaflet.css";
+import 'leaflet/dist/leaflet.css';
 
-import GlyphIcon from "util_components/GlyphIcon";
-import Geolocator from "util_components/Geolocator";
-import { Location } from "util_components/types";
+import GlyphIcon from 'util_components/GlyphIcon';
+import Geolocator from 'util_components/Geolocator';
+import { Location } from 'util_components/types';
 // @ts-ignore
-import { Button } from "reactstrap";
-import Map from "util_components/Map";
-import urlMapPosition from "util_components/urlMapPosition";
+import { Button } from 'reactstrap';
+import Map from 'util_components/Map';
+import urlMapPosition from 'util_components/urlMapPosition';
 
 type MapProps = {
   onLocationSelected?: (location: any) => any;
@@ -47,24 +47,14 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
     return (
       <div className="position-relative">
         {onLocationSelected && (
-          <div
-            className="position-absolute p-2 text-center w-100"
-            style={{ zIndex: 500 }}
-          >
-            <Button
-              color="primary"
-              size="sm"
-              onClick={() => this.onLocationSelected()}
-            >
+          <div className="position-absolute p-2 text-center w-100" style={{ zIndex: 500 }}>
+            <Button color="primary" size="sm" onClick={() => this.onLocationSelected()}>
               Select here
             </Button>
           </div>
         )}
         {currentPosition && (
-          <div
-            className="position-absolute"
-            style={{ zIndex: 401, right: 12, bottom: 36 }}
-          >
+          <div className="position-absolute" style={{ zIndex: 401, right: 12, bottom: 36 }}>
             <Button color="primary" size="sm" onClick={this.gotoMyLocation}>
               <i className="material-icons">my_location</i>
             </Button>
@@ -78,11 +68,7 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
         >
           {children}
         </Map>
-        <Geolocator
-          onLocation={([lon, lat]) =>
-            this.setState({ currentPosition: { lat, lon } })
-          }
-        />
+        <Geolocator onLocation={([lon, lat]) => this.setState({ currentPosition: { lat, lon } })} />
       </div>
     );
   }
@@ -100,11 +86,7 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
   componentDidUpdate(prevProps: MapProps) {
     const location = this.props.location;
     if (location && location !== prevProps.location) {
-      urlMapPosition.write(
-        location.lat,
-        location.lon,
-        this.leafletMap?.getZoom() || 18,
-      );
+      urlMapPosition.write(location.lat, location.lon, this.leafletMap?.getZoom() || 18);
       this.setState({ userMovedMap: false });
     }
     this.refreshMap();
@@ -137,7 +119,7 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
 
     if (onLocationSelected) {
       if (!this.markers.selectedPosition) {
-        const icon = new (GlyphIcon as any)({ glyph: "add", glyphSize: 20 });
+        const icon = new (GlyphIcon as any)({ glyph: 'add', glyphSize: 20 });
         this.markers.selectedPosition = L.marker(this.leafletMap.getCenter(), {
           icon,
         }).addTo(this.leafletMap);
@@ -152,42 +134,29 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
       if (marker) marker.setLatLng(currentLatLng);
       else {
         const icon = new (GlyphIcon as any)({
-          glyph: "my_location",
+          glyph: 'my_location',
           glyphSize: 20,
         });
-        this.markers.currentPosition = L.marker(
-          currentLatLng as [number, number],
-          { icon },
-        ).addTo(this.leafletMap);
+        this.markers.currentPosition = L.marker(currentLatLng as [number, number], { icon }).addTo(
+          this.leafletMap,
+        );
       }
     }
   }
 
   getMapState() {
     const center = this.leafletMap.getCenter();
-    return [center.lat, center.lng, this.leafletMap.getZoom()] as [
-      number,
-      number,
-      number,
-    ];
+    return [center.lat, center.lng, this.leafletMap.getZoom()] as [number, number, number];
   }
 
   onMapInitialized = (leafletMap: any) => {
     const { onMapInitialized } = this.props;
     this.leafletMap = leafletMap;
-    this.leafletMap.on("zoomstart", () =>
-      this.setState({ userMovedMap: true }),
-    );
-    this.leafletMap.on("movestart", () =>
-      this.setState({ userMovedMap: true }),
-    );
-    this.leafletMap.on("move", () => this.mapMoved());
-    this.leafletMap.on("zoomend", () =>
-      urlMapPosition.write(...this.getMapState()),
-    );
-    this.leafletMap.on("moveend", () =>
-      urlMapPosition.write(...this.getMapState()),
-    );
+    this.leafletMap.on('zoomstart', () => this.setState({ userMovedMap: true }));
+    this.leafletMap.on('movestart', () => this.setState({ userMovedMap: true }));
+    this.leafletMap.on('move', () => this.mapMoved());
+    this.leafletMap.on('zoomend', () => urlMapPosition.write(...this.getMapState()));
+    this.leafletMap.on('moveend', () => urlMapPosition.write(...this.getMapState()));
     this.refreshMap();
     if (onMapInitialized) onMapInitialized(leafletMap);
   };
@@ -204,10 +173,10 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
   gotoMyLocation = () => {
     const { currentPosition } = this.state;
     if (!currentPosition) return;
-    const currentLatLng = [
-      (currentPosition as any).lat,
-      (currentPosition as any).lon,
-    ] as [number, number];
+    const currentLatLng = [(currentPosition as any).lat, (currentPosition as any).lon] as [
+      number,
+      number,
+    ];
     this.leafletMap.setView(currentLatLng, 18);
   };
 

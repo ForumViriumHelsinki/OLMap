@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export default class ErrorAlert extends React.Component<{
   status?: boolean;
@@ -11,7 +11,7 @@ export default class ErrorAlert extends React.Component<{
         {message}
       </div>
     ) : (
-      ""
+      ''
     );
   }
 }

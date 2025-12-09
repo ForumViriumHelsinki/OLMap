@@ -1,29 +1,25 @@
-import React from "react";
-import Form from "@rjsf/core";
-import validator from "@rjsf/validator-ajv8";
-import { JSONSchema7 } from "json-schema";
-import Modal, { ModalBody } from "util_components/bootstrap/Modal";
-import CreateChangeset from "util_components/osm/api/CreateChangeset";
-import ErrorAlert from "util_components/bootstrap/ErrorAlert";
-import { AppContext, OSMEditContextType } from "components/types";
-import {
-  osmApiCall,
-  osmEditContext,
-  setOSMContext,
-} from "util_components/osm/utils";
+import React from 'react';
+import Form from '@rjsf/core';
+import validator from '@rjsf/validator-ajv8';
+import { JSONSchema7 } from 'json-schema';
+import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
+import CreateChangeset from 'util_components/osm/api/CreateChangeset';
+import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
+import { AppContext, OSMEditContextType } from 'components/types';
+import { osmApiCall, osmEditContext, setOSMContext } from 'util_components/osm/utils';
 
 const schema: JSONSchema7 = {
-  type: "object",
+  type: 'object',
   properties: {
-    username: { type: "string", title: "OSM Username", default: "" },
-    password: { type: "string", title: "OSM Password", default: "" },
-    comment: { type: "string", title: "Changeset comment", default: "" },
+    username: { type: 'string', title: 'OSM Username', default: '' },
+    password: { type: 'string', title: 'OSM Password', default: '' },
+    comment: { type: 'string', title: 'Changeset comment', default: '' },
   },
-  required: ["username", "password", "comment"],
+  required: ['username', 'password', 'comment'],
 };
 
 const uiSchema = {
-  password: { "ui:widget": "password" },
+  password: { 'ui:widget': 'password' },
 };
 
 type OpenOSMChangesetProps = {
@@ -56,7 +52,7 @@ export default class OpenOSMChangesetModal extends React.Component<
       fields = {
         username,
         password,
-        comment: changeset ? changeset.comment : "",
+        comment: changeset ? changeset.comment : '',
       };
     } else fields = {};
 
@@ -84,20 +80,17 @@ export default class OpenOSMChangesetModal extends React.Component<
   onSubmit = (data: any) => {
     const { username, password, comment } = data.formData;
     const { onCreated, onClose } = this.props;
-    osmApiCall(
-      "changeset/create",
-      CreateChangeset,
-      { comment },
-      { username, password },
-    ).then(({ response, text }) => {
-      if (!response.ok) this.setState({ error: text, formData: data.formData });
-      else {
-        const id = parseInt(text);
-        const context = { username, password, changeset: { id, comment } };
-        setOSMContext(context);
-        onCreated(context);
-        onClose();
-      }
-    });
+    osmApiCall('changeset/create', CreateChangeset, { comment }, { username, password }).then(
+      ({ response, text }) => {
+        if (!response.ok) this.setState({ error: text, formData: data.formData });
+        else {
+          const id = parseInt(text);
+          const context = { username, password, changeset: { id, comment } };
+          setOSMContext(context);
+          onCreated(context);
+          onClose();
+        }
+      },
+    );
   };
 }

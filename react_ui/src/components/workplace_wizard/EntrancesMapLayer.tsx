@@ -1,18 +1,14 @@
-import React from "react";
+import React from 'react';
 
-import { nearbyEntrancesUrl } from "components/workplace_wizard/urls";
-import {
-  MapFeature,
-  Point,
-  Workplace,
-} from "components/workplace_wizard/types";
-import { Marker, Popup } from "react-leaflet";
-import * as L from "leaflet";
-import delivery_icon from "./delivery_entrance.svg";
-import sessionRequest from "sessionRequest";
-import { LatLngLiteral } from "leaflet";
-import { popupBtn, WWIcon } from "components/workplace_wizard/util_components";
-import { ImageButton } from "components/workplace_wizard/ImageButton";
+import { nearbyEntrancesUrl } from 'components/workplace_wizard/urls';
+import { MapFeature, Point, Workplace } from 'components/workplace_wizard/types';
+import { Marker, Popup } from 'react-leaflet';
+import * as L from 'leaflet';
+import delivery_icon from './delivery_entrance.svg';
+import sessionRequest from 'sessionRequest';
+import { LatLngLiteral } from 'leaflet';
+import { popupBtn, WWIcon } from 'components/workplace_wizard/util_components';
+import { ImageButton } from 'components/workplace_wizard/ImageButton';
 
 type EntrancesMapLayerProps = {
   location: Point;
@@ -27,7 +23,7 @@ const initialState: EntrancesMapLayerState = {};
 
 const size = 20;
 const icon = L.divIcon({
-  className: "mapIcon discrete",
+  className: 'mapIcon discrete',
   html: `<img src="${delivery_icon}"/>`,
   iconSize: [size, size],
   iconAnchor: [size / 2, size / 2],
@@ -56,18 +52,11 @@ export default class EntrancesMapLayer extends React.Component<
               <div className="p-2 font-weight-bold">
                 <WWIcon icon="location_city" /> Yhdistä:
               </div>
-              <button
-                className={popupBtn}
-                onClick={() => addEntrance(entrance, true)}
-              >
+              <button className={popupBtn} onClick={() => addEntrance(entrance, true)}>
                 <WWIcon icon="door_front" outline /> Toimitussisäänkäynti
               </button>
-              <button
-                className={popupBtn}
-                onClick={() => addEntrance(entrance, false)}
-              >
-                <WWIcon icon="door_front" className="discrete" outline /> Muu
-                sisäänkäynti
+              <button className={popupBtn} onClick={() => addEntrance(entrance, false)}>
+                <WWIcon icon="door_front" className="discrete" outline /> Muu sisäänkäynti
               </button>
             </Popup>
           </Marker>

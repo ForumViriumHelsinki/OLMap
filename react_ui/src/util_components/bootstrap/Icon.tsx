@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 type Props = {
   icon: string;
@@ -9,7 +9,7 @@ type Props = {
 };
 
 export default class Icon extends React.Component<Props> {
-  static defaultProps = { align: "text-bottom" };
+  static defaultProps = { align: 'text-bottom' };
 
   render() {
     const { icon, text, className, outline, align } = this.props;
@@ -17,8 +17,8 @@ export default class Icon extends React.Component<Props> {
       <>
         <i
           className={`material-icons${
-            outline ? "-outlined" : ""
-          } align-${align} ${className || ""}`}
+            outline ? '-outlined' : ''
+          } align-${align} ${className || ''}`}
         >
           {icon}
         </i>

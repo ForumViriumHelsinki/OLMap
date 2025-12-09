@@ -1,26 +1,26 @@
-import React from "react";
+import React from 'react';
 
-import sessionRequest from "sessionRequest";
-import { mapFeatureTypesUrl, osmImageNoteUrl } from "urls";
-import { AppContext, MapFeatureTypes, OSMImageNote } from "components/types";
-import Modal from "util_components/bootstrap/Modal";
-import ErrorAlert from "util_components/bootstrap/ErrorAlert";
+import sessionRequest from 'sessionRequest';
+import { mapFeatureTypesUrl, osmImageNoteUrl } from 'urls';
+import { AppContext, MapFeatureTypes, OSMImageNote } from 'components/types';
+import Modal from 'util_components/bootstrap/Modal';
+import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
 
-import "components/osm_image_notes/OSMImageNotes.css";
+import 'components/osm_image_notes/OSMImageNotes.css';
 
-import { LocationTuple, Location } from "util_components/types";
-import OSMImageNoteTags from "components/osm_image_notes/OSMImageNoteTags";
-import ZoomableImage from "util_components/ZoomableImage";
-import OSMImageNoteComments from "components/osm_image_notes/OSMImageNoteComments";
-import { OSMFeature } from "util_components/osm/types";
-import { formatTimestamp } from "utils";
-import { userCanEditNote } from "./utils";
-import NearbyAddressesAsOSMLoader from "components/osm_image_notes/NearbyAddressesAsOSMLoader";
-import MapToolButton from "components/osm_image_notes/MapToolButton";
-import OSMImageNoteActionsMenu from "components/osm_image_notes/OSMImageNoteActionsMenu";
-import OSMImageNoteAddress from "components/osm_image_notes/OSMImageNoteAddress";
-import OSMImageNoteRelatedPlaces from "components/osm_image_notes/OSMImageNoteRelatedPlaces";
-import OSMImageNoteMapFeatures from "components/osm_image_notes/OSMImageNoteMapFeatures";
+import { LocationTuple, Location } from 'util_components/types';
+import OSMImageNoteTags from 'components/osm_image_notes/OSMImageNoteTags';
+import ZoomableImage from 'util_components/ZoomableImage';
+import OSMImageNoteComments from 'components/osm_image_notes/OSMImageNoteComments';
+import { OSMFeature } from 'util_components/osm/types';
+import { formatTimestamp } from 'utils';
+import { userCanEditNote } from './utils';
+import NearbyAddressesAsOSMLoader from 'components/osm_image_notes/NearbyAddressesAsOSMLoader';
+import MapToolButton from 'components/osm_image_notes/MapToolButton';
+import OSMImageNoteActionsMenu from 'components/osm_image_notes/OSMImageNoteActionsMenu';
+import OSMImageNoteAddress from 'components/osm_image_notes/OSMImageNoteAddress';
+import OSMImageNoteRelatedPlaces from 'components/osm_image_notes/OSMImageNoteRelatedPlaces';
+import OSMImageNoteMapFeatures from 'components/osm_image_notes/OSMImageNoteMapFeatures';
 
 type OSMImageNoteModalProps = {
   mapFeatureTypes?: MapFeatureTypes;
@@ -84,23 +84,20 @@ export default class OSMImageNoteModal extends React.Component<
     if (repositioning)
       return (
         <div className="mt-4 text-right">
-          Scroll map to select position{" "}
-          <MapToolButton onClick={this.cancelLocationRequest}>
-            Cancel
-          </MapToolButton>
+          Scroll map to select position{' '}
+          <MapToolButton onClick={this.cancelLocationRequest}>Cancel</MapToolButton>
         </div>
       );
 
     const canEdit = userCanEditNote(user, note);
-    const adjustPosition =
-      canEdit && requestLocation ? this.adjustPosition : undefined;
+    const adjustPosition = canEdit && requestLocation ? this.adjustPosition : undefined;
 
     const credit = `${
       note.created_by
-        ? typeof note.created_by === "object"
+        ? typeof note.created_by === 'object'
           ? note.created_by.username
           : note.created_by
-        : "Anonymous"
+        : 'Anonymous'
     } on ${formatTimestamp(note.created_at)}`;
 
     const title = (
@@ -121,29 +118,22 @@ export default class OSMImageNoteModal extends React.Component<
       </>
     );
 
-    const modalCls = note.image ? "modal-xl" : "modal-dialog-centered";
+    const modalCls = note.image ? 'modal-xl' : 'modal-dialog-centered';
     return fullScreen ? (
       <>
         <h6 className="pt-2">{title}</h6>
         {this.renderContent()}
       </>
     ) : (
-      <Modal
-        title={title}
-        className={modalCls}
-        onClose={onClose}
-        headerCls="pl-0 pt-2 pr-2 pb-2"
-      >
+      <Modal title={title} className={modalCls} onClose={onClose} headerCls="pl-0 pt-2 pr-2 pb-2">
         {this.renderContent()}
       </Modal>
     );
   }
 
   renderContent() {
-    const mapFeatureTypes =
-      this.props.mapFeatureTypes || this.state.mapFeatureTypes;
-    const { note, error, nearbyFeatures, nearbyAddresses, repositioning } =
-      this.state;
+    const mapFeatureTypes = this.props.mapFeatureTypes || this.state.mapFeatureTypes;
+    const { note, error, nearbyFeatures, nearbyAddresses, repositioning } = this.state;
     const { user } = this.context;
 
     if (repositioning || !note) return null;
@@ -155,10 +145,7 @@ export default class OSMImageNoteModal extends React.Component<
 
     return (
       <>
-        <ErrorAlert
-          status={error}
-          message="Saving features failed. Try again perhaps?"
-        />
+        <ErrorAlert status={error} message="Saving features failed. Try again perhaps?" />
         {note.image && <ZoomableImage src={note.image} className="noteImage" />}
 
         <OSMImageNoteTags
@@ -182,9 +169,7 @@ export default class OSMImageNoteModal extends React.Component<
 
         <OSMImageNoteRelatedPlaces
           {...{ note, readOnly, saveAddresses: this.saveAddresses }}
-          onFeaturesLoaded={(nearbyFeatures) =>
-            this.setState({ nearbyFeatures })
-          }
+          onFeaturesLoaded={(nearbyFeatures) => this.setState({ nearbyFeatures })}
           savePlaces={this.onFeaturesSelected}
         />
 
@@ -194,17 +179,12 @@ export default class OSMImageNoteModal extends React.Component<
             osmImageNote={note}
             nearbyFeatures={nearbyFeatures.concat(nearbyAddresses)}
             refreshNote={this.fetchNote}
-            addNearbyFeature={(f) =>
-              this.setState({ nearbyFeatures: [f].concat(nearbyFeatures) })
-            }
+            addNearbyFeature={(f) => this.setState({ nearbyFeatures: [f].concat(nearbyFeatures) })}
             onSubmit={(data) => this.updateSelectedNote(data)}
           />
         )}
 
-        <OSMImageNoteComments
-          osmImageNote={note}
-          refreshNote={this.fetchNote}
-        />
+        <OSMImageNoteComments osmImageNote={note} refreshNote={this.fetchNote} />
       </>
     );
   }
@@ -222,7 +202,7 @@ export default class OSMImageNoteModal extends React.Component<
     if (!note) return;
     const url = osmImageNoteUrl(note.id as number);
 
-    sessionRequest(url, { method: "PATCH", data }).then((response) => {
+    sessionRequest(url, { method: 'PATCH', data }).then((response) => {
       if (response.status < 300)
         response.json().then((note: OSMImageNote) => {
           this.setState({ note, error: false });

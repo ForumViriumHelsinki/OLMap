@@ -1,12 +1,12 @@
-import React from "react";
+import React from 'react';
 
-import * as L from "leaflet";
+import * as L from 'leaflet';
 
-import Icon from "util_components/bootstrap/Icon";
-import Map from "util_components/Map";
-import { getCenter, getDistance } from "geolib";
-import { OSMFeature } from "util_components/osm/types";
-import GlyphIcon from "util_components/GlyphIcon";
+import Icon from 'util_components/bootstrap/Icon';
+import Map from 'util_components/Map';
+import { getCenter, getDistance } from 'geolib';
+import { OSMFeature } from 'util_components/osm/types';
+import GlyphIcon from 'util_components/GlyphIcon';
 
 type OSMFeatureMapPopupProps = {
   osmFeature: OSMFeature;
@@ -35,7 +35,7 @@ export default class OSMFeatureMapPopup extends React.Component<
     const { osmFeature, location } = this.props;
     const { open } = this.state;
 
-    if (!(osmFeature.lat && osmFeature.lon)) return "";
+    if (!(osmFeature.lat && osmFeature.lon)) return '';
 
     return (
       <div className="position-relative d-inline-block mr-1">
@@ -75,20 +75,16 @@ export default class OSMFeatureMapPopup extends React.Component<
     const mapLayer = L.layerGroup();
     const style = {
       radius: 2,
-      color: "#28a745",
+      color: '#28a745',
       opacity: 0.05,
       weight: 20,
-      fillColor: "#28a745",
+      fillColor: '#28a745',
       fillOpacity: 1,
     };
-    L.circleMarker({ lng: location[0], lat: location[1] }, style).addTo(
-      mapLayer,
-    );
+    L.circleMarker({ lng: location[0], lat: location[1] }, style).addTo(mapLayer);
     // @ts-ignore
-    const icon = new GlyphIcon({ glyph: "star" });
-    L.marker({ lng: osmFeature.lon, lat: osmFeature.lat }, { icon }).addTo(
-      mapLayer,
-    );
+    const icon = new GlyphIcon({ glyph: 'star' });
+    L.marker({ lng: osmFeature.lon, lat: osmFeature.lat }, { icon }).addTo(mapLayer);
     return mapLayer;
   }
 }

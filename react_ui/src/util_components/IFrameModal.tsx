@@ -1,5 +1,5 @@
-import React from "react";
-import Modal, { ModalBody } from "util_components/bootstrap/Modal";
+import React from 'react';
+import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
 
 type IFrameModalProps = {
   url: string;
@@ -11,10 +11,7 @@ type IFrameModalState = {};
 
 const initialState: IFrameModalState = {};
 
-export default class IFrameModal extends React.Component<
-  IFrameModalProps,
-  IFrameModalState
-> {
+export default class IFrameModal extends React.Component<IFrameModalProps, IFrameModalState> {
   state = initialState;
 
   render() {
@@ -24,9 +21,9 @@ export default class IFrameModal extends React.Component<
         <iframe
           src={url}
           style={{
-            width: "100%",
-            height: "calc(100vh - 200px)",
-            border: "none",
+            width: '100%',
+            height: 'calc(100vh - 200px)',
+            border: 'none',
           }}
         />
       </Modal>

@@ -1,16 +1,16 @@
-import React from "react";
+import React from 'react';
 import {
   ButtonDropdown,
   DropdownItem,
   DropdownMenu,
   DropdownToggle,
   // @ts-ignore
-} from "reactstrap";
-import { AppContext, Notification } from "components/types";
-import sessionRequest from "sessionRequest";
-import { notificationSeenUrl, notificationsUrl } from "urls";
-import { formatTimestamp } from "utils";
-import MapToolButton from "components/osm_image_notes/MapToolButton";
+} from 'reactstrap';
+import { AppContext, Notification } from 'components/types';
+import sessionRequest from 'sessionRequest';
+import { notificationSeenUrl, notificationsUrl } from 'urls';
+import { formatTimestamp } from 'utils';
+import MapToolButton from 'components/osm_image_notes/MapToolButton';
 
 type NotificationsButtonProps = {};
 
@@ -38,10 +38,7 @@ export default class NotificationsButton extends React.Component<
     if (!notifications || !notifications.length) return null;
 
     return (
-      <ButtonDropdown
-        isOpen={open}
-        toggle={() => this.setState({ open: !open })}
-      >
+      <ButtonDropdown isOpen={open} toggle={() => this.setState({ open: !open })}>
         <DropdownToggle tag="span">
           <MapToolButton icon="inbox">{notifications.length}</MapToolButton>
         </DropdownToggle>
@@ -49,9 +46,9 @@ export default class NotificationsButton extends React.Component<
           <div
             className="text-ellipsis"
             style={{
-              maxWidth: "50vw",
-              maxHeight: "calc(100vh - 200px)",
-              overflowY: "auto",
+              maxWidth: '50vw',
+              maxHeight: 'calc(100vh - 200px)',
+              overflowY: 'auto',
             }}
           >
             {notifications.map((notification) => (
@@ -61,8 +58,7 @@ export default class NotificationsButton extends React.Component<
                 key={notification.id}
               >
                 <DropdownItem>
-                  {notification.comment.user || "Anonymous"}:{" "}
-                  {notification.comment.comment}{" "}
+                  {notification.comment.user || 'Anonymous'}: {notification.comment.comment}{' '}
                   <span className="small text-black-50 pl-2">
                     {formatTimestamp(notification.comment.created_at)}
                   </span>
@@ -102,10 +98,8 @@ export default class NotificationsButton extends React.Component<
   };
 
   markSeen(notificationId: number) {
-    sessionRequest(notificationSeenUrl(notificationId), { method: "PUT" }).then(
-      (response: any) => {
-        if (response.status < 300) this.loadNotifications();
-      },
-    );
+    sessionRequest(notificationSeenUrl(notificationId), { method: 'PUT' }).then((response: any) => {
+      if (response.status < 300) this.loadNotifications();
+    });
   }
 }

@@ -1,10 +1,10 @@
-import React from "react";
-import { OSMFeature } from "util_components/osm/types";
-import { OSMImageNote } from "components/types";
-import Icon from "util_components/bootstrap/Icon";
-import { LocationTuple } from "util_components/types";
-import OSMFeaturesSelection from "util_components/osm/OSMFeaturesSelection";
-import { osmFeatureLabel } from "util_components/osm/utils";
+import React from 'react';
+import { OSMFeature } from 'util_components/osm/types';
+import { OSMImageNote } from 'components/types';
+import Icon from 'util_components/bootstrap/Icon';
+import { LocationTuple } from 'util_components/types';
+import OSMFeaturesSelection from 'util_components/osm/OSMFeaturesSelection';
+import { osmFeatureLabel } from 'util_components/osm/utils';
 
 type OSMImageNoteRelatedPlacesProps = {
   note: OSMImageNote;
@@ -43,28 +43,28 @@ export default class OSMImageNoteRelatedPlaces extends React.Component<
               className="btn btn-light btn-sm rounded-pill float-right"
               onClick={() => this.setState({ editing: !editing })}
             >
-              <Icon icon={editing ? "close" : "edit"} />
+              <Icon icon={editing ? 'close' : 'edit'} />
             </button>
           )}
           <strong>Related places: </strong>
           {!editing &&
             (!osm_features.length
-              ? "-"
+              ? '-'
               : !nearbyPlaces.length
-                ? "Loading..."
+                ? 'Loading...'
                 : osm_features.map((featureId) => {
                     const feature = nearbyPlaces.find((a) => a.id == featureId);
                     return (
                       feature && (
                         <span key={featureId}>
-                          {featureId != osm_features[0] && ", "}
+                          {featureId != osm_features[0] && ', '}
                           {osmFeatureLabel(feature)}
                         </span>
                       )
                     );
                   }))}
         </div>
-        <div style={editing ? {} : { display: "none" }}>
+        <div style={editing ? {} : { display: 'none' }}>
           <OSMFeaturesSelection
             location={locationTuple}
             onChange={savePlaces}

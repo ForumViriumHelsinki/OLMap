@@ -1,21 +1,21 @@
-import { default as L } from "leaflet";
+import { default as L } from 'leaflet';
 import {
   AccessPoint,
   MapFeature,
   UnloadingPlace,
   Workplace,
   WorkplaceEntrance,
-} from "components/workplace_wizard/types";
-import { Marker, Popup } from "react-leaflet";
-import React from "react";
-import { JSONSchema } from "components/types";
-import wp_icon from "components/workplace_wizard/workplace.svg";
-import delivery_icon from "components/workplace_wizard/delivery_entrance.svg";
-import entrance_icon from "components/workplace_wizard/entrance.svg";
-import unloading_icon from "components/workplace_wizard/unloading.svg";
-import access_icon from "components/workplace_wizard/access.svg";
-import { ImageButton } from "components/workplace_wizard/ImageButton";
-import { EditMapFeatureButton } from "components/workplace_wizard/EditMapFeatureButton";
+} from 'components/workplace_wizard/types';
+import { Marker, Popup } from 'react-leaflet';
+import React from 'react';
+import { JSONSchema } from 'components/types';
+import wp_icon from 'components/workplace_wizard/workplace.svg';
+import delivery_icon from 'components/workplace_wizard/delivery_entrance.svg';
+import entrance_icon from 'components/workplace_wizard/entrance.svg';
+import unloading_icon from 'components/workplace_wizard/unloading.svg';
+import access_icon from 'components/workplace_wizard/access.svg';
+import { ImageButton } from 'components/workplace_wizard/ImageButton';
+import { EditMapFeatureButton } from 'components/workplace_wizard/EditMapFeatureButton';
 import {
   AddUPButton,
   latLng,
@@ -23,13 +23,13 @@ import {
   popupBtn,
   RemoveButton,
   WWIcon,
-} from "components/workplace_wizard/util_components";
+} from 'components/workplace_wizard/util_components';
 
 const iSize = 28;
 
 function icon(src: string, size: number = iSize, cls?: string) {
   return L.divIcon({
-    className: "mapIcon" + (cls ? " " + cls : ""),
+    className: 'mapIcon' + (cls ? ' ' + cls : ''),
     html: `<img src="${src}"/>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
@@ -44,13 +44,7 @@ export const icons: { [k: string]: any } = {
   access: icon(access_icon),
 };
 
-export const WorkplaceMarker = ({
-  onMove,
-  workplace,
-}: {
-  onMove: any;
-  workplace: Workplace;
-}) => (
+export const WorkplaceMarker = ({ onMove, workplace }: { onMove: any; workplace: Workplace }) => (
   <Marker position={latLng(workplace)} icon={icons.workplace}>
     <Popup closeOnClick={true} closeButton={false} className="wwPopup">
       <MoveButton onClick={onMove} />
@@ -114,9 +108,7 @@ export const UPMarker = ({ up, entrance, editor, schema }: UPMarkerProps) => (
         onChange={() => editor.setState({ changed: true })}
       />
       <RemoveButton
-        onClick={() =>
-          editor.removeItem(up, entrance.unloading_places as UnloadingPlace[])
-        }
+        onClick={() => editor.removeItem(up, entrance.unloading_places as UnloadingPlace[])}
       />
     </Popup>
   </Marker>
@@ -132,9 +124,7 @@ export const APMarker = ({ ap, up, editor }: APMarkerProps) => (
   <Marker position={latLng(ap)} icon={icons.access}>
     <Popup closeOnClick={true} closeButton={false} className="wwPopup">
       <MoveButton onClick={() => editor.move(ap)} />
-      <RemoveButton
-        onClick={() => editor.removeItem(ap, up.access_points as MapFeature[])}
-      />
+      <RemoveButton onClick={() => editor.removeItem(ap, up.access_points as MapFeature[])} />
     </Popup>
   </Marker>
 );

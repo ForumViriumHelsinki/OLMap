@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export type User = {
   id: number;
@@ -72,7 +72,7 @@ export type WorkplaceEntrance = {
   entrance_data?: MapFeature;
   workplace: number;
   entrance?: number;
-  deliveries?: "yes" | "no" | "main";
+  deliveries?: 'yes' | 'no' | 'main';
   delivery_types?: string[];
   delivery_hours?: string;
   delivery_instructions?: string;
@@ -105,6 +105,4 @@ export type ImageNotesContextType = {
   user?: User;
 };
 
-export const ImageNotesContext = React.createContext(
-  {} as ImageNotesContextType,
-);
+export const ImageNotesContext = React.createContext({} as ImageNotesContextType);
