@@ -1,0 +1,126 @@
+# OLMap Frontend - Helm values for helm-webapp chart
+# Tech stack: React 18, TypeScript, Leaflet/MapboxGL, nginx
+
+image:
+  repository: ghcr.io/forumviriumhelsinki/olmap-frontend
+  tag: "0.2.1"  # Updated by ArgoCD Image Updater
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+- name: ghcr-login-secret
+
+# Frontend uses a separate service account (no GCP access needed)
+serviceAccount:
+  create: false
+
+# Security context for Kyverno policy compliance
+# nginx user (101) with writable directories via emptyDir
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 101
+  fsGroup: 101
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 101
+  capabilities:
+    drop:
+    - ALL
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 80
+
+# Ingress configuration - serves the SPA, proxies /api to backend
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # SPA catch-all routing - serve index.html for non-file paths
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      location ~* ^/(?!api|admin|static|rest-auth|accounts|health).*$ {
+        try_files $uri $uri/ /index.html;
+      }
+  hosts:
+  - host: olmap.dataportal.fi
+    paths:
+    - path: /
+      pathType: Prefix
+  tls:
+  - hosts:
+    - olmap.dataportal.fi
+    secretName: olmap-frontend-tls # pragma: allowlist secret
+
+# Health check for nginx
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Resource allocation
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+# Volumes for nginx writable directories (required with readOnlyRootFilesystem)
+volumes:
+- name: nginx-cache
+  emptyDir: {}
+- name: nginx-run
+  emptyDir: {}
+- name: nginx-tmp
+  emptyDir: {}
+- name: nginx-conf
+  emptyDir: {}
+
+volumeMounts:
+- name: nginx-cache
+  mountPath: /var/cache/nginx
+- name: nginx-run
+  mountPath: /var/run
+- name: nginx-tmp
+  mountPath: /tmp
+- name: nginx-conf
+  mountPath: /etc/nginx/conf.d
+
+# Single replica managed by KEDA
+replicaCount: 1
+
+# KEDA scaling configuration (office hours: Mon-Fri 7am-6pm Helsinki)
+keda:
+  enabled: true
+  minReplicaCount: 0
+  maxReplicaCount: 2
+  pollingInterval: 30
+  cooldownPeriod: 300
+  triggers:
+  - type: cron
+    metadata:
+      timezone: Europe/Helsinki
+      start: 0 7 * * 1-5
+      end: 0 18 * * 1-5
+      desiredReplicas: "1"
