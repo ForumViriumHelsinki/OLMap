@@ -1,15 +1,15 @@
-# OLMap - Django Backend
-# Tech stack: Django REST Framework, PostgreSQL, Gunicorn
+# OLMap Backend - Helm values for helm-webapp chart
+# Tech stack: Django REST Framework, PostgreSQL, Cloud SQL IAM Auth
 
 image:
   repository: ghcr.io/forumviriumhelsinki/olmap-backend
-  tag: "0.1.0"  # Updated by ArgoCD Image Updater
+  tag: "0.2.1"  # Updated by ArgoCD Image Updater
 
 # Migration job image - tracked separately for visibility
 migrations:
   image:
     repository: ghcr.io/forumviriumhelsinki/olmap-backend
-    tag: "0.1.0"  # Updated by ArgoCD Image Updater
+    tag: "0.2.1"  # Updated by ArgoCD Image Updater
 
 imagePullSecrets:
 - name: ghcr-login-secret
@@ -59,57 +59,30 @@ podSecurityContext:
 
 securityContext:
   allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: false  # Django needs writable filesystem
+  readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 1000
   capabilities:
     drop:
     - ALL
 
-# Service configuration
-service:
-  type: ClusterIP
-  port: 8000
-  targetPort: 8000
-
-# Ingress configuration
-ingress:
-  enabled: true
-  className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  hosts:
-  - host: api.olmap.dataportal.fi
-    paths:
-    - path: /
-      pathType: ImplementationSpecific
-  tls:
-  - hosts:
-    - api.olmap.dataportal.fi
-    secretName: olmap-backend-tls  # pragma: allowlist secret
-
-# Health checks
-livenessProbe:
-  httpGet:
-    path: /health/
-    port: 8000
-  initialDelaySeconds: 30
-  periodSeconds: 30
-  timeoutSeconds: 5
-  failureThreshold: 3
-
-readinessProbe:
-  httpGet:
-    path: /health/
-    port: 8000
-  initialDelaySeconds: 10
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 3
-
 # Environment variables
 env:
-  # Database configuration via Cloud SQL Proxy with IAM authentication
+  # Django settings
+  DJANGO_DEBUG:
+    value: "false"
+  DJANGO_SECRET_KEY:
+    valueFrom:
+      secretKeyRef:
+        name: olmap-backend-secrets
+        key: DJANGO_SECRET_KEY
+  DJANGO_ALLOWED_HOSTS:
+    value: "olmap.dataportal.fi,localhost"
+  DJANGO_CORS_ALLOWED_ORIGINS:
+    value: "https://olmap.dataportal.fi"
+  DJANGO_MIGRATE:
+    value: "true"
+  # Database configuration (Cloud SQL via proxy with IAM auth)
   SQL_ENGINE:
     value: "django.db.backends.postgresql"
   SQL_HOST:
@@ -120,58 +93,113 @@ env:
     value: "api_olmap_org"
   POSTGRES_USER:
     value: "olmap-app@fvh-project-containers-etc.iam"
-  # Django settings
-  DJANGO_DEBUG:
-    value: "False"
-  DJANGO_ALLOWED_HOSTS:
-    value: "api.olmap.dataportal.fi,citylogistiikka.fvh.io,localhost"
-  # Secret key from External Secrets
-  DJANGO_SECRET_KEY:
-    valueFrom:
-      secretKeyRef:
-        name: olmap-secrets
-        key: DJANGO_SECRET_KEY
-  # Sentry error tracking
+  # Frontend URL for CORS and redirects
+  FRONTEND_ROOT:
+    value: "https://olmap.dataportal.fi"
+  # Admin email
+  ADMIN_EMAIL:
+    value: "admin@forumvirium.fi"
+  # Sentry for error monitoring
   SENTRY_DSN:
     valueFrom:
       secretKeyRef:
-        name: olmap-secrets
+        name: olmap-backend-secrets
         key: SENTRY_DSN
   SENTRY_ENVIRONMENT:
     value: "production"
+  # Google OAuth (for django-allauth)
+  GOOGLE_CLIENT_ID:
+    valueFrom:
+      secretKeyRef:
+        name: olmap-backend-secrets
+        key: GOOGLE_CLIENT_ID
+  GOOGLE_CLIENT_SECRET:
+    valueFrom:
+      secretKeyRef:
+        name: olmap-backend-secrets
+        key: GOOGLE_CLIENT_SECRET
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+# Ingress configuration - API endpoint (same domain as frontend, path-based routing)
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+  - host: olmap.dataportal.fi
+    paths:
+    - path: /api
+      pathType: Prefix
+    - path: /admin
+      pathType: Prefix
+    - path: /static
+      pathType: Prefix
+    - path: /rest-auth
+      pathType: Prefix
+    - path: /accounts
+      pathType: Prefix
+  tls:
+  - hosts:
+    - olmap.dataportal.fi
+    secretName: olmap-backend-tls  # pragma: allowlist secret
+
+# Health checks for Django
+livenessProbe:
+  httpGet:
+    path: /health/
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /ready/
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
 
 # Resource allocation
 resources:
   requests:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 250m
+    memory: 512Mi
   limits:
     cpu: 500m
-    memory: 512Mi
+    memory: 1Gi
 
-# Volumes for writable directories
+# Volumes for writable directories (required with readOnlyRootFilesystem)
 volumes:
 - name: tmp
   emptyDir: {}
-- name: static
+- name: staticfiles
   emptyDir: {}
 
 volumeMounts:
 - name: tmp
   mountPath: /tmp
-- name: static
+- name: staticfiles
   mountPath: /app/staticfiles
 
 # External Secrets configuration (secrets from GCP Secret Manager)
 externalSecret:
   enabled: true
-  name: olmap-external-secret
+  name: olmap-backend-external-secret
   refreshInterval: 1h
   secretStoreRef:
     kind: ClusterSecretStore
     name: gcp-store
   target:
-    name: olmap-secrets
+    name: olmap-backend-secrets
     creationPolicy: Owner
   data:
   - secretKey: DJANGO_SECRET_KEY  # pragma: allowlist secret
@@ -180,6 +208,12 @@ externalSecret:
   - secretKey: SENTRY_DSN  # pragma: allowlist secret
     remoteRef:
       key: sentry-dsn-olmap-django
+  - secretKey: GOOGLE_CLIENT_ID  # pragma: allowlist secret
+    remoteRef:
+      key: olmap-oauth-client-id
+  - secretKey: GOOGLE_CLIENT_SECRET  # pragma: allowlist secret
+    remoteRef:
+      key: olmap-oauth-client-secret
 
 # Database migrations (Helm hook - runs before deployment)
 migrations:
@@ -225,7 +259,7 @@ migrations:
   - name: DJANGO_SECRET_KEY
     valueFrom:
       secretKeyRef:
-        name: olmap-secrets
+        name: olmap-backend-secrets
         key: DJANGO_SECRET_KEY
   waitForDatabase:
     enabled: true
