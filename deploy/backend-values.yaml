@@ -21,7 +21,7 @@ serviceAccount:
   create: true
   name: olmap-backend
   annotations:
-    iam.gke.io/gcp-service-account: olmap@fvh-project-containers-etc.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: olmap-app@fvh-project-containers-etc.iam.gserviceaccount.com
 
 # Cloud SQL Proxy sidecar (runs continuously alongside the app)
 initContainers:
@@ -117,9 +117,9 @@ env:
   SQL_PORT:
     value: "5432"
   POSTGRES_DB:
-    value: "olmap"
+    value: "api_olmap_org"
   POSTGRES_USER:
-    value: "olmap@fvh-project-containers-etc.iam"
+    value: "olmap-app@fvh-project-containers-etc.iam"
   # Django settings
   DJANGO_DEBUG:
     value: "False"
@@ -179,7 +179,7 @@ externalSecret:
       key: olmap-django-secret-key
   - secretKey: SENTRY_DSN  # pragma: allowlist secret
     remoteRef:
-      key: sentry_dsn_olmap
+      key: sentry-dsn-olmap-django
 
 # Database migrations (Helm hook - runs before deployment)
 migrations:
@@ -219,9 +219,9 @@ migrations:
   - name: SQL_PORT
     value: '5432'
   - name: POSTGRES_DB
-    value: 'olmap'
+    value: 'api_olmap_org'
   - name: POSTGRES_USER
-    value: 'olmap@fvh-project-containers-etc.iam'
+    value: 'olmap-app@fvh-project-containers-etc.iam'
   - name: DJANGO_SECRET_KEY
     valueFrom:
       secretKeyRef:
@@ -231,7 +231,7 @@ migrations:
     enabled: true
     host: 127.0.0.1
     port: 5432
-    user: 'olmap@fvh-project-containers-etc.iam'
+    user: 'olmap-app@fvh-project-containers-etc.iam'
     timeout: 300
   resources:
     limits:
