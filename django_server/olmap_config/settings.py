@@ -172,7 +172,16 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-    ]
+    ],
+    # Rate limiting to prevent brute force and DoS attacks
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "100/hour",
+        "user": "1000/hour",
+    },
 }
 
 REST_AUTH = {
@@ -222,6 +231,26 @@ FRONTEND_ROOT = os.environ.get("FRONTEND_ROOT", "https://app.olmap.org/")
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# Security headers - enabled in production (non-DEBUG) mode
+if not DEBUG:
+    # HSTS settings - enforce HTTPS
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    # Redirect HTTP to HTTPS
+    SECURE_SSL_REDIRECT = True
+
+    # Prevent MIME type sniffing
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+
+    # Secure cookies
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+    # Prevent clickjacking (also set via X-Frame-Options middleware)
+    X_FRAME_OPTIONS = "DENY"
+
 ADMINS = [["FVH Django admins", os.environ.get("ADMIN_EMAIL", "django-admins@forumvirium.fi")]]
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
@@ -233,7 +262,8 @@ if not DEBUG and SENTRY_DSN:
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
-        send_default_pii=os.environ.get("SENTRY_SEND_PII", "True").lower() in ("true", "1", "yes", "on"),
+        # Default to False for privacy/GDPR compliance; set SENTRY_SEND_PII=true to enable
+        send_default_pii=os.environ.get("SENTRY_SEND_PII", "False").lower() in ("true", "1", "yes", "on"),
     )
 
 DATETIME_FORMAT = "Y-m-d H:i:s"

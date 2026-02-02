@@ -32,3 +32,17 @@ __pycache__
 /react_ui/playwright-report/
 /react_ui/playwright/.cache/
 /react_ui/.playwright/
+
+# Environment and secrets (keep .env.example but ignore actual .env files)
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.dev
+
+# Kubernetes secrets with real values (use sealed-secrets or external-secrets in production)
+# k8s/*/secrets.yaml files should only contain placeholder values
+# Real secrets should be managed via:
+# - Sealed Secrets: https://github.com/bitnami-labs/sealed-secrets
+# - External Secrets: https://external-secrets.io/
+# - Or your cloud provider's secrets manager
