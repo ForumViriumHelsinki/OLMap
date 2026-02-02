@@ -1,5 +1,10 @@
 import settings from './settings';
 
+// SECURITY NOTE: Tokens stored in localStorage are vulnerable to XSS attacks.
+// TODO: Consider migrating to httpOnly cookies for improved security.
+// This would require backend changes to set cookies on login and read them on requests.
+// See: https://owasp.org/www-community/HttpOnly
+
 export function login(token) {
   localStorage.setItem('olmap-token', token);
 }

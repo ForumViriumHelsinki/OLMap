@@ -52,7 +52,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
             return [IsReviewerOrCreator()]
         elif self.action in ["upvote", "downvote", "mark_processed"]:
             return [permissions.IsAuthenticated()]
-        elif self.action == ["mark_accepted", "mark_reviewed"]:
+        elif self.action in ["mark_accepted", "mark_reviewed"]:
             return [IsReviewer()]
         else:
             return super().get_permissions()
