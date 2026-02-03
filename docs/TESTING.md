@@ -14,8 +14,8 @@ This document describes how to run tests for the OLMap project across different 
 # Run all unit tests
 cd react_ui && npm test -- --watchAll=false
 
-# Or use Make
-make test-frontend
+# Or use Just
+just test-frontend
 ```
 
 ### 2. Frontend E2E Tests (Playwright)
@@ -30,7 +30,7 @@ make test-frontend
 skaffold dev
 
 # Terminal 2:
-make test-e2e
+just test-e2e
 
 # Option 2: Direct execution
 cd react_ui && ./run-e2e-tests.sh
@@ -57,8 +57,8 @@ docker compose up -d postgres
 # Run tests
 cd django_server && DJANGO_DEBUG=true uv run python manage.py test
 
-# Or use Make
-make test-backend
+# Or use Just
+just test-backend
 ```
 
 ## Testing with Skaffold
@@ -70,7 +70,7 @@ make test-backend
 skaffold dev
 
 # In another terminal, run e2e tests
-make test-e2e
+just test-e2e
 ```
 
 ### Skaffold Test Integration
@@ -84,7 +84,7 @@ The project includes Skaffold integration for automated testing:
 skaffold dev
 
 # Terminal 2: Wait for services to be ready, then run tests
-make test-e2e
+just test-e2e
 ```
 
 #### With Verify Profile (Advanced)
@@ -247,7 +247,7 @@ lsof -ti:3000 | xargs kill -9
 
 1. **Run unit tests before e2e tests** - Faster feedback loop
 2. **Use `skaffold dev`** for development - Automatic rebuilds
-3. **Use `make test-e2e`** for manual testing - Simpler than remembering paths
+3. **Use `just test-e2e`** for manual testing - Simpler than remembering paths
 4. **Check screenshots on failure** - Saved in `test-results/`
 5. **Use headed mode for debugging** - `npm run test:e2e:headed`
 6. **Keep tests independent** - Don't rely on execution order
@@ -257,11 +257,11 @@ lsof -ti:3000 | xargs kill -9
 
 ```bash
 # All test commands at a glance
-make help                    # Show available test targets
-make test-frontend           # Jest unit tests
-make test-backend           # Django tests (needs PostgreSQL)
-make test-e2e               # Playwright e2e (needs full stack)
-make test-all               # All unit tests (not e2e)
+just                         # Show available recipes
+just test-frontend           # Jest unit tests
+just test-backend            # Django tests (needs PostgreSQL)
+just test-e2e                # Playwright e2e (needs full stack)
+just test                    # All unit tests (not e2e)
 
 # Skaffold workflows
 skaffold dev                # Develop with hot-reload

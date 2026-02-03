@@ -54,7 +54,7 @@ portForward:
     resourceName: postgres
     port: 5432
     localPort: 5432
-# Note: Playwright e2e tests run after deployment via 'make test-e2e'
+# Note: Playwright e2e tests run after deployment via 'just test-e2e'
 # or by running 'cd react_ui && ./run-e2e-tests.sh' after 'skaffold dev' is running
 profiles:
   - name: with-tests

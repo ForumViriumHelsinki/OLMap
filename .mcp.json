@@ -2,15 +2,39 @@
   "mcpServers": {
     "playwright": {
       "command": "bunx",
-      "args": ["-y", "@playwright/mcp@latest"]
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ]
     },
     "context7": {
       "command": "bunx",
-      "args": ["-y", "@upstash/context7-mcp"]
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
     },
     "sequential-thinking": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "serena": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "claude-code",
+        "--project",
+        "OLMap"
+      ],
+      "env": {}
     }
   }
 }

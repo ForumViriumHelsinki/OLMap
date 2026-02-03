@@ -8,29 +8,45 @@ OLMap (Open Logistics Map) is a geospatial web application for collecting and ma
 
 ## Development Commands
 
-### Backend (Django) - from `django_server/` directory:
+Run `just` to see all available commands. Key recipes:
 
 ```bash
-uv sync                # Install dependencies
-uv run python manage.py migrate      # Run migrations
-uv run python manage.py runserver   # Start dev server (port 8000)
-uv run flake8          # Lint Python code (configured in pyproject.toml)
-uv run python manage.py test        # Run Django tests
+# Setup
+just install           # Install all dependencies (backend + frontend)
+cp .env.example .env   # Configure environment (defaults work for local dev)
+
+# Development
+just dev               # Start all services with docker-compose (with logs)
+just start             # Start services in background
+just stop              # Stop services
+
+# Testing
+just test              # Run all unit tests (backend + frontend)
+just test-backend      # Django tests only
+just test-frontend     # Jest tests only
+just test-e2e          # Playwright e2e tests (requires running app)
+
+# Code quality
+just lint              # Run all linters
+just format            # Format all code
+just format-check      # Check formatting without changes
+
+# Django management
+just manage <command>  # Run Django management commands
+just migrate           # Run database migrations
+just shell             # Open Django shell
 ```
 
-### Frontend (React) - from `react_ui/` directory:
+### Manual commands (if not using justfile):
 
+**Backend** (from `django_server/`):
 ```bash
-npm install            # Install dependencies
-npm start              # Start dev server (port 3000)
-npm run build          # Production build
-npm test               # Run React tests
+uv sync && uv run python manage.py runserver
 ```
 
-### Docker Development:
-
+**Frontend** (from `react_ui/`):
 ```bash
-docker-compose up      # Starts web (Django), db (Postgres), frontend (React)
+npm install && npm start
 ```
 
 ## Architecture
@@ -60,9 +76,9 @@ See [TESTING.md](docs/TESTING.md) for comprehensive testing guide including:
 Quick test commands:
 
 ```bash
-make test-frontend    # Jest unit tests
-make test-backend     # Django tests (requires PostgreSQL)
-make test-e2e         # Playwright e2e (requires full stack)
+just test-frontend    # Jest unit tests
+just test-backend     # Django tests (requires PostgreSQL)
+just test-e2e         # Playwright e2e (requires full stack)
 ```
 
 ## Code Quality
