@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/ForumViriumHelsinki/OLMap/compare/olmap-frontend-v0.2.1...olmap-frontend-v0.2.2) (2026-02-03)
+
+
+### Bug Fixes
+
+* **react_ui:** regenerate package-lock.json for npm ci compatibility ([#58](https://github.com/ForumViriumHelsinki/OLMap/issues/58)) ([2a6c105](https://github.com/ForumViriumHelsinki/OLMap/commit/2a6c105c8641dbe93c331e794b81c6f6d8221b49))
+
 ## [0.2.1](https://github.com/ForumViriumHelsinki/OLMap/compare/olmap-frontend-v0.2.0...olmap-frontend-v0.2.1) (2025-11-18)
 
 
