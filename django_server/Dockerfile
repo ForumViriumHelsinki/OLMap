@@ -1,5 +1,5 @@
 # Multi-stage build for production Django application
-FROM python:3.13-slim as base
+FROM python:3.13-slim as builder
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -11,12 +11,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Set shell with pipefail option for safer pipe operations
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-# Install system dependencies and uv
+# Install build dependencies and uv
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
-    netcat-openbsd \
     curl \
     && curl -LsSf https://astral.sh/uv/install.sh | bash \
     && rm -rf /var/lib/apt/lists/*
@@ -24,15 +23,47 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Add uv to PATH
 ENV PATH="/root/.local/bin:$PATH"
 
-# Create non-root user
-RUN groupadd -r olmap && useradd -r -g olmap olmap
-
 # Set work directory
 WORKDIR /app
 
 # Install Python dependencies
 COPY pyproject.toml ./
 RUN uv pip install --system -e .
+
+# Runtime stage
+FROM python:3.13-slim
+
+# OCI labels for GHCR integration
+LABEL org.opencontainers.image.source="https://github.com/ForumViriumHelsinki/OLMap" \
+      org.opencontainers.image.description="OLMap backend - Django REST API for geospatial data" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.vendor="Forum Virium Helsinki"
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_LINK_MODE=copy \
+    PATH="/app/.venv/bin:$PATH"
+
+# Set shell with pipefail option for safer pipe operations
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Install runtime dependencies only
+# hadolint ignore=DL3008
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    netcat-openbsd \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r olmap && useradd -r -g olmap olmap
+
+# Set work directory
+WORKDIR /app
+
+# Copy virtual environment from builder
+COPY --from=builder /root/.local /home/olmap/.local
 
 # Copy entrypoint and make it executable
 COPY --chown=olmap:olmap entrypoint.sh ./
