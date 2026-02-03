@@ -1,5 +1,5 @@
 # Multi-stage build for React application
-FROM node:18-alpine as build
+FROM node:22-alpine as build
 
 # Set working directory
 WORKDIR /app
@@ -39,7 +39,13 @@ COPY . .
 RUN npm run build
 
 # Production stage with nginx
-FROM nginx:alpine as production
+FROM nginx:1.28-alpine as production
+
+# OCI labels for GHCR integration
+LABEL org.opencontainers.image.source="https://github.com/ForumViriumHelsinki/OLMap" \
+      org.opencontainers.image.description="OLMap frontend - geospatial web application" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.vendor="Forum Virium Helsinki"
 
 # Install curl for health checks and envsubst for template processing
 # hadolint ignore=DL3018
