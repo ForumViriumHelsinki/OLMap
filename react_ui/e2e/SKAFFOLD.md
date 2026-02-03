@@ -4,7 +4,7 @@ This document describes how to run Playwright e2e tests with Skaffold.
 
 ## Quick Start
 
-### Method 1: Using Skaffold + Make (Recommended)
+### Method 1: Using Skaffold + Just (Recommended)
 
 ```bash
 # Terminal 1: Start Skaffold with port-forwarding
@@ -13,7 +13,7 @@ skaffold dev
 # Wait for message: "Port forwarding service/olmap-frontend in namespace olmap..."
 
 # Terminal 2: Run e2e tests
-make test-e2e
+just test-e2e
 ```
 
 ### Method 2: Using Skaffold Verify Profile
@@ -64,7 +64,7 @@ The `with-tests` profile adds a verify stage that:
 Example:
 
 ```bash
-BASE_URL=http://custom-host:8080 make test-e2e
+BASE_URL=http://custom-host:8080 just test-e2e
 ```
 
 ### Skaffold Profiles
@@ -117,13 +117,13 @@ skaffold delete && skaffold dev
 
 **Problem:** Container can't access services
 
-**Solution:** The verify profile uses `host.docker.internal` which may not work on all systems. Use Method 1 (Make) instead:
+**Solution:** The verify profile uses `host.docker.internal` which may not work on all systems. Use Method 1 (Just) instead:
 
 ```bash
 # Use the reliable method
 skaffold dev
 # In another terminal:
-make test-e2e
+just test-e2e
 ```
 
 ## CI/CD Integration
@@ -140,11 +140,11 @@ For GitHub Actions or other CI systems:
   run: |
     skaffold run &
     kubectl wait --for=condition=ready pod --all -n olmap --timeout=300s
-    make test-e2e
+    just test-e2e
 ```
 
 ## See Also
 
 - [TESTING.md](../../docs/TESTING.md) - Complete testing guide
 - [README.md](../e2e/README.md) - Playwright test documentation
-- `Makefile` - Available test targets
+- `justfile` - Available recipes (`just` to list)

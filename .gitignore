@@ -38,7 +38,6 @@ __pycache__
 .env.local
 .env.*.local
 !.env.example
-!.env.dev
 
 # Kubernetes secrets with real values (use sealed-secrets or external-secrets in production)
 # k8s/*/secrets.yaml files should only contain placeholder values
