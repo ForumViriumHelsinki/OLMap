@@ -1,50 +1,30 @@
-name: Auto-merge ArgoCD Image Updater branches
+# Auto-merges pull requests created by ArgoCD Image Updater.
+# Approves the PR using AUTO_MERGE_PAT (or GITHUB_TOKEN fallback),
+# then enables auto-merge so it lands once status checks pass.
+name: Auto-merge image updater PRs
 
 on:
-  push:
-    branches:
-      - 'image-updater-**'
+  pull_request:
+    types: [opened, synchronize]
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  create-and-merge:
+  auto-merge:
+    if: startsWith(github.head_ref, 'image-updater/')
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Create Pull Request
-        id: create-pr
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          PR_URL=$(gh pr create \
-            --base master \
-            --head "${{ github.ref_name }}" \
-            --title "chore(deps): update container image" \
-            --body "Automated image update by argocd-image-updater.
-
-          Branch: \`${{ github.ref_name }}\`" \
-            2>&1) || true
-
-          # Check if PR already exists
-          if echo "$PR_URL" | grep -q "already exists"; then
-            PR_URL=$(gh pr view "${{ github.ref_name }}" --json url -q .url)
-          fi
-
-          echo "pr_url=$PR_URL" >> "$GITHUB_OUTPUT"
-          echo "Created/found PR: $PR_URL"
+      - uses: actions/checkout@v6
 
       - name: Approve PR
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.AUTO_MERGE_PAT || secrets.GITHUB_TOKEN }}
-        run: gh pr review --approve "${{ github.ref_name }}"
-        continue-on-error: true
+        run: gh pr review "${{ github.event.pull_request.number }}" --approve
 
       - name: Enable auto-merge
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr merge --auto --squash "${{ github.ref_name }}"
+        run: gh pr merge "${{ github.event.pull_request.number }}" --auto --squash --base master
