@@ -49,7 +49,7 @@
     "typescript": "^5.9.3"
   },
   "resolutions": {
-    "@turf/difference": "7.0.0"
+    "@turf/difference": "7.3.4"
   },
   "overrides": {
     "typescript": "^5.9.3"
