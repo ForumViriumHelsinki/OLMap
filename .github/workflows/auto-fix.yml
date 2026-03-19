@@ -1,0 +1,24 @@
+name: Auto-fix CI Failures
+
+on:
+  workflow_run:
+    workflows: ["Tests"]
+    types: [completed]
+
+jobs:
+  auto-fix:
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      !startsWith(github.event.workflow_run.head_commit.message, 'fix(auto):') &&
+      (github.event.workflow_run.actor.type != 'Bot' ||
+       github.event.workflow_run.actor.login == 'claude[bot]' ||
+       github.event.workflow_run.actor.login == 'claude') &&
+      github.event.workflow_run.head_branch != 'master'
+    uses: ForumViriumHelsinki/.github/.github/workflows/reusable-auto-fix.yml@main
+    with:
+      branch: ${{ github.event.workflow_run.head_branch }}
+      run_id: ${{ github.event.workflow_run.id }}
+      workflow_name: ${{ github.event.workflow_run.name }}
+      head_sha: ${{ github.event.workflow_run.head_sha }}
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
