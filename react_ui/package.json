@@ -29,7 +29,7 @@
     "@turf/turf": "^7.2.0",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
-    "bootstrap": "^4.6.2",
+    "bootstrap": "^5.0.0",
     "geolib": "^3.3.4",
     "http-proxy-middleware": "^3.0.5",
     "leaflet": "^1.9.4",
