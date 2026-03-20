@@ -39,7 +39,7 @@ COPY . .
 RUN npm run build
 
 # Production stage with nginx
-FROM nginx:1.28-alpine as production
+FROM nginx:1.29-alpine as production
 
 # OCI labels for GHCR integration
 LABEL org.opencontainers.image.source="https://github.com/ForumViriumHelsinki/OLMap" \
