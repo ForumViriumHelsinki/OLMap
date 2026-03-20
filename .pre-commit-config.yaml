@@ -48,10 +48,11 @@ repos:
     hooks:
       - id: biome-format
         name: biome format
-        entry: bash -c 'cd react_ui && npx @biomejs/biome format --write "${@#react_ui/}"' --
-        language: system
+        entry: biome format --write
+        language: node
+        additional_dependencies: ['@biomejs/biome@2.3.14']
         files: ^react_ui/.*\.(js|jsx|ts|tsx|json)$
-        exclude: ^react_ui/(build|node_modules)/
+        exclude: ^react_ui/(build|node_modules|package-lock\.json)
 
   # 4. HEAVIER: Security scanning
   - repo: https://github.com/Yelp/detect-secrets
