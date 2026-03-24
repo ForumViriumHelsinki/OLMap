@@ -1,0 +1,20 @@
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Global allowlist for known false positives"
+
+paths = [
+    '''\.env\.example$''',
+    '''\.env\.dev$''',
+    '''k8s/local/.*\.yaml$''',
+    '''react_ui/public/.*\.html$''',
+]
+
+regexTarget = "line"
+regexes = [
+    # Default/placeholder Django secret keys
+    '''SECRET_KEY.*(?:change-me|placeholder|default|insecure)''',
+    # Mapbox public access tokens (not secrets)
+    '''pk\.eyJ1Ijoi''',
+]

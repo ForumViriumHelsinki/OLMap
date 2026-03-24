@@ -29,7 +29,7 @@ This security analysis covers the OLMap (Open Logistics Map) application, a Djan
 
 ```yaml
 REACT_APP_DIGITRANSIT_KEY: "d253c31db9ab41c195f7ef36fc250da4"
-REACT_APP_MAPBOX_TOKEN: "pk.eyJ1Ijoiam9oYW4tZnZoIiwiYSI6ImNrNDJtOGh5cDAxczIzb3FpdHg1Z3c5MGwifQ.bp9ubCm67HLIorEUb21K3A"
+REACT_APP_MAPBOX_TOKEN: "pk.eyJ1Ijoiam9oYW4t...REDACTED"
 ```
 
 **Risk:** API keys are committed to version control and could be exposed. Even in a "local" config, these keys appear to be real production tokens that provide access to external services.
@@ -273,7 +273,7 @@ The codebase includes several good security practices:
 1. **Secret Key Protection:** Production requires `DJANGO_SECRET_KEY` environment variable
 2. **Password Validation:** Django's built-in password validators are enabled
 3. **Authentication:** Uses industry-standard django-allauth and dj-rest-auth
-4. **Secrets Detection:** `.secrets.baseline` configured for detect-secrets scanning
+4. **Secrets Detection:** `.gitleaks.toml` configured for gitleaks scanning
 5. **CSRF Protection:** CsrfViewMiddleware is enabled
 6. **SSL Support:** `SECURE_PROXY_SSL_HEADER` is configured
 7. **Role-Based Access:** Reviewer group with proper permission classes
@@ -349,4 +349,4 @@ The codebase includes several good security practices:
 - `.env.example`
 - `.env.dev`
 - `docker-compose.yml`
-- `.secrets.baseline`
+- `.gitleaks.toml`
