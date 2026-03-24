@@ -54,11 +54,10 @@ repos:
         exclude: ^react_ui/(build|node_modules)/
 
   # 4. HEAVIER: Security scanning
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.0
     hooks:
-      - id: detect-secrets
-        args: [--baseline, .secrets.baseline]
+      - id: gitleaks
 
   # 5. HEAVIEST: Type checking and deeper analysis
   # ESLint temporarily disabled - many existing issues to fix in separate PR
