@@ -2,14 +2,14 @@ import React from 'react';
 // @ts-ignore
 import _ from 'lodash';
 
-import { LocationTuple } from 'util_components/types';
+import type { LocationTuple } from 'util_components/types';
 import { getDistance } from 'geolib';
-import { GeolibInputCoordinates } from 'geolib/es/types';
+import type { GeolibInputCoordinates } from 'geolib/es/types';
 // @ts-ignore
 import { ListGroup, ListGroupItem } from 'reactstrap';
 import PillsSelection from 'util_components/PillsSelection';
 import Toggle from 'util_components/Toggle';
-import { OSMFeature, osmFeatureTypes } from 'util_components/osm/types';
+import { type OSMFeature, osmFeatureTypes } from 'util_components/osm/types';
 import OSMFeatureMapPopup from 'util_components/osm/OSMFeatureMapPopup';
 import { osmFeatureLabel } from 'util_components/osm/utils';
 
@@ -21,9 +21,9 @@ const filterOptions: filterOption[] = ['entrance', 'place', 'address', 'street',
 
 const filters: { [key: string]: (f: OSMFeature) => boolean | null } = {
   entrance: (f) => Boolean(f.tags.entrance),
-  place: (f) => Boolean(f.tags.name && f.type != 'way'),
+  place: (f) => Boolean(f.tags.name && f.type !== 'way'),
   address: (f) => Boolean(f.tags['addr:housenumber'] && !f.tags.name && !f.tags.entrance),
-  street: (f) => Boolean(f.type == 'way'),
+  street: (f) => Boolean(f.type === 'way'),
   barrier: (f) => Boolean(f.tags.barrier),
 };
 
@@ -67,7 +67,7 @@ export default class OSMFeatureList extends React.Component<
           selectedFeatures.length ? (
             selectedFeatures.map((osmFeature: any, i) => (
               <ListGroupItem key={i}>
-                {featureActions && featureActions(osmFeature)}
+                {featureActions?.(osmFeature)}
                 <OSMFeatureMapPopup osmFeature={osmFeature} location={location} />
                 {this.label(osmFeature)}
               </ListGroupItem>
@@ -106,7 +106,7 @@ export default class OSMFeatureList extends React.Component<
                 active={selectedFeatureIds.includes(osmFeature.id)}
                 onClick={() => this.toggleSelectedFeature(osmFeature)}
               >
-                {featureActions && featureActions(osmFeature)}
+                {featureActions?.(osmFeature)}
 
                 <OSMFeatureMapPopup osmFeature={osmFeature} location={location} />
                 {this.label(osmFeature)}
@@ -137,7 +137,7 @@ export default class OSMFeatureList extends React.Component<
   private label(osmFeature: OSMFeature) {
     const { location } = this.props;
     let label = osmFeatureLabel(osmFeature);
-    if (osmFeature.type == 'node')
+    if (osmFeature.type === 'node')
       label += ` (${getDistance(osmFeature, location as GeolibInputCoordinates)}m)`;
     return label;
   }
@@ -146,7 +146,7 @@ export default class OSMFeatureList extends React.Component<
     const { onChange } = this.props;
     const selectedFeatureIds = this.props.selectedFeatureIds.slice();
     const index = selectedFeatureIds.indexOf(osmFeature.id);
-    if (index == -1) selectedFeatureIds.push(osmFeature.id);
+    if (index === -1) selectedFeatureIds.push(osmFeature.id);
     else selectedFeatureIds.splice(index, 1);
     onChange(selectedFeatureIds);
   }
@@ -158,7 +158,7 @@ export default class OSMFeatureList extends React.Component<
     const sortFn = {
       name: (f: OSMFeature) => this.label(f),
       distance: (f: OSMFeature) =>
-        f.type == 'node' ? getDistance(f, location as GeolibInputCoordinates) : 40,
+        f.type === 'node' ? getDistance(f, location as GeolibInputCoordinates) : 40,
       relevance: (f: OSMFeature) => {
         for (const i in osmFeatureTypes) if (f.tags[osmFeatureTypes[i].requiredTag]) return i;
         return osmFeatureTypes.length;

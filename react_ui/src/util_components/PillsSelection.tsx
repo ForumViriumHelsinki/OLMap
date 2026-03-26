@@ -33,6 +33,6 @@ export default class PillsSelection extends React.Component<PillsSelectionProps>
     const target = e.target as HTMLElement;
     target.classList.remove('hasactive');
     target.blur();
-    return onClick && onClick(tag);
+    return onClick?.(tag);
   }
 }

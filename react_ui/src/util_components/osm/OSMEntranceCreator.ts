@@ -1,12 +1,12 @@
-import { Location } from 'util_components/types';
+import type { Location } from 'util_components/types';
 import { osmApiCall, overpassQuery } from 'util_components/osm/utils';
-import { OSMFeature } from 'util_components/osm/types';
+import type { OSMFeature } from 'util_components/osm/types';
 import { nearestPointOnLine, point, lineString } from '@turf/turf';
-import { Point, Feature } from 'geojson';
+import type { Point, Feature } from 'geojson';
 import CreateNode from 'util_components/osm/api/CreateNode';
 import UpdateWay from 'util_components/osm/api/UpdateWay';
 import CreateWay from 'util_components/osm/api/CreateWay';
-import { OSMEditContextType } from 'components/types';
+import type { OSMEditContextType } from 'components/types';
 
 type GeoJSONPoint = any;
 type GeoJSONPolygon = any;
@@ -45,7 +45,7 @@ export default class OSMEntranceCreator {
 
   query() {
     return `relation[building]; (way(r);way[building];way[highway][layer${
-      this.layer ? '=' + this.layer : '!~".*"'
+      this.layer ? `=${this.layer}` : '!~".*"'
     }];)->.result;`;
   }
 
@@ -81,13 +81,13 @@ export default class OSMEntranceCreator {
         });
         [this.building, this.entrancePoint] = this.findNearestFeature(
           freshElems,
-          (f) => !(f.tags && f.tags.highway),
+          (f) => !f.tags?.highway,
           this.point,
         );
         if (!this.entrancePoint) this.entrancePoint = this.point;
         [this.road, this.accessPoint] = this.findNearestFeature(
           freshElems,
-          (f) => f.tags && f.tags.highway,
+          (f) => f.tags?.highway,
           this.entrancePoint,
         );
         return this;
@@ -115,11 +115,11 @@ export default class OSMEntranceCreator {
     // If entrance address is the same as building address, do not duplicate the address information in the
     // entrance node; if building address is not set, set it based on entrance:
     if (tags['addr:housenumber'] || tags['addr:street'])
-      if (this.building && this.building.tags)
+      if (this.building?.tags)
         if (this.building.tags['addr:housenumber'] || this.building.tags['addr:street']) {
           if (
-            tags['addr:housenumber'] == this.building.tags['addr:housenumber'] &&
-            tags['addr:street'] == this.building.tags['addr:street']
+            tags['addr:housenumber'] === this.building.tags['addr:housenumber'] &&
+            tags['addr:street'] === this.building.tags['addr:street']
           ) {
             delete tags['addr:housenumber'];
             delete tags['addr:street'];
@@ -137,7 +137,7 @@ export default class OSMEntranceCreator {
     return osmApiCall(`node/create`, CreateNode, props, osmEditContext).then(
       ({ response, text }) => {
         if (!response.ok) throw new Error(text);
-        const osmId = parseInt(text);
+        const osmId = parseInt(text, 10);
         const entrance: OSMFeature = {
           id: osmId,
           lat,
@@ -216,7 +216,7 @@ export default class OSMEntranceCreator {
     return osmApiCall(`node/create`, CreateNode, props, osmEditContext)
       .then(({ response, text }) => {
         if (!response.ok) throw new Error(text);
-        const osmId = parseInt(text);
+        const osmId = parseInt(text, 10);
         (this.road as any).nodes.splice(index + 1, 0, osmId);
         (this.road as any).geometry = this.newRoadGeometry();
         const props = {

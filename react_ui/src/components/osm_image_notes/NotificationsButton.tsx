@@ -6,7 +6,7 @@ import {
   DropdownToggle,
   // @ts-ignore
 } from 'reactstrap';
-import { AppContext, Notification } from 'components/types';
+import { AppContext, type Notification } from 'components/types';
 import sessionRequest from 'sessionRequest';
 import { notificationSeenUrl, notificationsUrl } from 'urls';
 import { formatTimestamp } from 'utils';
@@ -35,7 +35,7 @@ export default class NotificationsButton extends React.Component<
 
   render() {
     const { open, notifications } = this.state;
-    if (!notifications || !notifications.length) return null;
+    if (!notifications?.length) return null;
 
     return (
       <ButtonDropdown isOpen={open} toggle={() => this.setState({ open: !open })}>

@@ -24,11 +24,9 @@ export default class Toggle extends React.Component<ToggleProps, ToggleState> {
         {children}
       </>
     ) : (
-      <>
-        <a className="btn btn-outline-dark btn-sm btn-compact" onClick={this.toggleState}>
-          {off}
-        </a>
-      </>
+      <a className="btn btn-outline-dark btn-sm btn-compact" onClick={this.toggleState}>
+        {off}
+      </a>
     );
   }
 

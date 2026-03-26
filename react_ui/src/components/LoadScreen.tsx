@@ -6,7 +6,11 @@ export default class LoadScreen extends React.Component {
     return (
       <div className="container">
         <div className="jumbotron mt-5 bg-light shadow text-center">
-          <img className="w-50" src="images/FORUM_VIRIUM_logo_orange.png" />
+          <img
+            className="w-50"
+            src="images/FORUM_VIRIUM_logo_orange.png"
+            alt="Forum Virium Helsinki"
+          />
           <h3>Open Logistics Map</h3>
           <p className="lead text-primary mt-3">
             To confidently go where many a delivery man has gotten lost before.

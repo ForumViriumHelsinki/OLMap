@@ -1,11 +1,10 @@
-import { OSMFeature, osmFeatureTypes } from './types';
+import { type OSMFeature, osmFeatureTypes } from './types';
 import { capitalize } from 'utils';
 import { apiUrl } from 'util_components/osm/urls';
 import { renderToStaticMarkup } from 'react-dom/server';
 import React from 'react';
-import { OSMEditContextType } from 'components/types';
+import type { OSMEditContextType } from 'components/types';
 import { getBoundsOfDistance } from 'geolib';
-import _ from 'lodash';
 import settings from '../../settings.js';
 const { overpassInterpreterPath } = settings;
 
@@ -46,7 +45,7 @@ export const osmApiCall = (
     'ref',
   );
 
-  const Authorization = `Basic ${btoa(username + ':' + password)}`;
+  const Authorization = `Basic ${btoa(`${username}:${password}`)}`;
 
   return fetch(_url, {
     body,

@@ -1,8 +1,8 @@
 import React from 'react';
-import { OSMFeature } from 'util_components/osm/types';
-import { OSMImageNote } from 'components/types';
+import type { OSMFeature } from 'util_components/osm/types';
+import type { OSMImageNote } from 'components/types';
 import Icon from 'util_components/bootstrap/Icon';
-import { LocationTuple } from 'util_components/types';
+import type { LocationTuple } from 'util_components/types';
 import OSMFeaturesSelection from 'util_components/osm/OSMFeaturesSelection';
 import { osmFeatureLabel } from 'util_components/osm/utils';
 
@@ -53,11 +53,11 @@ export default class OSMImageNoteRelatedPlaces extends React.Component<
               : !nearbyPlaces.length
                 ? 'Loading...'
                 : osm_features.map((featureId) => {
-                    const feature = nearbyPlaces.find((a) => a.id == featureId);
+                    const feature = nearbyPlaces.find((a) => a.id === featureId);
                     return (
                       feature && (
                         <span key={featureId}>
-                          {featureId != osm_features[0] && ', '}
+                          {featureId !== osm_features[0] && ', '}
                           {osmFeatureLabel(feature)}
                         </span>
                       )

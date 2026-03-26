@@ -26,7 +26,7 @@ export default class ZoomableImage extends React.Component<ZoomableImageProps, Z
     return (
       <img
         src={src}
-        className={'zoomableImage ' + className}
+        className={`zoomableImage ${className}`}
         onMouseMove={this.positionImage}
         onMouseOut={this.restoreImage}
         onClick={this.toggleImgZoom}

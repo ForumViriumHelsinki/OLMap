@@ -58,7 +58,7 @@ class MapFeatureViewSet(viewsets.ReadOnlyModelViewSet):
 
     @with_parameters(["lat", "lon"])
     @action(methods=["GET"], detail=False)
-    def near(self, request, *args, **kwargs):  # noqa: ARG002
+    def near(self, request, *args, **kwargs):
         """
         Return features within approximately 100m of the position passed as lat, lon in the query parameters.
         """
@@ -118,7 +118,7 @@ class WorkplaceViewSet(BaseWorkplaceViewSet, MapFeatureViewSet, viewsets.ModelVi
 
     @with_parameters(["name"])
     @action(methods=["GET"], detail=False)
-    def search(self, request, *args, **kwargs):  # noqa: ARG002
+    def search(self, request, *args, **kwargs):
         """
         Search for a particular workplace by name (case insensitive, but must match the start of the name as saved
         in OLMap). Returns a list of matching OLMap workplaces along with delivery instructions if available.

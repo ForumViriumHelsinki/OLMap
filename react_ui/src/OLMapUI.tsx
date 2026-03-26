@@ -1,18 +1,23 @@
 import React from 'react';
-// @ts-ignore
 import { HashRouter as Router, Route, Switch, useParams, Redirect } from 'react-router-dom';
 
 import sessionRequest, { logout } from 'sessionRequest';
 
 import LoginScreen from 'components/LoginScreen';
 import LoadScreen from 'components/LoadScreen';
-import { AppContext, User } from 'components/types';
+import { AppContext, type User } from 'components/types';
 import ResetPasswordScreen from 'components/ResetPasswordScreen';
 import OSMImageNoteModal from 'components/osm_image_notes/OSMImageNoteModal';
 import NavBar from 'util_components/bootstrap/NavBar';
 import OSMImageNotesEditor from 'components/osm_image_notes/OSMImageNotesEditor';
 import ImageNotesContextProvider from 'components/osm_image_notes/ImageNotesContextProvider';
 import WorkplaceWizard from 'components/workplace_wizard/WorkplaceWizard';
+
+type OSMType = 'node' | 'way' | 'relation';
+
+type RouteProps = {
+  match: { params: Record<string, string | undefined> };
+};
 
 type UIState = {
   user?: User;
@@ -36,7 +41,7 @@ class OLMapUI extends React.Component<{}, UIState> {
 
   refreshUser() {
     sessionRequest('/rest-auth/user/').then((response) => {
-      if (response.status == 401) this.setState({ user: undefined, dataFetched: true });
+      if (response.status === 401) this.setState({ user: undefined, dataFetched: true });
       else response.json().then((user) => this.setState({ user, dataFetched: true }));
     });
   }
@@ -50,8 +55,7 @@ class OLMapUI extends React.Component<{}, UIState> {
 
   onResize = () => {
     const el = document.getElementById('OLMapUI');
-    // @ts-ignore
-    if (el) el.style.height = window.innerHeight;
+    if (el) el.style.height = `${window.innerHeight}px`;
   };
 
   componentWillUnmount() {
@@ -61,7 +65,6 @@ class OLMapUI extends React.Component<{}, UIState> {
   render() {
     const { user, dataFetched } = this.state;
 
-    // @ts-ignore
     const ImageNote = () => {
       const { noteId } = useParams<{ noteId: string }>();
       return (
@@ -74,7 +77,7 @@ class OLMapUI extends React.Component<{}, UIState> {
     };
 
     const ResetPassword = () => {
-      const params = useParams() as any;
+      const params = useParams<{ uid: string; token: string }>();
       return <ResetPasswordScreen uid={params.uid} token={params.token} />;
     };
 
@@ -111,19 +114,19 @@ class OLMapUI extends React.Component<{}, UIState> {
             </Route>
             <Route
               path="/ww/osm/:osmType/:osmId"
-              render={(props: any) => {
+              render={(props: RouteProps) => {
                 if (!user) return <Redirect to="/login/" />;
                 const { osmType, osmId } = props.match.params;
                 return (
                   <WithNavBar>
-                    <WorkplaceWizard {...{ osmType, osmId }} />
+                    <WorkplaceWizard osmType={osmType as OSMType} osmId={osmId} />
                   </WithNavBar>
                 );
               }}
             />
             <Route
               path="/ww/id/:olmapId"
-              render={(props: any) => {
+              render={(props: RouteProps) => {
                 if (!user) return <Redirect to="/login/" />;
                 const { olmapId } = props.match.params;
                 return (
@@ -135,12 +138,12 @@ class OLMapUI extends React.Component<{}, UIState> {
             />
             <Route
               path="/ww/osm/:osmType/:osmId"
-              render={(props: any) => {
+              render={(props: RouteProps) => {
                 if (!user) return <Redirect to="/login/" />;
                 const { osmType, osmId } = props.match.params;
                 return (
                   <WithNavBar>
-                    <WorkplaceWizard {...{ osmType, osmId }} />
+                    <WorkplaceWizard osmType={osmType as OSMType} osmId={osmId} />
                   </WithNavBar>
                 );
               }}
@@ -157,7 +160,7 @@ class OLMapUI extends React.Component<{}, UIState> {
             <Route path="/note/:noteId">{!user ? <Redirect to="/login/" /> : <ImageNote />}</Route>
             <Route
               path="/Notes/new/:osmId(\d+)?/"
-              render={(props: any) => {
+              render={(props: RouteProps) => {
                 if (!user) return <Redirect to="/login/" />;
                 const { osmId } = props.match.params;
                 return <MapUI newNote osmFeatures={osmId && [Number(osmId)]} />;
@@ -165,7 +168,7 @@ class OLMapUI extends React.Component<{}, UIState> {
             />
             <Route
               path="/Notes/:noteId(\d+)?"
-              render={(props: any) => {
+              render={(props: RouteProps) => {
                 if (!user) return <Redirect to="/login/" />;
                 return (
                   <MapUI

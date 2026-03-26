@@ -34,7 +34,7 @@ export default class Confirm extends React.Component<ConfirmProps> {
   private onConfirm() {
     const { onConfirm, onClose } = this.props;
     const input = document.getElementById('confirmText') as HTMLInputElement;
-    const value = input && input.value;
+    const value = input?.value;
     onClose();
     onConfirm(value);
   }

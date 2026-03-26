@@ -30,7 +30,7 @@ export const osmFeatureTypes: OSMFeatureType[] = [
     label: (tags) => {
       const { entrance } = tags;
       const address = osmAddressString(tags);
-      return `${address && `${address} `} ${entrance == 'yes' ? '' : entrance} entrance`;
+      return `${address && `${address} `} ${entrance === 'yes' ? '' : entrance} entrance`;
     },
   },
   {

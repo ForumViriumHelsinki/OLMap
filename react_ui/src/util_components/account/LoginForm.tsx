@@ -1,4 +1,4 @@
-import React, { FormEvent } from 'react';
+import React, { type FormEvent } from 'react';
 import sessionRequest, { login, logout } from 'sessionRequest';
 import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
 import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
@@ -122,13 +122,13 @@ export default class LoginForm extends React.Component<Props, State> {
     const { onLogin, loginUrl } = this.props;
     e.preventDefault();
     const formData = new FormData(e.target);
-    let data = {};
+    const data = {};
     // @ts-ignore
     formData.forEach((value: any, key: string) => (data[key] = value));
     this.setState({ error: false, ...data });
     logout();
     sessionRequest(loginUrl, { method: 'POST', data: data }).then((response) => {
-      if (response.status == 200)
+      if (response.status === 200)
         response.json().then((data) => {
           login(data.key);
           onLogin();
@@ -143,7 +143,7 @@ export default class LoginForm extends React.Component<Props, State> {
 
     e.preventDefault();
     sessionRequest(passwordResetUrl, { method: 'POST', data: { email } }).then((response) => {
-      if (response.status == 200) this.setState({ resetEmailSent: true });
+      if (response.status === 200) this.setState({ resetEmailSent: true });
       else this.setState({ error: true });
     });
   };

@@ -3,7 +3,7 @@ import React from 'react';
 import _ from 'lodash';
 
 import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
-import { OSMChangeset } from './types';
+import type { OSMChangeset } from './types';
 
 const changesetUrl = (id: string) =>
   `https://www.openstreetmap.org/api/0.6/changeset/${id}/download`;
@@ -39,7 +39,7 @@ export default class OSMChangesetSelection extends React.Component<
           className="form-control"
           type="number"
           id="changesetId"
-          defaultValue={changeset && changeset.id}
+          defaultValue={changeset?.id}
         />
         <div className="mt-2 flex-fill">
           <button className="btn btn-primary" onClick={this.loadChangeset}>
@@ -84,7 +84,7 @@ export default class OSMChangesetSelection extends React.Component<
         if (!(lat && lon)) return;
         return {
           type: 'node',
-          id: id && id.value,
+          id: id?.value,
           lat: lat.value,
           lon: lon.value,
           tags: Object.fromEntries(

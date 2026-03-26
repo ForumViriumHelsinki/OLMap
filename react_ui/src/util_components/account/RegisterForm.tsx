@@ -1,7 +1,7 @@
 import React from 'react';
 import Form from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
-import { JSONSchema6 } from 'json-schema';
+import type { JSONSchema6 } from 'json-schema';
 // @ts-ignore
 import { Button } from 'reactstrap';
 import sessionRequest, { login } from 'sessionRequest';
@@ -55,9 +55,7 @@ export default class RegisterForm extends React.Component<RegisterFormProps, Reg
         validator={validator}
         {...({ extraErrors: this.extraErrors() } as any)}
       >
-        {errors && errors.non_field_errors && (
-          <ErrorAlert message={errors.non_field_errors} status />
-        )}
+        {errors?.non_field_errors && <ErrorAlert message={errors.non_field_errors} status />}
         <Button color="primary" type="submit">
           Register
         </Button>

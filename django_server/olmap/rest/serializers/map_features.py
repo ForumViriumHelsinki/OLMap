@@ -117,7 +117,7 @@ class WorkplaceEntranceSerializer(TranslationSerializerMixin, serializers.ModelS
         if data and data.get("delivery_types", None):
             for t in data["delivery_types"]:
                 models.DeliveryType.objects.get_or_create(name=t)
-        return super().__init__(instance, data, **kwargs)
+        super().__init__(instance, data, **kwargs)
 
 
 @MapFeatureSerializer.register_subclass(models.Workplace)

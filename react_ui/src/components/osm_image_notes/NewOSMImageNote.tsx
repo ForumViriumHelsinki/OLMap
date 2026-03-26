@@ -3,17 +3,17 @@ import React from 'react';
 // @ts-ignore
 import { Button, Spinner } from 'reactstrap';
 import Icon from 'util_components/bootstrap/Icon';
-import { LocationTuple, Location } from 'util_components/types';
+import type { LocationTuple, Location } from 'util_components/types';
 import Modal from 'util_components/bootstrap/Modal';
 import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
 
 import sessionRequest from 'sessionRequest';
 import { osmImageNotesUrl, osmImageNoteUrl } from 'urls';
-import { ImageNotesContext, OSMImageNote } from 'components/types';
+import { ImageNotesContext, type OSMImageNote } from 'components/types';
 import OSMFeaturesSelection from 'util_components/osm/OSMFeaturesSelection';
 import MapFeatureSet from 'components/map_features/MapFeatureSet';
 import OSMImageNoteTags from 'components/osm_image_notes/OSMImageNoteTags';
-import { OSMFeature } from 'util_components/osm/types';
+import type { OSMFeature } from 'util_components/osm/types';
 import NearbyAddressesAsOSMLoader from 'components/osm_image_notes/NearbyAddressesAsOSMLoader';
 import Confirm from 'util_components/bootstrap/Confirm';
 import MapToolButton from 'components/osm_image_notes/MapToolButton';
@@ -281,9 +281,9 @@ export default class NewOSMImageNote extends React.Component<
 
   onCancel = () => {
     const status = this.state.status;
-    if (status == 'commenting') this.setState({ confirmCancel: true });
+    if (status === 'commenting') this.setState({ confirmCancel: true });
     else {
-      if (status == 'locating') this.props.cancelLocationRequest();
+      if (status === 'locating') this.props.cancelLocationRequest();
       this.setState(resetState);
     }
   };
@@ -327,7 +327,7 @@ export default class NewOSMImageNote extends React.Component<
           return;
         }
 
-        let formData = new FormData();
+        const formData = new FormData();
         formData.append('image', image);
         this.setState({ imagesUploading: imagesUploading.concat([data]) });
         sessionRequest(osmImageNoteUrl(data.id as number), {

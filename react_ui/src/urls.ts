@@ -1,4 +1,4 @@
-import { LocationTuple } from 'util_components/types';
+import type { LocationTuple } from 'util_components/types';
 
 export const loginUrl = '/rest-auth/login/';
 export const registerUrl = '/rest-auth/registration/';

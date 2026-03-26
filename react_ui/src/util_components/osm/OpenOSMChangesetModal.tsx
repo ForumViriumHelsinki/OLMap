@@ -1,11 +1,11 @@
 import React from 'react';
 import Form from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
-import { JSONSchema7 } from 'json-schema';
+import type { JSONSchema7 } from 'json-schema';
 import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
 import CreateChangeset from 'util_components/osm/api/CreateChangeset';
 import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
-import { AppContext, OSMEditContextType } from 'components/types';
+import { AppContext, type OSMEditContextType } from 'components/types';
 import { osmApiCall, osmEditContext, setOSMContext } from 'util_components/osm/utils';
 
 const schema: JSONSchema7 = {
@@ -84,7 +84,7 @@ export default class OpenOSMChangesetModal extends React.Component<
       ({ response, text }) => {
         if (!response.ok) this.setState({ error: text, formData: data.formData });
         else {
-          const id = parseInt(text);
+          const id = parseInt(text, 10);
           const context = { username, password, changeset: { id, comment } };
           setOSMContext(context);
           onCreated(context);

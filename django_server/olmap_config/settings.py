@@ -277,7 +277,7 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 GOOGLE_ACCOUNT_JSON = os.path.join(CONFIG_DIR, "google_service_account.json")
 
 try:
-    from .local_settings import *  # noqa
+    from .local_settings import *  # noqa: F403
 except ImportError:
     pass
 

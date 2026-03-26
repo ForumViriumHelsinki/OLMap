@@ -1,8 +1,8 @@
 import React from 'react';
 // @ts-ignore
 import _ from 'lodash';
-import { LocationTuple } from 'util_components/types';
-import { OSMFeature } from 'util_components/osm/types';
+import type { LocationTuple } from 'util_components/types';
+import type { OSMFeature } from 'util_components/osm/types';
 import sessionRequest from 'sessionRequest';
 import { nearbyAddressesUrl } from 'urls';
 

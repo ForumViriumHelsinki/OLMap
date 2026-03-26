@@ -1,11 +1,11 @@
 import React from 'react';
-import { JSONSchema, MapFeature, OSMImageNote, WorkplaceEntrance } from 'components/types';
+import type { JSONSchema, MapFeature, OSMImageNote, WorkplaceEntrance } from 'components/types';
 import { SimpleOSMImageNotesMap } from 'components/osm_image_notes/OSMImageNotesMap';
-import { Location } from 'util_components/types';
+import type { Location } from 'util_components/types';
 import sessionRequest from 'sessionRequest';
 import { osmImageNoteUrl, workplaceEntrancesUrl, workplaceEntranceUrl } from 'urls';
 import { osmFeatureLabel } from 'util_components/osm/utils';
-import { OSMFeature } from 'util_components/osm/types';
+import type { OSMFeature } from 'util_components/osm/types';
 // @ts-ignore
 import Form from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
@@ -107,7 +107,7 @@ export default class WorkplaceEntranceEditor extends React.Component<
       .then((response) => response.json())
       .then((entranceNote) => {
         const { workplace } = this.props;
-        const entrance = entranceNote.entrance_set && entranceNote.entrance_set[0];
+        const entrance = entranceNote.entrance_set?.[0];
         if (!entrance) return;
         const workplaceEntrance: WorkplaceEntrance = {
           workplace: workplace.id as number,

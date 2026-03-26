@@ -8,12 +8,12 @@ from django.http import JsonResponse
 logger = logging.getLogger(__name__)
 
 
-def health_check(request):  # noqa: ARG001
+def health_check(request):
     """Basic health check endpoint for Kubernetes liveness probe"""
     return JsonResponse({"status": "healthy", "service": "olmap-backend"})
 
 
-def ready_check(request):  # noqa: ARG001
+def ready_check(request):
     """Readiness check endpoint for Kubernetes readiness probe"""
     checks = {}
     all_healthy = True
@@ -36,7 +36,7 @@ def ready_check(request):  # noqa: ARG001
                 connection.close()
             else:
                 logger.error(f"Database health check failed after {max_retries} attempts: {e}")
-                checks["database"] = f"unhealthy: {str(e)}"
+                checks["database"] = f"unhealthy: {e!s}"
                 all_healthy = False
 
     # Cache check (if configured)

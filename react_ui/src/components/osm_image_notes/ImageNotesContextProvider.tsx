@@ -3,9 +3,9 @@ import sessionRequest from 'sessionRequest';
 import { mapFeatureTypesUrl, osmImageNotesUrl, osmImageNoteUrl } from 'urls';
 import {
   AppContext,
-  ImageNotesContextType,
-  MapFeatureTypes,
-  OSMImageNote,
+  type ImageNotesContextType,
+  type MapFeatureTypes,
+  type OSMImageNote,
   ImageNotesContext,
 } from 'components/types';
 
@@ -64,13 +64,13 @@ export default class ImageNotesContextProvider extends React.Component<
     return sessionRequest(osmImageNoteUrl(note.id as number)).then((response) => {
       if (!this.state.osmImageNotes) return;
       const osmImageNotes = this.state.osmImageNotes.slice();
-      const index = osmImageNotes.findIndex((note2) => note2.id == note.id);
+      const index = osmImageNotes.findIndex((note2) => note2.id === note.id);
 
-      if (response.status == 404) {
+      if (response.status === 404) {
         // The note has been rejected
         osmImageNotes.splice(index, 1);
         this.setState({ osmImageNotes });
-      } else if (response.status == 200)
+      } else if (response.status === 200)
         response.json().then((note) => {
           // Align created_by with how it is serialized in the note list response:
           if (note.created_by && typeof note.created_by !== 'number')

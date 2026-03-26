@@ -1,9 +1,9 @@
 import React from 'react';
-import { osmAddressString, OSMFeature } from 'util_components/osm/types';
-import { OSMImageNote } from 'components/types';
+import { osmAddressString, type OSMFeature } from 'util_components/osm/types';
+import type { OSMImageNote } from 'components/types';
 import Icon from 'util_components/bootstrap/Icon';
 import OSMFeatureList from 'util_components/osm/OSMFeatureList';
-import { LocationTuple } from 'util_components/types';
+import type { LocationTuple } from 'util_components/types';
 
 type OSMImageNoteAddressProps = {
   note: OSMImageNote;
@@ -50,11 +50,11 @@ export default class OSMImageNoteAddress extends React.Component<
               : !nearbyAddresses.length
                 ? 'Loading...'
                 : addresses.map((addressId) => {
-                    const address = nearbyAddresses.find((a) => a.id == addressId);
+                    const address = nearbyAddresses.find((a) => a.id === addressId);
                     return (
                       address && (
                         <span key={addressId}>
-                          {addressId != addresses[0] && ', '}
+                          {addressId !== addresses[0] && ', '}
                           {osmAddressString(address.tags)}
                         </span>
                       )

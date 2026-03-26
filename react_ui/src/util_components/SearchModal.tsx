@@ -25,7 +25,7 @@ export default class SearchModal extends React.Component<SearchModalProps, Searc
           type="text"
           placeholder={placeholder || 'Search'}
           onBlur={this.onSearch}
-          onKeyPress={(e) => e.key == 'Enter' && this.onSearch(e)}
+          onKeyPress={(e) => e.key === 'Enter' && this.onSearch(e)}
         />
         {searchTerm && (
           <IFrameModal

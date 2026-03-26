@@ -1,6 +1,6 @@
 import React from 'react';
-import { positioningOptions, WWIcon } from 'components/workplace_wizard/util_components';
-import { UnloadingPlace, WorkplaceEntrance } from 'components/workplace_wizard/types';
+import { type positioningOptions, WWIcon } from 'components/workplace_wizard/util_components';
+import type { UnloadingPlace, WorkplaceEntrance } from 'components/workplace_wizard/types';
 
 type WWToolbarProps = {
   activeEntrance?: WorkplaceEntrance;
@@ -19,7 +19,6 @@ export default class WWToolbar extends React.Component<WWToolbarProps, WWToolbar
 
   render() {
     const { activeEntrance, activeUP, addFeature } = this.props;
-    const {} = this.state;
     return (
       <div className="mt-2">
         <button className={toolbarBtn} onClick={() => addFeature('newDeliveryEntrance')}>

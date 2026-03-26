@@ -1,6 +1,6 @@
 import React from 'react';
 import Icon from 'util_components/bootstrap/Icon';
-import { User } from 'components/types';
+import type { User } from 'components/types';
 import Confirm from 'util_components/bootstrap/Confirm';
 
 type NavBarProps = {
@@ -25,14 +25,14 @@ export default class NavBar extends React.Component<NavBarProps, NavBarState> {
     return (
       <nav className="navbar navbar-dark bg-primary text-light p-0 flex-shrink-0">
         <div className="w-25">
-          <div className={'dropdown d-inline-block' + showCls}>
+          <div className={`dropdown d-inline-block${showCls}`}>
             <button
               className="btn btn-primary p-1"
               onClick={() => this.setState({ showMenu: !showMenu })}
             >
               <Icon icon="menu" text={user ? user.username : ''}></Icon>
             </button>
-            <div className={'dropdown-menu' + showCls}>
+            <div className={`dropdown-menu${showCls}`}>
               <a className="dropdown-item" href="#/ww/">
                 <Icon icon="location_city" /> Workplace delivery instructions
               </a>

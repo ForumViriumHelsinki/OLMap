@@ -1,6 +1,6 @@
 import React from 'react';
 import PillsSelection from 'util_components/PillsSelection';
-import { MapFeatureTypes } from 'components/types';
+import type { MapFeatureTypes } from 'components/types';
 import Icon from 'util_components/bootstrap/Icon';
 
 type OSMImageNoteTagsProps = {

@@ -1,6 +1,6 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
-module.exports = function (app) {
+module.exports = (app) => {
   // Get Digitransit API key from environment
   const digitransitKey =
     process.env.REACT_APP_DIGITRANSIT_KEY || 'd253c31db9ab41c195f7ef36fc250da4';

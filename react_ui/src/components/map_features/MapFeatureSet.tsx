@@ -1,15 +1,9 @@
 import React from 'react';
 
-import {
-  AppContext,
-  JSONSchema,
-  MapFeature,
-  OSMImageNote,
-  WorkplaceEntrance,
-} from 'components/types';
+import { AppContext, type JSONSchema, type MapFeature, type OSMImageNote } from 'components/types';
 // @ts-ignore
 import { Button } from 'reactstrap';
-import { OSMFeature } from 'util_components/osm/types';
+import type { OSMFeature } from 'util_components/osm/types';
 import { userCanEditNote } from 'components/osm_image_notes/utils';
 import MapFeatureEditor from 'components/map_features/MapFeatureEditor';
 
@@ -51,7 +45,7 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
     const { user } = this.context;
     // @ts-ignore
     const mapFeatures = (osmImageNote[this.getFeatureListFieldName()] || []) as MapFeature[];
-    const editable = userCanEditNote(user, osmImageNote) && mapFeatures.length == 0;
+    const editable = userCanEditNote(user, osmImageNote) && mapFeatures.length === 0;
     const osmFeatureIndex = Object.fromEntries(nearbyFeatures.map((f) => [f.id, f]));
 
     return (
@@ -114,13 +108,13 @@ export default class MapFeatureSet extends React.Component<MapFeatureSetProps, M
     }
 
     if (schema.properties.name) {
-      const f = selectedFeatures.find((f) => f.tags['name']);
+      const f = selectedFeatures.find((f) => f.tags.name);
       if (f) {
-        newMapFeature.name = f.tags['name'];
+        newMapFeature.name = f.tags.name;
       }
     }
 
-    if (featureTypeName == 'Workplace') newMapFeature.workplace_entrances = [];
+    if (featureTypeName === 'Workplace') newMapFeature.workplace_entrances = [];
 
     mapFeatures.push(newMapFeature);
     // @ts-ignore
