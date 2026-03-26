@@ -147,7 +147,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=False, methods=["get"])
-    def map_feature_schemas(self, request, pk=None):
+    def map_feature_schemas(self, request):
         serializer = self.get_serializer()
         schemas = {}
         for prop_type in models.map_feature_types:

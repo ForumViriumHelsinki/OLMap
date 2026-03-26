@@ -262,7 +262,7 @@ class PrimaryKeyRelatedFieldConverter:
 class StringRelatedFieldConverter:
     field_class = serializers.StringRelatedField
 
-    def convert(self, field):
+    def convert(self, _field):
         return {"type": "string"}
 
 
@@ -270,7 +270,7 @@ class StringRelatedFieldConverter:
 class HyperlinkedRelatedFieldConverter:
     field_class = serializers.HyperlinkedRelatedField
 
-    def convert(self, field):
+    def convert(self, _field):
         return {"type": "string", "format": "uri"}
 
 
@@ -278,7 +278,7 @@ class HyperlinkedRelatedFieldConverter:
 class SlugRelatedFieldConverter:
     field_class = serializers.SlugRelatedField
 
-    def convert(self, field):
+    def convert(self, _field):
         # FIXME: hardcoded slug regex
         return {"type": "string", "pattern": "^[-a-zA-Z0-9_]+$"}
 
