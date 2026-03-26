@@ -1,13 +1,13 @@
 import React from 'react';
 import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
 import OSMEntranceCreator from 'util_components/osm/OSMEntranceCreator';
-import { Location } from 'util_components/types';
-import { MapFeature, OSMEditContextType, OSMImageNote } from 'components/types';
-import { OSMFeature } from 'util_components/osm/types';
+import type { Location } from 'util_components/types';
+import type { MapFeature, OSMEditContextType, OSMImageNote } from 'components/types';
+import type { OSMFeature } from 'util_components/osm/types';
 import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
 import Map from 'util_components/Map';
 import { CircleMarker, Polyline } from 'react-leaflet';
-import { LatLngExpression } from 'leaflet';
+import type { LatLngExpression } from 'leaflet';
 
 type OSMEntranceCreationModalProps = {
   onClose: () => any;
@@ -43,8 +43,8 @@ export default class OSMEntranceCreationModal extends React.Component<
     const accessLatLng =
       accessPoint && ([...accessPoint.geometry.coordinates].reverse() as LatLngExpression);
 
-    const road = entranceCreator && entranceCreator.newRoadGeometry();
-    const building = entranceCreator && entranceCreator.newBuildingGeometry();
+    const road = entranceCreator?.newRoadGeometry();
+    const building = entranceCreator?.newBuildingGeometry();
     const wayType = this.getEntrancePathTags().highway;
 
     return (
@@ -82,7 +82,7 @@ export default class OSMEntranceCreationModal extends React.Component<
                   className="btn btn-outline-primary btn-sm"
                   onClick={() => this.setState({ createWay: !createWay })}
                 >
-                  {createWay ? 'Omit' : 'Create'} {wayType} {wayType == 'service' ? 'road' : ''}
+                  {createWay ? 'Omit' : 'Create'} {wayType} {wayType === 'service' ? 'road' : ''}
                 </button>
                 <button className="btn btn-primary btn-sm ml-2" onClick={this.createOSMEntrance}>
                   Save to OSM
@@ -121,7 +121,7 @@ export default class OSMEntranceCreationModal extends React.Component<
     const { osmImageNote, entrance } = this.props;
     // @ts-ignore
     const steps = (osmImageNote.steps_set || [])[0];
-    const pathType = entrance.type == 'garage' ? 'service' : 'footway';
+    const pathType = entrance.type === 'garage' ? 'service' : 'footway';
 
     if (steps) return steps.as_osm_tags;
     return { highway: pathType, access: entrance.access || 'destination' };

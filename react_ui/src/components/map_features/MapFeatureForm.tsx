@@ -2,7 +2,7 @@ import React from 'react';
 import Form from '@rjsf/core';
 import validator from '@rjsf/validator-ajv8';
 
-import { JSONSchema, MapFeature } from 'components/types';
+import type { JSONSchema, MapFeature } from 'components/types';
 // @ts-ignore
 import { Button } from 'reactstrap';
 import ConfirmButton from 'util_components/bootstrap/ConfirmButton';

@@ -1,21 +1,14 @@
 import React from 'react';
-import _ from 'lodash';
-import { MapFeature, OSMImageNote } from 'components/types';
+import type { MapFeature, OSMImageNote } from 'components/types';
 // @ts-ignore
 import { Button } from 'reactstrap';
 import Modal from 'util_components/bootstrap/Modal';
-import { SimpleOSMImageNotesMap } from 'components/osm_image_notes/OSMImageNotesMap';
-import { Location, LocationTuple } from 'util_components/types';
+import type { Location, LocationTuple } from 'util_components/types';
 import sessionRequest from 'sessionRequest';
-import {
-  osmImageNoteUrl,
-  unloadingPlaceUrl,
-  workplaceEntrancesUrl,
-  workplaceEntranceUrl,
-} from 'urls';
+import { unloadingPlaceUrl } from 'urls';
 import Map from 'util_components/Map';
 import * as L from 'leaflet';
-import { LatLngLiteral } from 'leaflet';
+import type { LatLngLiteral } from 'leaflet';
 // @ts-ignore
 
 type UnloadingPlaceAccessPointsProps = {

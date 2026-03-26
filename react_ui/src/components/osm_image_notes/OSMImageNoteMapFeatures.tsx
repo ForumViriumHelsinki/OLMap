@@ -1,7 +1,7 @@
 import React from 'react';
 import MapFeatureSet from 'components/map_features/MapFeatureSet';
-import { MapFeatureTypes, OSMImageNote } from 'components/types';
-import { OSMFeature } from 'util_components/osm/types';
+import type { MapFeatureTypes, OSMImageNote } from 'components/types';
+import type { OSMFeature } from 'util_components/osm/types';
 
 type OSMImageNoteMapFeaturesProps = {
   mapFeatureTypes: MapFeatureTypes;
@@ -31,7 +31,6 @@ export default class OSMImageNoteMapFeatures extends React.Component<
       onSubmit,
       addNearbyFeature,
     } = this.props;
-    const {} = this.state;
     return this.getRelevantFeatureTypes().map((featureTypeName) => (
       <div key={featureTypeName}>
         <MapFeatureSet

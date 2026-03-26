@@ -1,5 +1,7 @@
+// biome-ignore lint/correctness/noUnusedImports: React is needed for JSX with classic runtime
+import React from 'react';
 import { default as L } from 'leaflet';
-import {
+import type {
   AccessPoint,
   MapFeature,
   UnloadingPlace,
@@ -7,8 +9,7 @@ import {
   WorkplaceEntrance,
 } from 'components/workplace_wizard/types';
 import { Marker, Popup } from 'react-leaflet';
-import React from 'react';
-import { JSONSchema } from 'components/types';
+import type { JSONSchema } from 'components/types';
 import wp_icon from 'components/workplace_wizard/workplace.svg';
 import delivery_icon from 'components/workplace_wizard/delivery_entrance.svg';
 import entrance_icon from 'components/workplace_wizard/entrance.svg';
@@ -29,7 +30,7 @@ const iSize = 28;
 
 function icon(src: string, size: number = iSize, cls?: string) {
   return L.divIcon({
-    className: 'mapIcon' + (cls ? ' ' + cls : ''),
+    className: `mapIcon${cls ? ` ${cls}` : ''}`,
     html: `<img src="${src}"/>`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],

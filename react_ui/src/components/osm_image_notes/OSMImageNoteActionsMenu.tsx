@@ -1,6 +1,6 @@
 import React from 'react';
 import Icon from 'util_components/bootstrap/Icon';
-import { OSMImageNote } from 'components/types';
+import type { OSMImageNote } from 'components/types';
 import OSMImageNoteReviewActions from 'components/osm_image_notes/OSMImageNoteReviewActions';
 import sessionRequest from 'sessionRequest';
 import { osmImageNoteUrl } from 'urls';
@@ -47,11 +47,11 @@ export default class OSMImageNoteActionsMenu extends React.Component<
     const hel3dUrl = `https://kartta.hel.fi/3d/?startingmap=Cesium%20Map&lang=en&${hel3dLayers}&${hel3dPosition}/`;
 
     return (
-      <div className={'dropdown d-inline-block' + showCls}>
+      <div className={`dropdown d-inline-block${showCls}`}>
         <button className="btn btn-light p-1" onClick={() => this.setState({ show: !show })}>
           <Icon icon="menu"></Icon>
         </button>
-        <div className={'dropdown-menu' + showCls}>
+        <div className={`dropdown-menu${showCls}`}>
           <button className="dropdown-item" onClick={this.copyPermalink}>
             <Icon icon="link" /> Copy link to this note
           </button>
@@ -83,7 +83,7 @@ export default class OSMImageNoteActionsMenu extends React.Component<
               OLMap
             </button>
           ) : (
-            <a className="dropdown-item" href={noteUrl} target="_blank">
+            <a className="dropdown-item" href={noteUrl} target="_blank" rel="noopener">
               OLMap
             </a>
           )}
@@ -129,7 +129,7 @@ export default class OSMImageNoteActionsMenu extends React.Component<
     const { note, refreshNote } = this.props;
     const files = this.imageEl().files as FileList;
     const image = files[0];
-    let formData = new FormData();
+    const formData = new FormData();
     formData.append('image', image);
     sessionRequest(osmImageNoteUrl(note.id as number), {
       method: 'PATCH',

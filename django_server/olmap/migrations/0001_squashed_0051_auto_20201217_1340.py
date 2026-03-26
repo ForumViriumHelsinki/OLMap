@@ -14,7 +14,7 @@ import olmap.models.osm_image_notes
 from olmap.rest.permissions import REVIEWER_GROUP
 
 
-def import_turku_addresses(apps, schema_editor):  # noqa: ARG001
+def import_turku_addresses(apps, schema_editor):
     if settings.TEST or os.environ.get("SKIP_ADDRESS_IMPORT", "").lower() in ("true", "1", "yes"):
         print("Skipping Turku address import (TEST or SKIP_ADDRESS_IMPORT is set)")
         return
@@ -63,7 +63,7 @@ def import_turku_addresses(apps, schema_editor):  # noqa: ARG001
         print(f"Warning: Failed to import Turku addresses: {e}")
 
 
-def import_helsinki_addresses(apps, schema_editor):  # noqa: ARG001
+def import_helsinki_addresses(apps, schema_editor):
     if settings.TEST or os.environ.get("SKIP_ADDRESS_IMPORT", "").lower() in ("true", "1", "yes"):
         print("Skipping Helsinki address import (TEST or SKIP_ADDRESS_IMPORT is set)")
         return
@@ -112,7 +112,7 @@ def import_helsinki_addresses(apps, schema_editor):  # noqa: ARG001
         print(f"Warning: Failed to import Helsinki addresses: {e}")
 
 
-def add_reviewer_group(apps, schema_editor):  # noqa: ARG001
+def add_reviewer_group(apps, schema_editor):
     Group = apps.get_model("auth", "Group")
     Group.objects.get_or_create(name=REVIEWER_GROUP)
 
@@ -122,7 +122,7 @@ street_address_regex = re.compile(
 )
 
 
-def sync_addresses(apps, schema_editor):  # noqa: ARG001
+def sync_addresses(apps, schema_editor):
     def sync_street_address(self):
         if self.street_address:
             match = re.fullmatch(street_address_regex, self.street_address)

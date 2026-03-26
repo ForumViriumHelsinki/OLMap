@@ -2,12 +2,12 @@ import React from 'react';
 // @ts-ignore
 import _ from 'lodash';
 
-import { LocationTuple } from 'util_components/types';
+import type { LocationTuple } from 'util_components/types';
 import CenteredSpinner from 'util_components/bootstrap/CenteredSpinner';
 // @ts-ignore
 import { Button, ListGroup, ListGroupItem } from 'reactstrap';
 import OSMFeatureList from 'util_components/osm/OSMFeatureList';
-import { OSMFeature } from 'util_components/osm/types';
+import type { OSMFeature } from 'util_components/osm/types';
 
 import { overpassQuery } from 'util_components/osm/utils';
 
@@ -128,8 +128,8 @@ export default class OSMFeaturesSelection extends React.Component<OSMFSProps, OS
       const nearbyOSMFeatures: OSMFeature[] = [];
       const wayNames: string[] = [];
       features.forEach((f) => {
-        if (f.type == 'way') {
-          const duplicate = wayNames.find((n) => n == f.tags.name);
+        if (f.type === 'way') {
+          const duplicate = wayNames.find((n) => n === f.tags.name);
           if (duplicate) return;
           else wayNames.push(f.tags.name);
         }

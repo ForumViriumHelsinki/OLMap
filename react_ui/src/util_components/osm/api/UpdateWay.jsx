@@ -1,5 +1,3 @@
-import React from 'react';
-
 const UpdateWay = ({ changesetId, way }) => (
   <osm>
     <way changeset={changesetId} id={way.id} version={way.version} visible="true">

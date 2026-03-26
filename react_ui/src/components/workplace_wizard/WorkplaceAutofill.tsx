@@ -1,10 +1,9 @@
 import React from 'react';
-import { Workplace } from 'components/workplace_wizard/types';
+import type { Workplace } from 'components/workplace_wizard/types';
 import { geocoderFocus } from 'components/workplace_wizard/settings';
 import { geocoderUrl, workplaceSearchUrl } from 'components/workplace_wizard/urls';
 import sessionRequest from 'sessionRequest';
 import { AppContext } from 'components/types';
-import settings from '../../settings.js';
 
 type WorkplaceAutofillProps = {
   onSelected: (wp: Workplace) => any;
@@ -121,7 +120,7 @@ export default class WorkplaceAutofill extends React.Component<
         <div className="mt-5 p-3 card">
           <h5>Käyttöohjeita</h5>
           <p>
-            <a href="https://youtu.be/2VHsi2N-NW8" target="_blank">
+            <a href="https://youtu.be/2VHsi2N-NW8" target="_blank" rel="noopener">
               Katso ohjeet videomuodossa
             </a>
           </p>
@@ -191,13 +190,13 @@ export default class WorkplaceAutofill extends React.Component<
     if (['name', 'street'].includes(field) && value.length > 2)
       this.fetchSuggestions(value).then((suggestions) => {
         // @ts-ignore
-        if (this.state[field] == value) this.setState({ suggestions, closed: false });
+        if (this.state[field] === value) this.setState({ suggestions, closed: false });
       });
-    if (field == 'name' && value.length > 2)
+    if (field === 'name' && value.length > 2)
       sessionRequest(workplaceSearchUrl(value))
         .then((r) => r.json())
         .then((olmapWorkplaces) => {
-          if (this.state[field] == value) this.setState({ olmapWorkplaces });
+          if (this.state[field] === value) this.setState({ olmapWorkplaces });
         });
   }
 
@@ -205,7 +204,7 @@ export default class WorkplaceAutofill extends React.Component<
     const { name, street, housenumber, unit } = this.state;
     const { onSelected } = this.props;
     if (!(name && street && housenumber)) return;
-    this.fetchSuggestions(`${street} ${housenumber}${unit ? ' ' + unit : ''}`).then(
+    this.fetchSuggestions(`${street} ${housenumber}${unit ? ` ${unit}` : ''}`).then(
       (suggestions) => {
         const [lon, lat] = suggestions[0].geometry.coordinates;
         return onSelected({ street, housenumber, unit, name, lon, lat });
@@ -219,8 +218,8 @@ export default class WorkplaceAutofill extends React.Component<
     const { onSelected } = this.props;
     const [nr, unit] = (housenumber || '').split(' ');
 
-    if (layer == 'venue') {
-      const osm_feature = source == 'openstreetmap' ? id.split(':')[1] : undefined;
+    if (layer === 'venue') {
+      const osm_feature = source === 'openstreetmap' ? id.split(':')[1] : undefined;
       return onSelected({
         street,
         housenumber: nr,
@@ -233,10 +232,10 @@ export default class WorkplaceAutofill extends React.Component<
     }
 
     let state = {};
-    if (layer == 'address') {
+    if (layer === 'address') {
       state = { street, housenumber: nr, unit };
     }
-    if (layer == 'street') state = { street: name };
+    if (layer === 'street') state = { street: name };
     this.setState({ ...state, suggestions: [] });
   }
 }

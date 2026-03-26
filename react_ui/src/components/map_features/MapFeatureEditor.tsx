@@ -1,20 +1,10 @@
 import React from 'react';
 import _ from 'lodash';
-import Form from '@rjsf/core';
 
-import {
-  AppContext,
-  JSONSchema,
-  MapFeature,
-  OSMImageNote,
-  WorkplaceEntrance,
-} from 'components/types';
-// @ts-ignore
-import { Button } from 'reactstrap';
-import { OSMFeature } from 'util_components/osm/types';
+import { AppContext, type JSONSchema, type MapFeature, type OSMImageNote } from 'components/types';
+import type { OSMFeature } from 'util_components/osm/types';
 import ConfirmButton from 'util_components/bootstrap/ConfirmButton';
 import { userCanEditNote } from 'components/osm_image_notes/utils';
-import WorkplaceTypeWidget from 'components/map_features/WorkplaceTypeWidget';
 import WorkplaceEntrances from 'components/map_features/WorkplaceEntrances';
 import UnloadingPlaceEntrances from 'components/map_features/UnloadingPlaceEntrances';
 import UnloadingPlaceAccessPoints from 'components/map_features/UnloadingPlaceAccessPoints';
@@ -56,7 +46,7 @@ type FeatureViewProps = {
 class EntranceView extends React.Component<FeatureViewProps> {
   render() {
     const { mapFeature } = this.props;
-    const access = mapFeature.access == 'yes' ? 'public' : mapFeature.access;
+    const access = mapFeature.access === 'yes' ? 'public' : mapFeature.access;
     const typeStr = _.filter([access, mapFeature.type, 'entrance']).join(' ');
     const tags = ['loadingdock', 'wheelchair', 'keycode', 'buzzer'].filter((t) => mapFeature[t]);
     const rows = ['width', 'height', 'phone', 'opening_hours'].filter((t) => mapFeature[t]);
@@ -184,12 +174,12 @@ export default class MapFeatureEditor extends React.Component<
             className="flex-grow-0 clickable"
             onClick={() => this.setState({ mode: nextMode[mode] })}
           >
-            <Icon icon={mode == 'compact' ? 'expand_more' : 'expand_less'} />
+            <Icon icon={mode === 'compact' ? 'expand_more' : 'expand_less'} />
           </div>
           <div className="flex-grow-1">
             {TypeView ? <TypeView {...{ mapFeature }} /> : <strong>{featureTypeName}</strong>}
 
-            {mode == 'editing' ? (
+            {mode === 'editing' ? (
               <MapFeatureForm
                 featureTypeName={featureTypeName}
                 schema={schema}
@@ -199,89 +189,87 @@ export default class MapFeatureEditor extends React.Component<
                 mapFeature={mapFeature}
               />
             ) : (
-              <>
-                {mode == 'expanded' && (
-                  <>
-                    {editable && (
-                      <div className="mt-3 mb-3 d-flex">
+              mode === 'expanded' && (
+                <>
+                  {editable && (
+                    <div className="mt-3 mb-3 d-flex">
+                      <button
+                        className="btn btn-sm btn-compact btn-outline-primary d-block flex-grow-1"
+                        onClick={() => this.setState({ mode: 'editing' })}
+                      >
+                        Edit
+                      </button>
+                      {featureTypeName === 'Workplace' && (
                         <button
-                          className="btn btn-sm btn-compact btn-outline-primary d-block flex-grow-1"
-                          onClick={() => this.setState({ mode: 'editing' })}
+                          className="btn btn-sm btn-compact btn-outline-secondary d-block flex-grow-1"
+                          onClick={this.extractWorkplace}
                         >
-                          Edit
+                          Extract
                         </button>
-                        {featureTypeName == 'Workplace' && (
-                          <button
-                            className="btn btn-sm btn-compact btn-outline-secondary d-block flex-grow-1"
-                            onClick={this.extractWorkplace}
-                          >
-                            Extract
-                          </button>
-                        )}
-                        <ConfirmButton
-                          onClick={() => this.onDelete()}
-                          className="btn-outline-danger btn-compact btn-sm d-block flex-grow-1"
-                          confirm={`Really delete ${featureTypeName}?`}
-                        >
-                          Delete
-                        </ConfirmButton>
-                      </div>
-                    )}
+                      )}
+                      <ConfirmButton
+                        onClick={() => this.onDelete()}
+                        className="btn-outline-danger btn-compact btn-sm d-block flex-grow-1"
+                        confirm={`Really delete ${featureTypeName}?`}
+                      >
+                        Delete
+                      </ConfirmButton>
+                    </div>
+                  )}
 
-                    {featureTypeName == 'Workplace' && editable && (
-                      <WorkplaceEntrances
-                        workplace={mapFeature}
-                        osmImageNote={osmImageNote}
-                        refreshNote={refreshNote}
-                        schema={schema.properties.workplace_entrances.items}
-                      />
-                    )}
-                    {featureTypeName == 'UnloadingPlace' && editable && mapFeature.id && (
-                      <div className="mb-4 mt-1">
-                        <UnloadingPlaceEntrances
-                          unloadingPlace={mapFeature}
-                          osmImageNote={osmImageNote}
-                        />
-                        <UnloadingPlaceAccessPoints
-                          unloadingPlace={mapFeature}
-                          osmImageNote={osmImageNote}
-                        />
-                      </div>
-                    )}
-
-                    {mapFeature.as_osm_tags && (
-                      <div className="mt-2">
-                        <textarea
-                          id={mapFeature.id + '-osm-text'}
-                          rows={Object.keys(mapFeature.as_osm_tags).length}
-                          className="form-control"
-                          readOnly
-                          value={Object.entries(mapFeature.as_osm_tags)
-                            .map(([k, v]) => `${k}=${v}`)
-                            .join('\n')}
-                        />
-                        <button
-                          className="btn btn-compact btn-sm btn-outline-secondary mt-2"
-                          onClick={() => this.copyText(mapFeature.id + '-osm-text')}
-                        >
-                          Copy
-                        </button>
-                      </div>
-                    )}
-                    <MapFeatureOSMLink
-                      {...{
-                        featureTypeName,
-                        mapFeature,
-                        osmFeature,
-                        nearbyFeatures,
-                        osmImageNote,
-                        addNearbyFeature,
-                        saveFeature: this.saveFeature,
-                      }}
+                  {featureTypeName === 'Workplace' && editable && (
+                    <WorkplaceEntrances
+                      workplace={mapFeature}
+                      osmImageNote={osmImageNote}
+                      refreshNote={refreshNote}
+                      schema={schema.properties.workplace_entrances.items}
                     />
-                  </>
-                )}
-              </>
+                  )}
+                  {featureTypeName === 'UnloadingPlace' && editable && mapFeature.id && (
+                    <div className="mb-4 mt-1">
+                      <UnloadingPlaceEntrances
+                        unloadingPlace={mapFeature}
+                        osmImageNote={osmImageNote}
+                      />
+                      <UnloadingPlaceAccessPoints
+                        unloadingPlace={mapFeature}
+                        osmImageNote={osmImageNote}
+                      />
+                    </div>
+                  )}
+
+                  {mapFeature.as_osm_tags && (
+                    <div className="mt-2">
+                      <textarea
+                        id={`${mapFeature.id}-osm-text`}
+                        rows={Object.keys(mapFeature.as_osm_tags).length}
+                        className="form-control"
+                        readOnly
+                        value={Object.entries(mapFeature.as_osm_tags)
+                          .map(([k, v]) => `${k}=${v}`)
+                          .join('\n')}
+                      />
+                      <button
+                        className="btn btn-compact btn-sm btn-outline-secondary mt-2"
+                        onClick={() => this.copyText(`${mapFeature.id}-osm-text`)}
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  )}
+                  <MapFeatureOSMLink
+                    {...{
+                      featureTypeName,
+                      mapFeature,
+                      osmFeature,
+                      nearbyFeatures,
+                      osmImageNote,
+                      addNearbyFeature,
+                      saveFeature: this.saveFeature,
+                    }}
+                  />
+                </>
+              )
             )}
           </div>
         </div>
@@ -298,7 +286,7 @@ export default class MapFeatureEditor extends React.Component<
     this.setState({ mode: 'compact' });
     if (!mapFeature.id) {
       featureList.splice(featureList.indexOf(mapFeature, 1));
-      onDelete && onDelete();
+      onDelete?.();
     }
   };
 
@@ -312,7 +300,7 @@ export default class MapFeatureEditor extends React.Component<
     // @ts-ignore
     Promise.resolve(onSubmit({ [fieldName]: featureList })).then(() => {
       this.setState({ mode: 'compact' });
-      onDelete && onDelete();
+      onDelete?.();
     });
   };
 
@@ -336,9 +324,9 @@ export default class MapFeatureEditor extends React.Component<
         });
 
         // @ts-ignore
-        if (osmImageNote.workplace_set.length == 1)
+        if (osmImageNote.workplace_set.length === 1)
           onSubmit({
-            tags: (osmImageNote.tags || []).filter((t) => t != 'Workplace'),
+            tags: (osmImageNote.tags || []).filter((t) => t !== 'Workplace'),
           });
       });
   };

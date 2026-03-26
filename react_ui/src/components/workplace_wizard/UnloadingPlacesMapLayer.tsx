@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { nearbyUnloadingPlacesUrl } from 'components/workplace_wizard/urls';
-import { MapFeature, Point } from 'components/workplace_wizard/types';
+import type { MapFeature, Point } from 'components/workplace_wizard/types';
 import { Marker, Popup } from 'react-leaflet';
 import * as L from 'leaflet';
 import up_icon from './unloading.svg';
 import sessionRequest from 'sessionRequest';
-import { LatLngLiteral } from 'leaflet';
+import type { LatLngLiteral } from 'leaflet';
 import { popupBtn, WWIcon } from 'components/workplace_wizard/util_components';
 import { ImageButton } from 'components/workplace_wizard/ImageButton';
 
@@ -39,27 +39,25 @@ export default class UnloadingPlacesMapLayer extends React.Component<
     const { addUP } = this.props;
     const { nearbyUnloadingPlaces } = this.state;
     return (
-      (nearbyUnloadingPlaces &&
-        nearbyUnloadingPlaces.map((unloadingPlace) => (
-          <Marker
-            key={unloadingPlace.id}
-            position={this.latLng(unloadingPlace)}
-            icon={icon}
-            zIndexOffset={-1000}
-          >
-            <Popup closeOnClick={true} closeButton={false} className="wwPopup">
-              <ImageButton f={unloadingPlace} />
-              {addUP ? (
-                <button className={popupBtn} onClick={() => addUP(unloadingPlace)}>
-                  <WWIcon icon="local_shipping" outline /> Yhdistä
-                </button>
-              ) : (
-                <div className="p-2 font-weight-bold">Luo sisäänkäynti ensin!</div>
-              )}
-            </Popup>
-          </Marker>
-        ))) ||
-      null
+      nearbyUnloadingPlaces?.map((unloadingPlace) => (
+        <Marker
+          key={unloadingPlace.id}
+          position={this.latLng(unloadingPlace)}
+          icon={icon}
+          zIndexOffset={-1000}
+        >
+          <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+            <ImageButton f={unloadingPlace} />
+            {addUP ? (
+              <button className={popupBtn} onClick={() => addUP(unloadingPlace)}>
+                <WWIcon icon="local_shipping" outline /> Yhdistä
+              </button>
+            ) : (
+              <div className="p-2 font-weight-bold">Luo sisäänkäynti ensin!</div>
+            )}
+          </Popup>
+        </Marker>
+      )) || null
     );
   }
 
@@ -70,7 +68,7 @@ export default class UnloadingPlacesMapLayer extends React.Component<
   componentDidUpdate(prevProps: Readonly<UnloadingPlacesMapLayerProps>) {
     const { lat, lon } = prevProps.location,
       l = this.props.location;
-    if (l.lat != lat || l.lon != lon) this.loadNearbyUnloadingPlaces();
+    if (l.lat !== lat || l.lon !== lon) this.loadNearbyUnloadingPlaces();
   }
 
   loadNearbyUnloadingPlaces() {

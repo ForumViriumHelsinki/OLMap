@@ -15,9 +15,48 @@
   },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
-    "enabled": false
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedImports": "error",
+        "noUnusedVariables": "warn",
+        "noUnusedFunctionParameters": "warn",
+        "useJsxKeyInIterable": "warn",
+        "noSolidDestructuredProps": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noTsIgnore": "warn",
+        "noDoubleEquals": "error",
+        "noShadowRestrictedNames": "warn",
+        "noArrayIndexKey": "off",
+        "useIterableCallbackReturn": "warn",
+        "noImplicitAnyLet": "warn"
+      },
+      "style": {
+        "useTemplate": "warn",
+        "noNonNullAssertion": "off",
+        "useImportType": "warn"
+      },
+      "complexity": {
+        "noBannedTypes": "warn",
+        "useOptionalChain": "warn"
+      },
+      "a11y": {
+        "useButtonType": "warn",
+        "useAltText": "warn",
+        "useValidAnchor": "warn",
+        "noStaticElementInteractions": "off",
+        "useKeyWithClickEvents": "off",
+        "useKeyWithMouseEvents": "off",
+        "useIframeTitle": "warn",
+        "noAutofocus": "off"
+      }
+    }
   },
   "javascript": {
+    "jsxRuntime": "reactClassic",
     "formatter": {
       "quoteStyle": "single",
       "semicolons": "always",

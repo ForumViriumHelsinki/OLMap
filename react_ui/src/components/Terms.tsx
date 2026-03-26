@@ -1,13 +1,11 @@
 import React from 'react';
 import Modal from 'util_components/bootstrap/Modal';
 
-type TermsProps = {};
-
-type TermsState = { showTerms: any };
+type TermsState = { showTerms: string | false };
 
 const initialState: TermsState = { showTerms: false };
 
-export default class Terms extends React.Component<TermsProps, TermsState> {
+export default class Terms extends React.Component<Record<string, never>, TermsState> {
   state = initialState;
 
   render() {

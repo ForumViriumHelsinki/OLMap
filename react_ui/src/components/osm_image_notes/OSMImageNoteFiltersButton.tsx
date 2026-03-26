@@ -9,7 +9,7 @@ import {
   DropdownToggle,
   // @ts-ignore
 } from 'reactstrap';
-import { AppContext, MapFeatureTypes, OSMImageNote, User } from 'components/types';
+import { AppContext, type MapFeatureTypes, type OSMImageNote, type User } from 'components/types';
 import MapToolButton from 'components/osm_image_notes/MapToolButton';
 import sessionRequest from 'sessionRequest';
 import { recentMappersUrl } from 'urls';
@@ -40,11 +40,11 @@ const _90d = 90 * _24h;
 
 const filter24h = (note: OSMImageNote) =>
   // @ts-ignore
-  new Date(note.modified_at || note.created_at).valueOf() > new Date().valueOf() - _24h;
+  new Date(note.modified_at || note.created_at).valueOf() > Date.now() - _24h;
 
 const filter90d = (note: OSMImageNote) =>
   // @ts-ignore
-  new Date(note.modified_at || note.created_at).valueOf() > new Date().valueOf() - _90d;
+  new Date(note.modified_at || note.created_at).valueOf() > Date.now() - _90d;
 
 const checkHeight = (note: OSMImageNote) => note.height;
 const underground = (note: OSMImageNote) => note.layer && note.layer < 0;
@@ -65,7 +65,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<
 
   componentDidUpdate(prevProps: Readonly<OSMImageNoteFiltersButtonProps>) {
     const notes = this.props.osmImageNotes;
-    if (notes && prevProps.osmImageNotes != notes) {
+    if (notes && prevProps.osmImageNotes !== notes) {
       const filters = Object.entries(this.filterOptions());
       const counts = filters.map(([k, v]) => [k, filterNotes(v, notes).length]);
       this.setState({ counts: Object.fromEntries(counts) });
@@ -80,7 +80,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<
     return {
       '24h': { newer_than: filter24h },
       '90 days': { newer_than: filter90d },
-      'My notes': { created_by: user && user.id },
+      'My notes': { created_by: user?.id },
 
       New: { is_processed: false, is_reviewed: false, is_accepted: false },
       'Ready for OSM': {
@@ -176,7 +176,7 @@ export default class OSMImageNoteFiltersButton extends React.Component<
 
     if (filter.tags) {
       const tag = filter.tags[0];
-      if (filters.tags && filters.tags.includes(tag)) {
+      if (filters.tags?.includes(tag)) {
         filters.tags = _.without(filters.tags, tag);
         if (!filters.tags.length) delete filters.tags;
       } else filters.tags = (filters.tags || []).concat(filter.tags);

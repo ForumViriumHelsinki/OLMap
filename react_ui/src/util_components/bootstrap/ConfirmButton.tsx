@@ -32,7 +32,7 @@ export default class ConfirmButton extends React.Component<ButtonProps> {
         </button>
         {showConfirmation && (
           <Confirm
-            title={confirm || children + '?'}
+            title={confirm || `${children}?`}
             onClose={() => this.setState({ showConfirmation: false })}
             onConfirm={onClick}
           />

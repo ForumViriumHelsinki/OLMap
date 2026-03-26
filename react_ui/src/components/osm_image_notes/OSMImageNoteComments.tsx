@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppContext, OSMImageNote } from 'components/types';
+import { AppContext, type OSMImageNote } from 'components/types';
 import { formatTimestamp } from 'utils';
 import sessionRequest from 'sessionRequest';
 import { osmImageNoteCommentsUrl, osmImageNoteCommentUrl } from 'urls';
@@ -66,7 +66,7 @@ export default class OSMImageNoteComments extends React.Component<OSMImageNoteCo
           onChange={() => this.setState({ changed: true })}
         />
         <button
-          className={'btn btn-primary btn-block' + (changed ? '' : ' invisible')}
+          className={`btn btn-primary btn-block${changed ? '' : ' invisible'}`}
           onClick={this.submit}
         >
           Submit

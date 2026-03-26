@@ -1,8 +1,6 @@
-import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './OLMapUI';
 import * as serviceWorker from './serviceWorker';
-import styles from './index.scss'; // eslint-disable-line
 
 const container = document.getElementById('root');
 const root = createRoot(container);

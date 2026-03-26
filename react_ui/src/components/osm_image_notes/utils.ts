@@ -1,4 +1,4 @@
-import { OSMImageNote, User } from 'components/types';
+import type { OSMImageNote, User } from 'components/types';
 
 export const userCanEditNote = (user: User | null, osmImageNote: OSMImageNote) => {
   const is_creator =
@@ -16,15 +16,15 @@ export const filterNotes = (filters: any, notes: OSMImageNote[]) => {
 
   return notes.filter((note: OSMImageNote) => {
     for (const [key, value] of entries) {
-      if (typeof value == 'function') {
+      if (typeof value === 'function') {
         if (!value(note)) return false;
-      } else if (value instanceof Array)
+      } else if (Array.isArray(value))
         for (const item of value) {
           // @ts-ignore
           if (!(note[key] || []).includes(item)) return false;
         }
       // @ts-ignore
-      else if (note[key] != value) return false;
+      else if (note[key] !== value) return false;
     }
     return true;
   });

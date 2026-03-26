@@ -104,7 +104,7 @@ schema_view = get_schema_view(
 class SchemaWithParameters(AutoSchema):
     def __init__(self, *args, **kwargs):
         self.tags_by_action = kwargs.pop("tags_by_action", {})
-        return super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_operation(self, path, method):
         op = super().get_operation(path, method)

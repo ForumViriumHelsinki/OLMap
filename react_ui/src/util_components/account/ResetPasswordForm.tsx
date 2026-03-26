@@ -1,5 +1,5 @@
-import React, { FormEvent } from 'react';
-import sessionRequest, { login, logout } from 'sessionRequest';
+import React from 'react';
+import sessionRequest, { logout } from 'sessionRequest';
 import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
 
 type Props = {
@@ -71,7 +71,7 @@ export default class ResetPasswordForm extends React.Component<Props, State> {
     const { changePasswordUrl, uid, token } = this.props;
     e.preventDefault();
     const formData = new FormData(e.target);
-    let data = {};
+    const data = {};
     // @ts-ignore
     formData.forEach((value: any, key: string) => (data[key] = value));
     this.setState({ error: false, ...data });
@@ -80,8 +80,8 @@ export default class ResetPasswordForm extends React.Component<Props, State> {
       method: 'POST',
       data: { ...data, uid, token },
     }).then((response) => {
-      if (response.status == 200) this.setState({ success: true });
-      else if (response.status == 400)
+      if (response.status === 200) this.setState({ success: true });
+      else if (response.status === 400)
         response.json().then((resp) => {
           if (resp.token)
             this.setState({
