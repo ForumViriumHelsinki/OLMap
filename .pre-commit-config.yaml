@@ -48,7 +48,7 @@ repos:
     hooks:
       - id: biome-format
         name: biome format
-        entry: biome format --write
+        entry: biome format --write --config-path react_ui
         language: node
         additional_dependencies: ['@biomejs/biome@2.3.14']
         files: ^react_ui/.*\.(js|jsx|ts|tsx|json)$
