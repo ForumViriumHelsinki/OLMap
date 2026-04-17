@@ -5,10 +5,10 @@ import 'mapbox-gl-leaflet';
 import settings from '../settings.js';
 
 import 'leaflet/dist/leaflet.css';
-import { LocationTuple } from 'util_components/types';
+import type { LocationTuple } from 'util_components/types';
 import Icon from 'util_components/bootstrap/Icon';
 import { MapContainer as LeafletMap } from 'react-leaflet';
-import { LatLngTuple } from 'leaflet';
+import type { LatLngTuple } from 'leaflet';
 import TunnelsMapLayer from 'components/workplace_wizard/TunnelsMapLayer';
 
 type MapProps = {
@@ -75,7 +75,7 @@ export default class Map extends React.Component<MapProps, MapState> {
           preferCanvas
         >
           {children}
-          {background == 'tunnels' && <TunnelsMapLayer />}
+          {background === 'tunnels' && <TunnelsMapLayer />}
         </LeafletMap>
         {backgroundChangeable && (
           <button
@@ -91,7 +91,7 @@ export default class Map extends React.Component<MapProps, MapState> {
   }
 
   componentDidUpdate(prevProps?: Readonly<MapProps>) {
-    if (prevProps && prevProps.extraLayers)
+    if (prevProps?.extraLayers)
       prevProps.extraLayers.forEach((layer) => {
         if (!this.props.extraLayers?.includes(layer)) layer.remove();
       });
@@ -132,7 +132,7 @@ export default class Map extends React.Component<MapProps, MapState> {
       'Data &copy; <a href="https://www.openstreetmap.org/">OSM</a> contribs, ' +
       '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>';
 
-    if (this.bgLayer && background == 'tunnels') return;
+    if (this.bgLayer && background === 'tunnels') return;
 
     if (this.bgLayer) this.bgLayer.remove();
 

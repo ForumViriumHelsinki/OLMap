@@ -2,10 +2,10 @@ import React from 'react';
 import { overpassQuery } from 'util_components/osm/utils';
 import { geocoderFocus } from 'components/workplace_wizard/settings';
 import { GeoJSON } from 'react-leaflet';
-import { GeoJsonObject } from 'geojson';
+import type { GeoJsonObject } from 'geojson';
 import osmtogeojson from 'osmtogeojson';
 import * as L from 'leaflet';
-import { LatLng } from 'leaflet';
+import type { LatLng } from 'leaflet';
 
 import './TunnelsMapLayer.scss';
 
@@ -47,7 +47,6 @@ export default class TunnelsMapLayer extends React.Component<
   state = initialState;
 
   render() {
-    const {} = this.props;
     const { tunnelFeatures } = this.state;
     return !tunnelFeatures ? null : (
       <GeoJSON data={tunnelFeatures} pointToLayer={this.pointToLayer} style={this.wayStyle} />

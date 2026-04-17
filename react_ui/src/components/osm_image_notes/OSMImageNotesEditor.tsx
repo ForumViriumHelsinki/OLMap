@@ -2,9 +2,9 @@ import React from 'react';
 import { withRouter } from 'react-router-dom';
 import _ from 'lodash';
 
-import { ImageNotesContext, OSMImageNote } from 'components/types';
-import { OSMChangeset } from 'util_components/osm/types';
-import { Location } from 'util_components/types';
+import { ImageNotesContext, type OSMImageNote } from 'components/types';
+import type { OSMChangeset } from 'util_components/osm/types';
+import type { Location } from 'util_components/types';
 import OSMImageNoteFiltersButton from 'components/osm_image_notes/OSMImageNoteFiltersButton';
 import NotificationsButton from 'components/osm_image_notes/NotificationsButton';
 import NewOSMImageNote from 'components/osm_image_notes/NewOSMImageNote';
@@ -71,7 +71,7 @@ class OSMImageNotesEditor extends React.Component<
                 onFiltersChanged={(filters) => this.setState({ filters })}
                 mapFeatureTypes={mapFeatureTypes}
               />
-              <a href="/editing-process.html" target="_blank">
+              <a href="/editing-process.html" target="_blank" rel="noopener">
                 <MapToolButton icon="help" />
               </a>
               <OSMChangesetSelectionButton

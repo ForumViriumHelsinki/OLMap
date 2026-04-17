@@ -1,14 +1,13 @@
 import React from 'react';
 import WorkplaceAutofill from 'components/workplace_wizard/WorkplaceAutofill';
-import { Workplace } from 'components/workplace_wizard/types';
+import type { Workplace } from 'components/workplace_wizard/types';
 import { olmapWorkplaceByOSMUrl, workplaceUrl } from 'components/workplace_wizard/urls';
-import * as L from 'leaflet';
+import type * as L from 'leaflet';
 
 import './WorkplaceWizard.scss';
 import sessionRequest from 'sessionRequest';
 import Icon from 'util_components/bootstrap/Icon';
 import WorkplaceWizardEditor from 'components/workplace_wizard/WorkplaceWizardEditor';
-import { AppContext } from 'components/types';
 import { overpassQuery } from 'util_components/osm/utils';
 
 type WorkplaceWizardProps = {
@@ -105,7 +104,7 @@ export default class WorkplaceWizard extends React.Component<
 
   loadWorkplace = (url: string) => {
     sessionRequest(url).then((response) => {
-      if (response.status != 200) return;
+      if (response.status !== 200) return;
       response.json().then((workplace) => {
         this.storeState({ workplace });
       });

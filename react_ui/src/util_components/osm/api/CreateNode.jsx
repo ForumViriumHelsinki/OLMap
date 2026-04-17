@@ -1,5 +1,3 @@
-import React from 'react';
-
 const CreateNode = ({ changesetId, lon, lat, tags }) => (
   <osm>
     <node changeset={changesetId} lat={lat} lon={lon}>

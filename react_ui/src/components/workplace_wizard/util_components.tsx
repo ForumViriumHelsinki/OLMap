@@ -1,7 +1,8 @@
-import { MapFeature } from 'components/workplace_wizard/types';
-import { Polyline, Popup } from 'react-leaflet';
+// biome-ignore lint/correctness/noUnusedImports: React is needed for JSX with classic runtime
 import React from 'react';
-import { LatLngLiteral } from 'leaflet';
+import type { MapFeature } from 'components/workplace_wizard/types';
+import { Polyline, Popup } from 'react-leaflet';
+import type { LatLngLiteral } from 'leaflet';
 import Icon from 'util_components/bootstrap/Icon';
 
 export const latLng = (feature: MapFeature) => {

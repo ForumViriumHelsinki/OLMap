@@ -1,5 +1,3 @@
-import React from 'react';
-
 const CreateWay = ({ changesetId, way }) => (
   <osm>
     <way changeset={changesetId} visible="true">

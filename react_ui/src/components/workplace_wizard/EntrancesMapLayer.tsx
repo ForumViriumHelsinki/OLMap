@@ -1,12 +1,12 @@
 import React from 'react';
 
 import { nearbyEntrancesUrl } from 'components/workplace_wizard/urls';
-import { MapFeature, Point, Workplace } from 'components/workplace_wizard/types';
+import { type MapFeature, type Point } from 'components/workplace_wizard/types';
 import { Marker, Popup } from 'react-leaflet';
 import * as L from 'leaflet';
 import delivery_icon from './delivery_entrance.svg';
 import sessionRequest from 'sessionRequest';
-import { LatLngLiteral } from 'leaflet';
+import type { LatLngLiteral } from 'leaflet';
 import { popupBtn, WWIcon } from 'components/workplace_wizard/util_components';
 import { ImageButton } from 'components/workplace_wizard/ImageButton';
 
@@ -39,29 +39,22 @@ export default class EntrancesMapLayer extends React.Component<
     const { addEntrance } = this.props;
     const { nearbyEntrances } = this.state;
     return (
-      (nearbyEntrances &&
-        nearbyEntrances.map((entrance) => (
-          <Marker
-            key={entrance.id}
-            position={this.latLng(entrance)}
-            icon={icon}
-            zIndexOffset={-1000}
-          >
-            <Popup closeOnClick={true} closeButton={false} className="wwPopup">
-              <ImageButton f={entrance} />
-              <div className="p-2 font-weight-bold">
-                <WWIcon icon="location_city" /> Yhdistä:
-              </div>
-              <button className={popupBtn} onClick={() => addEntrance(entrance, true)}>
-                <WWIcon icon="door_front" outline /> Toimitussisäänkäynti
-              </button>
-              <button className={popupBtn} onClick={() => addEntrance(entrance, false)}>
-                <WWIcon icon="door_front" className="discrete" outline /> Muu sisäänkäynti
-              </button>
-            </Popup>
-          </Marker>
-        ))) ||
-      null
+      nearbyEntrances?.map((entrance) => (
+        <Marker key={entrance.id} position={this.latLng(entrance)} icon={icon} zIndexOffset={-1000}>
+          <Popup closeOnClick={true} closeButton={false} className="wwPopup">
+            <ImageButton f={entrance} />
+            <div className="p-2 font-weight-bold">
+              <WWIcon icon="location_city" /> Yhdistä:
+            </div>
+            <button className={popupBtn} onClick={() => addEntrance(entrance, true)}>
+              <WWIcon icon="door_front" outline /> Toimitussisäänkäynti
+            </button>
+            <button className={popupBtn} onClick={() => addEntrance(entrance, false)}>
+              <WWIcon icon="door_front" className="discrete" outline /> Muu sisäänkäynti
+            </button>
+          </Popup>
+        </Marker>
+      )) || null
     );
   }
 
@@ -72,7 +65,7 @@ export default class EntrancesMapLayer extends React.Component<
   componentDidUpdate(prevProps: Readonly<EntrancesMapLayerProps>) {
     const { lat, lon } = prevProps.location,
       l = this.props.location;
-    if (l.lat != lat || l.lon != lon) this.loadNearbyEntrances();
+    if (l.lat !== lat || l.lon !== lon) this.loadNearbyEntrances();
   }
 
   loadNearbyEntrances() {

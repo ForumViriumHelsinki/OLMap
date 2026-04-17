@@ -8,7 +8,7 @@ import 'leaflet/dist/leaflet.css';
 
 import GlyphIcon from 'util_components/GlyphIcon';
 import Geolocator from 'util_components/Geolocator';
-import { Location } from 'util_components/types';
+import type { Location } from 'util_components/types';
 // @ts-ignore
 import { Button } from 'reactstrap';
 import Map from 'util_components/Map';
@@ -76,7 +76,7 @@ export default class MyPositionMap extends React.Component<MapProps, MapState> {
   private onLocationSelected() {
     const { onLocationSelected } = this.props;
     const { lat, lng } = this.leafletMap.getCenter();
-    return onLocationSelected && onLocationSelected({ lon: lng, lat });
+    return onLocationSelected?.({ lon: lng, lat });
   }
 
   componentWillUnmount() {

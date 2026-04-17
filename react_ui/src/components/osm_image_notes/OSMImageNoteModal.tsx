@@ -2,17 +2,17 @@ import React from 'react';
 
 import sessionRequest from 'sessionRequest';
 import { mapFeatureTypesUrl, osmImageNoteUrl } from 'urls';
-import { AppContext, MapFeatureTypes, OSMImageNote } from 'components/types';
+import { AppContext, type MapFeatureTypes, type OSMImageNote } from 'components/types';
 import Modal from 'util_components/bootstrap/Modal';
 import ErrorAlert from 'util_components/bootstrap/ErrorAlert';
 
 import 'components/osm_image_notes/OSMImageNotes.css';
 
-import { LocationTuple, Location } from 'util_components/types';
+import type { LocationTuple, Location } from 'util_components/types';
 import OSMImageNoteTags from 'components/osm_image_notes/OSMImageNoteTags';
 import ZoomableImage from 'util_components/ZoomableImage';
 import OSMImageNoteComments from 'components/osm_image_notes/OSMImageNoteComments';
-import { OSMFeature } from 'util_components/osm/types';
+import type { OSMFeature } from 'util_components/osm/types';
 import { formatTimestamp } from 'utils';
 import { userCanEditNote } from './utils';
 import NearbyAddressesAsOSMLoader from 'components/osm_image_notes/NearbyAddressesAsOSMLoader';
@@ -62,7 +62,7 @@ export default class OSMImageNoteModal extends React.Component<
   }
 
   componentDidUpdate(prevProps: Readonly<OSMImageNoteModalProps>) {
-    if (prevProps && prevProps.note.id != this.props.note.id) this.fetchNote();
+    if (prevProps && prevProps.note.id !== this.props.note.id) this.fetchNote();
   }
 
   loadMapFeatureTypes() {
@@ -231,7 +231,7 @@ export default class OSMImageNoteModal extends React.Component<
 
   cancelLocationRequest = () => {
     const { cancelLocationRequest } = this.props;
-    cancelLocationRequest && cancelLocationRequest();
+    cancelLocationRequest?.();
     this.setState({ repositioning: false });
   };
 }

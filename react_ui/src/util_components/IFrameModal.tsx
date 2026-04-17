@@ -1,5 +1,5 @@
 import React from 'react';
-import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
+import Modal from 'util_components/bootstrap/Modal';
 
 type IFrameModalProps = {
   url: string;

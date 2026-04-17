@@ -5,7 +5,7 @@ const urlMapPosition = {
     window.history.replaceState(
       null,
       '',
-      window.location.href.split('@')[0] + '@' + [lat, lng, zoom].join(','),
+      `${window.location.href.split('@')[0]}@${[lat, lng, zoom].join(',')}`,
     ),
 };
 

@@ -4,12 +4,12 @@ import * as L from 'leaflet';
 
 import MyPositionMap from 'util_components/MyPositionMap';
 import Map from 'util_components/Map';
-import { Location } from 'util_components/types';
+import type { Location } from 'util_components/types';
 
-import { ImageNotesContext, OSMImageNote } from 'components/types';
-import { OSMChangeset } from 'util_components/osm/types';
+import { ImageNotesContext, type OSMImageNote } from 'components/types';
+import type { OSMChangeset } from 'util_components/osm/types';
 import OSMChangesetMapLayer from 'util_components/osm/OSMChangesetMapLayer';
-import { LatLngLiteral } from 'leaflet';
+import type { LatLngLiteral } from 'leaflet';
 import { filterNotes } from 'components/osm_image_notes/utils';
 
 const markerColors = {
@@ -92,7 +92,7 @@ export default class OSMImageNotesMap extends React.Component<
       const style = {
         radius: 2,
         color: markerColors[category],
-        opacity: selectedNotes && selectedNotes.includes(osmImageNote.id as number) ? 0.4 : 0.05,
+        opacity: selectedNotes?.includes(osmImageNote.id as number) ? 0.4 : 0.05,
         weight: 20,
         fillColor: markerColors[category],
         fillOpacity: 1,
@@ -123,7 +123,7 @@ export default class OSMImageNotesMap extends React.Component<
 export class SimpleOSMImageNotesMap extends OSMImageNotesMap {
   render() {
     const { selectLocation, location, zoom } = this.props;
-    if (!location) return <></>;
+    if (!location) return null;
 
     return (
       <Map latLng={[location.lat, location.lon]} extraLayers={[this.getMapLayer()]} zoom={zoom} />

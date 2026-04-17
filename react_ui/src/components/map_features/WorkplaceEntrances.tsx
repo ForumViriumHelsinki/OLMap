@@ -1,7 +1,7 @@
 import React from 'react';
 // @ts-ignore
 
-import { JSONSchema, MapFeature, OSMImageNote, WorkplaceEntrance } from 'components/types';
+import type { JSONSchema, MapFeature, OSMImageNote, WorkplaceEntrance } from 'components/types';
 // @ts-ignore
 import { Button } from 'reactstrap';
 import Modal from 'util_components/bootstrap/Modal';
@@ -63,7 +63,7 @@ export default class WorkplaceEntrances extends React.Component<
         {editingEntrance && (
           <Modal
             onClose={() => this.setState({ editingEntrance: undefined })}
-            title={workplace.name + ': link entrance'}
+            title={`${workplace.name}: link entrance`}
           >
             <WorkplaceEntranceEditor
               schema={schema}
@@ -71,7 +71,7 @@ export default class WorkplaceEntrances extends React.Component<
               workplaceEntrance={editingEntrance}
               imageNote={osmImageNote}
               onSubmit={() => {
-                refreshNote && refreshNote();
+                refreshNote?.();
                 this.setState({ editingEntrance: undefined });
               }}
             />

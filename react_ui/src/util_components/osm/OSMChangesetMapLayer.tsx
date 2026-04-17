@@ -1,7 +1,7 @@
 import React from 'react';
 // @ts-ignore
 import * as L from 'leaflet';
-import { OSMChangeset, OSMFeature } from './types';
+import type { OSMChangeset, OSMFeature } from './types';
 import Modal, { ModalBody } from 'util_components/bootstrap/Modal';
 import { osmFeatureLabel } from 'util_components/osm/utils';
 import { capitalize } from 'utils';
@@ -34,7 +34,7 @@ export default class OSMChangesetMapLayer extends React.Component<
   }
 
   componentDidUpdate(prevProps: OSMChangesetMapLayerProps) {
-    if (prevProps.changeset != this.props.changeset) this.getMapLayer();
+    if (prevProps.changeset !== this.props.changeset) this.getMapLayer();
   }
 
   render() {

@@ -59,11 +59,11 @@ const GlyphIcon = L.Icon.extend({
 
     span.style.fontSize = options.glyphSize;
     span.style.color = options.glyphColor;
-    span.style.width = options.iconSize[0] + 'px';
-    span.style.lineHeight = options.iconSize[1] + 'px';
+    span.style.width = `${options.iconSize[0]}px`;
+    span.style.lineHeight = `${options.iconSize[1]}px`;
     span.style.textAlign = 'center';
-    span.style.marginLeft = options.glyphAnchor[0] + 'px';
-    span.style.marginTop = options.glyphAnchor[1] + 'px';
+    span.style.marginLeft = `${options.glyphAnchor[0]}px`;
+    span.style.marginTop = `${options.glyphAnchor[1]}px`;
     span.style.pointerEvents = 'none';
 
     if (textContent) {
@@ -80,34 +80,34 @@ const GlyphIcon = L.Icon.extend({
     }
 
     let options = this.options,
-      size = L.point(options['iconSize']),
+      size = L.point(options.iconSize),
       anchor = L.point(options.iconAnchor);
 
     if (!anchor && size) {
       anchor = size.divideBy(2, true);
     }
 
-    div.className = 'leaflet-marker-icon leaflet-glyph-icon ' + name;
+    div.className = `leaflet-marker-icon leaflet-glyph-icon ${name}`;
     const src = this._getIconUrl('icon');
     if (src) {
-      div.style.backgroundImage = "url('" + src + "')";
+      div.style.backgroundImage = `url('${src}')`;
     }
 
     if (options.bgPos) {
-      div.style.backgroundPosition = -options.bgPos.x + 'px ' + -options.bgPos.y + 'px';
+      div.style.backgroundPosition = `${-options.bgPos.x}px ${-options.bgPos.y}px`;
     }
     if (options.bgSize) {
-      div.style.backgroundSize = options.bgSize.x + 'px ' + options.bgSize.y + 'px';
+      div.style.backgroundSize = `${options.bgSize.x}px ${options.bgSize.y}px`;
     }
 
     if (anchor) {
-      div.style.marginLeft = -anchor.x + 'px';
-      div.style.marginTop = -anchor.y + 'px';
+      div.style.marginLeft = `${-anchor.x}px`;
+      div.style.marginTop = `${-anchor.y}px`;
     }
 
     if (size) {
-      div.style.width = size.x + 'px';
-      div.style.height = size.y + 'px';
+      div.style.width = `${size.x}px`;
+      div.style.height = `${size.y}px`;
     }
   },
 });

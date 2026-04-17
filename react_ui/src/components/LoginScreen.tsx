@@ -4,9 +4,7 @@ import LoginForm from 'util_components/account/LoginForm';
 import RegisterForm from 'util_components/account/RegisterForm';
 import Terms from 'components/Terms';
 
-type func = () => any;
-
-type LoginScreenProps = { onLogin: func };
+type LoginScreenProps = { onLogin: () => void };
 
 type LoginScreenState = {
   mode: 'login' | 'register';
@@ -21,7 +19,7 @@ export default class LoginScreen extends React.Component<LoginScreenProps, Login
 
   render() {
     const { onLogin } = this.props;
-    const { mode, showTerms } = this.state;
+    const { mode } = this.state;
 
     return (
       <div className="container">
@@ -29,10 +27,11 @@ export default class LoginScreen extends React.Component<LoginScreenProps, Login
           <img className="w-50" src="images/FORUM_VIRIUM_logo_orange.png" alt="logo" />
           <h3>Open Logistics Map</h3>
           <p className="lead">
-            {mode == 'login' ? (
+            {mode === 'login' ? (
               <>
                 <span className="text-primary">Sign in</span> or{' '}
                 <button
+                  type="button"
                   className="btn btn-outline-primary"
                   onClick={() => this.setState({ mode: 'register' })}
                 >
@@ -42,6 +41,7 @@ export default class LoginScreen extends React.Component<LoginScreenProps, Login
             ) : (
               <>
                 <button
+                  type="button"
                   className="btn btn-outline-primary"
                   onClick={() => this.setState({ mode: 'login' })}
                 >
@@ -52,7 +52,7 @@ export default class LoginScreen extends React.Component<LoginScreenProps, Login
             )}
           </p>
         </div>
-        {mode == 'login' ? (
+        {mode === 'login' ? (
           <LoginForm loginUrl={loginUrl} onLogin={onLogin} passwordResetUrl={passwordResetUrl} />
         ) : (
           <RegisterForm url={registerUrl} loginUrl={loginUrl} onLogin={onLogin} />

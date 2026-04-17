@@ -104,9 +104,10 @@ lint: lint-backend lint-frontend
 lint-backend:
     cd django_server && uv run ruff check .
 
-# Lint frontend (TypeScript check)
+# Lint frontend (TypeScript check + Biome)
 lint-frontend:
     cd react_ui && npx tsc --noEmit
+    cd react_ui && npx biome lint ./src
 
 # Format all code
 format: format-backend format-frontend

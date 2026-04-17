@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppContext, OSMImageNote } from 'components/types';
+import { AppContext, type OSMImageNote } from 'components/types';
 import Icon from 'util_components/bootstrap/Icon';
 
 import Confirm from 'util_components/bootstrap/Confirm';
@@ -47,7 +47,7 @@ export default class OSMImageNoteReviewActions extends React.Component<
       canEdit && (
         <>
           <h6 className="dropdown-header">Mark note as:</h6>
-          {!imageNote.is_accepted && !imageNote.is_processed && user && user.is_reviewer && (
+          {!imageNote.is_accepted && !imageNote.is_processed && user?.is_reviewer && (
             <button className="dropdown-item" onClick={this.onAccept}>
               <Icon icon="map" /> Ready for OSM
             </button>

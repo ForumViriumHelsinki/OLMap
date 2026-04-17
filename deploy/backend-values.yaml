@@ -77,9 +77,9 @@ env:
         name: olmap-backend-secrets
         key: DJANGO_SECRET_KEY
   DJANGO_ALLOWED_HOSTS:
-    value: "olmap.dataportal.fi,localhost"
+    value: "olmap-backend.dataportal.fi,localhost"
   DJANGO_CORS_ALLOWED_ORIGINS:
-    value: "https://olmap.dataportal.fi"
+    value: "https://olmap-frontend.dataportal.fi"
   DJANGO_MIGRATE:
     value: "true"
   # Database configuration (Cloud SQL via proxy with IAM auth)
@@ -95,7 +95,7 @@ env:
     value: "olmap-app@fvh-project-containers-etc.iam"
   # Frontend URL for CORS and redirects
   FRONTEND_ROOT:
-    value: "https://olmap.dataportal.fi"
+    value: "https://olmap-frontend.dataportal.fi"
   # Admin email
   ADMIN_EMAIL:
     value: "admin@forumvirium.fi"
@@ -125,29 +125,15 @@ service:
   port: 80
   targetPort: 8000
 
-# Ingress configuration - API endpoint (same domain as frontend, path-based routing)
-ingress:
+# Gateway API configuration (Envoy Gateway)
+# Replaces ingress-nginx; creates HTTPRoute pointing to shared dataportal-gateway
+# Hostname auto-generated as olmap-backend.dataportal.fi from release name
+gateway:
   enabled: true
-  className: nginx
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  hosts:
-  - host: olmap.dataportal.fi
-    paths:
-    - path: /api
-      pathType: Prefix
-    - path: /admin
-      pathType: Prefix
-    - path: /static
-      pathType: Prefix
-    - path: /rest-auth
-      pathType: Prefix
-    - path: /accounts
-      pathType: Prefix
-  tls:
-  - hosts:
-    - olmap.dataportal.fi
-    secretName: olmap-backend-tls  # pragma: allowlist secret
+
+# Ingress configuration - disabled in favour of Gateway API above
+ingress:
+  enabled: false
 
 # Health checks for Django
 livenessProbe:

@@ -96,7 +96,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         osm_image_note.save()
 
     @action(methods=["PUT"], detail=True)
-    def mark_reviewed(self, request, *args, **kwargs):  # noqa: ARG002
+    def mark_reviewed(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
         osm_image_note.processed_by = osm_image_note.processed_by or request.user
         osm_image_note.accepted_by = osm_image_note.accepted_by or request.user
@@ -105,14 +105,14 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response("OK")
 
     @action(methods=["PUT"], detail=True)
-    def mark_accepted(self, request, *args, **kwargs):  # noqa: ARG002
+    def mark_accepted(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
         osm_image_note.accepted_by = request.user
         osm_image_note.save()
         return Response("OK")
 
     @action(methods=["PUT"], detail=True)
-    def mark_processed(self, request, *args, **kwargs):  # noqa: ARG002
+    def mark_processed(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
         osm_image_note.processed_by = request.user
         osm_image_note.accepted_by = osm_image_note.accepted_by or request.user
@@ -120,7 +120,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response("OK")
 
     @action(methods=["PUT"], detail=True)
-    def hide_note(self, request, *args, **kwargs):  # noqa: ARG002
+    def hide_note(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
         osm_image_note.reviewed_by = request.user
         osm_image_note.visible = False
@@ -129,7 +129,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response("OK")
 
     @action(methods=["PUT"], detail=True)
-    def upvote(self, request, *args, **kwargs):  # noqa: ARG002
+    def upvote(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
         osm_image_note.upvotes.get_or_create(user=request.user)
         osm_image_note.downvotes.filter(user=request.user).delete()
@@ -138,7 +138,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(methods=["PUT"], detail=True)
-    def downvote(self, request, *args, **kwargs):  # noqa: ARG002
+    def downvote(self, request, *args, **kwargs):
         osm_image_note = self.get_object()
         osm_image_note.downvotes.get_or_create(user=request.user)
         osm_image_note.upvotes.filter(user=request.user).delete()
@@ -147,7 +147,7 @@ class OSMImageNotesViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=False, methods=["get"])
-    def map_feature_schemas(self, request, pk=None):  # noqa: ARG002
+    def map_feature_schemas(self, request):
         serializer = self.get_serializer()
         schemas = {}
         for prop_type in models.map_feature_types:
@@ -208,7 +208,7 @@ class OSMImageNoteCommentNotificationsViewSet(viewsets.ReadOnlyModelViewSet):
         return self.queryset.filter(user=self.request.user)
 
     @action(methods=["PUT"], detail=True)
-    def mark_seen(self, request, *args, **kwargs):  # noqa: ARG002
+    def mark_seen(self, request, *args, **kwargs):
         """
         Marks the notification as seen, i.e. removes it from the list of pending notifications for the authenticated
         user.
@@ -232,7 +232,7 @@ class OSMImageNotesGeoJSON(ListAPIView):
     queryset = models.OSMImageNote.objects.filter(visible=True).values()
     permission_classes: ClassVar = [permissions.AllowAny]
 
-    def list(self, request, *args, **kwargs):  # noqa: ARG002
+    def list(self, request, *args, **kwargs):
         serializer = self.get_serializer()
         return Response(
             {
@@ -262,7 +262,7 @@ class FullOSMImageNotesGeoJSON(ListAPIView):
     queryset = models.OSMImageNote.objects.filter(visible=True)
     permission_classes: ClassVar = [IsReviewer]
 
-    def list(self, request, *args, **kwargs):  # noqa: ARG002
+    def list(self, request, *args, **kwargs):
         serializer = self.get_serializer()
         return Response(
             {

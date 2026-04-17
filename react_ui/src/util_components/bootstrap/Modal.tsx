@@ -17,7 +17,7 @@ export class ModalActions extends React.Component<{ actions: Action[] }> {
     return (
       <div className="modal-footer">
         {this.props.actions.map(({ label, action, color }) => (
-          <button key={label} type="button" className={'btn btn-' + color} onClick={action}>
+          <button key={label} type="button" className={`btn btn-${color}`} onClick={action}>
             {label}
           </button>
         ))}
@@ -64,7 +64,7 @@ export default class Modal extends React.Component<ModalProps> {
           >
             <div className="modal-content">
               {(title || headerContent) && (
-                <div className={'modal-header ' + headerCls}>
+                <div className={`modal-header ${headerCls}`}>
                   {title && <h6 className="modal-title">{title}</h6>}
                   {headerContent}
                   {onClose && (

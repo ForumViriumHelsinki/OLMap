@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { MapFeature } from 'components/workplace_wizard/types';
-import { JSONSchema } from 'components/types';
+import type { MapFeature } from 'components/workplace_wizard/types';
+import type { JSONSchema } from 'components/types';
 import { popupBtn, WWIcon } from 'components/workplace_wizard/util_components';
 import Modal from 'util_components/bootstrap/Modal';
 import MapFeatureForm from 'components/map_features/MapFeatureForm';
@@ -49,7 +49,7 @@ export class EditMapFeatureButton extends React.Component<EditBtnProps, EditBtnS
   onCancel = () => this.setState({ editing: false });
 
   onSubmit = ({ formData }: any) => {
-    if (this.props.featureTypeName == 'Entrance')
+    if (this.props.featureTypeName === 'Entrance')
       Object.assign(this.props.mapFeature, { entrance_fields: formData });
     else Object.assign(this.props.mapFeature, formData);
     this.onCancel();

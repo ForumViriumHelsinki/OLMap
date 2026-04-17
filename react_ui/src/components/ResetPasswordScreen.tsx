@@ -8,14 +8,7 @@ type ResetPasswordScreenProps = {
   token: string;
 };
 
-type ResetPasswordScreenState = {};
-
-export default class ResetPasswordScreen extends React.Component<
-  ResetPasswordScreenProps,
-  ResetPasswordScreenState
-> {
-  state: ResetPasswordScreenState = {};
-
+export default class ResetPasswordScreen extends React.Component<ResetPasswordScreenProps> {
   render() {
     const { uid, token } = this.props;
     return (

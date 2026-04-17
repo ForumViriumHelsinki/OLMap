@@ -5,7 +5,7 @@ import * as L from 'leaflet';
 import Icon from 'util_components/bootstrap/Icon';
 import Map from 'util_components/Map';
 import { getCenter, getDistance } from 'geolib';
-import { OSMFeature } from 'util_components/osm/types';
+import type { OSMFeature } from 'util_components/osm/types';
 import GlyphIcon from 'util_components/GlyphIcon';
 
 type OSMFeatureMapPopupProps = {

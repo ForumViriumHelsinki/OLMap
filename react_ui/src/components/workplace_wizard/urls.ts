@@ -1,4 +1,4 @@
-import { Point } from 'components/workplace_wizard/types';
+import type { Point } from 'components/workplace_wizard/types';
 
 // Use proxy path to avoid CORS issues and handle API key injection
 export const geocoderUrl = `/digitransit-api/geocoding/v1/search`;

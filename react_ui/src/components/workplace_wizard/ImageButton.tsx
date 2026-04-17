@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapFeature } from 'components/workplace_wizard/types';
+import type { MapFeature } from 'components/workplace_wizard/types';
 import ReactDOM from 'react-dom';
 import Modal from 'util_components/bootstrap/Modal';
 import ZoomableImage from 'util_components/ZoomableImage';

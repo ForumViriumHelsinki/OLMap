@@ -1,11 +1,11 @@
 import React from 'react';
 import _ from 'lodash';
-import { MapFeature, OSMImageNote } from 'components/types';
+import type { MapFeature, OSMImageNote } from 'components/types';
 // @ts-ignore
 import { Button } from 'reactstrap';
 import Modal from 'util_components/bootstrap/Modal';
 import { SimpleOSMImageNotesMap } from 'components/osm_image_notes/OSMImageNotesMap';
-import { Location } from 'util_components/types';
+import type { Location } from 'util_components/types';
 import sessionRequest from 'sessionRequest';
 import { osmImageNoteUrl, unloadingPlaceUrl } from 'urls';
 // @ts-ignore
@@ -87,7 +87,7 @@ export default class UnloadingPlaceEntrances extends React.Component<
       .then((response) => response.json())
       .then((entranceNote) => {
         const { unloadingPlace } = this.props;
-        const entrance = entranceNote.entrance_set && entranceNote.entrance_set[0];
+        const entrance = entranceNote.entrance_set?.[0];
         if (!entrance) return;
         const entrances = unloadingPlace.entrances.includes(entrance.id)
           ? _.without(unloadingPlace.entrances, entrance.id)
