@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/ForumViriumHelsinki/OLMap/compare/olmap-frontend-v0.2.2...olmap-frontend-v0.2.3) (2026-04-17)
+
+
+### Performance Improvements
+
+* code quality: enable Biome linter, expand ruff rules, fix lint issues ([#82](https://github.com/ForumViriumHelsinki/OLMap/issues/82)) ([8916a7a](https://github.com/ForumViriumHelsinki/OLMap/commit/8916a7ac70bbf5eff00e99cf92ce3269837702af))
+
 ## [0.2.2](https://github.com/ForumViriumHelsinki/OLMap/compare/olmap-frontend-v0.2.1...olmap-frontend-v0.2.2) (2026-02-03)
 
 
