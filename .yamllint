@@ -5,6 +5,11 @@ rules:
   line-length:
     max: 120
     level: warning
+  # Helm/k8s values align block sequences with their parent key; workflows
+  # indent them. Allow either, as long as each file is internally consistent.
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
   document-start: disable  # Don't require --- at start
   truthy:
     allowed-values: ['true', 'false', 'on', 'off']
