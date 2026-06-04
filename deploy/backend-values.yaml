@@ -5,12 +5,6 @@ image:
   repository: ghcr.io/forumviriumhelsinki/olmap-backend
   tag: "0.2.1"  # Updated by ArgoCD Image Updater
 
-# Migration job image - tracked separately for visibility
-migrations:
-  image:
-    repository: ghcr.io/forumviriumhelsinki/olmap-backend
-    tag: "0.2.1"  # Updated by ArgoCD Image Updater
-
 imagePullSecrets:
 - name: ghcr-login-secret
 
@@ -203,6 +197,10 @@ externalSecret:
 
 # Database migrations (Helm hook - runs before deployment)
 migrations:
+  # Migration job image - tracked separately for visibility (ArgoCD Image Updater)
+  image:
+    repository: ghcr.io/forumviriumhelsinki/olmap-backend
+    tag: "0.2.1"  # Updated by ArgoCD Image Updater
   enabled: true
   command: ['python']
   args: ['manage.py', 'migrate', '--noinput']
