@@ -3,6 +3,15 @@
 App for collecting and discussing geospatial features important for last mile city logistics
 (entrances, steps, gates, barriers etc.) and modeling them for inclusion in OpenStreetMap.
 
+# Repository Archived
+Note: This repository has been archived.
+
+This project has concluded, and the code is no longer actively maintained. However, you are free to use the code as per the license terms. If you wish to continue development, feel free to fork this repository.
+
+Thank you for your interest in this project.
+
+-- project team 2026-08-27
+
 ## Installation
 
 **Prerequisites**:
