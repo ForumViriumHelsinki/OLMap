@@ -1,5 +1,5 @@
 # Multi-stage build for production Django application
-FROM python:3.13-slim as builder
+FROM python:3.14-slim as builder
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -31,7 +31,7 @@ COPY pyproject.toml ./
 RUN uv pip install --system -e .
 
 # Runtime stage
-FROM python:3.13-slim
+FROM python:3.14-slim
 
 # OCI labels for GHCR integration
 LABEL org.opencontainers.image.source="https://github.com/ForumViriumHelsinki/OLMap" \
